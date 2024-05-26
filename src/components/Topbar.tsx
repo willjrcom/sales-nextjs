@@ -1,24 +1,47 @@
 import React from 'react';
 import Link from 'next/link';
+import styles from './Topbar.module.css';
+import { IconType } from 'react-icons';
+import { IoIosNotifications } from 'react-icons/io';
 
 interface TopbarItemProps {
   label: string;
   href: string;
+  color?: string;
 }
 
-const TopbarItem: React.FC<TopbarItemProps> = ({ label, href }) => (
+interface TopbarItemIconProps {
+  icon: IconType;
+  href: string;
+}
+
+
+const TopbarItem: React.FC<TopbarItemProps> = ({ label, href, color }) => (
+  <Link href={href} style={{ backgroundColor: color }} className='rounded'>
+    <div className="btn px-4 py-1">{label}</div>
+  </Link>
+);
+
+const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => (
   <Link href={href}>
-    <div className="hover:underline">{label}</div>
+    <div className={styles.icon}>
+      <Icon />
+    </div>
   </Link>
 );
 
 const Topbar: React.FC = () => (
-  <div className="w-full h-16 bg-gray-800 text-white flex items-center justify-between px-4">
-    <div className="text-lg font-bold">My App</div>
+  <div className={`${styles.topbar} flex justify-between`}>
     <div className="flex space-x-4">
-      <TopbarItem label="Home" href="/" />
-      <TopbarItem label="Profile" href="/profile" />
-      <TopbarItem label="Settings" href="/settings" />
+      <TopbarItem label="Mesas" href="/" />
+      <TopbarItem label="Pedidos" href="/" />
+      <TopbarItem label="Entregas" href="/" />
+    </div>
+
+    <div className="flex space-x-4">
+      <TopbarItem label="Turno" href="/" color='green'/>
+      <div>&nbsp;</div>
+      <TopbarItemIcon icon={IoIosNotifications} href="/" />
     </div>
   </div>
 );

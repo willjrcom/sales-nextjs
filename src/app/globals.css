@@ -31,3 +31,9 @@ body {
     text-wrap: balance;
   }
 }
+
+.topbar {
+  width: 100vh; /* Define a altura para 100% da altura da janela do navegador */
+  background-color: #333; /* Cor de fundo (substitua pela cor desejada) */
+  color: #fff; /* Cor do texto (substitua pela cor desejada) */
+}

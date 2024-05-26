@@ -1,13 +1,10 @@
 'use client';
 
-import './globals.css';
 import Menu from './menu';
 
-const Home= () => {
+const Home = () => {
   return (
-    <div className="flex">
-      <Menu  />
-    </div>
+    <Menu  />
   );
 }
 

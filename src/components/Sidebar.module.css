@@ -1,0 +1,70 @@
+/* Sidebar.module.css */
+.sidebar {
+  width: 65px; /* Largura inicial do sidebar */
+  height: 100vh;
+  background-color: #333;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  transition: width 0.3s; /* Transição suave para a largura */
+  text-align: left; /* Alinha o texto à esquerda */
+}
+
+.sidebar:hover {
+  width: 200px; /* Largura do sidebar ao passar o mouse */
+}
+
+.sidebarContainer {
+  margin-left: 5px;
+  align-items: center;
+}
+
+.menuItem {
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s, padding 0.3s; /* Transição suave para a cor de fundo e padding */
+  text-decoration: none;
+  color: #fff;
+}
+
+.menuItem:hover, .menuItem:focus, .menuItemCompany:hover, .menuItemCompany:focus {
+  background-color: #444; /* Cor de fundo ao passar o mouse */
+}
+
+.menuItemCompanyBlock {
+  height: 100px;
+}
+
+.menuItemCompany {
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s, padding 0.3s; /* Transição suave para a cor de fundo e padding */
+}
+
+.icon {
+  font-size: 24px;
+  margin-right: 10px;
+  transition: margin-right 0.3s; /* Transição suave para o margin-right */
+}
+
+.label {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 0;
+  transition: max-width 0.3s; /* Transição suave para a largura máxima */
+}
+
+.sidebar:hover .label {
+  max-width: 140px; /* Largura máxima do texto ao passar o mouse */
+}
+
+.menuItem .label {
+  flex: 1; /* Faz o texto ocupar o espaço disponível */
+}

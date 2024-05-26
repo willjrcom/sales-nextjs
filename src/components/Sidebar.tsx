@@ -1,30 +1,63 @@
 import React from 'react';
+import { IconType } from 'react-icons';
+import { FaUserTie, FaCog, FaPlus } from 'react-icons/fa';
+import { TiFlowMerge } from 'react-icons/ti';
+import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
+import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
-import { FaHome, FaUser, FaCog } from 'react-icons/fa';
+import styles from './Sidebar.module.css';
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
+interface TopbarItemProps {
+  icon: IconType;
   label: string;
-  href: string;
+  path: string;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => (
-  <Link href={href}>
-    <div className="flex items-center p-4 hover:bg-gray-700 transition-colors duration-200">
-      <div className="w-12">{icon}</div>
-      <div className="ml-2">{label}</div>
-    </div>
-  </Link>
-);
+interface TopbarItemCompanyProps {
+  icon: IconType;
+  label: string;
+  path: string;
+}
 
-const Sidebar: React.FC = () => (
-  <div className="h-screen w-64 bg-gray-800 text-white">
-    <div className="flex flex-col">
-      <SidebarItem icon={<FaHome />} label="Home" href="/" />
-      <SidebarItem icon={<FaUser />} label="Profile" href="/profile" />
-      <SidebarItem icon={<FaCog />} label="Settings" href="/settings" />
+const SidebarItem: React.FC<TopbarItemProps> = ({ icon: Icon, label, path }) => {
+  return (
+    <Link href={path}>
+      <div className={styles.menuItem}>
+        <Icon className={styles.icon} />
+        <span className={styles.label}>{label}</span>
+      </div>
+    </Link>
+  )
+}
+
+const SidebarItemCompany: React.FC<TopbarItemCompanyProps> = ({ icon: Icon, label, path }) => {
+  return (
+    <Link href={path} style={{height: '100px'}}>
+      <div className={styles.menuItemCompanyBlock}>
+      <div className={styles.menuItemCompany}>
+        <Icon className={styles.icon} />
+        <span className={styles.label}>{label}</span>
+      </div>
+      </div>
+    </Link>
+  )
+}
+
+const Sidebar = () => {
+  return (
+    <div className={styles.sidebar}>
+      <div className={styles.sidebarContainer}>
+        <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" path="/" />
+        <SidebarItem icon={FaPlus} label="Novo Pedido" path="/" />
+        <SidebarItem icon={TiFlowMerge} label="Processos" path="/" />
+        <SidebarItem icon={MdFastfood} label="Cardápio" path="/" />
+        <SidebarItem icon={BsFillPeopleFill} label="Clientes" path="/" />
+        <SidebarItem icon={FaUserTie} label="Funcionários" path="/" />
+        <SidebarItem icon={MdOutlineHomeWork} label="Minha Empresa" path="/" />
+        <SidebarItem icon={FaCog} label="Configurações" path="/" />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Sidebar;
