@@ -52,8 +52,8 @@ const Sidebar = () => {
         <SidebarItem icon={FaPlus} label="Novo Pedido" path="/" />
         <SidebarItem icon={TiFlowMerge} label="Processos" path="/" />
         <SidebarItem icon={MdFastfood} label="Cardápio" path="/pages/product" />
-        <SidebarItem icon={BsFillPeopleFill} label="Clientes" path="/" />
-        <SidebarItem icon={FaUserTie} label="Funcionários" path="/" />
+        <SidebarItem icon={BsFillPeopleFill} label="Clientes" path="/pages/client" />
+        <SidebarItem icon={FaUserTie} label="Funcionários" path="/pages/employee" />
         <SidebarItem icon={MdOutlineHomeWork} label="Minha Empresa" path="/" />
         <SidebarItem icon={FaCog} label="Configurações" path="/" />
       </div>

@@ -1,22 +1,22 @@
 'use client'
 
-import CreateProductForm from "@/app/forms/product/create";
 import CrudLayout from "@/components/crud/layout";
 import Menu from "@/components/menu/layout";
+import CreateClientForm from "@/app/forms/client/create";
 import ButtonFilter from "@/components/crud/button-filter";
 import ButtonPlus from "@/components/crud/button-plus";
 
-const PageProducts = () => {
+const PageClient = () => {
     return (
         <body>
             <Menu>
-                <CrudLayout title="Produtos" 
-                    filterButtonChildren={<ButtonFilter name="produto" />} 
-                    plusButtonChildren={<ButtonPlus name="produto" href="/product/new"><CreateProductForm/></ButtonPlus>} 
+                <CrudLayout title="Clientes" 
+                    filterButtonChildren={<ButtonFilter name="cliente" />} 
+                    plusButtonChildren={<ButtonPlus name="cliente" href="/client/new"><CreateClientForm/></ButtonPlus>} 
                     tableChildren={<p>dados</p>}/>
             </Menu>
         </body>
     );
 }
 
-export default PageProducts
+export default PageClient
