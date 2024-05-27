@@ -1,6 +1,6 @@
 'use client';
 
-import CreateProductForm from './forms/product/modal';
+import CreateProductForm from './forms/product/create';
 import Menu from '../components/menu/layout';
 
 const Home = () => {
