@@ -23,10 +23,8 @@ const TopbarItem: React.FC<TopbarItemProps> = ({ label, href, color }) => (
 );
 
 const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => (
-  <Link href={href}>
-    <div className={styles.icon}>
-      <Icon />
-    </div>
+  <Link href={href} className={styles.icon}>
+      <Icon/>
   </Link>
 );
 
