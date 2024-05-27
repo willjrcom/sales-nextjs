@@ -1,6 +1,6 @@
 'use client';
 
-import './globals.css';
+import '../../globals.css';
 import Sidebar from '../../../components/sidebar/sidebar';
 import Topbar from '../../../components/topbar/topbar';
 import { AppProps } from 'next/app';

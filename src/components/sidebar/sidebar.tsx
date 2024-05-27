@@ -5,7 +5,7 @@ import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
-import styles from './Sidebar.module.css';
+import styles from './sidebar.module.css';
 
 interface TopbarItemProps {
   icon: IconType;
@@ -31,15 +31,13 @@ const SidebarItem: React.FC<TopbarItemProps> = ({ icon: Icon, label, path }) => 
 
 const SidebarItemCompany: React.FC<TopbarItemCompanyProps> = ({ icon: Icon, label }) => {
   return (
-    <div>
-      <div className={styles.menuItemCompany}>
-        <Icon className={styles.icon} />
-        <div className='grid'>
+    <div className={styles.menuItemCompany}>
+      <Icon className={styles.icon} />
+      <div className='grid'>
         <span className={styles.label}>{label}</span>
         <div className={styles.description}>
           <span>Rua Piedade 226, Jd. Leocadia</span>
           <span>(11) 96384-9111</span>
-        </div>
         </div>
       </div>
     </div>

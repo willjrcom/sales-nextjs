@@ -30,7 +30,7 @@
   color: #fff;
 }
 
-.menuItem:hover, .menuItem:focus{
+.menuItem:hover, .menuItem:focus {
   background-color: #444; /* Cor de fundo ao passar o mouse */
 }
 
@@ -38,15 +38,17 @@
   width: 100%;
   padding: 10px;
   display: flex;
+  transition: background-color 0.3s, padding 0.3s; /* Transição suave para a cor de fundo e padding */
+  text-decoration: none;
+  color: #fff;
 }
 
 .description {
   display: grid;
   font-size: small;
-  white-space: nowrap;
   overflow: hidden;
   max-width: 0;
-  transition: max-width 0.3s; /* Transição suave para a largura máxima */
+  height: 60px;
 }
 
 .icon {
@@ -68,6 +70,7 @@
 }
 
 .sidebar:hover .description {
+  transition-delay: 0.3s;
   max-width: 140px; /* Largura máxima do texto ao passar o mouse */
 }
 
@@ -75,6 +78,6 @@
   flex: 1; /* Faz o texto ocupar o espaço disponível */
 }
 
-.menuItem .description {
+.menuItemCompany .description {
   flex: 1; /* Faz o texto ocupar o espaço disponível */
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import styles from './Topbar.module.css';
+import styles from './topbar.module.css';
 import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
 
