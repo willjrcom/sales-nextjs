@@ -37,7 +37,7 @@ const SidebarItemCompany: React.FC<TopbarItemCompanyProps> = ({ icon: Icon, labe
         <div className='grid'>
         <span className={styles.label}>{label}</span>
         <div className={styles.description}>
-          <span>(11) 96384-9111</span>
+          <span>Rua Piedade 226, Jd. Leocadia</span>
           <span>(11) 96384-9111</span>
         </div>
         </div>

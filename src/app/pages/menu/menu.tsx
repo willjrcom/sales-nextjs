@@ -1,8 +1,8 @@
 'use client';
 
 import './globals.css';
-import Sidebar from '../components/Sidebar';
-import Topbar from '../components/Topbar';
+import Sidebar from '../../../components/sidebar/sidebar';
+import Topbar from '../../../components/topbar/topbar';
 import { AppProps } from 'next/app';
 
 const Menu= () => {

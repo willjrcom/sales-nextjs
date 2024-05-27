@@ -1,6 +1,6 @@
 'use client';
 
-import Menu from './menu';
+import Menu from './pages/menu/menu';
 
 const Home = () => {
   return (
