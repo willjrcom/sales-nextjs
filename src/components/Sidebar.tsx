@@ -16,7 +16,6 @@ interface TopbarItemProps {
 interface TopbarItemCompanyProps {
   icon: IconType;
   label: string;
-  path: string;
 }
 
 const SidebarItem: React.FC<TopbarItemProps> = ({ icon: Icon, label, path }) => {
@@ -30,16 +29,20 @@ const SidebarItem: React.FC<TopbarItemProps> = ({ icon: Icon, label, path }) => 
   )
 }
 
-const SidebarItemCompany: React.FC<TopbarItemCompanyProps> = ({ icon: Icon, label, path }) => {
+const SidebarItemCompany: React.FC<TopbarItemCompanyProps> = ({ icon: Icon, label }) => {
   return (
-    <Link href={path} style={{height: '100px'}}>
-      <div className={styles.menuItemCompanyBlock}>
+    <div>
       <div className={styles.menuItemCompany}>
         <Icon className={styles.icon} />
+        <div className='grid'>
         <span className={styles.label}>{label}</span>
+        <div className={styles.description}>
+          <span>(11) 96384-9111</span>
+          <span>(11) 96384-9111</span>
+        </div>
+        </div>
       </div>
-      </div>
-    </Link>
+    </div>
   )
 }
 
@@ -47,7 +50,7 @@ const Sidebar = () => {
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarContainer}>
-        <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" path="/" />
+        <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" />
         <SidebarItem icon={FaPlus} label="Novo Pedido" path="/" />
         <SidebarItem icon={TiFlowMerge} label="Processos" path="/" />
         <SidebarItem icon={MdFastfood} label="Cardápio" path="/" />
