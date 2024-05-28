@@ -1,56 +1,61 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
 import { Product } from "./product";
+import ButtonEdit from "@/app/components/crud/button-edit";
+import EditProductForm from "@/app/forms/product/edit";
 
 
 const ProductColumns = (): ColumnDef<Product>[] => [
   {
-    id: 'id',
-    accessorKey: 'id',
-    header: 'ID',
-  },
-  {
-    id: 'code',
+    id: 'Código',
     accessorKey: 'code',
     header: 'Code',
   },
   {
-    id: 'name',
+    id: 'Nome',
     accessorKey: 'name',
     header: 'Name',
   },
   {
-    id: 'description',
+    id: 'Descrição',
     accessorKey: 'description',
     header: 'Description',
+    maxSize: 10
   },
   {
-    id: 'price',
+    id: 'Preço',
     accessorKey: 'price',
     header: 'Price',
     cell: info => `$${info.getValue()}`, // example of custom cell rendering
   },
   {
-    id: 'cost',
+    id: 'Custo',
     accessorKey: 'cost',
     header: 'Cost',
     cell: info => `$${info.getValue()}`,
   },
   {
-    id: 'category',
+    id: 'Categoria',
     accessorKey: 'category.name', // assuming Category has a 'name' field
     header: 'Category',
   },
   {
-    id: 'size',
+    id: 'Tamanho',
     accessorKey: 'size.name', // assuming Size has a 'name' field
     header: 'Size',
   },
   {
-    id: 'is_available',
+    id: 'Disponível?',
     accessorKey: 'is_available',
     header: 'Available',
-    cell: info => (info.getValue() ? 'Yes' : 'No'),
+    cell: info => (info.getValue() ? 'Sim' : 'Não'),
+  },
+  {
+    id: 'Editar',
+    accessorKey: 'id',
+    header: 'ID',
+    cell: ({ row }) => (
+      <ButtonEdit name={row.original.name} href={`/product/edit/${row.original.id}`}><EditProductForm /></ButtonEdit>
+    ),
   },
 ];
 

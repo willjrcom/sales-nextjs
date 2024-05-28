@@ -1,7 +1,7 @@
 import GetProducts from "@/app/api/product/route";
 import { Product } from "@/app/entities/product/product";
 import ProductColumns from "@/app/entities/product/table-columns";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { Table, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 
 const CrudTable = () => {
@@ -36,7 +36,20 @@ const CrudTable = () => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    return (<table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
+    return (
+    <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
+        {tHead({ table })}
+        {tBody({ table, columns })}
+    </table>
+    )
+}
+
+interface THeadProps<T> {
+    table: Table<T>;
+}
+
+const tHead = <T,>({ table }: THeadProps<T>) => {
+    return(
         <thead className="bg-gray-50">
             {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id}>
@@ -45,12 +58,22 @@ const CrudTable = () => {
                             key={column.id}
                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                         >
-                            {flexRender(column.id, column.getContext())}
+                            {flexRender(column.column.columnDef.header, column.getContext())}
                         </th>
                     ))}
                 </tr>
             ))}
         </thead>
+    )
+}
+
+interface TBodyProps<T> {
+    table: Table<T>;
+    columns: any[]
+}
+
+const tBody = <T,>({ table, columns }: TBodyProps<T>) => {
+    return(
         <tbody className="bg-white divide-y divide-gray-200">
             {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map(row => (
@@ -73,7 +96,6 @@ const CrudTable = () => {
                 </tr>
             )}
         </tbody>
-    </table>
     )
 }
 

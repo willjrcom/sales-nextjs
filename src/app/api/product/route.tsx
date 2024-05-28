@@ -6,10 +6,10 @@ const GetProducts = async (): Promise<Product[]> => {
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "id-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXJyZW50X3NjaGVtYSI6ImxvamFfaWJpdGlfXzJxaXRpdHNyIiwiZXhwIjoxNzE2ODkxMTkyLCJzdWIiOiJpZC10b2tlbiIsInVzZXJfZW1haWwiOiJ3aWxsaWFtanVuaW9yNjlAZ21haWwuY29tIiwidXNlcl9pZCI6IjNkNDdlYjdkLTNjMjgtNDI5Mi05OWIzLTE5YWJkNDM3N2ZmMCJ9.fIif12mS8kTTW0ool8ZkcDstP3HkueFvk20JxHkeqNg"
+            "id-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXJyZW50X3NjaGVtYSI6ImxvamFfaWJpdGlfXzJxaXRpdHNyIiwiZXhwIjoxNzE2OTIxMTc2LCJzdWIiOiJpZC10b2tlbiIsInVzZXJfZW1haWwiOiJ3aWxsaWFtanVuaW9yNjlAZ21haWwuY29tIiwidXNlcl9pZCI6IjNkNDdlYjdkLTNjMjgtNDI5Mi05OWIzLTE5YWJkNDM3N2ZmMCJ9.NJddMufNcVJtLH8qY7qETAv-mOatyxqMQqb0-GS_p3o"
         },
     });
-    console.log(res)
+    
     if (!res.ok) {
         throw new Error("Failed to fetch products");
     }
