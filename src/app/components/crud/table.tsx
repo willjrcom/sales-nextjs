@@ -1,42 +1,40 @@
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { useMemo } from "react";
+import GetProducts from "@/app/api/product/route";
+import { Product } from "@/app/entities/product/product";
+import ProductColumns from "@/app/entities/product/table-columns";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { useEffect, useMemo, useState } from "react";
 
 const CrudTable = () => {
-    const data = [
-        {
-            col1: 'Hello',
-            col2: 'id',
-            col3: 'id',
-        },
-        {
-            col1: 'react-table',
-            col2: 'name',
-            col3: 'id',
-        },
-        {
-            col1: 'whatever',
-            col2: 'code',
-            col3: 'id',
-        },
-    ];
+    const [data, setData] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const columns = useMemo<ColumnDef<{ col1: string; col2: string, col3: string }>[]>(() => [
-        {
-            header: 'ID',
-            accessorKey: 'col1',
-        },
-        {
-            header: 'Name',
-            accessorKey: 'col2',
-        },
-        {
-            header: 'Code',
-            accessorKey: 'col3',
-        },
-    ], []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const products = await GetProducts();
+                console.log(products.length)
+                setData(products);
+            } catch (err) {
+                console.log("errorrrr")
+                console.log(err)
+                setError((err as Error).message);
+            } finally {
+                console.log("finally")
+                setLoading(false);
+            }
+        };
 
+        fetchData();
+    }, []);
 
-    const table = useReactTable({ columns, data, getCoreRowModel: getCoreRowModel(), });
+    const columns = useMemo(() => ProductColumns(), []);
+
+    const table = useReactTable({
+        columns,
+        data,
+        getCoreRowModel: getCoreRowModel(),
+    });
 
     return (<table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
         <thead className="bg-gray-50">
