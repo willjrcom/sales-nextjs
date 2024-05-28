@@ -1,5 +1,3 @@
-'use client';
-
 import Sidebar from '../sidebar/sidebar';
 import Topbar from '../topbar/topbar';
 
@@ -9,7 +7,7 @@ const Menu = ({
   children: React.ReactNode;
 }>)  => {
   return (
-    <body className="flex">
+    <div className="flex">
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Topbar />
@@ -17,7 +15,7 @@ const Menu = ({
           {children}
         </main>
       </div>
-    </body>
+    </div>
   );
 }
 

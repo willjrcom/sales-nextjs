@@ -7,11 +7,29 @@ import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
+import { useEffect, useState } from "react";
+import { Client } from "@/app/entities/client/client";
 import GetClients from "@/app/api/client/route";
 
-// eslint-disable-next-line @next/next/no-async-client-component
-const PageClient = async () => {
-    const clients = await GetClients()
+const PageClient = () => {
+    const [clients, setClients] = useState<Client[]>([])
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const clients = await GetClients()
+                setClients(clients);
+            } catch (err) {
+                setError((err as Error).message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <Menu>

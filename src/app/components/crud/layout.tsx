@@ -1,15 +1,20 @@
 const CrudLayout = ({
-    title, plusButtonChildren, filterButtonChildren, tableChildren
+    title, plusButtonChildren, filterButtonChildren, refreshButton, tableChildren
 }: Readonly<{
     title: string
     plusButtonChildren: React.ReactNode;
     filterButtonChildren: React.ReactNode;
+    refreshButton?: React.ReactNode;
     tableChildren: React.ReactNode;
 
 }>) => {
 
     return (<>
-        <h1 className="text-2xl font-bold mb-4">{title}</h1>
+        <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold mb-4">{title}</h1>
+            {refreshButton}
+        </div>
+        
         <div className="flex items-center justify-between">
             {filterButtonChildren}
             {plusButtonChildren}

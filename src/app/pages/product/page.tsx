@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import CreateProductForm from "@/app/forms/product/create";
 import CrudLayout from "@/app/components/crud/layout";
@@ -8,18 +8,44 @@ import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import GetProducts from "@/app/api/product/route";
+import Refresh from "@/app/components/crud/refresh";
+import { useEffect, useState } from "react";
+import { Product } from "@/app/entities/product/product";
 
-// eslint-disable-next-line @next/next/no-async-client-component
-const PageProducts = async () => {
-    const products = await GetProducts()
+const PageProducts = () => {
+    const [products, setProducts] = useState<Product[]>([])
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [lastUpdate, setLastUpdate] = useState(new Date());
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const products = await GetProducts()
+                setProducts(products);
+            } catch (err) {
+                setError((err as Error).message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     return (
         <Menu>
             <CrudLayout title="Produtos"
                 filterButtonChildren={<ButtonFilter name="produto" />}
-                plusButtonChildren={<ButtonPlus name="produto" href="/product/new"><CreateProductForm /></ButtonPlus>}
+                plusButtonChildren={
+                    <ButtonPlus name="produto" href="/product/new">
+                        <CreateProductForm />
+                    </ButtonPlus>
+                    }
+                refreshButton={<Refresh lastUpdate={lastUpdate} setItems={setProducts} getItems={GetProducts} setLastUpdate={setLastUpdate} />}
                 tableChildren={<CrudTable columns={ProductColumns()} data={products}></CrudTable>} />
         </Menu>
     );
 }
 
-export default PageProducts
+export default PageProducts;

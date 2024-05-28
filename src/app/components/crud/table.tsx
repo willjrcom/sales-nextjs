@@ -1,8 +1,4 @@
-import GetProducts from "@/app/api/product/route";
-import { Product } from "@/app/entities/product/product";
-import ProductColumns from "@/app/entities/product/table-columns";
 import { ColumnDef, Table, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
 
 interface DataProps<T> {
     columns: ColumnDef<T>[];
