@@ -2,13 +2,14 @@ import Link from "next/link";
 
 interface ModalProps {
     title: string;
+    isUpdate: boolean;
     show: boolean;
     onClose: () => void;
     children: React.ReactNode;
     createHref: string;
 }
 
-const Form = ({ title, show, onClose, children, createHref }: ModalProps) => {
+const Form = ({ title, isUpdate, show, onClose, children, createHref }: ModalProps) => {
     if (!show) return null;
 
     return (
@@ -22,7 +23,7 @@ const Form = ({ title, show, onClose, children, createHref }: ModalProps) => {
                     <Link href={createHref}>
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            type="button">Criar</button>
+                            type="button">{isUpdate ? 'Atualizar' : 'Cadastrar'}</button>
                     </Link>
 
                     <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onClose}>Cancelar</button>

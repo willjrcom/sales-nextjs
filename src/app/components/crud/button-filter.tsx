@@ -1,8 +1,6 @@
-import CreateClientForm from "@/app/forms/client/create";
 import FilterForm from "@/app/forms/filter";
-import Form from "@/app/forms/form";
 import { useState } from "react";
-import { FaFilter, FaPlus } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 
 interface FilterButtonProps {
     name: string;

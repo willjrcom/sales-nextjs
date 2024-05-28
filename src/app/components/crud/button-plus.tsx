@@ -1,5 +1,3 @@
-import CreateClientForm from "@/app/forms/client/create";
-import FilterForm from "@/app/forms/filter";
 import Form from "@/app/forms/form";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
@@ -30,7 +28,7 @@ const ButtonPlus = ({ name, href, children }: NewButtonProps) => {
                 <span>{newClient}</span>
             </button>
         
-            <Form title={newClient} show={showModal} onClose={(handleCloseModal)} createHref={href}>
+            <Form title={newClient} isUpdate={false} show={showModal} onClose={(handleCloseModal)} createHref={href}>
                 {children}
             </Form>
         </div>

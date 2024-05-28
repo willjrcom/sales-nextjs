@@ -1,5 +1,3 @@
-import CreateClientForm from "@/app/forms/client/create";
-import FilterForm from "@/app/forms/filter";
 import Form from "@/app/forms/form";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
@@ -29,7 +27,7 @@ const ButtonEdit = ({ name, href, children }: NewButtonProps) => {
                 <FaEdit />
             </button>
         
-            <Form title={newClient} show={showModal} onClose={(handleCloseModal)} createHref={href}>
+            <Form title={newClient} isUpdate={true} show={showModal} onClose={(handleCloseModal)} createHref={href}>
                 {children}
             </Form>
         </div>

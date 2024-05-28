@@ -9,7 +9,7 @@ const Menu = ({
   children: React.ReactNode;
 }>)  => {
   return (
-    <div className="flex">
+    <body className="flex">
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Topbar />
@@ -17,7 +17,7 @@ const Menu = ({
           {children}
         </main>
       </div>
-    </div>
+    </body>
   );
 }
 
