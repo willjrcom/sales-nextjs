@@ -5,7 +5,7 @@ interface DataProps<T> {
     data: T[];
 }
 
-const CrudTable = <T, >({ columns, data }: DataProps<T>) => {
+const CrudTable = <T,>({ columns, data }: DataProps<T>) => {
     const table = useReactTable({
         columns,
         data,
@@ -74,11 +74,13 @@ interface noResultsProps {
 
 const noResults = ({ columns }: noResultsProps) => {
     return (
-        <tr>
-            <td colSpan={columns.length} className="h-24 text-center text-gray-500">
-                Sem resultados.
-            </td>
-        </tr>
+        <tbody className="bg-white divide-y divide-gray-200">
+            <tr>
+                <td colSpan={columns.length} className="h-24 text-center text-gray-500">
+                    Sem resultados.
+                </td>
+            </tr>
+        </tbody>
     )
 }
 
