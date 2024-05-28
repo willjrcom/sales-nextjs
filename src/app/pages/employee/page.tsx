@@ -6,6 +6,7 @@ import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudLayout from "@/app/components/crud/layout";
 import Menu from "@/app/components/menu/layout";
 import CrudTable from "@/app/components/crud/table";
+import EmployeeColumns from "@/app/entities/employee/table-columns";
 
 const PageEmployee = () => {
     return (
@@ -13,7 +14,7 @@ const PageEmployee = () => {
             <CrudLayout title="Funcionários"
                 filterButtonChildren={<ButtonFilter name="funcionario" />}
                 plusButtonChildren={<ButtonPlus name="funcionario" href="/employee/new"><CreateEmployeeForm /></ButtonPlus>}
-                tableChildren={<CrudTable></CrudTable>} />
+                tableChildren={<CrudTable columns={EmployeeColumns()} data={[]}></CrudTable>} />
         </Menu>
     );
 }

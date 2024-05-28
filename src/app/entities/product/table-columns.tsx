@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Product } from "./product";
 import ButtonEdit from "@/app/components/crud/button-edit";
-import EditProductForm from "@/app/forms/product/edit";
+import EditEmployeeForm from "@/app/forms/employee/edit";
 
 
 const ProductColumns = (): ColumnDef<Product>[] => [
@@ -54,7 +54,7 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     accessorKey: 'id',
     header: 'ID',
     cell: ({ row }) => (
-      <ButtonEdit name={row.original.name} href={`/product/edit/${row.original.id}`}><EditProductForm /></ButtonEdit>
+      <ButtonEdit name={row.original.name} href={`/employee/edit/${row.original.id}`}><EditEmployeeForm /></ButtonEdit>
     ),
   },
 ];
