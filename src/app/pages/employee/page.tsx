@@ -11,8 +11,7 @@ import GetEmployees from "@/app/api/employee/route";
 import { Employee } from "@/app/entities/employee/employee";
 import { useEffect, useState } from "react";
 
-// eslint-disable-next-line @next/next/no-async-client-component
-const PageEmployee = async () => {
+const PageEmployee = () => {
     const [employees, setEmployees] = useState<Employee[]>([])
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
