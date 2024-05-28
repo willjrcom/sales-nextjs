@@ -1,6 +1,6 @@
 'use client';
 
-import Menu from '@/components/menu/layout';
+import Menu from '@/app/components/menu/layout';
 
 const Home = () => {
   return (

@@ -16,7 +16,7 @@ interface TopbarItemIconProps {
 }
 
 
-const TopbarItem: React.FC<TopbarItemProps> = ({ label, href, color }) => (
+const TopbarItem: React.FC<TopbarItemProps> = ({ label, href, color }: TopbarItemProps) => (
   <Link href={href} style={{ backgroundColor: color }} className='rounded'>
     <div className="btn px-4 py-1">{label}</div>
   </Link>
@@ -28,7 +28,7 @@ const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => 
   </Link>
 );
 
-const Topbar: React.FC = () => (
+const Topbar = () => (
   <div className={`${styles.topbar} flex justify-between`}>
     <div className="flex space-x-4">
       <TopbarItem label="Mesas" href="/" />

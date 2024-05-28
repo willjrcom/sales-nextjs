@@ -1,10 +1,10 @@
 'use client'
 
 import CreateEmployeeForm from "@/app/forms/employee/create";
-import ButtonFilter from "@/components/crud/button-filter";
-import ButtonPlus from "@/components/crud/button-plus";
-import CrudLayout from "@/components/crud/layout";
-import Menu from "@/components/menu/layout";
+import ButtonFilter from "@/app/components/crud/button-filter";
+import ButtonPlus from "@/app/components/crud/button-plus";
+import CrudLayout from "@/app/components/crud/layout";
+import Menu from "@/app/components/menu/layout";
 
 const PageEmployee = () => {
     return (

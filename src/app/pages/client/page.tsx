@@ -1,10 +1,10 @@
 'use client'
 
-import CrudLayout from "@/components/crud/layout";
-import Menu from "@/components/menu/layout";
+import CrudLayout from "@/app/components/crud/layout";
+import Menu from "@/app/components/menu/layout";
 import CreateClientForm from "@/app/forms/client/create";
-import ButtonFilter from "@/components/crud/button-filter";
-import ButtonPlus from "@/components/crud/button-plus";
+import ButtonFilter from "@/app/components/crud/button-filter";
+import ButtonPlus from "@/app/components/crud/button-plus";
 
 const PageClient = () => {
     return (
