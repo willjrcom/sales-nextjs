@@ -31,13 +31,13 @@ const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => 
 const Topbar = () => (
   <div className={`${styles.topbar} flex justify-between`}>
     <div className="flex space-x-4">
-      <TopbarItem label="Mesas" href="/" />
+      <TopbarItem label="Mesas" href="/pages/order-table" />
       <TopbarItem label="Pedidos" href="/" />
       <TopbarItem label="Entregas" href="/" />
     </div>
 
     <div className="flex space-x-4">
-      <TopbarItem label="Turno" href="/" color='green'/>
+      <TopbarItem label="Turno" href="/pages/shift" color='green'/>
       <div>&nbsp;</div>
       <TopbarItemIcon icon={IoIosNotifications} href="/" />
     </div>
