@@ -16,8 +16,8 @@ const LoginForm = () => {
       <div className="w-1/2 bg-yellow-500 relative">
         <img src="/img_login.jpg" alt="Login" className="w-full h-full object-cover" />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
-          <h2 className="text-2xl mb-2">Lorem ipsum dolor sit</h2>
-          <p>Lorem ipsum dolor sit amet consectetur. Pellentesque egestas nunc a nunc congue. Consectetur augue potenti pellentesque est nulla lorem.</p>
+          <h2 className="text-2xl mb-2">GazalTech</h2>
+          <p>Conecte-se a sua conta.</p>
         </div>
       </div>
       <div className="w-1/2 flex items-center justify-center bg-white">
