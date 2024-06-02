@@ -1,8 +1,6 @@
-'use client'// components/Mesas.js
-import React, { useRef } from 'react';
-import { useState } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+// components/Mesas.tsx
+import React, { useRef, useEffect, useState } from 'react';
+import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 
 const ItemTypes = {
   MESA: 'mesa',
@@ -13,7 +11,15 @@ interface DragItem {
   type: string;
 }
 
-const Mesa = ({ id, color, moveMesa }: { id: number, color: string, moveMesa: (fromId: number, toId: number) => void }) => {
+interface MesaProps {
+  id: number;
+  color: string;
+  moveMesa: (fromId: number, toId: number) => void;
+  toggleSelect: (id: number) => void;
+  isSelected: boolean;
+}
+
+const Mesa: React.FC<MesaProps> = ({ id, color, moveMesa, toggleSelect, isSelected }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>(() => ({
@@ -29,22 +35,27 @@ const Mesa = ({ id, color, moveMesa }: { id: number, color: string, moveMesa: (f
     drop: (item) => moveMesa(item.id, id),
   }));
 
-  drag(drop(ref));
+  useEffect(() => {
+    if (ref.current) {
+      drag(drop(ref));
+    }
+  }, [drag, drop]);
 
   return (
     <div className="flex flex-col items-center">
       <div
         ref={ref}
-        className={`w-16 h-16 ${color} ${isDragging ? 'opacity-50' : 'opacity-100'}`}
-        style={{ border: '1px solid black', margin: '5px' }}
+        onClick={() => toggleSelect(id)}
+        className={`w-16 h-16 ${color} ${isDragging ? 'opacity-50' : 'opacity-100'} ${isSelected ? 'border-4 border-blue-500' : 'border'}`}
+        style={{ margin: '5px' }}
       />
       <span>{id}</span>
     </div>
   );
 };
 
-const Mesas = () => {
-  const [mesas, setMesas] = useState([
+const Mesas: React.FC = () => {
+  const [mesas, setMesas] = useState<{ id: number; color: string }[]>([
     { id: 1, color: 'bg-green-500' },
     { id: 2, color: 'bg-green-500' },
     { id: 3, color: 'bg-yellow-500' },
@@ -62,6 +73,14 @@ const Mesas = () => {
     { id: 15, color: 'bg-green-500' },
   ]);
 
+  const [selectedMesas, setSelectedMesas] = useState<number[]>([]);
+
+  const toggleSelect = (id: number) => {
+    setSelectedMesas((prevSelected) =>
+      prevSelected.includes(id) ? prevSelected.filter((mesaId) => mesaId !== id) : [...prevSelected, id]
+    );
+  };
+
   const moveMesa = (fromId: number, toId: number) => {
     const fromIndex = mesas.findIndex((mesa) => mesa.id === fromId);
     const toIndex = mesas.findIndex((mesa) => mesa.id === toId);
@@ -71,21 +90,45 @@ const Mesas = () => {
     setMesas(updatedMesas);
   };
 
+  const removeMesas = (ids: number[]) => {
+    setMesas(mesas.filter((mesa) => !ids.includes(mesa.id)));
+    setSelectedMesas([]);
+  };
+
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: ItemTypes.MESA,
+    drop: () => removeMesas(selectedMesas),
+    collect: (monitor: DropTargetMonitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  }));
+
+  const dropRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (dropRef.current) {
+      drop(dropRef.current);
+    }
+  }, [drop]);
+
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="flex">
-        <div className="w-1/4 flex flex-col">
-          {mesas.slice(0, 3).map((mesa) => (
-            <Mesa key={mesa.id} id={mesa.id} color={mesa.color} moveMesa={moveMesa} />
-          ))}
-        </div>
-        <div className="w-3/4 grid grid-cols-8 gap-2">
-          {mesas.slice(3).map((mesa) => (
-            <Mesa key={mesa.id} id={mesa.id} color={mesa.color} moveMesa={moveMesa} />
-          ))}
-        </div>
+    <div className="flex">
+      <div className={`w-1/4 flex flex-col ${isOver ? 'bg-gray-200' : ''}`} ref={dropRef}>
+        <div className="p-4">Remove Here</div>
       </div>
-    </DndProvider>
+      <div className="w-3/4 grid grid-cols-8 gap-2">
+        {mesas.map((mesa) => (
+          <Mesa
+            key={mesa.id}
+            id={mesa.id}
+            color={mesa.color}
+            moveMesa={moveMesa}
+            toggleSelect={toggleSelect}
+            isSelected={selectedMesas.includes(mesa.id)}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

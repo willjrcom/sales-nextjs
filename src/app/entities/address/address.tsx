@@ -1,6 +1,4 @@
 import { UUID } from "crypto";
-import { Category } from "../category/category";
-import { Size } from "../size/size";
 
 export type Address = {
     id: string;
