@@ -7,29 +7,27 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
 import styles from './sidebar.module.css';
 
-interface TopbarItemProps {
+interface SidebarItemProps {
   icon: IconType;
   label: string;
   path: string;
 }
 
-interface TopbarItemCompanyProps {
+interface SidebarItemCompanyProps {
   icon: IconType;
   label: string;
 }
 
-const SidebarItem: React.FC<TopbarItemProps> = ({ icon: Icon, label, path }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, path }) => {
   return (
-    <Link href={path}>
-      <div className={styles.menuItem}>
+    <Link href={path} className={styles.menuItem}>
         <Icon className={styles.icon} />
         <span className={styles.label}>{label}</span>
-      </div>
     </Link>
   )
 }
 
-const SidebarItemCompany: React.FC<TopbarItemCompanyProps> = ({ icon: Icon, label }) => {
+const SidebarItemCompany: React.FC<SidebarItemCompanyProps> = ({ icon: Icon, label }) => {
   return (
     <div className={styles.menuItemCompany}>
       <Icon className={styles.icon} />
