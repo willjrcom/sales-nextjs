@@ -1,52 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { HiddenField, TextField } from '../field';
 
 const CreateAddressForm = () => {
+    const [street, setStreet] = useState('')
+    const [number, setNumber] = useState('')
+    const [neighborhood, setNeighborhood] = useState('')
+    const [complement, setComplement] = useState('')
+    const [reference, setReference] = useState('')
+    const [city, setCity] = useState('')
+    const [state, setState] = useState('')
+    const [cep, setCep] = useState('')
+    const [objectId, setObjectId] = useState('')
+
     return (
         <>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-                    Username
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="username"
-                    type="text"
-                    placeholder="Username"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                    Email
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="email"
-                    type="email"
-                    placeholder="Email"
-                />
-            </div>
-            <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-                    Password
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                    id="password"
-                    type="password"
-                    placeholder="******************"
-                />
-            </div>
-            <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="message">
-                    Message
-                </label>
-                <textarea
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="message"
-                    rows={4}
-                    placeholder="Your message"
-                ></textarea>
-            </div>
+        <br/>
+        <h2 className='text-xl'>Endereço</h2>
+        <hr className="my-4" />
+
+        <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={setStreet} value={street}/>
+
+        <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={setNumber} value={number}/>
+
+        <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={setNeighborhood} value={neighborhood}/>
+
+        <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={setComplement} value={complement}/>
+
+        <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={setReference} value={reference}/>
+
+        <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={setCity} value={city}/>
+
+        <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={setState} value={state}/>
+
+        <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={setCep} value={cep}/>
+
+        <HiddenField name="object_id" setValue={setObjectId} value={objectId}/>
         </>
     );
 };

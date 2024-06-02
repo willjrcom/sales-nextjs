@@ -1,0 +1,17 @@
+/* Estilo base para o modal */
+.modalContent {
+  width: 50%;
+  /* Define uma largura maior para o modal */
+  max-height: 90vh;
+  /* Define a altura máxima */
+  overflow-y: auto;
+  /* Ativa a rolagem vertical quando necessário */
+  background-color: white;
+  /* Fundo branco para o conteúdo do modal */
+  padding: 20px;
+  /* Espaçamento interno */
+  border-radius: 8px;
+  /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  /* Sombras para o modal */
+}

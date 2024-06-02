@@ -13,3 +13,5 @@ export type Address = {
     cep: string;
     delivery_tax: number;
 };
+
+export default Address
