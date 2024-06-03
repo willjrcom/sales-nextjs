@@ -1,17 +1,34 @@
-import { useState } from "react";
-import{ TextField, DateField } from "../field";
+import { useEffect, useState } from "react";
+import{ TextField, DateField, HiddenField } from "../field";
 import CreateAddressForm from "../address/create";
 import Address from "@/app/entities/address/address";
 import Person from "@/app/entities/person/person";
 
-const CreatePersonForm = () => {
-    const person: Person = new Person();
+interface PersonProps {
+    person: Person
+    onPersonChange: (updatedPerson: Person) => void;
+}
+
+const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
+    const [id, setId] = useState(person.id);
     const [name, setName] = useState(person.name);
     const [email, setEmail] = useState(person.email);
     const [cpf, setCpf] = useState(person.cpf);
     const [birthday, setBirthday] = useState(person.birthday);
-    const [contact, setContact] = useState(person.contact.ddd + person.contact.number);
+    const [contact, setContact] = useState(person.contact);
     const [address, setAddress] = useState<Address>(person.address);
+
+    useEffect(() => {
+        onPersonChange({
+            id,
+            name,
+            email,
+            cpf,
+            birthday,
+            contact,
+            address,
+        });
+    }, [id, name, email, cpf, birthday, contact, address, onPersonChange]);
 
     return (
         <>
@@ -21,12 +38,13 @@ const CreatePersonForm = () => {
 
             <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={setCpf} value={cpf}/>
 
-            <DateField name="birthday" friendlyName="Aniversário" setValue={setBirthday}/>
+            <DateField name="birthday" friendlyName="Aniversário" setValue={setBirthday} value={birthday} />
 
             <TextField name="contact" friendlyName="Celular" placeholder="Digite seu celular" setValue={setContact} value={contact}/>
 
             <CreateAddressForm address={address} onAddressChange={setAddress}/>
-            <a onClick={() => console.log({name, email, cpf, address})}>Criar</a>
+
+            <HiddenField name="id" setValue={setId} value={id}/>
         </>
     );
 }

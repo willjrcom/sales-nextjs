@@ -7,10 +7,10 @@ export class Person {
     email: string;
     cpf: string;
     birthday: string;
-    contact: Contact;
+    contact: string;
     address: Address;
 
-    constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address()) {
+    constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: string = "", address: Address = new Address()) {
         this.id = id;
         this.name = name;
         this.email = email;

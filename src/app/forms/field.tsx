@@ -22,6 +22,7 @@ interface DateFieldProps {
     friendlyName: string
     name: string
     disabled?: boolean
+    value: string
     setValue: Dispatch<SetStateAction<string>>
 }
 
@@ -84,7 +85,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
     )
 }
 
-const DateField = ({ friendlyName, name, disabled, setValue }: DateFieldProps) => {
+const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldProps) => {
 
     return (
         <div className="mb-4">
@@ -97,6 +98,7 @@ const DateField = ({ friendlyName, name, disabled, setValue }: DateFieldProps) =
                 id={name}
                 type="date"
                 disabled={disabled}
+                value={value}
                 onChange={e => setValue(e.target.value)}
             />
         </div>
@@ -112,9 +114,8 @@ const CheckboxField = ({ friendlyName, name, placeholder, disabled, value, setVa
             </label>
 
             <input
-                className={InputClassName}
                 id={name}
-                type="number"
+                type="checkbox"
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}
