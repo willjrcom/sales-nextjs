@@ -1,7 +1,4 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonEdit from "@/app/components/crud/button-edit";
-import EditProductForm from "@/app/forms/product/edit";
-import { Person } from "./person";
 
 const PersonColumns = <T,>(): ColumnDef<T>[] => [
   {

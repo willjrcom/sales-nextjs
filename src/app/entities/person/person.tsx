@@ -1,14 +1,24 @@
-import { Address } from "../address/address";
-import { Category } from "../category/category";
-import { Contact } from "../contact/contact";
-import { Size } from "../size/size";
+import Address from "../address/address";
+import Contact from "../contact/contact";
 
-export type Person = {
+export class Person {
     id: string;
     name: string;
     email: string;
-    cpf: number;
+    cpf: string;
     birthday: string;
     contact: Contact;
     address: Address;
+
+    constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address()) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.cpf = cpf;
+        this.birthday = birthday;
+        this.contact = contact;
+        this.address = address;
+    }
 };
+
+export default Person

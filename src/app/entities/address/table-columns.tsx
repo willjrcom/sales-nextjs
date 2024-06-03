@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Address } from "./address";
+import Address from "./address";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import EditAddressForm from "@/app/forms/address/edit";
 

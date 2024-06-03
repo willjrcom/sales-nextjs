@@ -1,14 +1,17 @@
 import { useState } from "react";
 import{ TextField, DateField } from "../field";
 import CreateAddressForm from "../address/create";
+import Address from "@/app/entities/address/address";
+import Person from "@/app/entities/person/person";
 
 const CreatePersonForm = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [cpf, setCpf] = useState('');
-    const [birthday, setBirthday] = useState(new Date());
-    const [contact, setContact] = useState('');
-    const [address, setAddress] = useState('');
+    const person: Person = new Person();
+    const [name, setName] = useState(person.name);
+    const [email, setEmail] = useState(person.email);
+    const [cpf, setCpf] = useState(person.cpf);
+    const [birthday, setBirthday] = useState(person.birthday);
+    const [contact, setContact] = useState(person.contact.ddd + person.contact.number);
+    const [address, setAddress] = useState<Address>(person.address);
 
     return (
         <>
@@ -22,13 +25,10 @@ const CreatePersonForm = () => {
 
             <TextField name="contact" friendlyName="Celular" placeholder="Digite seu celular" setValue={setContact} value={contact}/>
 
-            <CreateAddressForm/>
-            <a onClick={() => console.log({name, email, cpf, birthday})}>Criar</a>
+            <CreateAddressForm address={address} onAddressChange={setAddress}/>
+            <a onClick={() => console.log({name, email, cpf, address})}>Criar</a>
         </>
     );
 }
 
 export default CreatePersonForm
-
-// Contact  *Contact               `bun:"rel:has-one,join:id=object_id,notnull" json:"contact,omitempty"`
-// Address  *addressentity.Address `bun:"rel:has-one,join:id=object_id,notnull" json:"address,omitempty"`

@@ -1,16 +1,41 @@
-import React, { useState } from 'react';
-import { HiddenField, TextField } from '../field';
+import React, { useEffect, useState } from 'react';
+import { HiddenField, NumberField, TextField } from '../field';
+import Address from '@/app/entities/address/address';
 
-const CreateAddressForm = () => {
-    const [street, setStreet] = useState('')
-    const [number, setNumber] = useState('')
-    const [neighborhood, setNeighborhood] = useState('')
-    const [complement, setComplement] = useState('')
-    const [reference, setReference] = useState('')
-    const [city, setCity] = useState('')
-    const [state, setState] = useState('')
-    const [cep, setCep] = useState('')
-    const [objectId, setObjectId] = useState('')
+interface AddressProps {
+    address: Address
+    onAddressChange: (updatedAddress: Address) => void;
+}
+
+const CreateAddressForm = ({address, onAddressChange}:AddressProps) => {
+    const [id, setId] = useState(address.id);
+    const [street, setStreet] = useState(address.street);
+    const [number, setNumber] = useState(address.number);
+    const [neighborhood, setNeighborhood] = useState(address.neighborhood);
+    const [complement, setComplement] = useState(address.complement);
+    const [reference, setReference] = useState(address.reference);
+    const [city, setCity] = useState(address.city);
+    const [state, setState] = useState(address.state);
+    const [cep, setCep] = useState(address.cep);
+    const [deliveryTax, setDeliveryTax] = useState(address.delivery_tax);
+    const [objectId, setObjectId] = useState(address.object_id);
+
+    useEffect(() => {
+        onAddressChange({
+            id,
+            street,
+            number,
+            neighborhood,
+            complement,
+            reference,
+            city,
+            state,
+            cep,
+            object_id: objectId,
+            delivery_tax: deliveryTax,
+        });
+    }, [id, street, number, neighborhood, complement, reference, city, state, cep, objectId, deliveryTax, onAddressChange]);
+
 
     return (
         <>
@@ -34,7 +59,10 @@ const CreateAddressForm = () => {
 
         <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={setCep} value={cep}/>
 
+        <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={setDeliveryTax} value={deliveryTax}/>
+
         <HiddenField name="object_id" setValue={setObjectId} value={objectId}/>
+        <HiddenField name="id" setValue={setId} value={id}/>
         </>
     );
 };

@@ -1,52 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { TextField, NumberField, CheckboxField } from '../field';
+import Product from '@/app/entities/product/product';
 
 const CreateProductForm = () => {
+    const product: Product = new Product();
+    const [code, setCode] = useState(product.code);
+    const [name, setName] = useState(product.name);
+    const [description, setDescription] = useState(product.description);
+    const [price, setPrice] = useState(product.price);
+    const [cost, setCost] = useState(product.cost);
+    const [isAvailable, setIsAvailable] = useState(product.is_available);
+
     return (
         <>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-                    Username
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="username"
-                    type="text"
-                    placeholder="Username"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                    Email
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="email"
-                    type="email"
-                    placeholder="Email"
-                />
-            </div>
-            <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-                    Password
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                    id="password"
-                    type="password"
-                    placeholder="******************"
-                />
-            </div>
-            <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="message">
-                    Message
-                </label>
-                <textarea
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="message"
-                    rows={4}
-                    placeholder="Your message"
-                ></textarea>
-            </div>
+            <TextField friendlyName='Código de busca' name='code' setValue={setCode} value={code}/>
+            <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
+            <TextField friendlyName='Descrição' name='description' setValue={setDescription} value={description}/>
+            <NumberField friendlyName='Preço' name='price' setValue={setPrice} value={price}/>
+            <NumberField friendlyName='Custo' name='cost' setValue={setCost} value={cost}/>
+            <CheckboxField friendlyName='Disponível' name='is_available' setValue={setIsAvailable} value={isAvailable.toString()}/>
         </>
     );
 };
