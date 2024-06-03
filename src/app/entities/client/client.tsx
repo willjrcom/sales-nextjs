@@ -1,6 +1,7 @@
-import { Category } from "../category/category";
-import { Person } from "../person/person";
-import { Size } from "../size/size";
+import Person from "../person/person";
 
-export type Client = Person & {
+export class Client extends Person {
+    constructor() {
+        super();
+    }
 };

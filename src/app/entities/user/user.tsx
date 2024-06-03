@@ -1,4 +1,6 @@
-export type User = {
-    email: string;
-    companies: []
+export class User {
+    email: string = '';
+    companies: [] = [];
+
+    constructor() {}
 };

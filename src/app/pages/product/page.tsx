@@ -10,7 +10,7 @@ import ProductColumns from "@/app/entities/product/table-columns";
 import GetProducts from "@/app/api/product/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useEffect, useState } from "react";
-import { Product } from "@/app/entities/product/product";
+import Product from "@/app/entities/product/product";
 
 const PageProducts = () => {
     const [products, setProducts] = useState<Product[]>([])
