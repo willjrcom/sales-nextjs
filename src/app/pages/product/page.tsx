@@ -11,6 +11,7 @@ import GetProducts from "@/app/api/product/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useEffect, useState } from "react";
 import Product from "@/app/entities/product/product";
+import { useSession } from "next-auth/react";
 
 const PageProducts = () => {
     const [products, setProducts] = useState<Product[]>([])
@@ -18,11 +19,13 @@ const PageProducts = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
+    const { data: session } = useSession();
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!session) return;
             try {
-                const products = await GetProducts()
+                const products = await GetProducts(session)
                 setProducts(products);
             } catch (err) {
                 setError((err as Error).message);
@@ -32,19 +35,34 @@ const PageProducts = () => {
         };
 
         fetchData();
-    }, []);
+    }, [session]);
 
     return (
         <Menu>
             <CrudLayout title="Produtos"
-                filterButtonChildren={<ButtonFilter name="produto" />}
+                filterButtonChildren={
+                    <ButtonFilter name="produto" />
+                }
                 plusButtonChildren={
                     <ButtonPlus name="produto" href="/product/new">
                         <CreateProductForm />
                     </ButtonPlus>
-                    }
-                refreshButton={<Refresh lastUpdate={lastUpdate} setItems={setProducts} getItems={GetProducts} setLastUpdate={setLastUpdate} />}
-                tableChildren={<CrudTable columns={ProductColumns()} data={products}></CrudTable>} />
+                }
+                refreshButton={
+                    <Refresh 
+                        lastUpdate={lastUpdate} 
+                        setItems={setProducts} 
+                        getItems={GetProducts} 
+                        setLastUpdate={setLastUpdate} 
+                    />
+                }
+                tableChildren={
+                    <CrudTable 
+                        columns={ProductColumns()} 
+                        data={products}>
+                    </CrudTable>
+                } 
+                />
         </Menu>
     );
 }

@@ -19,16 +19,17 @@ const PageEmployee = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data:session } = useSession();
+    const { data: session } = useSession();
 
     useEffect(() => {
         const fetchData = async () => {
             if (!session) return;
-            
+
             try {
                 let newEmployees = await GetEmployees(session)
                 setEmployees(newEmployees);
             } catch (err) {
+                console.error("Error fetching employees: ", err);
                 setError((err as Error).message);
             } finally {
                 setLoading(false);
@@ -40,11 +41,26 @@ const PageEmployee = () => {
 
     return (
         <Menu>
-            <CrudLayout title="Funcionários"
+            <CrudLayout
+                title="Funcionários"
                 filterButtonChildren={<ButtonFilter name="funcionario" />}
-                plusButtonChildren={<ButtonPlus name="funcionario" href="/employee/new"><CreateEmployeeForm /></ButtonPlus>}
-                refreshButton={<Refresh lastUpdate={lastUpdate} setItems={setEmployees} getItems={GetEmployees} setLastUpdate={setLastUpdate} />}
-                tableChildren={<CrudTable columns={EmployeeColumns()} data={employees}></CrudTable>} />
+                plusButtonChildren={
+                    <ButtonPlus name="funcionario" href="/employee/new">
+                        <CreateEmployeeForm />
+                    </ButtonPlus>
+                }
+                refreshButton={
+                    <Refresh
+                        lastUpdate={lastUpdate}
+                        setItems={setEmployees}
+                        getItems={GetEmployees}
+                        setLastUpdate={setLastUpdate}
+                    />
+                }
+                tableChildren={
+                    <CrudTable columns={EmployeeColumns()} data={employees} />
+                }
+            />
         </Menu>
     );
 }

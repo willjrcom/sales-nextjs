@@ -1,3 +1,4 @@
+import { Session } from "next-auth"
 import { useSession } from "next-auth/react"
 
 interface RequestApiProps<T> {
@@ -14,6 +15,22 @@ interface Response<T> {
 const jsonHeaders = {
     "Content-Type": "application/json",
     "Accept": "application/json",
+}
+
+const AddIdToken = async (session: Session) => {
+    if (session.idToken === undefined) {
+        throw new Error("idToken not found in session");
+    }
+
+    return { "id-token": session.idToken }
+}
+
+const AddAccessToken = async (session: Session) => {
+    if (session.idToken === undefined) {
+        throw new Error("idToken not found in session");
+    }
+
+    return { "access-token": session.accessToken }
 }
 
 const RequestApi = async <T,TR>({path, body, method, headers }: RequestApiProps<T>): Promise<Response<TR>> => {
@@ -36,8 +53,8 @@ const RequestApi = async <T,TR>({path, body, method, headers }: RequestApiProps<
         throw new Error("Server error " + method + ", path: " + fullPath + ", status: " + res.status, { cause: res });
     }
 
-    const {data} = await res.json();
-    return data;
+    return await res.json();
 };
 
 export default RequestApi
+export { AddIdToken, AddAccessToken}

@@ -12,7 +12,7 @@ const Login = async (credencials: LoginProps): Promise<any> => {
             method: "POST",
             body: credencials,
         });
-    return response
+    return response.data
 };
 
 export default Login

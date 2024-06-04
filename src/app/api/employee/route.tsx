@@ -1,18 +1,12 @@
 import { Employee } from "@/app/entities/employee/employee";
-import RequestApi from "../request";
+import RequestApi, { AddIdToken } from "../request";
 import { Session } from "next-auth";
 
 const GetEmployees = async (session: Session): Promise<Employee[]> => {
-    if (session.idToken === undefined) {
-        throw new Error("idToken not found in session");
-    }
-
     const response = await RequestApi<null, Employee[]>({
         path: "/employee/all", 
         method: "GET",
-        headers: {
-            "id-token": session.idToken
-        }
+        headers: AddIdToken(session),
     });
     return response.data
 };

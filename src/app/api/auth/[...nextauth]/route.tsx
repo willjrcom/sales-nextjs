@@ -17,7 +17,7 @@ const authOptions: NextAuthOptions = {
                 const password = credentials?.password || "";
 
                 const response = await Login({ email, password });
-                console.log(response)
+                
                 if (response) {
                     return {
                         id: "2",
@@ -48,7 +48,7 @@ const authOptions: NextAuthOptions = {
 
             const now = new Date();
             now.setHours(now.getHours() + 3);
-
+            session.expires = now.toISOString();
             return session
         },
     },

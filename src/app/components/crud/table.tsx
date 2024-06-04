@@ -6,7 +6,6 @@ interface DataProps<T> {
 }
 
 const CrudTable = <T,>({ columns, data }: DataProps<T>) => {
-    console.log("data: ", data)
     const table = useReactTable({
         columns,
         data,
@@ -50,7 +49,7 @@ interface TBodyProps<T> {
 }
 
 const tBody = <T,>({ table, columns }: TBodyProps<T>) => {
-    if (table.getRowModel().rows.length == 0) {
+    if (table.getRowModel().rows.length === 0) {
         return noResults({ columns })
     }
 
@@ -60,29 +59,29 @@ const tBody = <T,>({ table, columns }: TBodyProps<T>) => {
                 <tr key={row.id} className="hover:bg-gray-100">
                     {row.getVisibleCells().map(cell => (
                         <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                    ))}
-                </tr>
-            ))}
-        </tbody>
-    )
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                ))}
+            </tr>
+        ))}
+    </tbody>
+)
 }
 
 interface noResultsProps {
-    columns: any[]
+columns: any[]
 }
 
 const noResults = ({ columns }: noResultsProps) => {
-    return (
-        <tbody className="bg-white divide-y divide-gray-200">
-            <tr>
-                <td colSpan={columns.length} className="h-24 text-center text-gray-500">
-                    Sem resultados.
-                </td>
-            </tr>
-        </tbody>
-    )
+return (
+    <tbody className="bg-white divide-y divide-gray-200">
+        <tr>
+            <td colSpan={columns.length} className="h-24 text-center text-gray-500">
+                Sem resultados.
+            </td>
+        </tr>
+    </tbody>
+)
 }
 
 export default CrudTable

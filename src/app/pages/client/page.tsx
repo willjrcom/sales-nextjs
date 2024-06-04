@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { Client } from "@/app/entities/client/client";
 import GetClients from "@/app/api/client/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { useSession } from "next-auth/react";
 
 const PageClient = () => {
     const [clients, setClients] = useState<Client[]>([])
@@ -18,11 +19,14 @@ const PageClient = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
+    const { data: session } = useSession();
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!session) return;
+            
             try {
-                const clients = await GetClients()
+                const clients = await GetClients(session)
                 setClients(clients);
             } catch (err) {
                 setError((err as Error).message);
@@ -32,7 +36,7 @@ const PageClient = () => {
         };
 
         fetchData();
-    }, []);
+    }, [session]);
 
     return (
         <Menu>
