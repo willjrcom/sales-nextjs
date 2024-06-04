@@ -6,7 +6,7 @@ const GetEmployees = async (session: Session): Promise<Employee[]> => {
     const response = await RequestApi<null, Employee[]>({
         path: "/employee/all", 
         method: "GET",
-        headers: AddIdToken(session),
+        headers: await AddIdToken(session),
     });
     return response.data
 };

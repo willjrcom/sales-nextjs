@@ -19,23 +19,27 @@ const jsonHeaders = {
 
 const AddIdToken = async (session: Session) => {
     if (session.idToken === undefined) {
-        throw new Error("idToken not found in session");
+        throw new Error("id token not found in session");
     }
 
     return { "id-token": session.idToken }
 }
 
 const AddAccessToken = async (session: Session) => {
-    if (session.idToken === undefined) {
-        throw new Error("idToken not found in session");
+    console.log(session.accessToken)
+    if (session.accessToken === undefined) {
+        throw new Error("access token not found in session");
     }
 
     return { "access-token": session.accessToken }
 }
 
 const RequestApi = async <T,TR>({path, body, method, headers }: RequestApiProps<T>): Promise<Response<TR>> => {
+    if (!path.startsWith("/")) {
+        throw new Error(`path: ${path} must start with /`);
+    }
+
     const fullPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`;
-    
     const res = await fetch(fullPath, {
         method: method,
         body: JSON.stringify(body),

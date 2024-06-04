@@ -6,12 +6,11 @@ interface LoginProps {
 }
 
 const Login = async (credencials: LoginProps): Promise<any> => {
-    const response = await RequestApi<LoginProps, any>(
-        {
-            path: "/user/login",
-            method: "POST",
-            body: credencials,
-        });
+    const response = await RequestApi<LoginProps, any>({
+        path: "/user/login",
+        method: "POST",
+        body: credencials,
+    });
     return response.data
 };
 

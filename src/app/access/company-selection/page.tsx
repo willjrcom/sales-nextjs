@@ -11,7 +11,7 @@ export default function CompanySelection() {
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
         if (schemaName && session) {
             const response = await Access({ schema: schemaName }, session);
-            if (response && session) {
+            if (response) {
                 session.idToken = response
                 router.push('/');
             }
@@ -19,7 +19,7 @@ export default function CompanySelection() {
             prompt('schema ou sessao invalida!');;
         }
     }
-    
+
     if (!session || !session?.companies) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -32,7 +32,7 @@ export default function CompanySelection() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-            <h1 className="text-4xl mb-10">Selecione uma Empresa</h1>
+            <h1 className="text-4xl mb-10">Selecione uma Empresa {session && <p>{session.accessToken}</p>}</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {session?.companies?.map(company => (
                     <button
@@ -45,6 +45,7 @@ export default function CompanySelection() {
                     </button>
                 ))}
             </div>
+            <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
         </div>
     );
 }

@@ -5,12 +5,12 @@ interface AccessProps {
     schema: string;
 }
 
-const Access = async (credencials: AccessProps, session: Session): Promise<any> => {
-    const response = await RequestApi<AccessProps, any>({
+const Access = async (credencials: AccessProps, session: Session): Promise<string> => {
+    const response = await RequestApi<AccessProps, string>({
         path: "/user/access",
         method: "POST",
         body: credencials,
-        headers: AddAccessToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

@@ -10,7 +10,7 @@ const GetClients = async (session: Session): Promise<Client[]> => {
     const response = await RequestApi<null, Client[]>({
         path: "/client/all", 
         method: "GET",
-        headers: AddIdToken(session),
+        headers: await AddIdToken(session),
     });
     return response.data
 };

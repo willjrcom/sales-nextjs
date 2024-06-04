@@ -7,7 +7,7 @@ const NewEmployee = async (employee: Employee, session: Session): Promise<string
         path: "/employee/new", 
         method: "POST",
         body: employee,
-        headers: AddIdToken(session),
+        headers: await AddIdToken(session),
     });
     return response.data
 };

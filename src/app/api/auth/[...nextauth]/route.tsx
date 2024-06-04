@@ -20,7 +20,7 @@ const authOptions: NextAuthOptions = {
                 
                 if (response) {
                     return {
-                        id: "2",
+                        id: response.access_token,
                         accessToken: response.access_token,
                         companies: response.companies,
                     };
@@ -30,7 +30,7 @@ const authOptions: NextAuthOptions = {
             }
         })
     ],
-    //secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
