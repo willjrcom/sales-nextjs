@@ -11,6 +11,7 @@ import GetEmployees from "@/app/api/employee/route";
 import { Employee } from "@/app/entities/employee/employee";
 import { useEffect, useState } from "react";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { useSession } from "next-auth/react";
 
 const PageEmployee = () => {
     const [employees, setEmployees] = useState<Employee[]>([])
@@ -18,12 +19,15 @@ const PageEmployee = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
+    const { data:session } = useSession();
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!session) return;
+            
             try {
-                const clients = await GetEmployees()
-                setEmployees(clients);
+                let newEmployees = await GetEmployees(session)
+                setEmployees(newEmployees);
             } catch (err) {
                 setError((err as Error).message);
             } finally {
@@ -32,7 +36,8 @@ const PageEmployee = () => {
         };
 
         fetchData();
-    }, []);
+    }, [session]);
+
     return (
         <Menu>
             <CrudLayout title="Funcionários"

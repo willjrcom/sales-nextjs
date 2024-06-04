@@ -46,6 +46,9 @@ const authOptions: NextAuthOptions = {
                 session.companies = token.companies;
             }
 
+            const now = new Date();
+            now.setHours(now.getHours() + 3);
+
             return session
         },
     },

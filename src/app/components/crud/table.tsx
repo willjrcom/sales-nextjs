@@ -6,6 +6,7 @@ interface DataProps<T> {
 }
 
 const CrudTable = <T,>({ columns, data }: DataProps<T>) => {
+    console.log("data: ", data)
     const table = useReactTable({
         columns,
         data,

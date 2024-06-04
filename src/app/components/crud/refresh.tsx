@@ -1,17 +1,23 @@
+import { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction } from "react";
 import { HiOutlineRefresh } from "react-icons/hi";
 
 interface RefreshProps<T> {
     lastUpdate: string;
     setItems: Dispatch<SetStateAction<T[]>>;
-    getItems: () => Promise<T[]>;
+    getItems: (session: Session) => Promise<T[]>;
     setLastUpdate: Dispatch<SetStateAction<string>>;
 }
 
 const Refresh = <T,>({ lastUpdate, setItems, getItems, setLastUpdate }: RefreshProps<T>) => {
+    const { data:session } = useSession();
+
     const handleRefresh = async () => {
         try {
-            const items = await getItems();
+            if (!session) return;
+
+            const items = await getItems(session);
             setItems(items);
             setLastUpdate(FormatRefreshTime(new Date()));
         } catch (error) {
