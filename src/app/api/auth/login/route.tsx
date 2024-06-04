@@ -10,7 +10,7 @@ const Login = async (credencials: LoginProps): Promise<any> => {
         {
             path: "/user/login",
             method: "POST",
-            body: credencials
+            body: credencials,
         });
     return response
 };

@@ -1,8 +1,7 @@
 'use client';
-import Login from '@/app/api/auth/login/route';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -12,16 +11,14 @@ const LoginForm = () => {
     event.preventDefault();
 
     try {
-      const res = await signIn('credentials', { email, password, redirect: false });
-  
+      const res = await signIn('Credentials', { email, password, redirect: false });
+      
       if (res?.error) {
-        prompt('Email ou senha inválidos!');
+        prompt(res.error);
         return;
       }
   
-      //router.push('/pages/company-selection');
     } catch (error) {
-      console.error(error);
     }
   };
 

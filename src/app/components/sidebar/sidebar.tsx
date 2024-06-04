@@ -1,33 +1,35 @@
 import React from 'react';
 import { IconType } from 'react-icons';
-import { FaUserTie, FaCog, FaPlus } from 'react-icons/fa';
+import { FaUserTie, FaCog, FaPlus, FaLongArrowAltUp, FaSignOutAlt } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
 import styles from './sidebar.module.css';
+import { signOut } from 'next-auth/react';
 
-interface SidebarItemProps {
+interface SidebarLinkItemProps {
   icon: IconType;
   label: string;
   path: string;
 }
 
-interface SidebarItemCompanyProps {
+interface SidebarItemProps {
   icon: IconType;
   label: string;
+  onClick?: () => Promise<void>;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, path }) => {
+const SidebarLinkItem: React.FC<SidebarLinkItemProps> = ({ icon: Icon, label, path }) => {
   return (
     <Link href={path} className={styles.menuItem}>
-        <Icon className={styles.icon} />
-        <span className={styles.label}>{label}</span>
+      <Icon className={styles.icon} />
+      <span className={styles.label}>{label}</span>
     </Link>
   )
 }
 
-const SidebarItemCompany: React.FC<SidebarItemCompanyProps> = ({ icon: Icon, label }) => {
+const SidebarItemCompany: React.FC<SidebarItemProps> = ({ icon: Icon, label }) => {
   return (
     <div className={styles.menuItemCompany}>
       <Icon className={styles.icon} />
@@ -42,18 +44,32 @@ const SidebarItemCompany: React.FC<SidebarItemCompanyProps> = ({ icon: Icon, lab
   )
 }
 
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, onClick }) => {
+  return (
+    <div className={styles.menuItem} onClick={onClick}>
+      <Icon className={styles.icon} />
+      <span className={styles.label}>{label}</span>
+    </div>
+  )
+}
+
 const Sidebar = () => {
+  const signOutToLogin = async () => {
+    await signOut({ callbackUrl: '/login' })
+  }
+
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarContainer}>
         <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" />
-        <SidebarItem icon={FaPlus} label="Novo Pedido" path="/" />
-        <SidebarItem icon={TiFlowMerge} label="Processos" path="/" />
-        <SidebarItem icon={MdFastfood} label="Cardápio" path="/pages/product" />
-        <SidebarItem icon={BsFillPeopleFill} label="Clientes" path="/pages/client" />
-        <SidebarItem icon={FaUserTie} label="Funcionários" path="/pages/employee" />
-        <SidebarItem icon={MdOutlineHomeWork} label="Minha Empresa" path="/" />
-        <SidebarItem icon={FaCog} label="Configurações" path="/" />
+        <SidebarLinkItem icon={FaPlus} label="Novo Pedido" path="/" />
+        <SidebarLinkItem icon={TiFlowMerge} label="Processos" path="/" />
+        <SidebarLinkItem icon={MdFastfood} label="Cardápio" path="/pages/product" />
+        <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" path="/pages/client" />
+        <SidebarLinkItem icon={FaUserTie} label="Funcionários" path="/pages/employee" />
+        <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" path="/" />
+        <SidebarLinkItem icon={FaCog} label="Configurações" path="/" />
+        <SidebarItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin}/>
       </div>
     </div>
   );
