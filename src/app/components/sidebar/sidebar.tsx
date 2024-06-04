@@ -55,7 +55,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, onClick })
 
 const Sidebar = () => {
   const signOutToLogin = async () => {
-    await signOut({ callbackUrl: '/login' })
+    await signOut({ callbackUrl: '/login', redirect: true });
   }
 
   return (

@@ -18,7 +18,6 @@ const authOptions: NextAuthOptions = {
 
                 const response = await Login({ email, password });
                 console.log(response)
-                const timeout = await setTimeout(() => {}, 3000000000);
                 if (response) {
                     return {
                         id: "2",
@@ -33,18 +32,25 @@ const authOptions: NextAuthOptions = {
     ],
     //secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        async session({ session, user }) {
+        async jwt({ token, user }) {
             if (user) {
-                session.accessToken = user.accessToken;
-                session.companies = user.companies;
+                token.accessToken = user.accessToken;
+                token.companies = user.companies;
+            }
+
+            return token
+        },
+        async session({ session, token }) {
+            if (token) {
+                session.accessToken = token.accessToken;
+                session.companies = token.companies;
             }
 
             return session
         },
     },
     pages: {
-        signOut: '/login',
-        signIn: '/access/company-selection',
+        signIn: '/login',
     },
 };
 

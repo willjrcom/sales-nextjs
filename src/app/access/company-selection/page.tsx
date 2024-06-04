@@ -9,15 +9,17 @@ export default function CompanySelection() {
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
-        if (schemaName) {
-            const response = await Access({ schema: schemaName });
+        if (schemaName && session) {
+            const response = await Access({ schema: schemaName }, session);
             if (response && session) {
                 session.idToken = response
                 router.push('/');
             }
+        } else {
+            prompt('schema ou sessao invalida!');;
         }
     }
-    console.log(session)
+    
     if (!session || !session?.companies) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
