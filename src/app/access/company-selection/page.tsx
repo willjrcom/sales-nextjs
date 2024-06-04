@@ -32,7 +32,7 @@ export default function CompanySelection() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-            <h1 className="text-4xl mb-10">Selecione uma Empresa {session && <p>{session.accessToken}</p>}</h1>
+            <h1 className="text-4xl mb-10">Selecione uma Empresa</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {session?.companies?.map(company => (
                     <button
