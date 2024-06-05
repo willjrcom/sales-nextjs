@@ -31,11 +31,15 @@ const authOptions: NextAuthOptions = {
         })
     ],
     secret: process.env.NEXTAUTH_SECRET,
+    session: {
+      maxAge: 24 * 60 * 60, // Duração da sessão em segundos (padrão é 30 dias)
+    },
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
                 token.accessToken = user.accessToken;
                 token.companies = user.companies;
+                
             }
 
             return token

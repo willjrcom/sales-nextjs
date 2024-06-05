@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation';
 
 export default function CompanySelection() {
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data } = useSession();
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
-        if (schemaName && session) {
-            const response = await Access({ schema: schemaName }, session);
+        if (schemaName && data) {
+            const response = await Access({ schema: schemaName }, data);
             if (response) {
-                session.idToken = response
+                data.idToken = response
                 router.push('/');
             }
         } else {
@@ -20,7 +20,7 @@ export default function CompanySelection() {
         }
     }
 
-    if (!session || !session?.companies) {
+    if (!data || !data?.companies) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
                 <h2 className="text-2xl font-bold">Não existem empresas disponíveis.</h2>
@@ -34,7 +34,7 @@ export default function CompanySelection() {
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <h1 className="text-4xl mb-10">Selecione uma Empresa</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {session?.companies?.map(company => (
+                {data?.companies?.map(company => (
                     <button
                         key={company.schema_name}
                         data-schema-name={company.schema_name}

@@ -1,34 +1,26 @@
 import Form from "@/app/forms/form";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
 interface NewButtonProps {
     name: string;
-    href: string;
     children: React.ReactNode;
+    showModal: boolean
+    setModal: (value: boolean) => void
 }
 
-const ButtonPlus = ({ name, href, children }: NewButtonProps) => {
-    const [showModal, setShowModal] = useState(false);
+const ButtonPlus = ({ name, children, showModal, setModal }: NewButtonProps) => {
 
-    const handleOpenModal = () => {
-        setShowModal(true);
-    };
+    const newClient = "Novo " + { name }.name;
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
-
-    const newClient = "Novo " + {name}.name;
-    
     return (
         <div>
-            <button onClick={handleOpenModal} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+            <button onClick={() => setModal(true)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                 <FaPlus />
                 <span>{newClient}</span>
             </button>
-        
-            <Form title={newClient} isUpdate={false} show={showModal} onClose={(handleCloseModal)} createHref={href}>
+
+            <Form title={newClient} show={showModal} onClose={(() => setModal(false))}>
                 {children}
             </Form>
         </div>

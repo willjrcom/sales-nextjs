@@ -12,6 +12,7 @@ import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useEffect, useState } from "react";
 import Product from "@/app/entities/product/product";
 import { useSession } from "next-auth/react";
+import ModalHandler from "@/app/components/modal/modal";
 
 const PageProducts = () => {
     const [products, setProducts] = useState<Product[]>([])
@@ -19,23 +20,26 @@ const PageProducts = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data: session } = useSession();
+    const { data, status } = useSession();
+    const modalHandler = ModalHandler();
+
+    const fetchData = async () => {
+        if (!data) return;
+        try {
+            const products = await GetProducts(data)
+            setProducts(products);
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!session) return;
-            try {
-                const products = await GetProducts(session)
-                setProducts(products);
-            } catch (err) {
-                setError((err as Error).message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [session]);
+        if (status === "authenticated") {
+            fetchData();
+        }
+    }, [data, status]);
 
     return (
         <Menu>
@@ -44,8 +48,12 @@ const PageProducts = () => {
                     <ButtonFilter name="produto" />
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="produto" href="/product/new">
-                        <CreateProductForm />
+                    <ButtonPlus name="produto"
+                        setModal={modalHandler.setShowModal}
+                        showModal={modalHandler.showModal}>
+                        <CreateProductForm 
+                        handleCloseModal={() => modalHandler.setShowModal(false)}
+                        reloadData={fetchData}/>
                     </ButtonPlus>
                 }
                 refreshButton={

@@ -12,32 +12,37 @@ import { Employee } from "@/app/entities/employee/employee";
 import { useEffect, useState } from "react";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
+import ModalHandler from "@/app/components/modal/modal";
 
 const PageEmployee = () => {
-    const [employees, setEmployees] = useState<Employee[]>([])
+    const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const formattedTime = FormatRefreshTime(new Date())
+    const formattedTime = FormatRefreshTime(new Date());
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data: session } = useSession();
+    const { data, status } = useSession();
+    const modalHandler = ModalHandler();
+
+    const fetchData = async () => {
+        if (!data) return;
+
+        try {
+            setLoading(true);
+            let newEmployees = await GetEmployees(data);
+            setEmployees(newEmployees);
+        } catch (err) {
+            console.error("Error fetching employees: ", err);
+            setError((err as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!session) return;
-
-            try {
-                let newEmployees = await GetEmployees(session)
-                setEmployees(newEmployees);
-            } catch (err) {
-                console.error("Error fetching employees: ", err);
-                setError((err as Error).message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [session]);
+        if (status === "authenticated") {
+            fetchData();
+        }
+    }, [status, data]);
 
     return (
         <Menu>
@@ -45,8 +50,13 @@ const PageEmployee = () => {
                 title="Funcionários"
                 filterButtonChildren={<ButtonFilter name="funcionario" />}
                 plusButtonChildren={
-                    <ButtonPlus name="funcionario" href="/employee/new">
-                        <CreateEmployeeForm />
+                    <ButtonPlus 
+                        name="funcionario" 
+                        showModal={modalHandler.showModal} 
+                        setModal={modalHandler.setShowModal}>
+                        <CreateEmployeeForm 
+                            handleCloseModal={() => modalHandler.setShowModal(false)}
+                            reloadData={fetchData}/>
                     </ButtonPlus>
                 }
                 refreshButton={
@@ -58,11 +68,13 @@ const PageEmployee = () => {
                     />
                 }
                 tableChildren={
-                    <CrudTable columns={EmployeeColumns()} data={employees} />
+                    <CrudTable 
+                        columns={EmployeeColumns()} 
+                        data={employees} />
                 }
             />
         </Menu>
     );
-}
+};
 
-export default PageEmployee
+export default PageEmployee;

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 const LoginForm = () => {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -37,14 +37,14 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    if (session) {
+    if (data) {
       router.push('/access/company-selection');
     }
-  }, [session, router]);
+  }, [data, router]);
 
   return (
     <div className="flex h-screen">
-      {session && <p>Logado</p>}
+      {data && <p>Logado</p>}
       <div className="w-1/2 bg-yellow-500 relative">
         <img src="/img_login.jpg" alt="Login" className="w-full h-full object-cover" />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">

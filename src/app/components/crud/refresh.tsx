@@ -11,13 +11,13 @@ interface RefreshProps<T> {
 }
 
 const Refresh = <T,>({ lastUpdate, setItems, getItems, setLastUpdate }: RefreshProps<T>) => {
-    const { data:session } = useSession();
+    const { data } = useSession();
 
     const handleRefresh = async () => {
         try {
-            if (!session) return;
+            if (!data) return;
 
-            const items = await getItems(session);
+            const items = await getItems(data);
             setItems(items);
             setLastUpdate(FormatRefreshTime(new Date()));
         } catch (error) {

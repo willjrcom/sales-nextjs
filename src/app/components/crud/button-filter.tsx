@@ -31,7 +31,6 @@ const ButtonFilter = ({ name, children }: FilterButtonProps) => {
                 {children}
             </FilterForm>
         </div>
-
     )
 }
 

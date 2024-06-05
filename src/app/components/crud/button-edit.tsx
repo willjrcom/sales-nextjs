@@ -27,7 +27,7 @@ const ButtonEdit = ({ name, href, children }: NewButtonProps) => {
                 <FaEdit />
             </button>
         
-            <Form title={newClient} isUpdate={true} show={showModal} onClose={(handleCloseModal)} createHref={href}>
+            <Form title={newClient}show={showModal} onClose={(handleCloseModal)}>
                 {children}
             </Form>
         </div>

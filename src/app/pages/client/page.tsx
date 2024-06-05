@@ -12,6 +12,7 @@ import { Client } from "@/app/entities/client/client";
 import GetClients from "@/app/api/client/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
+import ModalHandler from "@/app/components/modal/modal";
 
 const PageClient = () => {
     const [clients, setClients] = useState<Client[]>([])
@@ -19,32 +20,56 @@ const PageClient = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data: session } = useSession();
+    const { data, status } = useSession();
+    const modalHandler = ModalHandler();
+
+    const fetchData = async () => {
+        if (!data) return;
+        
+        try {
+            const clients = await GetClients(data)
+            setClients(clients);
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!session) return;
-            
-            try {
-                const clients = await GetClients(session)
-                setClients(clients);
-            } catch (err) {
-                setError((err as Error).message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [session]);
+        if (status === "authenticated") {
+            fetchData();
+        }
+    }, [data, status]);
 
     return (
         <Menu>
             <CrudLayout title="Clientes"
-                filterButtonChildren={<ButtonFilter name="cliente" />}
-                plusButtonChildren={<ButtonPlus name="cliente" href="/client/new"><CreateClientForm /></ButtonPlus>}
-                refreshButton={<Refresh lastUpdate={lastUpdate} setItems={setClients} getItems={GetClients} setLastUpdate={setLastUpdate} />}
-                tableChildren={<CrudTable columns={ClientColumns()} data={clients}></CrudTable>} />
+                filterButtonChildren={
+                    <ButtonFilter name="cliente" />
+                }
+                plusButtonChildren={
+                    <ButtonPlus 
+                        name="cliente" 
+                        setModal={modalHandler.setShowModal} 
+                        showModal={modalHandler.showModal}>
+                        <CreateClientForm 
+                            handleCloseModal={() => modalHandler.setShowModal(false)}
+                            reloadData={fetchData}/>
+                    </ButtonPlus>
+                }
+                refreshButton={
+                    <Refresh 
+                        lastUpdate={lastUpdate} 
+                        setItems={setClients} 
+                        getItems={GetClients} 
+                        setLastUpdate={setLastUpdate} />
+                }
+                tableChildren={
+                    <CrudTable 
+                        columns={ClientColumns()} 
+                        data={clients}>
+                    </CrudTable>} />
         </Menu>
     );
 }

@@ -26,7 +26,6 @@ const AddIdToken = async (session: Session) => {
 }
 
 const AddAccessToken = async (session: Session) => {
-    console.log(session.accessToken)
     if (session.accessToken === undefined) {
         throw new Error("access token not found in session");
     }
@@ -49,6 +48,7 @@ const RequestApi = async <T,TR>({path, body, method, headers }: RequestApiProps<
         },
     });
     
+
     if (!res.ok) {
         throw new Error("Failed to " + method + ", path: " + fullPath);
     }

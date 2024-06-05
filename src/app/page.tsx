@@ -4,9 +4,9 @@ import Menu from '@/app/components/menu/layout';
 import { useSession } from 'next-auth/react';
 
 const Home = () => {
-  const { data:session } = useSession();
+  const { data } = useSession();
   return (
-    <Menu><h1>Home {session && <p>{session.idToken}</p>}</h1></Menu>
+    <Menu><h1>Home {data && <p>{data.idToken}</p>}</h1></Menu>
   );
 }
 
