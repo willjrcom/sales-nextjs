@@ -2,17 +2,18 @@
 
 import CrudLayout from "@/app/components/crud/layout";
 import Menu from "@/app/components/menu/layout";
-import CreateClientForm from "@/app/forms/client/create";
+import ClientForm from "@/app/forms/client/create";
 import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
 import { useEffect, useState } from "react";
-import { Client } from "@/app/entities/client/client";
+import Client from "@/app/entities/client/client";
 import GetClients from "@/app/api/client/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import ModalHandler from "@/app/components/modal/modal";
+import NewClient from "@/app/api/client/new/route";
 
 const PageClient = () => {
     const [clients, setClients] = useState<Client[]>([])
@@ -53,7 +54,8 @@ const PageClient = () => {
                         name="cliente" 
                         setModal={modalHandler.setShowModal} 
                         showModal={modalHandler.showModal}>
-                        <CreateClientForm 
+                        <ClientForm 
+                            onSubmit={NewClient}
                             handleCloseModal={() => modalHandler.setShowModal(false)}
                             reloadData={fetchData}/>
                     </ButtonPlus>

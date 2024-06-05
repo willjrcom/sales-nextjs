@@ -1,6 +1,6 @@
 'use client'
 
-import CreateEmployeeForm from "@/app/forms/employee/create";
+import EmployeeForm from "@/app/forms/employee/form";
 import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudLayout from "@/app/components/crud/layout";
@@ -8,11 +8,12 @@ import Menu from "@/app/components/menu/layout";
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import GetEmployees from "@/app/api/employee/route";
-import { Employee } from "@/app/entities/employee/employee";
+import Employee from "@/app/entities/employee/employee";
 import { useEffect, useState } from "react";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import ModalHandler from "@/app/components/modal/modal";
+import NewEmployee from "@/app/api/employee/new/route";
 
 const PageEmployee = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -54,7 +55,8 @@ const PageEmployee = () => {
                         name="funcionario" 
                         showModal={modalHandler.showModal} 
                         setModal={modalHandler.setShowModal}>
-                        <CreateEmployeeForm 
+                        <EmployeeForm 
+                            onSubmit={NewEmployee}
                             handleCloseModal={() => modalHandler.setShowModal(false)}
                             reloadData={fetchData}/>
                     </ButtonPlus>

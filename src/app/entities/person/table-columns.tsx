@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Person from "./person";
 import Contact from "../contact/contact";
-import { Employee } from "../employee/employee";
 import Address from "../address/address";
 
 const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
@@ -29,8 +28,12 @@ const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
       id: 'Contato',
       header: 'Contato',
       accessorFn: row => {
-        if (row.contact as Contact) {
-          return "(" + row.contact.ddd + ") " + row.contact.number
+        if (row.contact as Contact) { 
+          const contact = row.contact as Contact
+          if (contact.ddd || contact.number) {
+            return "(" + contact.ddd + ") " + contact.number
+          }
+          return contact.ddd + " " + contact.number
         }
     },
   },

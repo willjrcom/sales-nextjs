@@ -1,8 +1,8 @@
-import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import Login from "../login/route";
 import Company from "@/app/entities/company/company";
+import { NextAuthOptions } from "next-auth";
 
 const authOptions: NextAuthOptions = {
     providers: [
@@ -32,14 +32,18 @@ const authOptions: NextAuthOptions = {
     ],
     secret: process.env.NEXTAUTH_SECRET,
     session: {
-      maxAge: 24 * 60 * 60, // Duração da sessão em segundos (padrão é 30 dias)
+        maxAge: 24 * 60 * 60, // Duração da sessão em segundos (padrão é 30 dias)
+        strategy: "jwt",
+    },
+    jwt: {
+        maxAge: 24 * 60 * 60,
     },
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
+                token.sub = user.accessToken;
                 token.accessToken = user.accessToken;
                 token.companies = user.companies;
-                
             }
 
             return token
@@ -59,15 +63,26 @@ const authOptions: NextAuthOptions = {
     pages: {
         signIn: '/login',
     },
+    debug: true,
+    cookies: {
+        sessionToken: {
+            name: "next-auth.session-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+            },
+        }
+    }
 };
 
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
-
 declare module "next-auth/jwt" {
     interface JWT {
-        idToken?: string;
+        idToken: string;
         accessToken?: string;
         companies: Company[]
     }
@@ -75,7 +90,7 @@ declare module "next-auth/jwt" {
 
 declare module "next-auth" {
     interface Session {
-        idToken?: string;
+        idToken: string;
         accessToken?: string;
         companies: Company[]
     }

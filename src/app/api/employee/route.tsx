@@ -1,4 +1,4 @@
-import { Employee } from "@/app/entities/employee/employee";
+import Employee from "@/app/entities/employee/employee";
 import RequestApi, { AddIdToken } from "../request";
 import { Session } from "next-auth";
 

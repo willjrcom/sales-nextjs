@@ -2,9 +2,9 @@ import Employee from "@/app/entities/employee/employee";
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 
-const NewEmployee = async (employee: Employee, session: Session): Promise<string> => {
+const UpdateEmployee = async (employee: Employee, session: Session): Promise<string> => {
     const response = await RequestApi<Employee, string>({
-        path: "/employee/new", 
+        path: "/employee/update/" + employee.id, 
         method: "POST",
         body: employee,
         headers: await AddIdToken(session),
@@ -12,4 +12,4 @@ const NewEmployee = async (employee: Employee, session: Session): Promise<string
     return response.data
 };
 
-export default NewEmployee
+export default UpdateEmployee
