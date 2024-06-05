@@ -7,6 +7,7 @@ interface TextFieldProps {
     disabled?: boolean
     value?: string
     setValue: Dispatch<SetStateAction<string>>
+    pattern?: string
 }
 
 interface NumberFieldProps {
@@ -52,7 +53,7 @@ interface HiddenFieldProps {
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
-const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue }: TextFieldProps) => {
+const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern }: TextFieldProps) => {
 
     return (
         <div className="mb-4">
@@ -67,7 +68,8 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue 
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}
-                onChange={e => setValue(e.target.value)}
+                onChange={e => setValue(e.target.value.replace(pattern!, ""))}
+                pattern={pattern}
             />
         </div>
     )

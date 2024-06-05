@@ -5,7 +5,6 @@ import ButtonModal from '../buttons-modal';
 import Client from '@/app/entities/client/client';
 import DateComponent from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
-import NewClient from '@/app/api/client/new/route';
 import CreateFormsProps from '../create-forms-props';
 
 

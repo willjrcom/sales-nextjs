@@ -16,12 +16,14 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
     const [email, setEmail] = useState(person.email);
     const [cpf, setCpf] = useState(person.cpf);
     const [birthday, setBirthday] = useState(person.birthday);
-    const [contactString, setContact] = useState("("+ person.contact.ddd+ ") " + person.contact.number);
+    const [contactDdd, setContactDdd] = useState(person.contact.ddd);
+    const [contactNumber, setContactNumber] = useState(person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);
 
     useEffect(() => {
         const contact = new Contact()
-        contact.ddd = contactString.split(" ")[0].replace("(", "")
+        contact.ddd = contactDdd
+        contact.number = contactNumber
 
         onPersonChange({
             id,
@@ -32,7 +34,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
             contact,
             address,
         });
-    }, [id, name, email, cpf, birthday, contactString, address, onPersonChange]);
+    }, [id, name, email, cpf, birthday, contactDdd, contactNumber, address, onPersonChange]);
 
     return (
         <>
@@ -44,8 +46,14 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
 
             <DateField name="birthday" friendlyName="Aniversário" setValue={setBirthday} value={birthday} />
 
-            <TextField name="contact" friendlyName="Celular" placeholder="Digite seu celular" setValue={setContact} value={contactString}/>
-
+            <div className="flex space-x-4">
+                <div className="w-1/3">
+                    <TextField name="ddd" friendlyName="DDD" placeholder="(xx)" setValue={setContactDdd} value={contactDdd} pattern="\(\d{2}\)"/>
+                </div>
+                <div className="w-2/3">
+                    <TextField name="number" friendlyName="Número" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber}pattern="\d{1} \d{4}-\d{4}|\d{4}-\d{4}"/>
+                </div>
+            </div>
             <CreateAddressForm address={address} onAddressChange={setAddress}/>
 
             <HiddenField name="id" setValue={setId} value={id}/>
