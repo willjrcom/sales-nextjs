@@ -10,7 +10,7 @@ const ClientColumns = (): ColumnDef<Client>[] => [
   {
     id: 'Editar',
     accessorKey: 'id',
-    header: 'ID',
+    header: 'Editar',
     cell: ({ row }) => (
       <ButtonEdit name={row.original.name} href={`/client/edit/${row.original.id}`}><EditClientForm /></ButtonEdit>
     ),

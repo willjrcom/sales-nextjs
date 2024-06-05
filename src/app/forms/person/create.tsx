@@ -3,6 +3,7 @@ import{ TextField, DateField, HiddenField } from "../field";
 import CreateAddressForm from "../address/create";
 import Address from "@/app/entities/address/address";
 import Person from "@/app/entities/person/person";
+import Contact from "@/app/entities/contact/contact";
 
 interface PersonProps {
     person: Person
@@ -15,10 +16,13 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
     const [email, setEmail] = useState(person.email);
     const [cpf, setCpf] = useState(person.cpf);
     const [birthday, setBirthday] = useState(person.birthday);
-    const [contact, setContact] = useState(person.contact);
+    const [contactString, setContact] = useState("("+ person.contact.ddd+ ") " + person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);
 
     useEffect(() => {
+        const contact = new Contact()
+        contact.ddd = contactString.split(" ")[0].replace("(", "")
+
         onPersonChange({
             id,
             name,
@@ -28,7 +32,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
             contact,
             address,
         });
-    }, [id, name, email, cpf, birthday, contact, address, onPersonChange]);
+    }, [id, name, email, cpf, birthday, contactString, address, onPersonChange]);
 
     return (
         <>
@@ -40,7 +44,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
 
             <DateField name="birthday" friendlyName="Aniversário" setValue={setBirthday} value={birthday} />
 
-            <TextField name="contact" friendlyName="Celular" placeholder="Digite seu celular" setValue={setContact} value={contact}/>
+            <TextField name="contact" friendlyName="Celular" placeholder="Digite seu celular" setValue={setContact} value={contactString}/>
 
             <CreateAddressForm address={address} onAddressChange={setAddress}/>
 

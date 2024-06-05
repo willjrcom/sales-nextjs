@@ -1,60 +1,60 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Product } from "./product";
+import Product from "./product";
 import ButtonEdit from "@/app/components/crud/button-edit";
-import EditEmployeeForm from "@/app/forms/employee/edit";
+import EditProductForm from "@/app/forms/product/edit";
 
 
 const ProductColumns = (): ColumnDef<Product>[] => [
   {
     id: 'Código',
     accessorKey: 'code',
-    header: 'Code',
+    header: 'Código',
   },
   {
     id: 'Nome',
     accessorKey: 'name',
-    header: 'Name',
+    header: 'Nome',
   },
   {
     id: 'Descrição',
     accessorKey: 'description',
-    header: 'Description',
+    header: 'Descrição',
     maxSize: 10
   },
   {
     id: 'Preço',
     accessorKey: 'price',
-    header: 'Price',
+    header: 'Preço',
     cell: info => `$${info.getValue()}`, // example of custom cell rendering
   },
   {
     id: 'Custo',
     accessorKey: 'cost',
-    header: 'Cost',
+    header: 'Custo',
     cell: info => `$${info.getValue()}`,
   },
   {
     id: 'Categoria',
     accessorKey: 'category.name', // assuming Category has a 'name' field
-    header: 'Category',
+    header: 'Categoria',
   },
   {
     id: 'Tamanho',
     accessorKey: 'size.name', // assuming Size has a 'name' field
-    header: 'Size',
+    header: 'Tamanho',
   },
   {
     id: 'Disponível?',
     accessorKey: 'is_available',
-    header: 'Available',
+    header: 'Disponível?',
     cell: info => (info.getValue() ? 'Sim' : 'Não'),
   },
   {
     id: 'Editar',
     accessorKey: 'id',
-    header: 'ID',
+    header: 'Editar',
     cell: ({ row }) => (
-      <ButtonEdit name={row.original.name} href={`/employee/edit/${row.original.id}`}><EditEmployeeForm /></ButtonEdit>
+      <ButtonEdit name={row.original.name} href={`/product/edit/${row.original.id}`}><EditProductForm /></ButtonEdit>
     ),
   },
 ];
