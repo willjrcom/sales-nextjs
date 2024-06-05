@@ -35,6 +35,15 @@ interface CheckboxFieldProps {
     setValue: Dispatch<SetStateAction<boolean>>
 }
 
+interface RadioFieldProps {
+    friendlyName: string;
+    name: string;
+    disabled?: boolean;
+    values: Record<string, string>[];
+    selectedValue: string;
+    setSelectedValue: Dispatch<SetStateAction<string>>;
+}
+
 interface HiddenFieldProps {
     name: string
     value?: string
@@ -106,7 +115,6 @@ const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldP
 }
 
 const CheckboxField = ({ friendlyName, name, placeholder, disabled, value, setValue }: CheckboxFieldProps) => {
-
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
@@ -125,10 +133,38 @@ const CheckboxField = ({ friendlyName, name, placeholder, disabled, value, setVa
     )
 }
 
+const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue }: RadioFieldProps) => (
+    <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+            {friendlyName}
+        </label>
+        {values.map((valueObj) => (
+            <div key={valueObj.id} className="flex items-center mb-2">
+                <input
+                    id={valueObj.id}
+                    type="radio"
+                    name={name}
+                    disabled={disabled}
+                    value={valueObj.id}
+                    checked={selectedValue === valueObj.id}
+                    onChange={e => setSelectedValue(e.target.value)}
+                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                />
+                <label
+                    htmlFor={valueObj.id}
+                    className="ml-2 block text-gray-700 text-sm cursor-pointer"
+                >
+                    {valueObj.name}
+                </label>
+            </div>
+        ))}
+    </div>
+);
+
 const HiddenField = ({ name, value, setValue }: HiddenFieldProps) => {
     return (
         <input type='hidden' id={name} name={name} value={value} onChange={e => setValue(e.target.value)}></input>
     )
 }
 
-export { TextField, NumberField, DateField, CheckboxField, HiddenField }
+export { TextField, NumberField, DateField, CheckboxField, RadioField, HiddenField }

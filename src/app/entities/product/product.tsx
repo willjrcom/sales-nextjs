@@ -9,7 +9,9 @@ export default class Product {
     description: string = "";
     price: number = 0;
     cost: number = 0;
+    category_id: string = "";
     category: Category = new Category();
+    size_id: string = "";
     size: Size = new Size();
     is_available: boolean = false;
 
