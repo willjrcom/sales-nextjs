@@ -1,7 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Product from "./product";
 import ButtonEdit from "@/app/components/crud/button-edit";
-import EditProductForm from "@/app/forms/product/edit";
+import ProductForm from "@/app/forms/product/form";
+import UpdateProduct from "@/app/api/product/update/route";
+import ModalHandler from "@/app/components/modal/modal";
+import { useRouter } from "next/router";
 
 
 const ProductColumns = (): ColumnDef<Product>[] => [
@@ -53,10 +56,27 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     id: 'Editar',
     accessorKey: 'id',
     header: 'Editar',
-    cell: ({ row }) => (
-      <ButtonEdit name={row.original.name} href={`/product/edit/${row.original.id}`}><EditProductForm /></ButtonEdit>
-    ),
+    cell: ({ row }) => {
+      const modalHandler = ModalHandler();
+
+      return (
+        <ButtonEdit 
+          name={row.original.name} 
+          href={`/product/edit/${row.original.id}`}>
+          <ProductForm 
+            item={row.original}
+            onSubmit={UpdateProduct} 
+            handleCloseModal={() => modalHandler.setShowModal(false)}
+            reloadData={Redirect} />
+        </ButtonEdit>
+      )
+    },
   },
 ];
+
+const Redirect = () => {
+  const router = useRouter();
+  router.reload();
+}
 
 export default ProductColumns

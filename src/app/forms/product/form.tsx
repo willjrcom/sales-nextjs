@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, NumberField, CheckboxField, RadioField } from '../field';
+import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../field';
 import Product from '@/app/entities/product/product';
 import ButtonModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
-import NewProduct from '@/app/api/product/new/route';
 import GetCategories from '@/app/api/category/route';
-import GetSizes from '@/app/api/size/route';
 import Category from '@/app/entities/category/category';
+import CreateFormsProps from '../create-forms-props';
 
-const CreateProductForm = ({ handleCloseModal, reloadData }: CreateFormsProps) => {
-    const product: Product = new Product();
+const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFormsProps<Product>) => {
+    const product = item || new Product();
+    const [id, setId] = useState(product.id);
     const [code, setCode] = useState(product.code);
     const [name, setName] = useState(product.name);
     const [description, setDescription] = useState(product.description);
@@ -27,6 +27,7 @@ const CreateProductForm = ({ handleCloseModal, reloadData }: CreateFormsProps) =
     const submit = async () => {
         if (!data) return;
 
+        product.id = id;
         product.code = code;
         product.name = name;
         product.description = description;
@@ -37,13 +38,13 @@ const CreateProductForm = ({ handleCloseModal, reloadData }: CreateFormsProps) =
         product.size_id = sizeId;
 
         try {
-            console.log(product)
-            const response = await NewProduct(product, data)
+            const response = await onSubmit(product, data)
     
             if (response) {
                 handleCloseModal();
                 reloadData();
             }
+
         } catch (error) {
             setError((error as Error).message);
         }
@@ -62,6 +63,7 @@ const CreateProductForm = ({ handleCloseModal, reloadData }: CreateFormsProps) =
                     records.push({ id: category.id.toString(), name: category.name })
                 }
                 setRecordCategories(records);
+
             } catch (error) {
                 setError((error as Error).message);
             }
@@ -85,6 +87,7 @@ const CreateProductForm = ({ handleCloseModal, reloadData }: CreateFormsProps) =
                 }
     
                 setRecordSizes(records);
+                
             } catch (error) {
                 setError((error as Error).message);
             }
@@ -105,9 +108,10 @@ const CreateProductForm = ({ handleCloseModal, reloadData }: CreateFormsProps) =
             <CheckboxField friendlyName='Disponível' name='is_available' setValue={setIsAvailable} value={isAvailable.toString()}/>
             <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={setCategoryId} selectedValue={categoryId} values={recordCategories}/>
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>
+            <HiddenField name='id' setValue={setId} value={id}/>
             <ButtonModal onSubmit={submit} onCancel={handleCloseModal}/>
         </>
     );
 };
 
-export default CreateProductForm;
+export default ProductForm;
