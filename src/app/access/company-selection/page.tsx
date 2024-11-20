@@ -23,25 +23,19 @@ export default function CompanySelection() {
             return;
         }
         
-        try {
-            const response = await Access({ schema: schemaName }, data);
-            if (response) {
-                update({ 
-                    ...data, 
-                    user: {
-                        ...data.user,
-                        idToken: response
-                    }
-                });
-                router.push('/');
-            } else {
-                setError('Resposta inválida do servidor.');
-            }
-        } catch (error: any) {
-            setError('Ocorreu um erro ao tentar acessar a empresa.');
+        const response = await Access({ schema: schemaName }, data);
+        if (response) {
+            await update({
+                    ...data,
+                    idToken: response
+                
+            });
+            router.push('/');
+        } else {
+            setError('Resposta inválida do servidor.');
         }
     }
-
+    
     if (!data?.user?.companies || data.user.companies.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">

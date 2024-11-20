@@ -45,14 +45,25 @@ const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {
-            if (trigger == "update") {
-                return { ...token, ...session.user }
+            if (trigger === "update" && session?.user?.idToken) {
+                token.idToken = session.user.idToken;
             }
-            return { ...token, ...user}
+
+            if (user) {
+                token.email = user.email;
+                token.sub = user.id;
+                token.companies = user.companies;
+            }
+
+            return token
         },
         
         async session({ session, token }) {
-            session.user = token as any;
+            session.user = session.user || {};
+            if (token.sub) session.user.id = token.sub;
+            if (token.idToken) session.user.idToken = token.idToken;
+            if (token.companies) session.user.companies = token.companies;
+        
             return session
         },
     },
@@ -62,7 +73,7 @@ const authOptions: NextAuthOptions = {
     debug: process.env.NODE_ENV === "development",
     cookies: {
         sessionToken: {
-            name: "sales-app.session-token",
+            name: "next-auth.session-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
@@ -76,18 +87,14 @@ const authOptions: NextAuthOptions = {
 declare module "next-auth/jwt" {
     interface JWT {
         id: string;
-        accessToken?: string;
+        idToken?: string;
         companies: Company[];
     }
 }
 
 declare module "next-auth" {
     interface Session {
-        user: {
-            id: string;
-            idToken?: string;
-            companies: Company[];
-        };
+        user: User
     }
 
     interface User {

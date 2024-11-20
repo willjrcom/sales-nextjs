@@ -5,7 +5,12 @@ interface LoginProps {
     password: string;
 }
 
-const Login = async (credencials: LoginProps): Promise<any> => {
+interface LoginResponse {
+    access_token: string;
+    companies: [];
+}
+
+const Login = async (credencials: LoginProps): Promise<LoginResponse> => {
     const response = await RequestApi<LoginProps, any>({
         path: "/user/login",
         method: "POST",
