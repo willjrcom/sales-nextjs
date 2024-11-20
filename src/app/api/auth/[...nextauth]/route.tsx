@@ -9,94 +9,94 @@ const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "text" },
+                email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                const email = credentials?.email || "";
-                const password = credentials?.password || "";
+                try {
+                    const email = credentials?.email || "";
+                    const password = credentials?.password || "";
 
-                const response = await Login({ email, password });
-                
-                if (response) {
-                    return {
-                        id: response.access_token,
-                        accessToken: response.access_token,
-                        companies: response.companies,
-                    };
+                    const response = await Login({ email, password });
+
+                    if (response?.access_token && response?.companies) {
+                        return {
+                            id: response.access_token,
+                            companies: response.companies,
+                            email: email,
+                        };
+                    }
+
+                    return null; // Retorna null se as credenciais forem inválidas
+                } catch (error) {
+                    console.error("Error during login:", error);
+                    return null; // Retorna null se ocorrer um erro
                 }
-
-                return null;
-            }
-        })
+            },
+        }),
     ],
     secret: process.env.NEXTAUTH_SECRET,
     session: {
-        maxAge: 24 * 60 * 60, // Duração da sessão em segundos (padrão é 30 dias)
+        maxAge: 24 * 60 * 60, // 1 dia de sessão
         strategy: "jwt",
     },
     jwt: {
-        maxAge: 24 * 60 * 60,
+        maxAge: 24 * 60 * 60, // 1 dia de JWT
     },
     callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.sub = user.accessToken;
-                token.accessToken = user.accessToken;
-                token.companies = user.companies;
+        async jwt({ token, user, trigger, session }) {
+            if (trigger == "update") {
+                return { ...token, ...session.user }
             }
-
-            return token
+            return { ...token, ...user}
         },
+        
         async session({ session, token }) {
-            if (token) {
-                session.accessToken = token.accessToken;
-                session.companies = token.companies;
-            }
-
-            const now = new Date();
-            now.setHours(now.getHours() + 3);
-            session.expires = now.toISOString();
+            session.user = token as any;
             return session
         },
     },
     pages: {
-        signIn: '/login',
+        signIn: '/login', // Página de login personalizada
     },
-    debug: true,
+    debug: process.env.NODE_ENV === "development",
     cookies: {
         sessionToken: {
-            name: "next-auth.session-token",
+            name: "sales-app.session-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
                 path: "/",
                 secure: process.env.NODE_ENV === "production",
             },
-        }
-    }
+        },
+    },
 };
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
 declare module "next-auth/jwt" {
     interface JWT {
-        idToken: string;
+        id: string;
         accessToken?: string;
-        companies: Company[]
+        companies: Company[];
     }
 }
 
 declare module "next-auth" {
     interface Session {
-        idToken: string;
-        accessToken?: string;
-        companies: Company[]
+        user: {
+            id: string;
+            idToken?: string;
+            companies: Company[];
+        };
     }
 
     interface User {
-        accessToken?: string;
-        companies: Company[]
+        id: string;
+        idToken?: string;
+        companies: Company[];
     }
 }
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

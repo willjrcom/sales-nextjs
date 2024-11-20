@@ -18,19 +18,19 @@ const jsonHeaders = {
 }
 
 const AddIdToken = async (session: Session) => {
-    if (session.idToken === undefined) {
+    if (session.user.idToken === undefined) {
         throw new Error("id token not found in session");
     }
 
-    return { "id-token": session.idToken }
+    return { "id-token": session.user.idToken }
 }
 
 const AddAccessToken = async (session: Session) => {
-    if (session.accessToken === undefined) {
+    if (session.user.id === undefined) {
         throw new Error("access token not found in session");
     }
 
-    return { "access-token": session.accessToken }
+    return { "access-token": session.user.id }
 }
 
 const RequestApi = async <T,TR>({path, body, method, headers }: RequestApiProps<T>): Promise<Response<TR>> => {

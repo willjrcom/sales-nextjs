@@ -12,10 +12,7 @@ export default withAuth(
     },
     {
         callbacks: {
-            authorized: ({ req, token }) => {
-                // Se tiver um token, a requisição está autorizada
-                return !!token;
-            }
+            authorized: ({ token }) => !!token, 
         }
     }
 );
