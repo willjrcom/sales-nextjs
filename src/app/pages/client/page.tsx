@@ -7,7 +7,7 @@ import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Client from "@/app/entities/client/client";
 import GetClients from "@/app/api/client/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
@@ -24,7 +24,7 @@ const PageClient = () => {
     const { data, status } = useSession();
     const modalHandler = ModalHandler();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!data) return;
         
         try {
@@ -35,13 +35,13 @@ const PageClient = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [data]);
 
     useEffect(() => {
         if (status === "authenticated") {
             fetchData();
         }
-    }, [data, status]);
+    }, [data, status, fetchData]);
 
     return (
         <Menu>

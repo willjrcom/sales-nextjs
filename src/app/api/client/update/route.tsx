@@ -5,7 +5,7 @@ import RequestApi, { AddIdToken } from "../../request";
 const UpdateClient = async (client: Client, session: Session): Promise<string> => {
     const response = await RequestApi<Client,string>({
         path: "/client/update/" + client.id, 
-        method: "POST",
+        method: "PATCH",
         body: client,
         headers: await AddIdToken(session),
     });

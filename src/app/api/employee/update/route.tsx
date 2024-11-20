@@ -5,7 +5,7 @@ import { Session } from "next-auth";
 const UpdateEmployee = async (employee: Employee, session: Session): Promise<string> => {
     const response = await RequestApi<Employee, string>({
         path: "/employee/update/" + employee.id, 
-        method: "POST",
+        method: "PATCH",
         body: employee,
         headers: await AddIdToken(session),
     });
