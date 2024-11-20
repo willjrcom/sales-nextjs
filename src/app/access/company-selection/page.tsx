@@ -12,7 +12,7 @@ export default function CompanySelection() {
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
-        
+
         if (!schemaName) {
             setError('Schema inválido!');
             return;
@@ -22,20 +22,21 @@ export default function CompanySelection() {
             setError('Sessão inválida!');
             return;
         }
-        
+
         const response = await Access({ schema: schemaName }, data);
         if (response) {
             await update({
-                    ...data,
+                ...data,
+                user: {
                     idToken: response
-                
+                },
             });
             router.push('/');
         } else {
             setError('Resposta inválida do servidor.');
         }
     }
-    
+
     if (!data?.user?.companies || data.user.companies.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -48,7 +49,7 @@ export default function CompanySelection() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-        {error && <p className="mb-4 text-red-500">{error}</p>}
+            {error && <p className="mb-4 text-red-500">{error}</p>}
             <h1 className="text-4xl mb-10">Selecione uma Empresa</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {data.user.companies.map(company => (

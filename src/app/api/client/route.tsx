@@ -1,12 +1,8 @@
-import { Client } from "@/app/entities/client/client";
+import Client from "@/app/entities/client/client";
 import { Session } from "next-auth";
 import RequestApi, { AddIdToken } from "../request";
 
 const GetClients = async (session: Session): Promise<Client[]> => {
-    if (session.idToken === undefined) {
-        throw new Error("idToken not found in session");
-    }
-
     const response = await RequestApi<null, Client[]>({
         path: "/client/all", 
         method: "GET",

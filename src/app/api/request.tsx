@@ -21,7 +21,7 @@ const AddIdToken = async (session: Session) => {
     if (session.user.idToken === undefined) {
         throw new Error("id token not found in session");
     }
-
+    
     return { "id-token": session.user.idToken }
 }
 
