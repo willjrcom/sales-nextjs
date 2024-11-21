@@ -33,7 +33,7 @@ const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateForm
 
     return (
         <>
-            <PersonForm person={person} onPersonChange={setPerson} likeTax={true} />
+            <PersonForm person={person} onPersonChange={setPerson}/>
 
             <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
         </>

@@ -9,10 +9,9 @@ import { format } from "date-fns";
 interface PersonProps {
     person: Person
     onPersonChange: (updatedPerson: Person) => void;
-    likeTax: boolean
 }
 
-const PersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
+const PersonForm = ({person, onPersonChange}: PersonProps) => {
     const [id, setId] = useState(person.id);
     const [name, setName] = useState(person.name);
     const [email, setEmail] = useState(person.email);
@@ -21,6 +20,7 @@ const PersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
     const [contactDdd, setContactDdd] = useState(person.contact.ddd);
     const [contactNumber, setContactNumber] = useState(person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);
+    const [likeTax, setLikeTax] = useState(person.likeTax);
 
     useEffect(() => {
         if (!birthday) return
@@ -40,8 +40,9 @@ const PersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
             birthday,
             contact,
             address,
+            likeTax,
         });
-    }, [id, name, email, cpf, birthday, contactDdd, contactNumber, address, onPersonChange]);
+    }, [id, name, email, cpf, birthday, contactDdd, contactNumber, address, likeTax, onPersonChange]);
 
     return (
         <>

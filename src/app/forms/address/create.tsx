@@ -8,7 +8,7 @@ interface AddressProps {
     likeTax: boolean;
 }
 
-const CreateAddressForm = ({address, onAddressChange, likeTax}:AddressProps) => {
+const CreateAddressForm = ({address, onAddressChange, likeTax}: AddressProps) => {
     const [id, setId] = useState(address.id);
     const [street, setStreet] = useState(address.street);
     const [number, setNumber] = useState(address.number);
