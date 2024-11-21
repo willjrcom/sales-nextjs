@@ -28,14 +28,21 @@ const PageEmployee = () => {
     const fetchData = useCallback(async () => {
         if (!data) return;
         FetchData({ getItems: GetEmployees, setItems: setEmployees, data, setError, setLoading })
-    }, [data]);
+    }, [data?.user?.idToken!]);
 
     useEffect(() => {
         fetchData();
-    }, [data, fetchData]);
+    }, [fetchData]);
 
+    if (loading) {
+        return (
+            <Menu><h1>Carregando página...</h1></Menu>
+        )
+    }
+    
     return (
         <Menu>
+            {error && <p className="mb-4 text-red-500">{error}</p>}
             <CrudLayout
                 title="Funcionários"
                 filterButtonChildren={<ButtonFilter name="funcionario" />}

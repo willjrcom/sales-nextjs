@@ -9,7 +9,6 @@ const GetProducts = async (session: Session): Promise<Product[]> => {
         headers: await AddIdToken(session),
     });
 
-    console.log(response)
     return response.data
 };
 

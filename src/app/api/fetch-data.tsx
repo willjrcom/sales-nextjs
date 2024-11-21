@@ -10,9 +10,8 @@ interface FetchDataProps<T> {
 }
 
 const FetchData = async <T,>({ getItems, setItems, data, setError, setLoading }: FetchDataProps<T>) => {
-    if (!data) return;
-
     try {
+        setLoading(true);
         const items = await getItems(data)
         setItems(items);
     } catch (err) {

@@ -109,6 +109,8 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
             <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={setCategoryId} selectedValue={categoryId} values={recordCategories}/>
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>
             <HiddenField name='id' setValue={setId} value={id}/>
+
+            {error && <p className="mb-4 text-red-500">{error}</p>}
             <ButtonModal isUpdate={product.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
         </>
     );

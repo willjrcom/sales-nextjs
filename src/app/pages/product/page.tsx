@@ -26,16 +26,23 @@ const PageProducts = () => {
     const modalHandler = ModalHandler();
 
     const fetchData = useCallback(async () => {
-        if (!data) return;
+        if (!data?.user.idToken) return;
         FetchData({ getItems: GetProducts, setItems: setProducts, data, setError, setLoading })
-    }, [data]);
+    }, [data?.user.idToken!]);
 
     useEffect(() => {
         fetchData();
-    }, [data, fetchData]);
+    }, [fetchData]);
+    
+    if (loading) {
+        return (
+            <Menu><h1>Carregando página...</h1></Menu>
+        )
+    }
     
     return (
         <Menu>
+            {error && <p className="mb-4 text-red-500">{error}</p>}
             <CrudLayout title="Produtos"
                 filterButtonChildren={
                     <ButtonFilter name="produto" />

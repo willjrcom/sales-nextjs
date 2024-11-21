@@ -8,7 +8,7 @@ const LoginForm = () => {
   const { data } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -44,7 +44,6 @@ const LoginForm = () => {
 
   return (
     <div className="flex h-screen">
-      {data && <p>Logado</p>}
       <div className="w-1/2 bg-yellow-500 relative">
         <img src="/img_login.jpg" alt="Login" className="w-full h-full object-cover" />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">

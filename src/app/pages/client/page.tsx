@@ -29,14 +29,21 @@ const PageClient = () => {
         if (!data) return;
         FetchData({ getItems: GetClients, setItems: setClients, data, setError, setLoading })
         
-    }, [data]);
+    }, [data?.user?.idToken!]);
 
     useEffect(() => {
         fetchData();
-    }, [data, fetchData]);
+    }, [fetchData]);
 
+    if (loading) {
+        return (
+            <Menu><h1>Carregando página...</h1></Menu>
+        )
+    }
+    
     return (
         <Menu>
+            {error && <p className="mb-4 text-red-500">{error}</p>}
             <CrudLayout title="Clientes"
                 filterButtonChildren={
                     <ButtonFilter name="cliente" />

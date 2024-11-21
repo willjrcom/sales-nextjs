@@ -23,6 +23,11 @@ export default function CompanySelection() {
             return;
         }
 
+        if (!data.user.id) {
+            setError('Token ID inválido!');
+            return;
+        }
+
         const response = await Access({ schema: schemaName }, data);
         if (response) {
             await update({

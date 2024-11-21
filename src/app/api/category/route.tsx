@@ -8,7 +8,6 @@ const GetCategories = async (session: Session): Promise<Category[]> => {
         method: "GET",
         headers: await AddIdToken(session),
     });
-    console.log(response.data)
     return response.data
 };
 
