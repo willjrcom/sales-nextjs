@@ -12,18 +12,19 @@ import { signOut } from 'next-auth/react';
 interface SidebarLinkItemProps {
   icon: IconType;
   label: string;
-  path: string;
+  href: string;
 }
 
 interface SidebarItemProps {
+  href?: string;
   icon: IconType;
   label: string;
   onClick?: () => Promise<void>;
 }
 
-const SidebarLinkItem: React.FC<SidebarLinkItemProps> = ({ icon: Icon, label, path }) => {
+const SidebarLinkItem: React.FC<SidebarLinkItemProps> = ({ icon: Icon, label, href }) => {
   return (
-    <Link href={path} className={styles.menuItem}>
+    <Link href={href} className={styles.menuItem}>
       <Icon className={styles.icon} />
       <span className={styles.label}>{label}</span>
     </Link>
@@ -45,17 +46,18 @@ const SidebarItemCompany: React.FC<SidebarItemProps> = ({ icon: Icon, label }) =
   )
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, onClick }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon: Icon, label, onClick }) => {
   return (
-    <div className={styles.menuItem} onClick={onClick}>
+    <Link href={href!} className={styles.menuItem} onClick={onClick}>
       <Icon className={styles.icon} />
       <span className={styles.label}>{label}</span>
-    </div>
+    </Link>
   )
 }
 
 const Sidebar = () => {
-  const signOutToLogin = async () => {
+  const signOutToLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     await signOut({ callbackUrl: '/login', redirect: true });
   }
 
@@ -63,14 +65,14 @@ const Sidebar = () => {
     <div className={styles.sidebar}>
       <div className={styles.sidebarContainer}>
         <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" />
-        <SidebarLinkItem icon={FaPlus} label="Novo Pedido" path="/" />
-        <SidebarLinkItem icon={TiFlowMerge} label="Processos" path="/" />
-        <SidebarLinkItem icon={MdFastfood} label="Cardápio" path="/pages/product" />
-        <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" path="/pages/client" />
-        <SidebarLinkItem icon={FaUserTie} label="Funcionários" path="/pages/employee" />
-        <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" path="/" />
-        <SidebarLinkItem icon={FaCog} label="Configurações" path="/" />
-        <SidebarItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin}/>
+        <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/" />
+        <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/" />
+        <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
+        <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
+        <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
+        <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
+        <SidebarLinkItem icon={FaCog} label="Configurações" href="/" />
+        <SidebarItem href="/login" icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin}/>
       </div>
     </div>
   );
