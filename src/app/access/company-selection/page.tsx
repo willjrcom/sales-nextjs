@@ -1,4 +1,5 @@
 'use client';
+
 import Access from '@/app/api/auth/access/route';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';

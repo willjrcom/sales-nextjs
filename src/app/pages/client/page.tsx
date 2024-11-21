@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import CrudLayout from "@/app/components/crud/layout";
 import Menu from "@/app/components/menu/layout";
@@ -55,8 +55,7 @@ const PageClient = () => {
                         showModal={modalHandler.showModal}>
                         <ClientForm 
                             onSubmit={NewClient}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            reloadData={fetchData}/>
+                            handleCloseModal={() => modalHandler.setShowModal(false)}/>
                     </ButtonPlus>
                 }
                 refreshButton={

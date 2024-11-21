@@ -1,10 +1,11 @@
+'use client';
+
 import { ColumnDef } from "@tanstack/react-table";
 import Product from "./product";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import ProductForm from "@/app/forms/product/form";
 import UpdateProduct from "@/app/api/product/update/route";
 import ModalHandler from "@/app/components/modal/modal";
-import { useRouter } from "next/router";
 
 
 const ProductColumns = (): ColumnDef<Product>[] => [
@@ -66,17 +67,11 @@ const ProductColumns = (): ColumnDef<Product>[] => [
           <ProductForm 
             item={row.original}
             onSubmit={UpdateProduct} 
-            handleCloseModal={() => modalHandler.setShowModal(false)}
-            reloadData={Redirect} />
+            handleCloseModal={() => modalHandler.setShowModal(false)}/>
         </ButtonEdit>
       )
     },
   },
 ];
-
-const Redirect = () => {
-  const router = useRouter();
-  router.reload();
-}
 
 export default ProductColumns

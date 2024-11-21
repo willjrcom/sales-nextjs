@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../field';
 import Product from '@/app/entities/product/product';
@@ -7,8 +9,9 @@ import GetCategories from '@/app/api/category/route';
 import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/route';
+import { useRouter } from 'next/router';
 
-const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFormsProps<Product>) => {
+const ProductForm = ({ handleCloseModal, onSubmit, item }: CreateFormsProps<Product>) => {
     const product = item || new Product();
     const [id, setId] = useState(product.id);
     const [code, setCode] = useState(product.code);
@@ -24,7 +27,8 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
     const [error, setError] = useState<string | null>(null);
-
+    const router = useRouter();
+    
     const submit = async () => {
         if (!data) return;
 
@@ -43,7 +47,7 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
     
             if (response) {
                 handleCloseModal();
-                reloadData();
+                router.reload();
             }
 
         } catch (error) {
@@ -54,6 +58,8 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product, data);
+        handleCloseModal();
+        router.reload();
     }
 
     useEffect(() => {

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import EmployeeForm from "@/app/forms/employee/form";
 import ButtonFilter from "@/app/components/crud/button-filter";
@@ -53,8 +53,7 @@ const PageEmployee = () => {
                         setModal={modalHandler.setShowModal}>
                         <EmployeeForm 
                             onSubmit={NewEmployee}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            reloadData={fetchData}/>
+                            handleCloseModal={() => modalHandler.setShowModal(false)}/>
                     </ButtonPlus>
                 }
                 refreshButton={

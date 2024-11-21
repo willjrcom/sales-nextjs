@@ -4,7 +4,6 @@ import ButtonEdit from "@/app/components/crud/button-edit";
 import PersonColumns from "../person/table-columns";
 import ClientForm from "@/app/forms/client/form";
 import ModalHandler from "@/app/components/modal/modal";
-import { useRouter } from "next/router";
 import UpdateClient from "@/app/api/client/update/route";
 
 
@@ -24,17 +23,11 @@ const ClientColumns = (): ColumnDef<Client>[] => [
           <ClientForm
             item={row.original}
             onSubmit={UpdateClient}
-            handleCloseModal={() => modalHandler.setShowModal(false)}
-            reloadData={Redirect} />
+            handleCloseModal={() => modalHandler.setShowModal(false)}/>
         </ButtonEdit>
       )
     },
   },
 ];
-
-const Redirect = () => {
-  const router = useRouter();
-  router.reload();
-}
 
 export default ClientColumns

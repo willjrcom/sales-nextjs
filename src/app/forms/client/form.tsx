@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import PersonForm from '../person/form';
 import Person from '@/app/entities/person/person';
@@ -7,11 +9,13 @@ import DateComponent from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteClient from '@/app/api/client/delete/route';
+import { useRouter } from 'next/router';
 
 
-const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateFormsProps<Client>) => {
+const ClientForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Client>) => {
     const [person, setPerson] = useState<Person>(item as Person || new Person())
     const { data } = useSession();
+    const router = useRouter();
 
     const submit = async () => {
         if (!data) return;
@@ -21,7 +25,7 @@ const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateForm
 
         if (response) {
             handleCloseModal()
-            reloadData()
+            router.reload();
         }
     }
     
@@ -29,12 +33,13 @@ const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateForm
         if (!data) return;
         let client = new Client(person)
         DeleteClient(client, data)
+        handleCloseModal();
+        router.reload();
     }
 
     return (
         <>
             <PersonForm person={person} onPersonChange={setPerson}/>
-
             <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
         </>
     );
