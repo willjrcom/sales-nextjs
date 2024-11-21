@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import CreatePersonForm from '../person/create';
 import Person from '@/app/entities/person/person';
-import NewEmployee from '@/app/api/employee/new/route';
 import Employee from '@/app/entities/employee/employee';
 import { useSession } from 'next-auth/react';
 import ButtonModal from '../buttons-modal';
@@ -26,7 +25,7 @@ const EmployeeForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateFo
 
     return (
         <>
-            <CreatePersonForm person={person} onPersonChange={setPerson}/>
+            <CreatePersonForm person={person} onPersonChange={setPerson} likeTax={false}/>
             <ButtonModal isUpdate={person.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
         </>
     );

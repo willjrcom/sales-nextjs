@@ -8,9 +8,10 @@ import Contact from "@/app/entities/contact/contact";
 interface PersonProps {
     person: Person
     onPersonChange: (updatedPerson: Person) => void;
+    likeTax: boolean
 }
 
-const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
+const CreatePersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
     const [id, setId] = useState(person.id);
     const [name, setName] = useState(person.name);
     const [email, setEmail] = useState(person.email);
@@ -54,7 +55,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
                     <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber} pattern="\d{1} \d{4}-\d{4}|\d{4}-\d{4}"/>
                 </div>
             </div>
-            <CreateAddressForm address={address} onAddressChange={setAddress}/>
+            <CreateAddressForm address={address} onAddressChange={setAddress} likeTax={likeTax} />
 
             <HiddenField name="id" setValue={setId} value={id}/>
         </>

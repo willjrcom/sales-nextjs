@@ -5,9 +5,10 @@ import Address from '@/app/entities/address/address';
 interface AddressProps {
     address: Address
     onAddressChange: (updatedAddress: Address) => void;
+    likeTax: boolean;
 }
 
-const CreateAddressForm = ({address, onAddressChange}:AddressProps) => {
+const CreateAddressForm = ({address, onAddressChange, likeTax}:AddressProps) => {
     const [id, setId] = useState(address.id);
     const [street, setStreet] = useState(address.street);
     const [number, setNumber] = useState(address.number);
@@ -58,8 +59,8 @@ const CreateAddressForm = ({address, onAddressChange}:AddressProps) => {
         <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={setState} value={state}/>
 
         <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={setCep} value={cep}/>
-
-        <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={setDeliveryTax} value={deliveryTax}/>
+        {likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={setDeliveryTax} value={deliveryTax}/>}
+        
 
         <HiddenField name="object_id" setValue={setObjectId} value={objectId}/>
         <HiddenField name="id" setValue={setId} value={id}/>

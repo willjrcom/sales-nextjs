@@ -77,7 +77,7 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
 }
 
 const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue }: NumberFieldProps) => {
-
+    
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
