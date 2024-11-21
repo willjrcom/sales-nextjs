@@ -31,7 +31,7 @@ const ClientForm = ({ item, handleCloseModal, onSubmit, context }: CreateFormsPr
     const onDelete = async () => {
         if (!data) return;
         let client = new Client(person)
-        DeleteClient(client, data)
+        DeleteClient(client.id, data)
         handleCloseModal();
         context.removeItem(client.id)
     }

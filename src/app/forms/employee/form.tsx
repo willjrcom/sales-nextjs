@@ -29,7 +29,7 @@ const EmployeeForm = ({ item, handleCloseModal, onSubmit, context }: CreateForms
     const onDelete = async () => {
         if (!data) return;
         let employee = new Employee(person)
-        DeleteEmployee(employee, data)
+        DeleteEmployee(employee.id, data)
         handleCloseModal();
         context.removeItem(employee.id)
     }

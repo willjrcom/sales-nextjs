@@ -53,7 +53,7 @@ const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsP
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteProduct(product, data);
+        DeleteProduct(product.id, data);
         handleCloseModal();
         context.removeItem(product.id)
     }
