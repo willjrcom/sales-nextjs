@@ -5,9 +5,11 @@ import PersonColumns from "../person/table-columns";
 import ModalHandler from "@/app/components/modal/modal";
 import EmployeeForm from "@/app/forms/employee/form";
 import UpdateEmployee from "@/app/api/employee/update/route";
+import { useEmployees } from "@/app/context/employee/context";
+import { ItemContextProps } from "@/app/context/props";
 
 
-const EmployeeColumns = (): ColumnDef<Employee>[] => [
+const EmployeeColumns = (context: ItemContextProps<Employee>): ColumnDef<Employee>[] => [
   ...PersonColumns<Employee>(),
   {
     id: 'Editar',
@@ -15,7 +17,6 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       const modalHandler = ModalHandler();
-
       return (
         <ButtonEdit
           name={row.original.name}
@@ -23,7 +24,8 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
           <EmployeeForm
             item={row.original}
             onSubmit={UpdateEmployee}
-            handleCloseModal={() => modalHandler.setShowModal(false)} />
+            handleCloseModal={() => modalHandler.setShowModal(false)}
+            context={context}/>
         </ButtonEdit>
       )
     },

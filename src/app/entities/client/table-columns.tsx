@@ -5,6 +5,7 @@ import PersonColumns from "../person/table-columns";
 import ClientForm from "@/app/forms/client/form";
 import ModalHandler from "@/app/components/modal/modal";
 import UpdateClient from "@/app/api/client/update/route";
+import { useClients } from "@/app/context/client/context";
 
 
 const ClientColumns = (): ColumnDef<Client>[] => [
@@ -23,7 +24,8 @@ const ClientColumns = (): ColumnDef<Client>[] => [
           <ClientForm
             item={row.original}
             onSubmit={UpdateClient}
-            handleCloseModal={() => modalHandler.setShowModal(false)}/>
+            handleCloseModal={() => modalHandler.setShowModal(false)}
+            context={useClients()}/>
         </ButtonEdit>
       )
     },

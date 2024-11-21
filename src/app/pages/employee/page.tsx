@@ -7,45 +7,41 @@ import CrudLayout from "@/app/components/crud/layout";
 import Menu from "@/app/components/menu/layout";
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
-import GetEmployees from "@/app/api/employee/route";
-import Employee from "@/app/entities/employee/employee";
-import { useCallback, useEffect, useState } from "react";
-import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { useSession } from "next-auth/react";
+import Refresh from "@/app/components/crud/refresh";
 import ModalHandler from "@/app/components/modal/modal";
 import NewEmployee from "@/app/api/employee/new/route";
-import FetchData from "@/app/api/fetch-data";
+import { EmployeeProvider, useEmployees } from "@/app/context/employee/context";
 
 const PageEmployee = () => {
-    const [employees, setEmployees] = useState<Employee[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const formattedTime = FormatRefreshTime(new Date());
-    const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data } = useSession();
+    return (
+        <Menu>
+            <EmployeeProvider>
+                <Crud />
+            </EmployeeProvider>
+        </Menu>
+    );
+};
+
+const Crud = () => {
+    const context = useEmployees();
     const modalHandler = ModalHandler();
 
-    const fetchData = useCallback(async () => {
-        if (!data) return;
-        FetchData({ getItems: GetEmployees, setItems: setEmployees, data, setError, setLoading })
-    }, [data?.user?.idToken!]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    if (loading) {
+    if (context.getLoading()) {
         return (
-            <Menu><h1>Carregando página...</h1></Menu>
+            <h1>Carregando página...</h1>
         )
     }
     
     return (
-        <Menu>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
+        <>
+        {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout
                 title="Funcionários"
-                filterButtonChildren={<ButtonFilter name="funcionario" />}
+                filterButtonChildren={
+                    <ButtonFilter name="funcionario"
+                        setShowModal={modalHandler.setShowModal} 
+                        showModal={modalHandler.showModal}/>
+                }
                 plusButtonChildren={
                     <ButtonPlus 
                         name="funcionario" 
@@ -53,25 +49,23 @@ const PageEmployee = () => {
                         setModal={modalHandler.setShowModal}>
                         <EmployeeForm 
                             onSubmit={NewEmployee}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}/>
+                            handleCloseModal={() => modalHandler.setShowModal(false)}
+                            context={context}
+                            />
                     </ButtonPlus>
                 }
                 refreshButton={
                     <Refresh
-                        lastUpdate={lastUpdate}
-                        setItems={setEmployees}
-                        getItems={GetEmployees}
-                        setLastUpdate={setLastUpdate}
+                        context={context}
                     />
                 }
                 tableChildren={
                     <CrudTable 
-                        columns={EmployeeColumns()} 
-                        data={employees} />
+                        columns={EmployeeColumns(context)} 
+                        data={context.items} />
                 }
             />
-        </Menu>
-    );
-};
-
+        </>
+    )
+}
 export default PageEmployee;

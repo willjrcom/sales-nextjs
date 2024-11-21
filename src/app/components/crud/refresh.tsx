@@ -1,25 +1,21 @@
-import { Session } from "next-auth";
+
+import { ItemContextProps } from "@/app/context/props";
 import { useSession } from "next-auth/react";
-import { Dispatch, SetStateAction } from "react";
 import { HiOutlineRefresh } from "react-icons/hi";
 
 interface RefreshProps<T> {
-    lastUpdate: string;
-    setItems: Dispatch<SetStateAction<T[]>>;
-    getItems: (session: Session) => Promise<T[]>;
-    setLastUpdate: Dispatch<SetStateAction<string>>;
+    context: ItemContextProps<T>;
 }
 
-const Refresh = <T,>({ lastUpdate, setItems, getItems, setLastUpdate }: RefreshProps<T>) => {
+const Refresh = <T,>({ context }: RefreshProps<T>) => {
     const { data } = useSession();
 
     const handleRefresh = async () => {
         try {
             if (!data) return;
 
-            const items = await getItems(data);
-            setItems(items);
-            setLastUpdate(FormatRefreshTime(new Date()));
+            context.fetchData();
+            context.updateLastUpdate();
         } catch (error) {
             console.error(error);
         }
@@ -28,7 +24,7 @@ const Refresh = <T,>({ lastUpdate, setItems, getItems, setLastUpdate }: RefreshP
     return (
         <div className="flex items-center gap-3">
             <button onClick={handleRefresh}><HiOutlineRefresh /></button>
-            <label className="text-gray-800">Atualizado em {lastUpdate}</label>
+            <label className="text-gray-800">Atualizado em {context.getLastUpdate()}</label>
         </div>
     );
 }

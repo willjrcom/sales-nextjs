@@ -7,45 +7,39 @@ import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
-import GetProducts from "@/app/api/product/route";
-import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
-import Product from "@/app/entities/product/product";
-import { useSession } from "next-auth/react";
+import Refresh from "@/app/components/crud/refresh";
 import ModalHandler from "@/app/components/modal/modal";
 import NewProduct from "@/app/api/product/new/route";
-import FetchData from "@/app/api/fetch-data";
+import { ProductProvider, useProducts } from "@/app/context/product/context";
 
 const PageProducts = () => {
-    const [products, setProducts] = useState<Product[]>([])
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const formattedTime = FormatRefreshTime(new Date())
-    const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data } = useSession();
-    const modalHandler = ModalHandler();
-
-    const fetchData = useCallback(async () => {
-        if (!data?.user.idToken) return;
-        FetchData({ getItems: GetProducts, setItems: setProducts, data, setError, setLoading })
-    }, [data?.user.idToken!]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-    
-    if (loading) {
-        return (
-            <Menu><h1>Carregando página...</h1></Menu>
-        )
-    }
-    
     return (
         <Menu>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
+            <ProductProvider>
+                <Crud />
+            </ProductProvider>
+        </Menu>
+    );
+}
+
+const Crud = () => {
+    const modalHandler = ModalHandler();
+    const context = useProducts();
+
+    if (context.getLoading()) {
+        return (
+            <h1>Carregando página...</h1>
+        )
+    }
+
+    return (
+        <>
+        {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout title="Produtos"
                 filterButtonChildren={
-                    <ButtonFilter name="produto" />
+                    <ButtonFilter name="produto" 
+                    setShowModal={modalHandler.setShowModal} 
+                    showModal={modalHandler.showModal}/>
                 }
                 plusButtonChildren={
                     <ButtonPlus name="produto"
@@ -53,26 +47,23 @@ const PageProducts = () => {
                         showModal={modalHandler.showModal}>
                         <ProductForm 
                             onSubmit={NewProduct}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}/>
+                            handleCloseModal={() => modalHandler.setShowModal(false)}
+                            context={context}/>
                     </ButtonPlus>
                 }
                 refreshButton={
                     <Refresh 
-                        lastUpdate={lastUpdate} 
-                        setItems={setProducts} 
-                        getItems={GetProducts} 
-                        setLastUpdate={setLastUpdate} 
+                        context={context}
                     />
                 }
                 tableChildren={
                     <CrudTable 
                         columns={ProductColumns()} 
-                        data={products}>
+                        data={context.items}>
                     </CrudTable>
                 } 
                 />
-        </Menu>
-    );
+            </>
+    )
 }
-
 export default PageProducts;

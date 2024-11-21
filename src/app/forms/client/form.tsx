@@ -12,10 +12,9 @@ import DeleteClient from '@/app/api/client/delete/route';
 import { useRouter } from 'next/router';
 
 
-const ClientForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Client>) => {
+const ClientForm = ({ item, handleCloseModal, onSubmit, context }: CreateFormsProps<Client>) => {
     const [person, setPerson] = useState<Person>(item as Person || new Person())
     const { data } = useSession();
-    const router = useRouter();
 
     const submit = async () => {
         if (!data) return;
@@ -25,7 +24,7 @@ const ClientForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Clien
 
         if (response) {
             handleCloseModal()
-            router.reload();
+            context.addItem(client)
         }
     }
     
@@ -34,7 +33,7 @@ const ClientForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Clien
         let client = new Client(person)
         DeleteClient(client, data)
         handleCloseModal();
-        router.reload();
+        context.removeItem(client.id)
     }
 
     return (

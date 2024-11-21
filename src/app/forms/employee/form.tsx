@@ -9,12 +9,10 @@ import ButtonsModal from '../buttons-modal';
 import DateComponent from '@/app/utils/date';
 import CreateFormsProps from '../create-forms-props';
 import DeleteEmployee from '@/app/api/employee/delete/route';
-import { useRouter } from 'next/router';
 
-const EmployeeForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Employee>) => {
+const EmployeeForm = ({ item, handleCloseModal, onSubmit, context }: CreateFormsProps<Employee>) => {
     const [person, setPerson] = useState<Person>(item as Person || new Person())
     const { data } = useSession();
-    const router = useRouter();
     
     const submit = async () => {
         if (!data) return;
@@ -24,7 +22,7 @@ const EmployeeForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Emp
 
         if (response) {
             handleCloseModal();
-            router.reload();
+            context.addItem(employee)
         }
     }
 
@@ -33,7 +31,7 @@ const EmployeeForm = ({ item, handleCloseModal, onSubmit }: CreateFormsProps<Emp
         let employee = new Employee(person)
         DeleteEmployee(employee, data)
         handleCloseModal();
-        router.reload();
+        context.removeItem(employee.id)
     }
 
     return (
