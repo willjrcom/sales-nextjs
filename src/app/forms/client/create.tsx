@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import CreatePersonForm from '../person/create';
 import Person from '@/app/entities/person/person';
-import ButtonModal from '../buttons-modal';
+import ButtonsModal from '../buttons-modal';
 import Client from '@/app/entities/client/client';
 import DateComponent from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
+import DeleteClient from '@/app/api/client/delete/route';
 
 
 const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateFormsProps<Client>) => {
@@ -24,10 +25,17 @@ const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateForm
         }
     }
     
+    const onDelete = async () => {
+        if (!data) return;
+        let client = new Client(person)
+        DeleteClient(client, data)
+    }
+
     return (
         <>
             <CreatePersonForm person={person} onPersonChange={setPerson} likeTax={true} />
-            <ButtonModal isUpdate={person.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
+
+            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
         </>
     );
 };

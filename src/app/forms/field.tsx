@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, use, useEffect, useMemo } from "react"
 
 interface TextFieldProps {
     friendlyName: string
@@ -98,7 +98,6 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
 }
 
 const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldProps) => {
-
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
@@ -110,7 +109,7 @@ const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldP
                 id={name}
                 type="date"
                 disabled={disabled}
-                value={format(value, "yyyy-MM-dd")}
+                value={value}
                 onChange={e => setValue(e.target.value)}
             />
         </div>

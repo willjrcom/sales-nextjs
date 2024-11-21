@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../field';
 import Product from '@/app/entities/product/product';
-import ButtonModal from '../buttons-modal';
+import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import GetCategories from '@/app/api/category/route';
 import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
+import DeleteProduct from '@/app/api/product/delete/route';
 
 const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFormsProps<Product>) => {
     const product = item || new Product();
@@ -48,6 +49,11 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
         } catch (error) {
             setError((error as Error).message);
         }
+    }
+
+    const onDelete = async () => {
+        if (!data) return;
+        DeleteProduct(product, data);
     }
 
     useEffect(() => {
@@ -111,7 +117,7 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonModal isUpdate={product.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
+            <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
         </>
     );
 };

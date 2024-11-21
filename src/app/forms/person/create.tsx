@@ -4,6 +4,7 @@ import CreateAddressForm from "../address/create";
 import Address from "@/app/entities/address/address";
 import Person from "@/app/entities/person/person";
 import Contact from "@/app/entities/contact/contact";
+import { format } from "date-fns";
 
 interface PersonProps {
     person: Person
@@ -20,7 +21,12 @@ const CreatePersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
     const [contactDdd, setContactDdd] = useState(person.contact.ddd);
     const [contactNumber, setContactNumber] = useState(person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);
-    
+
+    useEffect(() => {
+        if (!birthday) return
+        setBirthday(format(birthday, "yyyy-MM-dd"));
+    }, [])
+
     useEffect(() => {
         const contact = new Contact()
         contact.ddd = contactDdd
