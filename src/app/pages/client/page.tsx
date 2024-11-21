@@ -2,7 +2,7 @@
 
 import CrudLayout from "@/app/components/crud/layout";
 import Menu from "@/app/components/menu/layout";
-import ClientForm from "@/app/forms/client/create";
+import ClientForm from "@/app/forms/client/form";
 import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";

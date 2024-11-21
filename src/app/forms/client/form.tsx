@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CreatePersonForm from '../person/create';
+import PersonForm from '../person/form';
 import Person from '@/app/entities/person/person';
 import ButtonsModal from '../buttons-modal';
 import Client from '@/app/entities/client/client';
@@ -33,7 +33,7 @@ const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateForm
 
     return (
         <>
-            <CreatePersonForm person={person} onPersonChange={setPerson} likeTax={true} />
+            <PersonForm person={person} onPersonChange={setPerson} likeTax={true} />
 
             <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
         </>

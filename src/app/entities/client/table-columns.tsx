@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Client from "./client";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import PersonColumns from "../person/table-columns";
-import ClientForm from "@/app/forms/client/create";
+import ClientForm from "@/app/forms/client/form";
 import ModalHandler from "@/app/components/modal/modal";
 import { useRouter } from "next/router";
 import UpdateClient from "@/app/api/client/update/route";

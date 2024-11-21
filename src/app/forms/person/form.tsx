@@ -12,7 +12,7 @@ interface PersonProps {
     likeTax: boolean
 }
 
-const CreatePersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
+const PersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
     const [id, setId] = useState(person.id);
     const [name, setName] = useState(person.name);
     const [email, setEmail] = useState(person.email);
@@ -68,4 +68,4 @@ const CreatePersonForm = ({person, onPersonChange, likeTax}: PersonProps) => {
     );
 }
 
-export default CreatePersonForm
+export default PersonForm
