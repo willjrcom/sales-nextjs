@@ -9,7 +9,7 @@ import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import GetProducts from "@/app/api/product/route";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import Product from "@/app/entities/product/product";
 import { useSession } from "next-auth/react";
 import ModalHandler from "@/app/components/modal/modal";
@@ -22,20 +22,18 @@ const PageProducts = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data, status } = useSession();
+    const { data } = useSession();
     const modalHandler = ModalHandler();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!data) return;
-        FetchData({ getItems: GetProducts, setItems: setProducts, data, setError, setLoading }  )
-    }
+        FetchData({ getItems: GetProducts, setItems: setProducts, data, setError, setLoading })
+    }, [data]);
 
     useEffect(() => {
-        if (status === "authenticated") {
-            fetchData();
-        }
-    }, [data, status]);
-
+        fetchData();
+    }, [data, fetchData]);
+    
     return (
         <Menu>
             <CrudLayout title="Produtos"

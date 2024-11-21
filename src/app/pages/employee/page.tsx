@@ -9,11 +9,12 @@ import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import GetEmployees from "@/app/api/employee/route";
 import Employee from "@/app/entities/employee/employee";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import ModalHandler from "@/app/components/modal/modal";
 import NewEmployee from "@/app/api/employee/new/route";
+import FetchData from "@/app/api/fetch-data";
 
 const PageEmployee = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -21,29 +22,17 @@ const PageEmployee = () => {
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date());
     const [lastUpdate, setLastUpdate] = useState(formattedTime);
-    const { data, status } = useSession();
+    const { data } = useSession();
     const modalHandler = ModalHandler();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!data) return;
-
-        try {
-            setLoading(true);
-            let newEmployees = await GetEmployees(data);
-            setEmployees(newEmployees);
-        } catch (err) {
-            console.error("Error fetching employees: ", err);
-            setError((err as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    };
+        FetchData({ getItems: GetEmployees, setItems: setEmployees, data, setError, setLoading })
+    }, [data]);
 
     useEffect(() => {
-        if (status === "authenticated") {
-            fetchData();
-        }
-    }, [status, data]);
+        fetchData();
+    }, [data, fetchData]);
 
     return (
         <Menu>

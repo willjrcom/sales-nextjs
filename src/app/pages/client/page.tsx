@@ -14,6 +14,7 @@ import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import ModalHandler from "@/app/components/modal/modal";
 import NewClient from "@/app/api/client/new/route";
+import FetchData from "@/app/api/fetch-data";
 
 const PageClient = () => {
     const [clients, setClients] = useState<Client[]>([])
@@ -26,22 +27,13 @@ const PageClient = () => {
 
     const fetchData = useCallback(async () => {
         if (!data) return;
+        FetchData({ getItems: GetClients, setItems: setClients, data, setError, setLoading })
         
-        try {
-            const clients = await GetClients(data)
-            setClients(clients);
-        } catch (err) {
-            setError((err as Error).message);
-        } finally {
-            setLoading(false);
-        }
     }, [data]);
 
     useEffect(() => {
-        if (status === "authenticated") {
-            fetchData();
-        }
-    }, [data, status, fetchData]);
+        fetchData();
+    }, [data, fetchData]);
 
     return (
         <Menu>
