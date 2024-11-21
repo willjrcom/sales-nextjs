@@ -5,7 +5,6 @@ import PersonColumns from "../person/table-columns";
 import ModalHandler from "@/app/components/modal/modal";
 import EmployeeForm from "@/app/forms/employee/form";
 import UpdateEmployee from "@/app/api/employee/update/route";
-import { useEmployees } from "@/app/context/employee/context";
 import { ItemContextProps } from "@/app/context/props";
 
 
@@ -19,8 +18,7 @@ const EmployeeColumns = (context: ItemContextProps<Employee>): ColumnDef<Employe
       const modalHandler = ModalHandler();
       return (
         <ButtonEdit
-          name={row.original.name}
-          href={`/client/edit/${row.original.id}`}>
+          name={row.original.name}>
           <EmployeeForm
             item={row.original}
             onSubmit={UpdateEmployee}

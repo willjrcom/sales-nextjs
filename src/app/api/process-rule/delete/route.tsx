@@ -1,9 +1,9 @@
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 
-const DeleteProduct = async (id: string, session: Session): Promise<string> => {
+const DeleteProcessRule = async (id: string, session: Session): Promise<string> => {
     const response = await RequestApi<string, string>({
-        path: "/product/" + id, 
+        path: "/product-category/process-rule/" + id, 
         method: "DELETE",
         headers: await AddIdToken(session),
     });
@@ -11,4 +11,4 @@ const DeleteProduct = async (id: string, session: Session): Promise<string> => {
     return response.data
 };
 
-export default DeleteProduct
+export default DeleteProcessRule

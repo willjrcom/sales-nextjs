@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 
 const NewSize = async (size: Size, session: Session): Promise<string> => {
     const response = await RequestApi<Size, string>({
-        path: "/size/new", 
+        path: "/product-category/size/new", 
         method: "POST",
         body: size,
         headers: await AddIdToken(session),

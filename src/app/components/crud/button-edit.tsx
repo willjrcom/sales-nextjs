@@ -4,11 +4,10 @@ import { FaEdit } from "react-icons/fa";
 
 interface NewButtonProps {
     name: string;
-    href: string;
     children: React.ReactNode;
 }
 
-const ButtonEdit = ({ name, href, children }: NewButtonProps) => {
+const ButtonEdit = ({ name, children }: NewButtonProps) => {
     const [showModal, setShowModal] = useState(false);
 
     const handleOpenModal = () => {

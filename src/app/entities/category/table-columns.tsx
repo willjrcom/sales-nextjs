@@ -5,6 +5,8 @@ import UpdateCategory from "@/app/api/category/update/route";
 import ModalHandler from "@/app/components/modal/modal";
 import { useCategories } from "@/app/context/category/context";
 import Category from "./category";
+import PageProcessRules from "@/app/pages/product/process-rule";
+import { ProcessRuleProvider } from "@/app/context/process-rule/context";
 
 
 const CategoryColumns = (): ColumnDef<Category>[] => [
@@ -27,8 +29,7 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
 
       return (
         <ButtonEdit 
-          name={row.original.name} 
-          href={`/category/edit/${row.original.id}`}>
+          name={row.original.name}>
           <CategoryForm 
             item={row.original}
             onSubmit={UpdateCategory} 
@@ -38,6 +39,20 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
       )
     },
   },
+  {
+    id: 'Processos',
+    accessorKey: 'process_rules',
+    header: 'Processos',
+    cell: ({row}) => {
+      return (
+        <ButtonEdit name="Processos">
+          <ProcessRuleProvider id={row.original.id}>
+            <PageProcessRules id={row.original.id} />
+          </ProcessRuleProvider>
+        </ButtonEdit>
+      )
+    }
+  }
 ];
 
 export default CategoryColumns

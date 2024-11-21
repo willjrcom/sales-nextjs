@@ -1,6 +1,6 @@
 export interface ItemContextProps<T> {
     items: T[];
-    fetchData: () => void;
+    fetchData: (id?: string) => void;
     setItemsState: (items: T[]) => void;
     addItem: (product: T) => void;
     removeItem: (id: string) => void;
