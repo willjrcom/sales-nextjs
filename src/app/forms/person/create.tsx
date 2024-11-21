@@ -19,7 +19,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
     const [contactDdd, setContactDdd] = useState(person.contact.ddd);
     const [contactNumber, setContactNumber] = useState(person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);
-
+    
     useEffect(() => {
         const contact = new Contact()
         contact.ddd = contactDdd
@@ -44,7 +44,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
 
             <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={setCpf} value={cpf}/>
 
-            <DateField name="birthday" friendlyName="Aniversário" setValue={setBirthday} value={birthday} />
+            <DateField name="birthday" friendlyName="Nascimento" setValue={setBirthday} value={birthday} />
 
             <div className="flex space-x-4">
                 <div className="w-1/3">

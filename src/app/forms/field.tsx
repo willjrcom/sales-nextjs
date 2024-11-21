@@ -1,3 +1,4 @@
+import { format } from "date-fns"
 import { Dispatch, SetStateAction } from "react"
 
 interface TextFieldProps {
@@ -109,7 +110,7 @@ const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldP
                 id={name}
                 type="date"
                 disabled={disabled}
-                value={value}
+                value={format(value, "yyyy-MM-dd")}
                 onChange={e => setValue(e.target.value)}
             />
         </div>

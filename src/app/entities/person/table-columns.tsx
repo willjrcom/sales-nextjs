@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Person from "./person";
 import Contact from "../contact/contact";
 import Address from "../address/address";
+import { format } from "date-fns";
 
 const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
   {
@@ -23,6 +24,11 @@ const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
     id: 'Nascimento',
     accessorKey: 'birthday',
     header: 'Nascimento',
+    accessorFn: row => {
+      const date = new Date(row.birthday);
+      const formattedDate = format(date, "dd/MM/yyyy");
+      return formattedDate
+    }
   },
   {
       id: 'Contato',
