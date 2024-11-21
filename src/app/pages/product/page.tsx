@@ -1,69 +1,63 @@
 'use client';
 
-import ProductForm from "@/app/forms/product/form";
-import CrudLayout from "@/app/components/crud/layout";
-import Menu from "@/app/components/menu/layout";
-import ButtonFilter from "@/app/components/crud/button-filter";
-import ButtonPlus from "@/app/components/crud/button-plus";
-import CrudTable from "@/app/components/crud/table";
-import ProductColumns from "@/app/entities/product/table-columns";
-import Refresh from "@/app/components/crud/refresh";
-import ModalHandler from "@/app/components/modal/modal";
-import NewProduct from "@/app/api/product/new/route";
-import { ProductProvider, useProducts } from "@/app/context/product/context";
+import { useState } from 'react';
+import PageProducts from './product';
+import Menu from '@/app/components/menu/layout';
+import { ProductProvider } from '@/app/context/product/context';
+import PageCategories from './category';
+import { CategoryProvider } from '@/app/context/category/context';
 
-const PageProducts = () => {
+const Categorias = () => <div>Conteúdo de Categorias</div>;
+const Processos = () => <div>Conteúdo de Processos</div>;
+
+const PageWithTabs = () => {
+    const [activeTab, setActiveTab] = useState<'produtos' | 'categorias' | 'processos'>('produtos');
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'produtos':
+                return <PageProducts />;
+            case 'categorias':
+                return <PageCategories />;
+            case 'processos':
+                return <Processos />;
+            default:
+                return null;
+        }
+    };
+
     return (
         <Menu>
-            <ProductProvider>
-                <Crud />
-            </ProductProvider>
+            <CategoryProvider>
+                <ProductProvider>
+                <div className="container">
+                    <h1 className="title">Produtos</h1>
+                    <div className="tabs">
+                        <button
+                            className={`tab ${activeTab === 'produtos' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('produtos')}
+                        >
+                            Produtos
+                        </button>
+                        <button
+                            className={`tab ${activeTab === 'categorias' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('categorias')}
+                        >
+                            Categorias
+                        </button>
+                        <button
+                            className={`tab ${activeTab === 'processos' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('processos')}
+                        >
+                            Processos
+                        </button>
+                    </div>
+                    <div className="content">{renderContent()}</div>
+                </div>
+                </ProductProvider>
+            </CategoryProvider>
         </Menu>
     );
-}
+};
 
-const Crud = () => {
-    const modalHandler = ModalHandler();
-    const context = useProducts();
-
-    if (context.getLoading()) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
-    return (
-        <>
-        {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
-            <CrudLayout title="Produtos"
-                filterButtonChildren={
-                    <ButtonFilter name="produto" 
-                    setShowModal={modalHandler.setShowModal} 
-                    showModal={modalHandler.showModal}/>
-                }
-                plusButtonChildren={
-                    <ButtonPlus name="produto"
-                        setModal={modalHandler.setShowModal}
-                        showModal={modalHandler.showModal}>
-                        <ProductForm 
-                            onSubmit={NewProduct}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            context={context}/>
-                    </ButtonPlus>
-                }
-                refreshButton={
-                    <Refresh 
-                        context={context}
-                    />
-                }
-                tableChildren={
-                    <CrudTable 
-                        columns={ProductColumns()} 
-                        data={context.items}>
-                    </CrudTable>
-                } 
-                />
-            </>
-    )
-}
-export default PageProducts;
+export default PageWithTabs;
