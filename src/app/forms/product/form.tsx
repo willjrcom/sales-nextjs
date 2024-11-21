@@ -77,11 +77,11 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
             if (!data) return;
 
             try {
-                console.log(categoryId)
                 const category = categories.find(category => category.id === categoryId);
                 if (!category) return;
 
                 let records: Record<string, string>[] = [];
+
                 for (const size of category.sizes) {
                     records.push({ id: size.id.toString(), name: size.name })
                 }
@@ -109,7 +109,7 @@ const ProductForm = ({ handleCloseModal, reloadData, onSubmit, item }: CreateFor
             <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={setCategoryId} selectedValue={categoryId} values={recordCategories}/>
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>
             <HiddenField name='id' setValue={setId} value={id}/>
-            <ButtonModal onSubmit={submit} onCancel={handleCloseModal}/>
+            <ButtonModal isUpdate={product.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
         </>
     );
 };

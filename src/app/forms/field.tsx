@@ -140,6 +140,7 @@ const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSe
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
             {friendlyName}
         </label>
+        {values.length === 0 && <p className="text-gray-600">Nenhuma opção disponível</p>}
         {values.map((valueObj) => (
             <div key={valueObj.id} className="flex items-center mb-2">
                 <input

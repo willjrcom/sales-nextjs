@@ -51,7 +51,7 @@ const CreatePersonForm = ({person, onPersonChange}: PersonProps) => {
                     <TextField name="ddd" friendlyName="DDD" placeholder="(xx)" setValue={setContactDdd} value={contactDdd} pattern="\(\d{2}\)"/>
                 </div>
                 <div className="w-2/3">
-                    <TextField name="number" friendlyName="Número" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber}pattern="\d{1} \d{4}-\d{4}|\d{4}-\d{4}"/>
+                    <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber} pattern="\d{1} \d{4}-\d{4}|\d{4}-\d{4}"/>
                 </div>
             </div>
             <CreateAddressForm address={address} onAddressChange={setAddress}/>

@@ -10,17 +10,16 @@ interface NewButtonProps {
 }
 
 const ButtonPlus = ({ name, children, showModal, setModal }: NewButtonProps) => {
-
-    const newClient = "Novo " + { name }.name;
+    const newButton = "Novo " + { name }.name;
 
     return (
         <div>
             <button onClick={() => setModal(true)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                 <FaPlus />
-                <span>{newClient}</span>
+                <span>{newButton}</span>
             </button>
 
-            <Form title={newClient} show={showModal} onClose={(() => setModal(false))}>
+            <Form title={newButton} show={showModal} onClose={(() => setModal(false))}>
                 {children}
             </Form>
         </div>

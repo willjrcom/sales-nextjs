@@ -27,7 +27,7 @@ const EmployeeForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateFo
     return (
         <>
             <CreatePersonForm person={person} onPersonChange={setPerson}/>
-            <ButtonModal onSubmit={submit} onCancel={handleCloseModal}/>
+            <ButtonModal isUpdate={person.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
         </>
     );
 };

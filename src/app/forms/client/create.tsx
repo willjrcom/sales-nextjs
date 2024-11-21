@@ -23,10 +23,11 @@ const ClientForm = ({ item, handleCloseModal, reloadData, onSubmit }: CreateForm
             reloadData()
         }
     }
+    
     return (
         <>
             <CreatePersonForm person={person} onPersonChange={setPerson}/>
-            <ButtonModal onSubmit={submit} onCancel={handleCloseModal}/>
+            <ButtonModal isUpdate={person.id !== ''} onSubmit={submit} onCancel={handleCloseModal}/>
         </>
     );
 };

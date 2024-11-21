@@ -19,7 +19,7 @@ const ButtonEdit = ({ name, href, children }: NewButtonProps) => {
         setShowModal(false);
     };
 
-    const newClient = "Editar " + {name}.name;
+    const editButton = "Editar " + {name}.name;
     
     return (
         <div>
@@ -27,7 +27,7 @@ const ButtonEdit = ({ name, href, children }: NewButtonProps) => {
                 <FaEdit />
             </button>
         
-            <Form title={newClient}show={showModal} onClose={(handleCloseModal)}>
+            <Form title={editButton}show={showModal} onClose={(handleCloseModal)}>
                 {children}
             </Form>
         </div>
