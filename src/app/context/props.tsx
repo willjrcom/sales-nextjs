@@ -28,15 +28,22 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const [error, setError] = useState<string | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
+    const idToken = data?.user.idToken;
 
     const fetchData = useCallback(async () => {
-        if (!data?.user.idToken) return;
-        FetchData({ getItems, setItems, data, setError, setLoading })
-    }, [data?.user.idToken!]);
+        if (!idToken) return; // Use a variável simplificada
+        FetchData({ getItems, setItems, data, setError, setLoading });
+    }, [idToken, getItems, setItems, data, setError, setLoading]); // Inclua todas as dependências necessárias
+
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const filterItems = (key: keyof T, value: string) => {
+        if (!value) return items;
+        return items.filter((item) => String(item[key]).toLowerCase().includes(value.toLowerCase()));
+    }
 
     const setItemsState = (items: T[]) => {
         setItems(items);
@@ -56,7 +63,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const getLoading = () => loading;
     const getLastUpdate = () => lastUpdate;
 
-    return { items, fetchData, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
+    return { items, fetchData, filterItems, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
 }
 
 export default GenericProvider

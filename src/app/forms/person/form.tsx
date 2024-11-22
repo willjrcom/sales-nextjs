@@ -24,9 +24,13 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
     const [address, setAddress] = useState<Address>(person.address);
 
     useEffect(() => {
-        if (!birthday) return
-        setBirthday(format(birthday, "yyyy-MM-dd"));
-    }, [])
+        if (!birthday) return;
+        setBirthday((prevBirthday) =>
+            typeof prevBirthday === "string"
+                ? prevBirthday
+                : format(prevBirthday, "yyyy-MM-dd")
+        );
+    }, [birthday]);
 
     useEffect(() => {
         const contact = new Contact()
