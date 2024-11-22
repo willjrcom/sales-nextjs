@@ -1,8 +1,7 @@
-import { format } from "date-fns"
-import { Dispatch, SetStateAction, use, useEffect, useMemo } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 interface TextFieldProps {
-    friendlyName: string
+    friendlyName?: string
     name: string
     placeholder?: string
     disabled?: boolean
@@ -66,9 +65,11 @@ const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 t
 const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern }: TextFieldProps) => {
     return (
         <div className="mb-4">
+            {friendlyName === '' &&
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
                 {friendlyName}
             </label>
+            }
 
             <input
                 className={InputClassName}

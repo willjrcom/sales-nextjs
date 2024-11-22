@@ -44,7 +44,7 @@ export default function PageProcessRules () {
                 tableChildren={
                     <CrudTable 
                         columns={ProcessRuleColumns()} 
-                        data={context.filterItems!('category_id', categoryID)}>
+                        data={context.filterItems('category_id', categoryID)}>
                     </CrudTable>
                 } 
                 />

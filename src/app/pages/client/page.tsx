@@ -49,7 +49,7 @@ const Crud = () => {
                 tableChildren={
                     <CrudTable 
                         columns={ClientColumns()} 
-                        data={context.filterItems!('name', nome)}>
+                        data={context.filterItems('name', nome)}>
                     </CrudTable>
                 } 
             />

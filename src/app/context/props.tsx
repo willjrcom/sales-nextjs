@@ -6,7 +6,8 @@ import { Session } from "next-auth";
 
 export interface ItemContextProps<T> {
     items: T[];
-    filterItems?: (key: keyof T, value: string) => T[];
+    filterItems: (key: keyof T, value: string) => T[];
+    findByID: (id: string) => T | undefined;
     fetchData: (id?: string) => void;
     setItemsState: (items: T[]) => void;
     addItem: (product: T) => void;
@@ -45,6 +46,10 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
         return items.filter((item) => String(item[key]).toLowerCase().includes(value.toLowerCase()));
     }
 
+    const findByID = (id: string) => {
+        return items.find((item) => item.id === id);
+    }
+
     const setItemsState = (items: T[]) => {
         setItems(items);
     }
@@ -63,7 +68,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const getLoading = () => loading;
     const getLastUpdate = () => lastUpdate;
 
-    return { items, fetchData, filterItems, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
+    return { items, fetchData, findByID, filterItems, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
 }
 
 export default GenericProvider

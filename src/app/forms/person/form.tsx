@@ -24,13 +24,9 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
     const [address, setAddress] = useState<Address>(person.address);
 
     useEffect(() => {
-        if (!birthday) return;
-        setBirthday((prevBirthday) =>
-            typeof prevBirthday === "string"
-                ? prevBirthday
-                : format(prevBirthday, "yyyy-MM-dd")
-        );
-    }, [birthday]);
+        if (!birthday) return
+        setBirthday(format(birthday, "yyyy-MM-dd"));
+    }, []);
 
     useEffect(() => {
         const contact = new Contact()
@@ -60,10 +56,10 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
 
             <div className="flex space-x-4">
                 <div className="w-1/3">
-                    <TextField name="ddd" friendlyName="DDD" placeholder="(xx)" setValue={setContactDdd} value={contactDdd} pattern="\(\d{2}\)"/>
+                    <TextField name="ddd" friendlyName="DDD" placeholder="(xx)" setValue={setContactDdd} value={contactDdd} />
                 </div>
                 <div className="w-2/3">
-                    <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber} pattern="\d{1} \d{4}-\d{4}|\d{4}-\d{4}"/>
+                    <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber} />
                 </div>
             </div>
             <CreateAddressForm address={address} onAddressChange={setAddress} />
