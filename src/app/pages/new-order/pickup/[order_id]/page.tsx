@@ -3,8 +3,6 @@
 import Menu from "@/app/components/menu/layout"
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useClients } from "@/app/context/client/context";
-import Client from "@/app/entities/client/client";
 import { useSession } from "next-auth/react";
 import Order from "@/app/entities/order/order";
 import GetOrderByID from "@/app/api/order/[id]/route";

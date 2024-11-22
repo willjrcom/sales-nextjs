@@ -1,6 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import Order from "./order";
+import Link from "next/link";
+import { FaEdit } from "react-icons/fa";
 
 const OrderColumns = (): ColumnDef<Order>[] => [
   {
@@ -32,13 +34,9 @@ const OrderColumns = (): ColumnDef<Order>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit 
-          name={String(row.original.order_number)}>
-            <h1>order</h1>
-          {/* <OrderForm 
-            item={row.original}
-            isUpdate={true}/> */}
-        </ButtonEdit>
+        <Link href={'/pages/order/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
+            <FaEdit />
+        </Link>
       )
     },
   },

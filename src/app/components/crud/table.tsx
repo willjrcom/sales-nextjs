@@ -13,10 +13,12 @@ const CrudTable = <T,>({ columns, data }: DataProps<T>) => {
     });
 
     return (
-        <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
-            {tHead({ table })}
-            {tBody({ table, columns })}
-        </table>
+        <div className="overflow-y-auto h-[80vh]">
+            <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
+                {tHead({ table })}
+                {tBody({ table, columns })}
+            </table>
+        </div>
     )
 }
 
