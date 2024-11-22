@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { FaShoppingCart, FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const Header = () => {
@@ -11,7 +12,7 @@ const Header = () => {
 const UserCard = () => {
     return (
         <div className="bg-white p-4 shadow-md rounded-lg flex items-center">
-            <img src="/img_login.jpg" alt="User" className="w-16 h-16 rounded-full mr-4" />
+            <Image src="/img_login.jpg" alt="User" width={40} height={40} className="rounded-full mr-4" />
             <div>
                 <h2 className="text-xl font-bold">Olá, Patrik</h2>
                 <p>Turno aberto às: <span className="font-semibold">18:30</span></p>
@@ -108,7 +109,7 @@ const TopSales = () => {
                     {topSales.map((sale) => (
                         <tr key={sale.id} className="border-t">
                             <td className="py-2 flex items-center">
-                                <img src="/img_login.jpg" alt={sale.name} className="w-10 h-10 rounded-full mr-4" />
+                                <Image src="/img_login.jpg" alt={sale.name} width={40} height={40} className="rounded-full mr-4"/>
                                 {sale.name}
                             </td>
                             <td className="py-2">{sale.quantity}</td>
@@ -125,7 +126,7 @@ const TopSales = () => {
 
 const ShiftDashboard = () => {
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
+        <div className="p-8 bg-gray-100 h-[80vh] overflow-y-auto">
             <UserCard />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                 <SalesCard

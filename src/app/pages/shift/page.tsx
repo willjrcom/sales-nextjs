@@ -1,3 +1,5 @@
+'use client';
+
 import Menu from "@/app/components/menu/layout"
 import ShiftDashboard from "./shift"
 
