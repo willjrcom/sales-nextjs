@@ -22,7 +22,7 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
           name={row.original.name}>
           <EmployeeForm
             item={row.original}
-            onSubmit={UpdateEmployee}/>
+            isUpdate={true}/>
         </ButtonEdit>
       )
     },

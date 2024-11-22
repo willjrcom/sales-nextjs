@@ -11,8 +11,10 @@ import CreateFormsProps from '../create-forms-props';
 import DeleteEmployee from '@/app/api/employee/delete/route';
 import { useEmployees } from '@/app/context/employee/context';
 import ModalHandler from '@/app/components/modal/modal';
+import NewEmployee from '@/app/api/employee/new/route';
+import UpdateEmployee from '@/app/api/employee/update/route';
 
-const EmployeeForm = ({ item, onSubmit }: CreateFormsProps<Employee>) => {
+const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalHandler = ModalHandler();
     const context = useEmployees();
     const [person, setPerson] = useState<Person>(item as Person || new Person())
@@ -22,7 +24,7 @@ const EmployeeForm = ({ item, onSubmit }: CreateFormsProps<Employee>) => {
         if (!data) return;
         let employee = new Employee(person)
         employee.birthday = DateComponent(person.birthday)
-        const response = await onSubmit(employee, data)
+        const response = isUpdate ? await UpdateEmployee(employee, data) : await NewEmployee(employee, data)
 
         if (response) {
             modalHandler.setShowModal(false);

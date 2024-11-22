@@ -18,7 +18,7 @@ const ClientColumns = (): ColumnDef<Client>[] => [
           name={row.original.name}>
           <ClientForm
             item={row.original}
-            onSubmit={UpdateClient}/>
+            isUpdate={true}/>
         </ButtonEdit>
       )
     },

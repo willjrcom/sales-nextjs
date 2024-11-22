@@ -19,7 +19,7 @@ const CreateAddressForm = ({address, onAddressChange}: AddressProps) => {
     const [cep, setCep] = useState(address.cep);
     const [deliveryTax, setDeliveryTax] = useState(address.delivery_tax);
     const [objectId, setObjectId] = useState(address.object_id);
-    console.log(address.likeTax);
+    
     useEffect(() => {
         onAddressChange({
             id,

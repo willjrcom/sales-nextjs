@@ -10,19 +10,20 @@ import CreateFormsProps from '../create-forms-props';
 import DeleteClient from '@/app/api/client/delete/route';
 import { useClients } from '@/app/context/client/context';
 import ModalHandler from '@/app/components/modal/modal';
+import NewClient from '@/app/api/client/new/route';
+import UpdateClient from '@/app/api/client/update/route';
 
 
-const ClientForm = ({ item, onSubmit }: CreateFormsProps<Client>) => {
+const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalHandler = ModalHandler();
     const context = useClients();
-    const [person, setPerson] = useState<Client>(item as Client || new Client())
+    const [client, setPerson] = useState<Client>(item as Client || new Client())
     const { data } = useSession();
 
     const submit = async () => {
         if (!data) return;
-        let client = new Client(person)
-        client.birthday = DateComponent(person.birthday)
-        const response = await onSubmit(client, data)
+        client.birthday = DateComponent(client.birthday)
+        const response = isUpdate ? await UpdateClient(client, data) : await NewClient(client, data)
 
         if (response) {
             modalHandler.setShowModal(false)
@@ -32,7 +33,6 @@ const ClientForm = ({ item, onSubmit }: CreateFormsProps<Client>) => {
     
     const onDelete = async () => {
         if (!data) return;
-        let client = new Client(person)
         DeleteClient(client.id, data)
         modalHandler.setShowModal(false)
         context.removeItem(client.id)
@@ -40,8 +40,8 @@ const ClientForm = ({ item, onSubmit }: CreateFormsProps<Client>) => {
 
     return (
         <>
-            <PersonForm person={person} onPersonChange={setPerson}/>
-            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>
+            <PersonForm person={client} onPersonChange={setPerson}/>
+            <ButtonsModal isUpdate={client.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>
             modalHandler.setShowModal(false)}/>
         </>
     );

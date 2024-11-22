@@ -2,13 +2,11 @@
 
 import ProcessRuleForm from "@/app/forms/process-rule/form";
 import CrudLayout from "@/app/components/crud/layout";
-import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import ModalHandler from "@/app/components/modal/modal";
-import NewProcessRule from "@/app/api/process-rule/new/route";
 import { useProcessRules } from "@/app/context/process-rule/context";
 import { SelectField } from "@/app/forms/field";
 import { useCategories } from "@/app/context/category/context";
@@ -35,11 +33,8 @@ export default function PageProcessRules () {
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="processos"
-                        setModal={modalHandler.setShowModal}
-                        showModal={modalHandler.showModal}>
-                        <ProcessRuleForm 
-                            onSubmit={NewProcessRule}/>
+                    <ButtonPlus name="processos">
+                        <ProcessRuleForm/>
                     </ButtonPlus>
                 }
                 refreshButton={

@@ -9,8 +9,10 @@ import CreateFormsProps from '../create-forms-props';
 import DeleteProcessRule from '@/app/api/process-rule/delete/route';
 import { useProcessRules } from '@/app/context/process-rule/context';
 import ModalHandler from '@/app/components/modal/modal';
+import NewProcessRule from '@/app/api/process-rule/new/route';
+import UpdateProcessRule from '@/app/api/process-rule/update/route';
 
-const ProcessRuleForm = ({ onSubmit, item }: CreateFormsProps<ProcessRule>) => {
+const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalHandler = ModalHandler();
     const processRule = item || new ProcessRule();
     const [id, setId] = useState(processRule.id);
@@ -42,7 +44,7 @@ const ProcessRuleForm = ({ onSubmit, item }: CreateFormsProps<ProcessRule>) => {
         processRule.category_id;
 
         try {
-            const response = await onSubmit(processRule, data)
+            const response = isUpdate ? await UpdateProcessRule(processRule, data) : await NewProcessRule(processRule, data);
     
             if (response) {
                 modalHandler.setShowModal(false);

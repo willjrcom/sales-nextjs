@@ -9,8 +9,10 @@ import CreateFormsProps from '../create-forms-props';
 import DeleteCategory from '@/app/api/category/delete/route';
 import ModalHandler from '@/app/components/modal/modal';
 import { useCategories } from '@/app/context/category/context';
+import NewCategory from '@/app/api/category/new/route';
+import UpdateCategory from '@/app/api/category/update/route';
 
-const CategoryForm = ({ onSubmit, item }: CreateFormsProps<Category>) => {
+const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalHandler = ModalHandler();
     const context = useCategories();
     const category = item || new Category();
@@ -28,7 +30,7 @@ const CategoryForm = ({ onSubmit, item }: CreateFormsProps<Category>) => {
         category.image_path = imagePath
 
         try {
-            const response = await onSubmit(category, data)
+            const response = isUpdate ? await UpdateCategory(category, data) : await NewCategory(category, data)
     
             if (response) {
                 modalHandler.setShowModal(false);

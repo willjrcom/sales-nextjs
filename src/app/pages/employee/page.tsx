@@ -9,7 +9,6 @@ import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import ModalHandler from "@/app/components/modal/modal";
-import NewEmployee from "@/app/api/employee/new/route";
 import { EmployeeProvider, useEmployees } from "@/app/context/employee/context";
 
 const PageEmployee = () => {
@@ -38,17 +37,12 @@ const Crud = () => {
             <CrudLayout
                 title="Funcionários"
                 filterButtonChildren={
-                    <ButtonFilter name="funcionario"
-                        setShowModal={modalHandler.setShowModal} 
-                        showModal={modalHandler.showModal}/>
+                    <ButtonFilter><h1>meu filtro</h1></ButtonFilter>
                 }
                 plusButtonChildren={
                     <ButtonPlus 
-                        name="funcionario" 
-                        showModal={modalHandler.showModal} 
-                        setModal={modalHandler.setShowModal}>
-                        <EmployeeForm 
-                            onSubmit={NewEmployee}/>
+                        name="funcionario">
+                        <EmployeeForm/>
                     </ButtonPlus>
                 }
                 refreshButton={

@@ -1,13 +1,12 @@
 import React from 'react';
 
 interface ModalProps {
-    title: string;
     show: boolean;
     onClose: () => void;
     children: React.ReactNode;
 }
 
-const FilterForm = ({ title, show, onClose, children }: ModalProps) => {
+const FilterForm = ({ show, onClose, children }: ModalProps) => {
     if (!show) return null;
 
     return (

@@ -27,7 +27,7 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
           name={row.original.name} >
           <ProcessRuleForm 
             item={row.original}
-            onSubmit={UpdateProcessRule} />
+            isUpdate={true} />
         </ButtonEdit>
       )
     },
