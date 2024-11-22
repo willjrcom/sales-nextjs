@@ -66,7 +66,7 @@ const Sidebar = () => {
     <div className={styles.sidebar}>
       <div className={styles.sidebarContainer}>
         <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" />
-        <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/" />
+        <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
         <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/" />
         <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
         <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />

@@ -3,11 +3,8 @@
 import { useState } from 'react';
 import PageProducts from './product';
 import Menu from '@/app/components/menu/layout';
-import { ProductProvider } from '@/app/context/product/context';
 import PageCategories from './category';
-import { CategoryProvider } from '@/app/context/category/context';
 import PageProcessRules from './process-rule';
-import { ProcessRuleProvider } from '@/app/context/process-rule/context';
 
 const PageWithTabs = () => {
     const [activeTab, setActiveTab] = useState<'produtos' | 'categorias' | 'processos'>('produtos');
@@ -48,13 +45,7 @@ const PageWithTabs = () => {
                         Processos
                     </button>
                 </div>
-                <CategoryProvider>
-                    <ProductProvider>
-                        <ProcessRuleProvider>
-                            <div className="content">{renderContent()}</div>
-                        </ProcessRuleProvider>
-                    </ProductProvider>
-                </CategoryProvider>
+                <div className="content">{renderContent()}</div>
             </div>
         </Menu>
     );

@@ -37,11 +37,11 @@ const authOptions: NextAuthOptions = {
     ],
     secret: process.env.NEXTAUTH_SECRET,
     session: {
-        maxAge: 24 * 60 * 60, // 1 dia de sessão
+        maxAge: 3 * 60 * 60, // 1 dia de sessão
         strategy: "jwt",
     },
     jwt: {
-        maxAge: 24 * 60 * 60, // 1 dia de JWT
+        maxAge: 3 * 60 * 60, // 1 dia de JWT
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {

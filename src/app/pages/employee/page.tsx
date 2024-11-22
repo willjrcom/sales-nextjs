@@ -14,9 +14,7 @@ import { EmployeeProvider, useEmployees } from "@/app/context/employee/context";
 const PageEmployee = () => {
     return (
         <Menu>
-            <EmployeeProvider>
-                <Crud />
-            </EmployeeProvider>
+            <Crud />
         </Menu>
     );
 };

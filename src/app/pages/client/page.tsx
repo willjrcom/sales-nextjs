@@ -7,17 +7,14 @@ import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import ModalHandler from "@/app/components/modal/modal";
-import { ClientProvider, useClients } from "@/app/context/client/context";
+import { useClients } from "@/app/context/client/context";
 import { TextField } from "@/app/forms/field";
 import { useState } from "react";
 
 const PageClient = () => {
     return (
         <Menu>
-            <ClientProvider>
-                <Crud />
-            </ClientProvider>
+            <Crud />
         </Menu>
     );
 }
@@ -53,8 +50,10 @@ const Crud = () => {
                     <CrudTable 
                         columns={ClientColumns()} 
                         data={context.filterItems!('name', nome)}>
-                    </CrudTable>} />
-                    </>
+                    </CrudTable>
+                } 
+            />
+        </>
     )
 }
 export default PageClient
