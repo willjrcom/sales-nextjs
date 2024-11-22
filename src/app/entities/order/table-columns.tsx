@@ -34,7 +34,7 @@ const OrderColumns = (): ColumnDef<Order>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <Link href={'/pages/order/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
+        <Link href={'/pages/order-control/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
             <FaEdit />
         </Link>
       )

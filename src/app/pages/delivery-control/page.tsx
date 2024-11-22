@@ -1,0 +1,38 @@
+'use client';
+
+import CrudTable from "@/app/components/crud/table";
+import Menu from "@/app/components/menu/layout";
+import { useOrders } from "@/app/context/order/context";
+import Order from "@/app/entities/order/order";
+import OrderColumns from "@/app/entities/order/table-columns";
+import { useEffect, useState } from "react";
+
+const PageOrder = () => {
+    return (
+        <Menu>
+            <Page/>
+        </Menu>
+    )
+}
+
+const Page = () => {
+    const context = useOrders();
+    const [orders, setOrders] = useState<Order[]>([]);
+
+    useEffect(() => {
+        for (const order of context.items) {
+            if (order.delivery) {
+                setOrders([...orders, order])
+            }
+        }
+    }, [context]);
+
+    return (
+        <>
+            <h1 className="p-2">Pedidos</h1>
+            <CrudTable columns={OrderColumns()} data={orders}/>
+        </>
+    )
+}
+
+export default PageOrder
