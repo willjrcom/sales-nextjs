@@ -69,6 +69,12 @@ const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsP
                 setCategories(response);
 
                 let records: Record<string, string>[] = [];
+
+                if (!response) {
+                    setRecordCategories([]);
+                    return;
+                }
+                
                 for (const category of response) {
                     records.push({ id: category.id.toString(), name: category.name })
                 }
@@ -91,6 +97,11 @@ const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsP
                 if (!category) return;
 
                 let records: Record<string, string>[] = [];
+
+                if (!category.sizes) {
+                    setRecordSizes([]);
+                    return;
+                }
 
                 for (const size of category.sizes) {
                     records.push({ id: size.id.toString(), name: size.name })
