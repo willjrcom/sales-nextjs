@@ -4,11 +4,11 @@ export default class ProcessRule {
     order: number = 0;
     description: string = "";
     imagePath: string = "";
-    idealTime: number = 0;
-    experimentalError: number = 0;
-    idealTimeFormatted: string = "";
-    experimentalErrorFormatted: string = "";
-    categoryId: string = "";
+    ideal_time: number = 0;
+    experimental_error: number = 0;
+    ideal_time_formatted: string = "";
+    experimental_error_formatted: string = "";
+    category_id: string = "";
 
     constructor() {}
 }

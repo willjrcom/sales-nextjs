@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React from 'react';
 import { IconType } from 'react-icons';
 import { FaUserTie, FaCog, FaPlus, FaLongArrowAltUp, FaSignOutAlt } from 'react-icons/fa';

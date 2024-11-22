@@ -9,7 +9,6 @@ import DateComponent from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteClient from '@/app/api/client/delete/route';
-import { useRouter } from 'next/router';
 
 
 const ClientForm = ({ item, handleCloseModal, onSubmit, context }: CreateFormsProps<Client>) => {

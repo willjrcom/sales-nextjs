@@ -5,8 +5,8 @@ import UpdateCategory from "@/app/api/category/update/route";
 import ModalHandler from "@/app/components/modal/modal";
 import { useCategories } from "@/app/context/category/context";
 import Category from "./category";
-import PageProcessRules from "@/app/pages/product/process-rule";
-import { ProcessRuleProvider } from "@/app/context/process-rule/context";
+import Link from "next/link";
+import { FaEdit } from "react-icons/fa";
 
 
 const CategoryColumns = (): ColumnDef<Category>[] => [
@@ -45,11 +45,11 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
     header: 'Processos',
     cell: ({row}) => {
       return (
-        <ButtonEdit name="Processos">
-          <ProcessRuleProvider id={row.original.id}>
-            <PageProcessRules id={row.original.id} />
-          </ProcessRuleProvider>
-        </ButtonEdit>
+        <Link href={`/pages/process-rule/${row.original.id}`}>
+          <button className="flex items-center space-x-2 p-2 rounded-md w-max">
+              <FaEdit />
+          </button>
+        </Link>
       )
     }
   }

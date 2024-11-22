@@ -1,3 +1,4 @@
+'use client';
 
 import FetchData from '@/app/api/fetch-data';
 import GetClients from '@/app/api/client/route';

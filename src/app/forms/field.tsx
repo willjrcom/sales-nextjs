@@ -52,6 +52,15 @@ interface HiddenFieldProps {
     setValue: Dispatch<SetStateAction<string>>
 }
 
+interface SelectFieldProps {
+    friendlyName: string;
+    name: string;
+    disabled?: boolean;
+    values: { id: string; name: string }[];
+    selectedValue: string;
+    setSelectedValue: (value: string) => void;
+}
+
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
 const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern }: TextFieldProps) => {
@@ -169,4 +178,33 @@ const HiddenField = ({ name, value, setValue }: HiddenFieldProps) => {
     )
 }
 
-export { TextField, NumberField, DateField, CheckboxField, RadioField, HiddenField }
+const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue }: SelectFieldProps) => (
+    <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+            {friendlyName}
+        </label>
+        {values.length === 0 ? (
+            <p className="text-gray-600">Nenhuma opção disponível</p>
+        ) : (
+            <select
+                id={name}
+                name={name}
+                disabled={disabled}
+                value={selectedValue}
+                onChange={(e) => setSelectedValue(e.target.value)}
+                className="form-select block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+                <option value="" disabled>
+                    Selecione uma opção
+                </option>
+                {values.map((valueObj) => (
+                    <option key={valueObj.id} value={valueObj.id}>
+                        {valueObj.name}
+                    </option>
+                ))}
+            </select>
+        )}
+    </div>
+);
+
+export { TextField, NumberField, DateField, CheckboxField, RadioField, HiddenField, SelectField }

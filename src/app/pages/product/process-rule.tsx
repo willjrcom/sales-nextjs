@@ -10,19 +10,15 @@ import Refresh from "@/app/components/crud/refresh";
 import ModalHandler from "@/app/components/modal/modal";
 import NewProcessRule from "@/app/api/process-rule/new/route";
 import { useProcessRules } from "@/app/context/process-rule/context";
-import "./style.css";
-import { useEffect } from "react";
+import { SelectField } from "@/app/forms/field";
+import { useCategories } from "@/app/context/category/context";
+import { useState } from "react";
 
-interface PageProcessRulesProps {
-    id: string
-}
-const PageProcessRules = ({ id }: PageProcessRulesProps) => {
+export default function PageProcessRules () {
+    const [categoryID, setCategoryID] = useState("");
     const modalHandler = ModalHandler();
     const context = useProcessRules();
-    
-    useEffect(() => {
-        context.fetchData(id);
-    }, []);
+    const contextCategory = useCategories();
 
     if (context.getLoading()) {
         return (
@@ -35,9 +31,8 @@ const PageProcessRules = ({ id }: PageProcessRulesProps) => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout title="Processos"
                 filterButtonChildren={
-                    <ButtonFilter name="processos" 
-                    setShowModal={modalHandler.setShowModal} 
-                    showModal={modalHandler.showModal}/>
+                    <SelectField 
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
                 }
                 plusButtonChildren={
                     <ButtonPlus name="processos"
@@ -57,11 +52,10 @@ const PageProcessRules = ({ id }: PageProcessRulesProps) => {
                 tableChildren={
                     <CrudTable 
                         columns={ProcessRuleColumns()} 
-                        data={context.items}>
+                        data={context.filterItems!('category_id', categoryID)}>
                     </CrudTable>
                 } 
                 />
-            </>
+                </>
     )
 }
-export default PageProcessRules;

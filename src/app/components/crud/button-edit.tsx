@@ -1,3 +1,5 @@
+'use client';
+
 import Form from "@/app/forms/form";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";

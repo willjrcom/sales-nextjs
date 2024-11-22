@@ -1,4 +1,5 @@
-// components/Mesas.tsx
+'use client';
+
 import React, { useRef, useEffect, useState } from 'react';
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 

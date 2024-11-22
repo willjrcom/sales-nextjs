@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { TextField, NumberField, HiddenField } from '../field';
 import ProcessRule from '@/app/entities/process-rule/process-rule';

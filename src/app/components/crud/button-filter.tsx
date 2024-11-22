@@ -1,5 +1,4 @@
 import FilterForm from "@/app/forms/filter";
-import { useState } from "react";
 import { FaFilter } from "react-icons/fa";
 
 interface FilterButtonProps {

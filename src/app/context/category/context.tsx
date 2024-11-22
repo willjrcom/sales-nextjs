@@ -1,5 +1,3 @@
-'use client';
-
 import FetchData from '@/app/api/fetch-data';
 import GetCategorys from '@/app/api/category/route';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
@@ -55,7 +53,7 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
 export const useCategories = () => {
     const context = useContext(ContextCategory);
     if (!context) {
-        throw new Error('useItems must be used within a ItemsProvider');
+        throw new Error('useItems must be used within a CategoryProvider');
     }
     return context;
 };

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { TextField, HiddenField } from '../field';
 import Category from '@/app/entities/category/category';

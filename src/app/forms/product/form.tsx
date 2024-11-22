@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../field';
 import Product from '@/app/entities/product/product';

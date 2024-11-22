@@ -55,7 +55,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
 export const useProducts = () => {
     const context = useContext(ContextProduct);
     if (!context) {
-        throw new Error('useItems must be used within a ItemsProvider');
+        throw new Error('useItems must be used within a ProductProvider');
     }
     return context;
 };
