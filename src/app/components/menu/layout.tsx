@@ -7,6 +7,7 @@ import { ProductProvider } from '@/app/context/product/context';
 import { ProcessRuleProvider } from '@/app/context/process-rule/context';
 import { PlaceProvider } from '@/app/context/place/context';
 import { TableProvider } from '@/app/context/table/context';
+import { OrderProvider } from '@/app/context/order/context';
 
 const Menu = ({
   children,
@@ -21,15 +22,17 @@ const Menu = ({
             <ProcessRuleProvider>
               <PlaceProvider>
                 <TableProvider>
-                  <div className="flex">
-                    <Sidebar />
-                    <div className="flex-1 flex flex-col">
-                      <Topbar />
-                      <main className="p-4">
-                        {children}
-                      </main>
+                  <OrderProvider>
+                    <div className="flex">
+                      <Sidebar />
+                      <div className="flex-1 flex flex-col">
+                        <Topbar />
+                        <main className="p-4">
+                          {children}
+                        </main>
+                      </div>
                     </div>
-                  </div>
+                  </OrderProvider>
                 </TableProvider>
               </PlaceProvider>
             </ProcessRuleProvider>

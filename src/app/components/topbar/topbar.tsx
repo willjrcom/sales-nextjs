@@ -32,7 +32,7 @@ const Topbar = () => (
   <div className={`${styles.topbar} flex justify-between`}>
     <div className="flex space-x-4">
       <TopbarItem label="Mesas" href="/pages/order-table" />
-      <TopbarItem label="Pedidos" href="/" />
+      <TopbarItem label="Pedidos" href="/pages/order" />
       <TopbarItem label="Entregas" href="/" />
     </div>
 

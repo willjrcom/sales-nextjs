@@ -24,7 +24,7 @@ const Page = () => {
         <>
             <div className="flex items-center space-x-4">
                 <div className="flex flex-col w-1/3">
-                    <label htmlFor="contato" className="text-sm font-semibold mb-1">Retirada/Balcão</label>
+                    <label htmlFor="contato" className="text-sm font-semibold mb-1">Balcão/Retirada</label>
                     <TextField 
                         name="contato" 
                         placeholder="Digite o nome do pedido" 
