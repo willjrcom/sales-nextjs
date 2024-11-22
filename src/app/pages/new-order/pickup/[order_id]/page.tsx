@@ -3,11 +3,13 @@
 import Menu from "@/app/components/menu/layout"
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useClients } from "@/app/context/client/context";
+import Client from "@/app/entities/client/client";
+import { useSession } from "next-auth/react";
 import Order from "@/app/entities/order/order";
 import GetOrderByID from "@/app/api/order/[id]/route";
-import { useSession } from 'next-auth/react';
 
-const PageNewOrderDelivery = () => {
+const PageNewOrderPickup = () => {
     return (
         <Menu>
             <Page/>
@@ -19,7 +21,7 @@ const Page = () => {
     const { order_id } = useParams();
     const [order, setOrder] = useState<Order | null>();
     const { data } = useSession();
-
+    
     useEffect(() => {
         getOrder();
     }, [data]);
@@ -30,7 +32,7 @@ const Page = () => {
         const orderFound = await GetOrderByID(order_id as string, data);
         setOrder(orderFound);
     }
-    
+
     if (!order_id || !order) {
         return (
             <h1>Pedido não encontrado</h1>
@@ -39,8 +41,8 @@ const Page = () => {
     
     return (
         <>
-            <h1>{order?.id}</h1>
+            <h1>{order.id}</h1>
         </>
     );
 }
-export default PageNewOrderDelivery
+export default PageNewOrderPickup

@@ -1,11 +1,13 @@
 'use client';
 
 import GetClientByContact from "@/app/api/client/contact/route";
+import NewOrderPickup from "@/app/api/order-pickup/new/route";
 import Menu from "@/app/components/menu/layout"
 import Client from "@/app/entities/client/client";
 import { TextField } from "@/app/forms/field";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCheck, FaSearch } from "react-icons/fa";
 
@@ -19,6 +21,14 @@ const PageNewOrderPickup = () => {
 
 const Page = () => {
     const [orderName, setOrderName] = useState('');
+    const router = useRouter();
+    const { data } = useSession();
+
+    const newOrder = async (name: string) => {
+        if (!data) return
+        const response = await NewOrderPickup(name, data)
+        router.push('/pages/new-order/pickup/' + response.order_id)
+    }
 
     return (
         <>
@@ -32,12 +42,10 @@ const Page = () => {
                         value={orderName} 
                     />
                 </div>
-                <Link href={"/pages/new-order/pickup/" + orderName} hidden={orderName === ''}>
-                <button className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+                <button onClick={() => newOrder(orderName)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                     <FaCheck />
                     <span> Iniciar pedido</span>
                 </button>
-                </Link>
             </div>
         </>
     )

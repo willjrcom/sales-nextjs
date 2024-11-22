@@ -1,18 +1,19 @@
 'use client';
 
-import Menu from "@/app/components/menu/layout"
-import { useEffect, useState } from "react";
+import Menu from "@/app/components/menu/layout";
+import Table from "@/app/entities/table/table";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Order from "@/app/entities/order/order";
 import GetOrderByID from "@/app/api/order/[id]/route";
-import { useSession } from 'next-auth/react';
+import { useSession } from "next-auth/react";
 
-const PageNewOrderDelivery = () => {
+const PageNewOrderTable = () => {
     return (
         <Menu>
             <Page/>
         </Menu>
-    )
+    );
 }
 
 const Page = () => {
@@ -30,7 +31,7 @@ const Page = () => {
         const orderFound = await GetOrderByID(order_id as string, data);
         setOrder(orderFound);
     }
-    
+
     if (!order_id || !order) {
         return (
             <h1>Pedido não encontrado</h1>
@@ -43,4 +44,4 @@ const Page = () => {
         </>
     );
 }
-export default PageNewOrderDelivery
+export default PageNewOrderTable

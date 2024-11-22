@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { IconType } from 'react-icons';
-import { FaUserTie, FaCog, FaPlus, FaLongArrowAltUp, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserTie, FaCog, FaPlus, FaSignOutAlt } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
@@ -17,7 +17,6 @@ interface SidebarLinkItemProps {
 }
 
 interface SidebarItemProps {
-  href?: string;
   icon: IconType;
   label: string;
   onClick?: () => Promise<void>;
@@ -47,18 +46,17 @@ const SidebarItemCompany: React.FC<SidebarItemProps> = ({ icon: Icon, label }) =
   )
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon: Icon, label, onClick }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, onClick }) => {
   return (
-    <Link href={href!} className={styles.menuItem} onClick={onClick}>
+    <button className={styles.menuItem} onClick={onClick}>
       <Icon className={styles.icon} />
       <span className={styles.label}>{label}</span>
-    </Link>
+    </button>
   )
 }
 
 const Sidebar = () => {
-  const signOutToLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+  const signOutToLogin = async () => {
     await signOut({ callbackUrl: '/login', redirect: true });
   }
 
@@ -73,7 +71,7 @@ const Sidebar = () => {
         <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
         <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
         <SidebarLinkItem icon={FaCog} label="Configurações" href="/" />
-        <SidebarItem href="/login" icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin}/>
+        <SidebarItem icon={FaSignOutAlt} label="Sair" onClick={() => signOutToLogin()}/>
       </div>
     </div>
   );
