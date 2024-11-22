@@ -2,11 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Employee  from "./employee";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import PersonColumns from "../person/table-columns";
-import ModalHandler from "@/app/components/modal/modal";
 import EmployeeForm from "@/app/forms/employee/form";
-import UpdateEmployee from "@/app/api/employee/update/route";
-import { ItemContextProps } from "@/app/context/props";
-import { useEmployees } from "@/app/context/employee/context";
 
 
 const EmployeeColumns = (): ColumnDef<Employee>[] => [

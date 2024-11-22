@@ -2,10 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import Product from "./product";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import ProductForm from "@/app/forms/product/form";
-import UpdateProduct from "@/app/api/product/update/route";
-import ModalHandler from "@/app/components/modal/modal";
-import { useProducts } from "@/app/context/product/context";
-
 
 const ProductColumns = (): ColumnDef<Product>[] => [
   {
@@ -61,8 +57,7 @@ const ProductColumns = (): ColumnDef<Product>[] => [
         <ButtonEdit 
           name={row.original.name}>
           <ProductForm 
-            item={row.original}
-            onSubmit={UpdateProduct} />
+            item={row.original} />
         </ButtonEdit>
       )
     },

@@ -1,10 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import ProcessRuleForm from "@/app/forms/process-rule/form";
-import UpdateProcessRule from "@/app/api/process-rule/update/route";
-import ModalHandler from "@/app/components/modal/modal";
 import ProcessRule from "./process-rule";
-import { useProcessRules } from "@/app/context/process-rule/context";
 
 const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
   {
