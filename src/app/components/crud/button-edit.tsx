@@ -3,6 +3,7 @@
 import Form from "@/app/forms/form";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
+import ModalHandler from "../modal/modal";
 
 interface NewButtonProps {
     name: string;
@@ -10,25 +11,17 @@ interface NewButtonProps {
 }
 
 const ButtonEdit = ({ name, children }: NewButtonProps) => {
-    const [showModal, setShowModal] = useState(false);
-
-    const handleOpenModal = () => {
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
+    const modalHandler = ModalHandler();
 
     const editButton = "Editar " + {name}.name;
     
     return (
         <div>
-            <button onClick={handleOpenModal} className="flex items-center space-x-2 p-2 rounded-md w-max">
+            <button onClick={() => modalHandler.setShowModal(true)} className="flex items-center space-x-2 p-2 rounded-md w-max">
                 <FaEdit />
             </button>
         
-            <Form title={editButton} show={showModal} onClose={(handleCloseModal)}>
+            <Form title={editButton} show={modalHandler.showModal} onClose={() => modalHandler.setShowModal(false)}>
                 {children}
             </Form>
         </div>

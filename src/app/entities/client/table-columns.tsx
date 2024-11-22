@@ -3,9 +3,7 @@ import Client from "./client";
 import ButtonEdit from "@/app/components/crud/button-edit";
 import PersonColumns from "../person/table-columns";
 import ClientForm from "@/app/forms/client/form";
-import ModalHandler from "@/app/components/modal/modal";
 import UpdateClient from "@/app/api/client/update/route";
-import { useClients } from "@/app/context/client/context";
 
 
 const ClientColumns = (): ColumnDef<Client>[] => [
@@ -15,17 +13,12 @@ const ClientColumns = (): ColumnDef<Client>[] => [
     accessorKey: 'id',
     header: 'Editar',
     cell: ({ row }) => {
-      const modalHandler = ModalHandler();
-
       return (
         <ButtonEdit
-          name={row.original.name}
-          href={`/client/edit/${row.original.id}`}>
+          name={row.original.name}>
           <ClientForm
             item={row.original}
-            onSubmit={UpdateClient}
-            handleCloseModal={() => modalHandler.setShowModal(false)}
-            context={useClients()}/>
+            onSubmit={UpdateClient}/>
         </ButtonEdit>
       )
     },

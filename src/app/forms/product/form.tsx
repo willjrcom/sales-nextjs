@@ -9,8 +9,12 @@ import GetCategories from '@/app/api/category/route';
 import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/route';
+import { useProducts } from '@/app/context/product/context';
+import ModalHandler from '@/app/components/modal/modal';
 
-const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsProps<Product>) => {
+const ProductForm = ({ onSubmit, item }: CreateFormsProps<Product>) => {
+    const modalHandler = ModalHandler();
+    const context = useProducts();
     const product = item || new Product();
     const [id, setId] = useState(product.id);
     const [code, setCode] = useState(product.code);
@@ -44,7 +48,7 @@ const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsP
             const response = await onSubmit(product, data)
     
             if (response) {
-                handleCloseModal();
+                modalHandler.setShowModal(false);
                 context.addItem(product);
             }
 
@@ -56,7 +60,7 @@ const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsP
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        handleCloseModal();
+        modalHandler.setShowModal(false);
         context.removeItem(product.id)
     }
 
@@ -132,7 +136,7 @@ const ProductForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsP
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
+            <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.setShowModal(false)}/>
         </>
     );
 };

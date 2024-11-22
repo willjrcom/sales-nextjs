@@ -50,7 +50,7 @@ const AddressColumns = (): ColumnDef<Address>[] => [
     accessorKey: 'id',
     header: 'ID',
     cell: ({ row }) => (
-      <ButtonEdit name={row.original.street} href={`/address/edit/${row.original.id}`}><EditAddressForm /></ButtonEdit>
+      <ButtonEdit name={row.original.street}><EditAddressForm /></ButtonEdit>
     ),
   },
 ];

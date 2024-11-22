@@ -6,9 +6,10 @@ import ModalHandler from "@/app/components/modal/modal";
 import EmployeeForm from "@/app/forms/employee/form";
 import UpdateEmployee from "@/app/api/employee/update/route";
 import { ItemContextProps } from "@/app/context/props";
+import { useEmployees } from "@/app/context/employee/context";
 
 
-const EmployeeColumns = (context: ItemContextProps<Employee>): ColumnDef<Employee>[] => [
+const EmployeeColumns = (): ColumnDef<Employee>[] => [
   ...PersonColumns<Employee>(),
   {
     id: 'Editar',
@@ -21,9 +22,7 @@ const EmployeeColumns = (context: ItemContextProps<Employee>): ColumnDef<Employe
           name={row.original.name}>
           <EmployeeForm
             item={row.original}
-            onSubmit={UpdateEmployee}
-            handleCloseModal={() => modalHandler.setShowModal(false)}
-            context={context}/>
+            onSubmit={UpdateEmployee}/>
         </ButtonEdit>
       )
     },

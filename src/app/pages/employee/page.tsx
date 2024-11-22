@@ -48,10 +48,7 @@ const Crud = () => {
                         showModal={modalHandler.showModal} 
                         setModal={modalHandler.setShowModal}>
                         <EmployeeForm 
-                            onSubmit={NewEmployee}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            context={context}
-                            />
+                            onSubmit={NewEmployee}/>
                     </ButtonPlus>
                 }
                 refreshButton={
@@ -61,7 +58,7 @@ const Crud = () => {
                 }
                 tableChildren={
                     <CrudTable 
-                        columns={EmployeeColumns(context)} 
+                        columns={EmployeeColumns()} 
                         data={context.items} />
                 }
             />

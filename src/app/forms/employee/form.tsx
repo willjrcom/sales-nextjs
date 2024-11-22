@@ -9,8 +9,12 @@ import ButtonsModal from '../buttons-modal';
 import DateComponent from '@/app/utils/date';
 import CreateFormsProps from '../create-forms-props';
 import DeleteEmployee from '@/app/api/employee/delete/route';
+import { useEmployees } from '@/app/context/employee/context';
+import ModalHandler from '@/app/components/modal/modal';
 
-const EmployeeForm = ({ item, handleCloseModal, onSubmit, context }: CreateFormsProps<Employee>) => {
+const EmployeeForm = ({ item, onSubmit }: CreateFormsProps<Employee>) => {
+    const modalHandler = ModalHandler();
+    const context = useEmployees();
     const [person, setPerson] = useState<Person>(item as Person || new Person())
     const { data } = useSession();
     
@@ -21,7 +25,7 @@ const EmployeeForm = ({ item, handleCloseModal, onSubmit, context }: CreateForms
         const response = await onSubmit(employee, data)
 
         if (response) {
-            handleCloseModal();
+            modalHandler.setShowModal(false);
             context.addItem(employee)
         }
     }
@@ -30,14 +34,14 @@ const EmployeeForm = ({ item, handleCloseModal, onSubmit, context }: CreateForms
         if (!data) return;
         let employee = new Employee(person)
         DeleteEmployee(employee.id, data)
-        handleCloseModal();
+        modalHandler.setShowModal(false);
         context.removeItem(employee.id)
     }
 
     return (
         <>
             <PersonForm person={person} onPersonChange={setPerson}/>
-            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
+            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.setShowModal(false)}/>
         </>
     );
 };

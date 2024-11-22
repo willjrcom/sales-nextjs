@@ -22,7 +22,6 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
     const [contactDdd, setContactDdd] = useState(person.contact.ddd);
     const [contactNumber, setContactNumber] = useState(person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);
-    const [likeTax, setLikeTax] = useState(person.likeTax);
 
     useEffect(() => {
         if (!birthday) return
@@ -42,9 +41,8 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
             birthday,
             contact,
             address,
-            likeTax,
         });
-    }, [id, name, email, cpf, birthday, contactDdd, contactNumber, address, likeTax, onPersonChange]);
+    }, [id, name, email, cpf, birthday, contactDdd, contactNumber, address, onPersonChange]);
 
     return (
         <>
@@ -64,7 +62,7 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
                     <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber} pattern="\d{1} \d{4}-\d{4}|\d{4}-\d{4}"/>
                 </div>
             </div>
-            <CreateAddressForm address={address} onAddressChange={setAddress} likeTax={likeTax} />
+            <CreateAddressForm address={address} onAddressChange={setAddress} />
 
             <HiddenField name="id" setValue={setId} value={id}/>
         </>

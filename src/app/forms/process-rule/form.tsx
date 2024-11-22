@@ -8,19 +8,21 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProcessRule from '@/app/api/process-rule/delete/route';
 import { useProcessRules } from '@/app/context/process-rule/context';
+import ModalHandler from '@/app/components/modal/modal';
 
-const ProcessRuleForm = ({ handleCloseModal, onSubmit, item }: CreateFormsProps<ProcessRule>) => {
+const ProcessRuleForm = ({ onSubmit, item }: CreateFormsProps<ProcessRule>) => {
+    const modalHandler = ModalHandler();
     const processRule = item || new ProcessRule();
     const [id, setId] = useState(processRule.id);
     const [name, setName] = useState(processRule.name);
     const [description, setDescription] = useState(processRule.description);
     const [order, setOrder] = useState(processRule.order);
     const [imagePath, setImagePath] = useState(processRule.imagePath);
-    const [idealTime, setIdealTime] = useState(processRule.idealTime);
-    const [experimentalError, setExperimentalError] = useState(processRule.experimentalError);
-    const [idealTimeFormatted, setIdealTimeFormatted] = useState(processRule.idealTimeFormatted);
-    const [experimentalErrorFormatted, setExperimentalErrorFormatted] = useState(processRule.experimentalErrorFormatted);
-    const [categoryId, setCategoryId] = useState(processRule.categoryId);
+    const [idealTime, setIdealTime] = useState(processRule.ideal_time);
+    const [experimentalError, setExperimentalError] = useState(processRule.experimental_error);
+    const [idealTimeFormatted, setIdealTimeFormatted] = useState(processRule.ideal_time_formatted);
+    const [experimentalErrorFormatted, setExperimentalErrorFormatted] = useState(processRule.experimental_error_formatted);
+    const [categoryId, setCategoryId] = useState(processRule.category_id);
     
     const { data } = useSession();
     const [error, setError] = useState<string | null>(null);
@@ -33,17 +35,17 @@ const ProcessRuleForm = ({ handleCloseModal, onSubmit, item }: CreateFormsProps<
         processRule.description = description;
         processRule.order = order;
         processRule.imagePath = imagePath;
-        processRule.idealTime = idealTime;
-        processRule.experimentalError = experimentalError;
-        processRule.idealTimeFormatted = idealTimeFormatted;
-        processRule.experimentalErrorFormatted = experimentalErrorFormatted;
-        processRule.categoryId;
+        processRule.ideal_time = idealTime;
+        processRule.experimental_error = experimentalError;
+        processRule.ideal_time_formatted = idealTimeFormatted;
+        processRule.experimental_error_formatted = experimentalErrorFormatted;
+        processRule.category_id;
 
         try {
             const response = await onSubmit(processRule, data)
     
             if (response) {
-                handleCloseModal();
+                modalHandler.setShowModal(false);
                 context.addItem(processRule);
             }
 
@@ -55,7 +57,7 @@ const ProcessRuleForm = ({ handleCloseModal, onSubmit, item }: CreateFormsProps<
     const onDelete = async () => {
         if (!data) return;
         DeleteProcessRule(processRule.id, data);
-        handleCloseModal();
+        modalHandler.setShowModal(false);
         context.removeItem(processRule.id)
     }
 
@@ -74,7 +76,7 @@ const ProcessRuleForm = ({ handleCloseModal, onSubmit, item }: CreateFormsProps<
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={processRule.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
+            <ButtonsModal isUpdate={processRule.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.setShowModal(false)}/>
         </>
     );
 };

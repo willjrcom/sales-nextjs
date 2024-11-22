@@ -57,17 +57,12 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     accessorKey: 'id',
     header: 'Editar',
     cell: ({ row }) => {
-      const modalHandler = ModalHandler();
-
       return (
         <ButtonEdit 
-          name={row.original.name} 
-          href={`/product/edit/${row.original.id}`}>
+          name={row.original.name}>
           <ProductForm 
             item={row.original}
-            onSubmit={UpdateProduct} 
-            handleCloseModal={() => modalHandler.setShowModal(false)}
-            context={useProducts()}/>
+            onSubmit={UpdateProduct} />
         </ButtonEdit>
       )
     },

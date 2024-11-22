@@ -11,6 +11,8 @@ import Refresh from "@/app/components/crud/refresh";
 import ModalHandler from "@/app/components/modal/modal";
 import NewClient from "@/app/api/client/new/route";
 import { ClientProvider, useClients } from "@/app/context/client/context";
+import { TextField } from "@/app/forms/field";
+import { useState } from "react";
 
 const PageClient = () => {
   
@@ -24,6 +26,7 @@ const PageClient = () => {
 }
 
 const Crud = () => {
+    const [nome, setNome] = useState<string>("");
     const context = useClients();
     const modalHandler = ModalHandler();
 
@@ -38,9 +41,7 @@ const Crud = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout title="Clientes"
                 filterButtonChildren={
-                    <ButtonFilter name="cliente"
-                        setShowModal={modalHandler.setShowModal} 
-                        showModal={modalHandler.showModal}/>
+                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} />
                 }
                 plusButtonChildren={
                     <ButtonPlus 
@@ -48,9 +49,7 @@ const Crud = () => {
                         setModal={modalHandler.setShowModal} 
                         showModal={modalHandler.showModal}>
                         <ClientForm 
-                            onSubmit={NewClient}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            context={context}/>
+                            onSubmit={NewClient}/>
                     </ButtonPlus>
                 }
                 refreshButton={
@@ -61,7 +60,7 @@ const Crud = () => {
                 tableChildren={
                     <CrudTable 
                         columns={ClientColumns()} 
-                        data={context.items}>
+                        data={context.filterItems!('name', nome)}>
                     </CrudTable>} />
                     </>
     )

@@ -36,9 +36,7 @@ const PageProducts = () => {
                         setModal={modalHandler.setShowModal}
                         showModal={modalHandler.showModal}>
                         <ProductForm 
-                            onSubmit={NewProduct}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            context={context}/>
+                            onSubmit={NewProduct}/>
                     </ButtonPlus>
                 }
                 refreshButton={

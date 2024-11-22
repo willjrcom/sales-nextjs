@@ -7,8 +7,12 @@ import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteCategory from '@/app/api/category/delete/route';
+import ModalHandler from '@/app/components/modal/modal';
+import { useCategories } from '@/app/context/category/context';
 
-const CategoryForm = ({ handleCloseModal, onSubmit, item, context }: CreateFormsProps<Category>) => {
+const CategoryForm = ({ onSubmit, item }: CreateFormsProps<Category>) => {
+    const modalHandler = ModalHandler();
+    const context = useCategories();
     const category = item || new Category();
     const [id, setId] = useState(category.id);
     const [name, setName] = useState(category.name);
@@ -27,7 +31,7 @@ const CategoryForm = ({ handleCloseModal, onSubmit, item, context }: CreateForms
             const response = await onSubmit(category, data)
     
             if (response) {
-                handleCloseModal();
+                modalHandler.setShowModal(false);
                 context.addItem(category);
             }
 
@@ -39,7 +43,7 @@ const CategoryForm = ({ handleCloseModal, onSubmit, item, context }: CreateForms
     const onDelete = async () => {
         if (!data) return;
         DeleteCategory(category.id, data);
-        handleCloseModal();
+        modalHandler.setShowModal(false);
         context.removeItem(category.id)
     }
 
@@ -51,7 +55,7 @@ const CategoryForm = ({ handleCloseModal, onSubmit, item, context }: CreateForms
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={category.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={handleCloseModal}/>
+            <ButtonsModal isUpdate={category.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.setShowModal(false)}/>
         </>
     );
 };

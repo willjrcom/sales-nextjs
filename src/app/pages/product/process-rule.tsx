@@ -39,9 +39,7 @@ export default function PageProcessRules () {
                         setModal={modalHandler.setShowModal}
                         showModal={modalHandler.showModal}>
                         <ProcessRuleForm 
-                            onSubmit={NewProcessRule}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            context={context}/>
+                            onSubmit={NewProcessRule}/>
                     </ButtonPlus>
                 }
                 refreshButton={

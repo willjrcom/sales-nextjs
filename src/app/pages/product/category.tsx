@@ -36,9 +36,7 @@ const PageCategories = () => {
                         setModal={modalHandler.setShowModal}
                         showModal={modalHandler.showModal}>
                         <CategoryForm 
-                            onSubmit={NewCategory}
-                            handleCloseModal={() => modalHandler.setShowModal(false)}
-                            context={context}/>
+                            onSubmit={NewCategory}/>
                     </ButtonPlus>
                 }
                 refreshButton={

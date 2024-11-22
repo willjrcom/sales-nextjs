@@ -27,6 +27,11 @@ export const ClientProvider = ({ children }: { children: ReactNode }) => {
         fetchData();
     }, [fetchData]);
 
+    const filterItems = (key: keyof Client, value: string) => {
+        if (value === '') return items;
+        return items.filter((client) => String(client[key!]).toLowerCase().includes(value.toLowerCase()));
+    };
+
     const setItemsState = (items: Client[]) => {
         setItems(items);
     }
@@ -46,7 +51,7 @@ export const ClientProvider = ({ children }: { children: ReactNode }) => {
     const getLastUpdate = () => lastUpdate;
 
     return (
-        <ContextClient.Provider value={{ items, fetchData, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextClient.Provider value={{ items, filterItems, fetchData, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
             {children}
         </ContextClient.Provider>
     );

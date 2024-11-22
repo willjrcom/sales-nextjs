@@ -4,6 +4,7 @@ import ProcessRuleForm from "@/app/forms/process-rule/form";
 import UpdateProcessRule from "@/app/api/process-rule/update/route";
 import ModalHandler from "@/app/components/modal/modal";
 import ProcessRule from "./process-rule";
+import { useProcessRules } from "@/app/context/process-rule/context";
 
 const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
   {
@@ -21,15 +22,12 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
     accessorKey: 'id',
     header: 'Editar',
     cell: ({ row }) => {
-      const modalHandler = ModalHandler();
-
       return (
         <ButtonEdit 
           name={row.original.name} >
           <ProcessRuleForm 
             item={row.original}
-            onSubmit={UpdateProcessRule} 
-            handleCloseModal={() => modalHandler.setShowModal(false)}/>
+            onSubmit={UpdateProcessRule} />
         </ButtonEdit>
       )
     },

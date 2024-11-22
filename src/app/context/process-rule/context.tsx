@@ -31,7 +31,6 @@ export const ProcessRuleProvider = ({ children }: { children: ReactNode }) => {
         return items.filter((processRule) => processRule[key!] === value);
     };
     
-
     const setItemsState = (items: ProcessRule[]) => {
         setItems(items);
     }

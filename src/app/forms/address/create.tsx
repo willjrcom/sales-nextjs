@@ -5,10 +5,9 @@ import Address from '@/app/entities/address/address';
 interface AddressProps {
     address: Address
     onAddressChange: (updatedAddress: Address) => void;
-    likeTax: boolean;
 }
 
-const CreateAddressForm = ({address, onAddressChange, likeTax}: AddressProps) => {
+const CreateAddressForm = ({address, onAddressChange}: AddressProps) => {
     const [id, setId] = useState(address.id);
     const [street, setStreet] = useState(address.street);
     const [number, setNumber] = useState(address.number);
@@ -20,7 +19,7 @@ const CreateAddressForm = ({address, onAddressChange, likeTax}: AddressProps) =>
     const [cep, setCep] = useState(address.cep);
     const [deliveryTax, setDeliveryTax] = useState(address.delivery_tax);
     const [objectId, setObjectId] = useState(address.object_id);
-
+    console.log(address.likeTax);
     useEffect(() => {
         onAddressChange({
             id,
@@ -59,7 +58,7 @@ const CreateAddressForm = ({address, onAddressChange, likeTax}: AddressProps) =>
         <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={setState} value={state}/>
 
         <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={setCep} value={cep}/>
-        {likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={setDeliveryTax} value={deliveryTax}/>}
+        {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={setDeliveryTax} value={deliveryTax}/>}
         
 
         <HiddenField name="object_id" setValue={setObjectId} value={objectId}/>

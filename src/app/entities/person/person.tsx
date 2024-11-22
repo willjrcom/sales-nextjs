@@ -9,7 +9,6 @@ export class Person {
     birthday: string = "";
     contact: Contact = new Contact();
     address: Address = new Address();
-    likeTax: boolean = false
 
     constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), likeTax: boolean = false) {
         this.id = id;
@@ -19,7 +18,7 @@ export class Person {
         this.birthday = birthday;
         this.contact = contact;
         this.address = address;
-        this.likeTax = likeTax
+        this.address.likeTax = likeTax
     }
 };
 

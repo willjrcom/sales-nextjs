@@ -25,16 +25,12 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
     accessorKey: 'id',
     header: 'Editar',
     cell: ({ row }) => {
-      const modalHandler = ModalHandler();
-
       return (
         <ButtonEdit 
           name={row.original.name}>
           <CategoryForm 
             item={row.original}
-            onSubmit={UpdateCategory} 
-            handleCloseModal={() => modalHandler.setShowModal(false)}
-            context={useCategories()}/>
+            onSubmit={UpdateCategory}/>
         </ButtonEdit>
       )
     },

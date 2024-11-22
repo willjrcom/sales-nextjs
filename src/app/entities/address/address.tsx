@@ -10,6 +10,9 @@ export default class Address {
     state: string = '';
     cep: string = '';
     delivery_tax: number = 0;
+    likeTax?: boolean = false
 
-    constructor() {}
+    constructor(likeTax: boolean = false) {
+        this.likeTax = likeTax
+    }
 }
