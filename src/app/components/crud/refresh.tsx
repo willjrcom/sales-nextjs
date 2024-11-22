@@ -1,5 +1,4 @@
 import { ItemContextProps } from "@/app/context/props";
-import { useSession } from "next-auth/react";
 import { HiOutlineRefresh } from "react-icons/hi";
 
 interface RefreshProps<T> {
@@ -7,12 +6,8 @@ interface RefreshProps<T> {
 }
 
 const Refresh = <T,>({ context }: RefreshProps<T>) => {
-    const { data } = useSession();
-
     const handleRefresh = async () => {
         try {
-            if (!data) return;
-
             context.fetchData();
             context.updateLastUpdate();
         } catch (error) {

@@ -23,7 +23,6 @@ const PageEmployee = () => {
 
 const Crud = () => {
     const context = useEmployees();
-    const modalHandler = ModalHandler();
 
     if (context.getLoading()) {
         return (

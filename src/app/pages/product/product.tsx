@@ -12,7 +12,6 @@ import { useProducts } from "@/app/context/product/context";
 import "./style.css";
 
 const PageProducts = () => {
-    const modalHandler = ModalHandler();
     const context = useProducts();
 
     if (context.getLoading()) {

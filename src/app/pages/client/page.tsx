@@ -25,7 +25,6 @@ const PageClient = () => {
 const Crud = () => {
     const [nome, setNome] = useState<string>("");
     const context = useClients();
-    const modalHandler = ModalHandler();
 
     if (context.getLoading()) {
         return (

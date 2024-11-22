@@ -11,8 +11,10 @@ import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/route';
 import { useProducts } from '@/app/context/product/context';
 import ModalHandler from '@/app/components/modal/modal';
+import UpdateProduct from '@/app/api/product/update/route';
+import NewProduct from '@/app/api/product/new/route';
 
-const ProductForm = ({ onSubmit, item }: CreateFormsProps<Product>) => {
+const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalHandler = ModalHandler();
     const context = useProducts();
     const product = item || new Product();
@@ -45,7 +47,7 @@ const ProductForm = ({ onSubmit, item }: CreateFormsProps<Product>) => {
         product.size_id = sizeId;
 
         try {
-            const response = await onSubmit(product, data)
+            const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
     
             if (response) {
                 modalHandler.setShowModal(false);

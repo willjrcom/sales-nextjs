@@ -14,7 +14,6 @@ import { useState } from "react";
 
 export default function PageProcessRules () {
     const [categoryID, setCategoryID] = useState("");
-    const modalHandler = ModalHandler();
     const context = useProcessRules();
     const contextCategory = useCategories();
 

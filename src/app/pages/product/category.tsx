@@ -12,7 +12,6 @@ import { useCategories } from "@/app/context/category/context";
 import "./style.css";
 
 const PageCategories = () => {
-    const modalHandler = ModalHandler();
     const context = useCategories();
 
     if (context.getLoading()) {

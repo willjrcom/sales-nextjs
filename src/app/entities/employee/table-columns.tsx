@@ -16,7 +16,6 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     accessorKey: 'id',
     header: 'Editar',
     cell: ({ row }) => {
-      const modalHandler = ModalHandler();
       return (
         <ButtonEdit
           name={row.original.name}>
