@@ -1,50 +1,15 @@
-import FetchData from '@/app/api/fetch-data';
 import GetCategories from '@/app/api/category/route';
-import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import Category from '@/app/entities/category/category';
-import { useSession } from 'next-auth/react';
-import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import { ItemContextProps } from '../props';
+import React, { createContext, useContext, ReactNode} from 'react';
+import GenericProvider, { ItemContextProps } from '../props';
 
 const ContextCategory = createContext<ItemContextProps<Category> | undefined>(undefined);
 
 export const CategoryProvider = ({ children }: { children: ReactNode }) => {
-    const [items, setItems] = useState<Category[]>([]);
-    const { data } = useSession();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const formattedTime = FormatRefreshTime(new Date())
-    const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
-
-    const fetchData = useCallback(async () => {
-        if (!data?.user.idToken) return;
-        FetchData({ getItems: GetCategories, setItems: setItems, data, setError, setLoading })
-    }, [data?.user.idToken!]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    const setItemsState = (items: Category[]) => {
-        setItems(items);
-    }
-
-    const addItem = (category: Category) => {
-        setItems((prev) => [...prev, category]);
-    };
-
-    const removeItem = (id: string) => {
-        setItems((prev) => prev.filter((category) => category.id !== id));
-    };
-
-    const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
-
-    const getError = () => error;
-    const getLoading = () => loading;
-    const getLastUpdate = () => lastUpdate;
+    const values = GenericProvider<Category>({ getItems: GetCategories });
 
     return (
-        <ContextCategory.Provider value={{ items, fetchData, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextCategory.Provider value={values}>
             {children}
         </ContextCategory.Provider>
     );
