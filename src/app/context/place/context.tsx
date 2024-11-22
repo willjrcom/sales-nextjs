@@ -1,15 +1,15 @@
 import FetchData from '@/app/api/fetch-data';
-import GetCategories from '@/app/api/category/route';
+import GetPlaces from '@/app/api/place/route';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
-import Category from '@/app/entities/category/category';
+import Place from '@/app/entities/place/place';
 import { useSession } from 'next-auth/react';
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { ItemContextProps } from '../props';
 
-const ContextCategory = createContext<ItemContextProps<Category> | undefined>(undefined);
+const ContextPlace = createContext<ItemContextProps<Place> | undefined>(undefined);
 
-export const CategoryProvider = ({ children }: { children: ReactNode }) => {
-    const [items, setItems] = useState<Category[]>([]);
+export const PlaceProvider = ({ children }: { children: ReactNode }) => {
+    const [items, setItems] = useState<Place[]>([]);
     const { data } = useSession();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -18,23 +18,23 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
 
     const fetchData = useCallback(async () => {
         if (!data?.user.idToken) return;
-        FetchData({ getItems: GetCategories, setItems: setItems, data, setError, setLoading })
+        FetchData({ getItems: GetPlaces, setItems: setItems, data, setError, setLoading })
     }, [data?.user.idToken!]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    const setItemsState = (items: Category[]) => {
+    const setItemsState = (items: Place[]) => {
         setItems(items);
     }
 
-    const addItem = (category: Category) => {
-        setItems((prev) => [...prev, category]);
+    const addItem = (place: Place) => {
+        setItems((prev) => [...prev, place]);
     };
 
     const removeItem = (id: string) => {
-        setItems((prev) => prev.filter((category) => category.id !== id));
+        setItems((prev) => prev.filter((place) => place.id !== id));
     };
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
@@ -44,16 +44,16 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
     const getLastUpdate = () => lastUpdate;
 
     return (
-        <ContextCategory.Provider value={{ items, fetchData, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextPlace.Provider value={{ items, fetchData, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
             {children}
-        </ContextCategory.Provider>
+        </ContextPlace.Provider>
     );
 };
 
-export const useCategories = () => {
-    const context = useContext(ContextCategory);
+export const usePlaces = () => {
+    const context = useContext(ContextPlace);
     if (!context) {
-        throw new Error('useItems must be used within a CategoryProvider');
+        throw new Error('useItems must be used within a PlaceProvider');
     }
     return context;
 };

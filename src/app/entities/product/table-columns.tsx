@@ -57,7 +57,8 @@ const ProductColumns = (): ColumnDef<Product>[] => [
         <ButtonEdit 
           name={row.original.name}>
           <ProductForm 
-            item={row.original} />
+            item={row.original} 
+            isUpdate={true}/>
         </ButtonEdit>
       )
     },

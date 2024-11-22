@@ -1,9 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 import ButtonEdit from "@/app/components/crud/button-edit";
-import CategoryForm from "@/app/forms/category/form";
-import Category from "./category";
+import PlaceForm from "@/app/forms/place/form";
+import UpdatePlace from "@/app/api/place/update/route";
+import Place from "./place";
 
-const CategoryColumns = (): ColumnDef<Category>[] => [
+
+const PlaceColumns = (): ColumnDef<Place>[] => [
   {
     id: 'Nome',
     accessorKey: 'name',
@@ -22,7 +24,7 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
       return (
         <ButtonEdit 
           name={row.original.name}>
-          <CategoryForm 
+          <PlaceForm 
             item={row.original}
             isUpdate={true}/>
         </ButtonEdit>
@@ -31,4 +33,4 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
   },
 ];
 
-export default CategoryColumns
+export default PlaceColumns
