@@ -1,6 +1,6 @@
-export default class Size {
+export default class Quantity {
   id: string = "";
-  name: string = "";
+  quantity: number = 0;
   is_active: boolean = false;
   category_id: string = "";
 

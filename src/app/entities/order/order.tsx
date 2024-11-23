@@ -1,4 +1,5 @@
 import Employee from "../employee/employee";
+import { GroupItem } from "./group-item";
 import { OrderDelivery } from "./orderDelivery";
 import { OrderPickup } from "./orderPickup";
 import { OrderTable } from "./orderTable";
@@ -42,11 +43,6 @@ interface OrderTimeLogs {
     finished_at?: Timestamp;
     canceled_at?: Timestamp;
     archived_at?: Timestamp;
-}
-
-interface GroupItem {
-    id: string;
-    name: string;
 }
 
 interface PaymentOrder {

@@ -65,7 +65,7 @@ const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 t
 const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern }: TextFieldProps) => {
     return (
         <div className="mb-4">
-            {friendlyName === '' &&
+            {friendlyName !== '' &&
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
                 {friendlyName}
             </label>

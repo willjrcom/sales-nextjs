@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import Order from "@/app/entities/order/order";
 import GetOrderByID from "@/app/api/order/[id]/route";
 import { useSession } from 'next-auth/react';
+import OrderManager from "../../order";
 
 const PageNewOrderDelivery = () => {
     return (
@@ -38,9 +39,7 @@ const Page = () => {
     }
     
     return (
-        <>
-            <h1>{order?.id}</h1>
-        </>
+        <OrderManager order={order}/>
     );
 }
 export default PageNewOrderDelivery

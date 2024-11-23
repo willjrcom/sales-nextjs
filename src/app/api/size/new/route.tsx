@@ -1,9 +1,9 @@
-import Size from "@/app/entities/size/size";
+import size from "@/app/entities/size/size";
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 
-const NewSize = async (size: Size, session: Session): Promise<string> => {
-    const response = await RequestApi<Size, string>({
+const Newsize = async (size: size, session: Session): Promise<string> => {
+    const response = await RequestApi<size, string>({
         path: "/product-category/size/new", 
         method: "POST",
         body: size,
@@ -13,4 +13,4 @@ const NewSize = async (size: Size, session: Session): Promise<string> => {
     return response.data
 };
 
-export default NewSize
+export default Newsize

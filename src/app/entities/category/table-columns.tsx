@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonEdit from "@/app/components/crud/button-edit";
-import CategoryForm from "@/app/forms/category/form";
 import Category from "./category";
+import Link from "next/link";
+import { FaEdit } from "react-icons/fa";
 
 const CategoryColumns = (): ColumnDef<Category>[] => [
   {
@@ -20,12 +20,9 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit 
-          name={row.original.name}>
-          <CategoryForm 
-            item={row.original}
-            isUpdate={true}/>
-        </ButtonEdit>
+        <Link href={'/pages/category/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
+            <FaEdit />
+        </Link>
       )
     },
   },

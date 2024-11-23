@@ -51,9 +51,12 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     
             if (response) {
                 modalHandler.setShowModal(false);
-                context.addItem(product);
             }
 
+            if (isUpdate) {
+                product.id = response
+                context.addItem(product);
+            }
         } catch (error) {
             setError((error as Error).message);
         }

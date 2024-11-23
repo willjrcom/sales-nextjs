@@ -1,5 +1,6 @@
 import ProcessRule from "../process-rule/process-rule";
 import Product from "../product/product";
+import Quantity from "../quantity/quantity";
 import Size from "../size/size";
 
 export default class Category {
@@ -8,6 +9,7 @@ export default class Category {
     name: string = "";
     sizes: Size[] = [];
     products: Product[] = [];
+    quantities: Quantity[] = [];
     process_rules: ProcessRule[] = [];
     
     constructor() {}

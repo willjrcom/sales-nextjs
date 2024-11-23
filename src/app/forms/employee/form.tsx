@@ -28,7 +28,11 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
 
         if (response) {
             modalHandler.setShowModal(false);
-            context.addItem(employee)
+        }
+
+        if (isUpdate) {
+            employee.id = response
+            context.addItem(employee);
         }
     }
 

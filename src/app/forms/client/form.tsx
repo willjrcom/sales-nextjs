@@ -26,8 +26,12 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         const response = isUpdate ? await UpdateClient(client, data) : await NewClient(client, data)
 
         if (response) {
-            modalHandler.setShowModal(false)
-            context.addItem(client)
+            modalHandler.setShowModal(false);
+        }
+
+        if (isUpdate) {
+            client.id = response
+            context.addItem(client);
         }
     }
     
