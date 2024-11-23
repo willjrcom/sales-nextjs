@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PersonForm from '../person/form';
 import ButtonsModal from '../buttons-modal';
 import Client from '@/app/entities/client/client';
@@ -13,13 +13,12 @@ import ModalHandler from '@/app/components/modal/modal';
 import NewClient from '@/app/api/client/new/route';
 import UpdateClient from '@/app/api/client/update/route';
 
-
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalHandler = ModalHandler();
     const context = useClients();
     const [client, setPerson] = useState<Client>(item as Client || new Client())
     const { data } = useSession();
-
+    console.log(client.address.likeTax)
     const submit = async () => {
         if (!data) return;
         client.birthday = DateComponent(client.birthday)

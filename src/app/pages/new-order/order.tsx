@@ -1,4 +1,5 @@
 import CategoryOrder from "@/app/components/order/category"
+import { useCategories } from "@/app/context/category/context"
 import { GroupItem } from "@/app/entities/order/group-item"
 import Order from "@/app/entities/order/order"
 import { useEffect, useState } from "react"
@@ -8,6 +9,7 @@ interface OrderManagerProps {
 }
 const OrderManager = ({ order }: OrderManagerProps) => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
+    const context = useCategories();
 
     useEffect(() => {
         const items = groupBy(order.groups, "category_id");
@@ -23,35 +25,9 @@ const OrderManager = ({ order }: OrderManagerProps) => {
                     <button className="w-1/5 bg-green-500 text-white py-2 rounded-lg mb-4">+ Item</button>
                 </div>
 
-                {Object.values(groupedItems).map((groups, index) => (
-                    <CategoryOrder key={index} groups={groups} />
-                ))}
-                {/* Categoria: Bebidas */}
-                <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-lg font-semibold">Bebidas</h2>
-                        <button className="text-blue-500 underline">Editar</button>
-                    </div>
-                    <div className="flex space-x-4 overflow-x-auto">
-                        <div className="p-4 border rounded-lg bg-gray-50">2 x Coca cola lata</div>
-                    </div>
-                    <hr />
-                    <p className="text-right mt-2">Subtotal: R$ 40,00</p>
-                </div>
-
-
-                {/* Categoria: Sobremesas */}
-                <div>
-                    <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-lg font-semibold">Sobremesas</h2>
-                        <button className="text-blue-500 underline">Editar</button>
-                    </div>
-                    <div className="flex space-x-4 overflow-x-auto">
-                        <div className="p-4 border rounded-lg bg-gray-50">2 x Milk-shake</div>
-                    </div>
-                    <hr />
-                    <p className="text-right mt-2">Subtotal: R$ 40,00</p>
-                </div>
+                {Object.entries(groupedItems).map(([key, groups], index) => (
+                    <CategoryOrder key={index} categoryName={context.findByID(key)!.name} groups={groups} />
+                ))}   
             </div>
 
             {/* Lado Direito */}

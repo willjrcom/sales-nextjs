@@ -58,41 +58,26 @@ interface CategoryFormProps {
 const CategoryForm = ({ item }: CategoryFormProps) => {
     const category = item || new Category();
     const [name, setName] = useState(category.name);
+    const [imagePath, setImagePath] = useState(category.image_path);
     const [sizes, setSizes] = useState<Size[]>(category.sizes);
     const [quantities, setQuantities] = useState<Quantity[]>(category.quantities);
-    
-    const [size, setSize] = useState<Size>({} as Size);
-    const [quantity, setQuantity] = useState<Quantity>({} as Quantity);
-
-    // const handleAdd = () => {
-    //     if (modalType === "size") {
-    //         setSizes((prev) => [...prev, size]);
-    //     } else if (modalType === "quantity") {
-    //         setQuantities((prev) => [...prev, quantity]);
-    //     }
-    //     setSize({} as Size);
-    //     setQuantity({} as Quantity);
-    // };
 
     return (
         <div className="flex flex-col items-center justify-center p-4">
             <h1 className="text-3xl font-bold mb-6">Categoria</h1>
             <TextField friendlyName="Nome da Categoria" name="name" placeholder="nome da categoria" setValue={setName} value={name} />
+            <TextField friendlyName="Imagem" name="image_path" placeholder="caminho da imagem" setValue={setImagePath} value={imagePath} />
 
             <ListSize item={category} />
             <ListQuantity item={category} />
-
-            {/* Botões */}
-            <div className="flex space-x-4">
-                <button className="bg-white border p-2 rounded-md">Cadastrar</button>
-                <button className="bg-white border p-2 rounded-md">Cancelar</button>
-            </div>
         </div>
     );
 };
 
 
 const ListSize = ({ item }: CategoryFormProps) => {
+    if (item?.sizes === undefined || item?.sizes.length === 0) item!.sizes = [];
+
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
@@ -114,6 +99,8 @@ const ListSize = ({ item }: CategoryFormProps) => {
 }
 
 const ListQuantity = ({ item }: CategoryFormProps) => {
+    if (item?.quantities === undefined || item?.quantities?.length === 0) item!.quantities = [];
+
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Quantidades</h2>

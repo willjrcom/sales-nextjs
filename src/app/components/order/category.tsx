@@ -2,14 +2,15 @@ import { GroupItem } from "@/app/entities/order/group-item"
 import GroupItemOrder from "./group-item"
 
 interface CategoryOrderProps {
+    categoryName: string;
     groups: GroupItem[]
 }
 
-const CategoryOrder = ({groups}: CategoryOrderProps) => {
+const CategoryOrder = ({groups, categoryName}: CategoryOrderProps) => {
     return (
         <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold">Pizza</h2>
+            <h2 className="text-lg font-semibold">{categoryName}</h2>
             <button className="text-blue-500 underline">Editar</button>
         </div>
         {/* Scroll horizontal */}
