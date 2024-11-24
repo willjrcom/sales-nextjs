@@ -8,12 +8,12 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProcessRule from '@/app/api/process-rule/delete/route';
 import { useProcessRules } from '@/app/context/process-rule/context';
-import ModalHandler from '@/app/components/modal/modal';
 import NewProcessRule from '@/app/api/process-rule/new/route';
 import UpdateProcessRule from '@/app/api/process-rule/update/route';
+import { useModal } from '@/app/context/modal/context';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const processRule = item || new ProcessRule();
     const [id, setId] = useState(processRule.id);
     const [name, setName] = useState(processRule.name);

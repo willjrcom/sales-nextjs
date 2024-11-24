@@ -1,9 +1,8 @@
 'use client';
 
-import Form from "@/app/forms/form";
-import { useState } from "react";
+import Modal from "@/app/forms/form";
 import { FaEdit } from "react-icons/fa";
-import ModalHandler from "../modal/modal";
+import { useModal } from "@/app/context/modal/context";
 
 interface NewButtonProps {
     name: string;
@@ -11,7 +10,7 @@ interface NewButtonProps {
 }
 
 const ButtonEdit = ({ name, children }: NewButtonProps) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal()
 
     const editButton = "Editar " + {name}.name;
     
@@ -21,9 +20,9 @@ const ButtonEdit = ({ name, children }: NewButtonProps) => {
                 <FaEdit />
             </button>
         
-            <Form title={editButton} show={modalHandler.showModal} onClose={() => modalHandler.setShowModal(false)}>
+            <Modal title={editButton} show={modalHandler.showModal}>
                 {children}
-            </Form>
+            </Modal>
         </div>
 
     )

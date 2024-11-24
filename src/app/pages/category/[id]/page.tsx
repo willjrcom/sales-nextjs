@@ -8,7 +8,7 @@ import Order from "@/app/entities/order/order";
 import Quantity from "@/app/entities/quantity/quantity";
 import Size from "@/app/entities/size/size";
 import { TextField } from "@/app/forms/field";
-import Form from "@/app/forms/form";
+import Modal from "@/app/forms/form";
 import QuantityForm from "@/app/forms/quantity/form";
 import SizeForm from "@/app/forms/size/form";
 import { useSession } from "next-auth/react";

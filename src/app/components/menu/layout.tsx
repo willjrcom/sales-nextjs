@@ -8,6 +8,7 @@ import { ProcessRuleProvider } from '@/app/context/process-rule/context';
 import { PlaceProvider } from '@/app/context/place/context';
 import { TableProvider } from '@/app/context/table/context';
 import { OrderProvider } from '@/app/context/order/context';
+import { ModalProvider } from '@/app/context/modal/context';
 
 const Menu = ({
   children,
@@ -15,31 +16,33 @@ const Menu = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <EmployeeProvider>
-      <ClientProvider>
-        <CategoryProvider>
-          <ProductProvider>
-            <ProcessRuleProvider>
-              <PlaceProvider>
-                <TableProvider>
-                  <OrderProvider>
-                    <div className="flex">
-                      <Sidebar />
-                      <div className="flex-1 flex flex-col">
-                        <Topbar />
-                        <main className="p-4">
-                          {children}
-                        </main>
+    <ModalProvider>
+      <EmployeeProvider>
+        <ClientProvider>
+          <CategoryProvider>
+            <ProductProvider>
+              <ProcessRuleProvider>
+                <PlaceProvider>
+                  <TableProvider>
+                    <OrderProvider>
+                      <div className="flex">
+                        <Sidebar />
+                        <div className="flex-1 flex flex-col">
+                          <Topbar />
+                          <main className="p-4">
+                            {children}
+                          </main>
+                        </div>
                       </div>
-                    </div>
-                  </OrderProvider>
-                </TableProvider>
-              </PlaceProvider>
-            </ProcessRuleProvider>
-          </ProductProvider>
-        </CategoryProvider>
-      </ClientProvider>
-    </EmployeeProvider>
+                    </OrderProvider>
+                  </TableProvider>
+                </PlaceProvider>
+              </ProcessRuleProvider>
+            </ProductProvider>
+          </CategoryProvider>
+        </ClientProvider>
+      </EmployeeProvider>
+    </ModalProvider>
   );
 }
 

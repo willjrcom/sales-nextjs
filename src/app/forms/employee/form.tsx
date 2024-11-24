@@ -13,9 +13,10 @@ import { useEmployees } from '@/app/context/employee/context';
 import ModalHandler from '@/app/components/modal/modal';
 import NewEmployee from '@/app/api/employee/new/route';
 import UpdateEmployee from '@/app/api/employee/update/route';
+import { useModal } from '@/app/context/modal/context';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const context = useEmployees();
     const [person, setPerson] = useState<Person>(item as Person || new Person())
     const { data } = useSession();

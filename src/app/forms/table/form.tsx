@@ -7,13 +7,13 @@ import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteTable from '@/app/api/table/delete/route';
-import ModalHandler from '@/app/components/modal/modal';
 import { useTables } from '@/app/context/table/context';
 import NewTable from '@/app/api/table/new/route';
 import UpdateTable from '@/app/api/table/update/route';
+import { useModal } from '@/app/context/modal/context';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const context = useTables();
     const table = item || new Table();
     const [id, setId] = useState(table.id);

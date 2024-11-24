@@ -10,7 +10,7 @@ const FilterForm = ({ show, onClose, children }: ModalProps) => {
     if (!show) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20">
             <form className="max-w-lg w-1/2 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <h2>Filtrar</h2>
                 <hr className="my-4" />

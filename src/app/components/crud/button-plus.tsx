@@ -1,7 +1,7 @@
-import Form from "@/app/forms/form";
+import Modal from "@/app/forms/form";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
-import ModalHandler from "../modal/modal";
+import { useModal } from "@/app/context/modal/context";
 
 interface NewButtonProps {
     name: string;
@@ -9,7 +9,7 @@ interface NewButtonProps {
 }
 
 const ButtonPlus = ({ name, children }: NewButtonProps) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const newButton = "Novo " + { name }.name;
 
     return (
@@ -19,9 +19,9 @@ const ButtonPlus = ({ name, children }: NewButtonProps) => {
                 <span>{newButton}</span>
             </button>
 
-            <Form title={newButton} show={modalHandler.showModal} onClose={(() => modalHandler.setShowModal(false))}>
+            <Modal title={newButton} show={modalHandler.showModal} onClose={(() => modalHandler.setShowModal(false))}>
                 {children}
-            </Form>
+            </Modal>
         </div>
 
     )

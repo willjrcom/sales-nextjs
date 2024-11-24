@@ -7,15 +7,15 @@ import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteQuantity from '@/app/api/quantity/delete/route';
-import ModalHandler from '@/app/components/modal/modal';
 import NewQuantity from '@/app/api/quantity/new/route';
 import UpdateQuantity from '@/app/api/quantity/update/route';
+import { useModal } from '@/app/context/modal/context';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
     categoryID: string
 }
 const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const quantity = item || new Quantity();
     const [id, setId] = useState(quantity.id);
     const [quantityName, setQuantityName] = useState((quantity.quantity as unknown) as string);

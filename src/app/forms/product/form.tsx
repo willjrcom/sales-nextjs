@@ -10,12 +10,12 @@ import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/route';
 import { useProducts } from '@/app/context/product/context';
-import ModalHandler from '@/app/components/modal/modal';
 import UpdateProduct from '@/app/api/product/update/route';
 import NewProduct from '@/app/api/product/new/route';
+import { useModal } from '@/app/context/modal/context';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const context = useProducts();
     const product = item || new Product();
     const [id, setId] = useState(product.id);

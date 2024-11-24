@@ -7,13 +7,13 @@ import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeletePlace from '@/app/api/place/delete/route';
-import ModalHandler from '@/app/components/modal/modal';
 import { usePlaces } from '@/app/context/place/context';
 import NewPlace from '@/app/api/place/new/route';
 import UpdatePlace from '@/app/api/place/update/route';
+import { useModal } from '@/app/context/modal/context';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
-    const modalHandler = ModalHandler();
+    const modalHandler = useModal();
     const context = usePlaces();
     const place = item || new Place();
     const [id, setId] = useState(place.id);
