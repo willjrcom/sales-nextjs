@@ -20,7 +20,7 @@ export default class Product {
 }
 
 const SchemaProduct = z.object({
-    code: z.string().max(100, 'Código precisa ter no máximo 100 caracteres'),
+    code: z.string().min(1, 'Código precisa ter pelo menos 1 caracteres').max(100, 'Código precisa ter no máximo 100 caracteres'),
     image_path: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     description: z.string().optional(),
