@@ -24,7 +24,7 @@ const PageEmployee = () => {
             <CrudLayout
                 title="Funcionários"
                 filterButtonChildren={
-                    <ButtonFilter modalName="new-employee"><h1>meu filtro</h1></ButtonFilter>
+                    <ButtonFilter modalName="filter-employee"></ButtonFilter>
                 }
                 plusButtonChildren={
                     <ButtonPlus modalName="new-employee"

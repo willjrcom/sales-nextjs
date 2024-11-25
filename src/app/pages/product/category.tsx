@@ -24,7 +24,7 @@ const PageCategories = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout title="Categorias"
                 filterButtonChildren={
-                    <ButtonFilter modalName="new-category"/>
+                    <ButtonFilter modalName="filter-category"/>
                 }
                 plusButtonChildren={
                     <ButtonPlus name="categoria" modalName="new-category">
