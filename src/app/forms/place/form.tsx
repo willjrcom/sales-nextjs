@@ -50,8 +50,8 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const onDelete = async () => {
         if (!data) return;
         DeletePlace(place.id, data);
-        modalHandler.hideModal(modalName);
         context.removeItem(place.id)
+        modalHandler.hideModal(modalName);
     }
 
     return (

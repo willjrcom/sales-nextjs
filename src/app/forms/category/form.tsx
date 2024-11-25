@@ -50,8 +50,8 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteCategory(category.id, data);
-        modalHandler.hideModal(modalName);
         context.removeItem(category.id)
+        modalHandler.hideModal(modalName);
     }
 
     return (

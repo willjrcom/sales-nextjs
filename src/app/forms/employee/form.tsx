@@ -39,14 +39,14 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
         if (!data) return;
         let employee = new Employee(person)
         DeleteEmployee(employee.id, data)
-        modalHandler.hideModal(modalName);
         context.removeItem(employee.id)
+        modalHandler.hideModal(modalName);
     }
 
     return (
         <>
             <PersonForm person={person} onPersonChange={setPerson}/>
-            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
+            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );
 };

@@ -47,8 +47,8 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteTable(table.id, data);
-        modalHandler.hideModal(modalName);
         context.removeItem(table.id)
+        modalHandler.hideModal(modalName);
     }
 
     return (

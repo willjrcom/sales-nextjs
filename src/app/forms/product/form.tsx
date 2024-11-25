@@ -67,8 +67,8 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        modalHandler.hideModal(modalName);
         context.removeItem(product.id)
+        modalHandler.hideModal(modalName);
     }
 
     useEffect(() => {

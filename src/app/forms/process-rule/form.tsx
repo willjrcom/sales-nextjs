@@ -64,8 +64,8 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProcessRule(processRule.id, data);
-        modalHandler.hideModal(modalName);
         context.removeItem(processRule.id)
+        modalHandler.hideModal(modalName);
     }
 
     return (

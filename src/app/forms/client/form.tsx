@@ -33,7 +33,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                 context.addItem(client);
             } else {
                 context.updateItem(client);
-                console.log("atualizado")
             }
             
             modalHandler.hideModal(modalName);
@@ -43,8 +42,8 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteClient(client.id, data)
-        modalHandler.hideModal(modalName)
         context.removeItem(client.id)
+        modalHandler.hideModal(modalName)
     }
 
     return (
