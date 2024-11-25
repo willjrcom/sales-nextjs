@@ -23,12 +23,12 @@ const SchemaProduct = z.object({
     code: z.string().max(100, 'Código precisa ter no máximo 100 caracteres'),
     image_path: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    description: z.string().min(3, 'Descrição precisa ter pelo menos 3 caracteres').max(100, 'Descrição precisa ter no máximo 100 caracteres').optional(),
+    description: z.string().optional(),
     price: z.number().min(1, 'Preço inválido'),
-    cost: z.number().min(1, 'Custo inválido'),
+    cost: z.number().optional(),
     category_id: z.string().uuid("Categoria inválida"),
     size_id: z.string().uuid("Tamanho inválido"),
-    is_available: z.boolean().optional(),
+    is_available: z.boolean(),
 });
 
 export const ValidateProductForm = (product: Product) => {

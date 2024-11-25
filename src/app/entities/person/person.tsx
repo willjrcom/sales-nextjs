@@ -28,7 +28,7 @@ export default Person
 const SchemaPerson = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     email: z.string().email('Email inválido'),
-    cpf: z.string().min(11, 'Cpf inválido').max(14, 'Cpf inválido').nullable(),
+    cpf: z.string().optional(),
     birthday: z.string().nullable(),
     contact: SchemaContact,
     address: SchemaAddress,

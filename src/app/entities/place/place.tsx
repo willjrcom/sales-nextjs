@@ -14,8 +14,8 @@ export default class Place {
 
 const SchemaPlace = z.object({
     image_path: z.string().optional(),
-    name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    is_available: z.boolean().optional(),
+    name: z.string().min(2, 'Nome precisa ter pelo menos 2 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
+    is_available: z.boolean(),
 });
 
 export const ValidatePlaceForm = (place: Place) => {

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../field';
-import Product from '@/app/entities/product/product';
+import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import GetCategories from '@/app/api/category/route';
@@ -13,6 +13,7 @@ import { useProducts } from '@/app/context/product/context';
 import UpdateProduct from '@/app/api/product/update/route';
 import NewProduct from '@/app/api/product/new/route';
 import { useModal } from '@/app/context/modal/context';
+import ErrorForms from '../error-forms';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product' : 'new-product'
@@ -33,6 +34,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
     const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
     
     const submit = async () => {
         if (!data) return;
@@ -46,6 +48,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         product.is_available = isAvailable;
         product.category_id = categoryId;
         product.size_id = sizeId;
+
+        const validationErrors = ValidateProductForm(product);
+        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
@@ -142,7 +147,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
-            {error && <p className="mb-4 text-red-500">{error}</p>}
+            <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );

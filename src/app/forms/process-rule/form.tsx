@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { TextField, NumberField, HiddenField } from '../field';
-import ProcessRule from '@/app/entities/process-rule/process-rule';
+import ProcessRule, { ValidateProcessRuleForm } from '@/app/entities/process-rule/process-rule';
 import ButtonsModal from '../buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -11,6 +11,7 @@ import { useProcessRules } from '@/app/context/process-rule/context';
 import NewProcessRule from '@/app/api/process-rule/new/route';
 import UpdateProcessRule from '@/app/api/process-rule/update/route';
 import { useModal } from '@/app/context/modal/context';
+import ErrorForms from '../error-forms';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule' : 'new-process-rule'
@@ -20,7 +21,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const [name, setName] = useState(processRule.name);
     const [description, setDescription] = useState(processRule.description);
     const [order, setOrder] = useState(processRule.order);
-    const [imagePath, setImagePath] = useState(processRule.imagePath);
+    const [imagePath, setImagePath] = useState(processRule.image_path);
     const [idealTime, setIdealTime] = useState(processRule.ideal_time);
     const [experimentalError, setExperimentalError] = useState(processRule.experimental_error);
     const [idealTimeFormatted, setIdealTimeFormatted] = useState(processRule.ideal_time_formatted);
@@ -30,6 +31,8 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const { data } = useSession();
     const [error, setError] = useState<string | null>(null);
     const context = useProcessRules()
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
+
     const submit = async () => {
         if (!data) return;
 
@@ -37,12 +40,15 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         processRule.name = name;
         processRule.description = description;
         processRule.order = order;
-        processRule.imagePath = imagePath;
+        processRule.image_path = imagePath;
         processRule.ideal_time = idealTime;
         processRule.experimental_error = experimentalError;
         processRule.ideal_time_formatted = idealTimeFormatted;
         processRule.experimental_error_formatted = experimentalErrorFormatted;
         processRule.category_id;
+
+        const validationErrors = ValidateProcessRuleForm(processRule);
+        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
             const response = isUpdate ? await UpdateProcessRule(processRule, data) : await NewProcessRule(processRule, data);
@@ -82,7 +88,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             <TextField friendlyName='Categoria' name='categoryId' value={categoryId} setValue={setCategoryId} disabled/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
-            {error && <p className="mb-4 text-red-500">{error}</p>}
+            <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={processRule.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );

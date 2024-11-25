@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 
 export default class ProcessRule {
     id: string = "";
@@ -19,11 +19,12 @@ const SchemaProcessRule = z.object({
     image_path: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     order: z.number().min(1, 'A primeira ordem deve ser 1'),
-    description: z.string().min(3, 'Descrição precisa ter pelo menos 3 caracteres').max(100, 'Descrição precisa ter no máximo 100 caracteres').optional(),
+    description: z.string().optional(),
     ideal_time: z.number().min(1, 'Tempo ideal inválido'),
     experimental_error: z.number().min(1, 'Erro experimental inválido'),
     ideal_time_formatted: z.string().optional(),
     experimental_error_formatted: z.string().optional(),
+    category_id: z.string().uuid("Categoria inválida"),
 });
 
 export const ValidateProcessRuleForm = (category: ProcessRule) => {
