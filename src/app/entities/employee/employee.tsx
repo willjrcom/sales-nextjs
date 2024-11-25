@@ -1,4 +1,5 @@
-import { Person } from "../person/person";
+import { z } from "zod";
+import { Person, ValidatePersonForm } from "../person/person";
 import { User } from "../user/user";
 
 export default class Employee extends Person {
@@ -11,4 +12,19 @@ export default class Employee extends Person {
         this.user_id = user_id;
         this.user = user;
     }
+};
+
+const SchemaEmployee = z.object({
+});
+
+export const ValidateEmployeeForm = (client: Employee) => {
+    const errors = ValidatePersonForm(client);
+    const validatedFields = SchemaEmployee.safeParse({
+    });
+
+    if (!validatedFields.success) {
+        // Usa o método flatten para simplificar os erros
+        return { ...errors, ...validatedFields.error.flatten().fieldErrors };
+    } 
+    return {}
 };

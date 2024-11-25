@@ -1,5 +1,6 @@
-import Address from "../address/address";
-import Contact from "../contact/contact";
+import { z } from "zod";
+import Address, { SchemaAddress } from "../address/address";
+import Contact, { SchemaContact } from "../contact/contact";
 
 export class Person {
     id: string = "";
@@ -23,3 +24,30 @@ export class Person {
 };
 
 export default Person
+
+const SchemaPerson = z.object({
+    name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
+    email: z.string().email('Email inválido'),
+    cpf: z.string().min(11, 'Cpf inválido').max(14, 'Cpf inválido').nullable(),
+    birthday: z.string().nullable(),
+    contact: SchemaContact,
+    address: SchemaAddress,
+});
+
+
+export const ValidatePersonForm = (person: Person) => {
+    const validatedFields = SchemaPerson.safeParse({
+        name: person.name,
+        email: person.email,
+        cpf: person.cpf,
+        birthday: person.birthday,
+        contact: person.contact,
+        address: person.address,
+    });
+
+    if (!validatedFields.success) {
+        // Usa o método flatten para simplificar os erros
+        return validatedFields.error.flatten().fieldErrors;
+    } 
+    return {}
+};
