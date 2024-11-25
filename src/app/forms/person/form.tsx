@@ -16,7 +16,7 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
     const [name, setName] = useState(person.name);
     const [email, setEmail] = useState(person.email);
     const [cpf, setCpf] = useState(person.cpf);
-    const [birthday, setBirthday] = useState(person.birthday);
+    const [birthday, setBirthday] = useState(person.birthday || new Date().toISOString());
     if (person.contact == null) person.contact = new Contact()
     const [contactDdd, setContactDdd] = useState(person.contact.ddd);
     const [contactNumber, setContactNumber] = useState(person.contact.number);

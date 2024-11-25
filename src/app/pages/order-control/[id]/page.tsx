@@ -24,7 +24,6 @@ const PageOrderEdit = () => {
             setOrder(orderFound);
             setError(null);
         } catch (error) {
-            console.log(error)
             setError(error as RequestError);
         }
     }

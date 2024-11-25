@@ -31,8 +31,8 @@ const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => 
 const Topbar = () => (
   <div className={`${styles.topbar} flex justify-between`}>
     <div className="flex space-x-4">
-      <TopbarItem label="Mesas" href="/pages/order-table-control" />
       <TopbarItem label="Pedidos" href="/pages/order-control" />
+      <TopbarItem label="Mesas" href="/pages/order-table-control" />
       <TopbarItem label="Entregas" href="/pages/delivery-control" />
     </div>
 

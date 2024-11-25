@@ -3,7 +3,7 @@ import { HiddenField, NumberField, TextField } from '../field';
 import Address from '@/app/entities/address/address';
 
 interface AddressProps {
-    address: Address
+    address: Address;
     onAddressChange: (updatedAddress: Address) => void;
 }
 

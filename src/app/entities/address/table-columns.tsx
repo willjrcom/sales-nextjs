@@ -1,7 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Address from "./address";
-import ButtonEdit from "@/app/components/crud/button-edit";
-import EditAddressForm from "@/app/forms/address/edit";
 
 const AddressColumns = (): ColumnDef<Address>[] => [
   {
@@ -44,14 +42,6 @@ const AddressColumns = (): ColumnDef<Address>[] => [
     id: 'Cep',
     accessorKey: 'cep',
     header: 'cep',
-  },
-  {
-    id: 'Editar',
-    accessorKey: 'id',
-    header: 'ID',
-    cell: ({ row }) => (
-      <ButtonEdit name={row.original.street}><EditAddressForm /></ButtonEdit>
-    ),
   },
 ];
 
