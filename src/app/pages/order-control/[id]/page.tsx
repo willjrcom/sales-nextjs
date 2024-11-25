@@ -24,7 +24,6 @@ const Page = () => {
 
     const getOrder = async () => {
         if (!id || !data || !!order) return;
-        console.log(id)
         const orderFound = await GetOrderByID(id as string, data);
         setOrder(orderFound);
     }

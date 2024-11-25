@@ -30,7 +30,6 @@ const Component = () => {
     useEffect(() => {
         if (!placeID) return;
         const filteredPlaces = contextPlace.filterItems('id', placeID)
-        console.log(filteredPlaces)
         if (filteredPlaces.length > 0) {
             const place = filteredPlaces[0];
 

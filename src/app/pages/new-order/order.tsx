@@ -68,7 +68,6 @@ function groupBy<T extends Record<string, any>>(array: T[], key: keyof T): Recor
         if (!result[groupKey]) {
             result[groupKey] = [];
         }
-        console.log(groupKey)
         result[groupKey].push(currentItem);
         return result;
     }, {} as Record<string, T[]>);

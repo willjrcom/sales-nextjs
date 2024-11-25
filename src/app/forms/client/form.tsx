@@ -18,7 +18,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const context = useClients();
     const [client, setPerson] = useState<Client>(item as Client || new Client())
     const { data } = useSession();
-    console.log(client.address.likeTax)
     const submit = async () => {
         if (!data) return;
         client.birthday = DateComponent(client.birthday)
