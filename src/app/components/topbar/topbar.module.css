@@ -15,3 +15,8 @@
   color: #fff;
   align-self: center;
 }
+
+.alert {
+  color: red;
+  align-self: center;
+}
