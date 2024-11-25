@@ -17,8 +17,7 @@ export const ValidateClientForm = (client: Client) => {
     });
 
     if (!validatedFields.success) {
-        // Usa o método flatten para simplificar os erros
         return { ...errors, ...validatedFields.error.flatten().fieldErrors };
     } 
-    return {}
+    return errors
 };
