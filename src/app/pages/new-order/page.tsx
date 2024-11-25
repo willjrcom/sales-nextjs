@@ -1,18 +1,11 @@
 'use client';
 
-import Menu from "@/app/components/menu/layout";
 import Link from "next/link";
 import React, { useState } from "react";
-import { FaLuggageCart, FaPaperPlane, FaTeamspeak, FaUtensils } from "react-icons/fa";
+import { FaLuggageCart, FaPaperPlane, FaUtensils } from "react-icons/fa";
 
 
 const PageNewOrder = () => {
-  return (
-    <Menu><PedidoOptions/></Menu>
-  )
-}
-
-const PedidoOptions = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const options = [

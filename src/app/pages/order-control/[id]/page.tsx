@@ -2,19 +2,12 @@
 
 import RequestError from "@/app/api/error";
 import GetOrderByID from "@/app/api/order/[id]/route";
-import Menu from "@/app/components/menu/layout";
 import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const PageOrderEdit = () => {
-    return (
-        <Menu><Page/></Menu>
-    )
-}
-
-const Page = () => {
     const { id } = useParams();
     const [order, setOrder] = useState<Order | null>();
     const { data } = useSession();

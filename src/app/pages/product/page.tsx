@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import PageProducts from './product';
-import Menu from '@/app/components/menu/layout';
 import PageCategories from './category';
 import PageProcessRules from './process-rule';
 
@@ -23,31 +22,29 @@ const PageWithTabs = () => {
     };
 
     return (
-        <Menu>
-            <div className="container">
-                <div className="tabs">
-                    <button
-                        className={`tab ${activeTab === 'produtos' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('produtos')}
-                    >
-                        Produtos
-                    </button>
-                    <button
-                        className={`tab ${activeTab === 'categorias' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('categorias')}
-                    >
-                        Categorias
-                    </button>
-                    <button
-                        className={`tab ${activeTab === 'processos' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('processos')}
-                    >
-                        Processos
-                    </button>
-                </div>
-                <div className="content">{renderContent()}</div>
+        <div className="container">
+            <div className="tabs">
+                <button
+                    className={`tab ${activeTab === 'produtos' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('produtos')}
+                >
+                    Produtos
+                </button>
+                <button
+                    className={`tab ${activeTab === 'categorias' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('categorias')}
+                >
+                    Categorias
+                </button>
+                <button
+                    className={`tab ${activeTab === 'processos' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('processos')}
+                >
+                    Processos
+                </button>
             </div>
-        </Menu>
+            <div className="content">{renderContent()}</div>
+        </div>
     );
 };
 

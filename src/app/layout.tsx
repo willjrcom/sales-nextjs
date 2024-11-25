@@ -6,8 +6,8 @@ import AuthProvider from "../../providers/auth-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "GazalFood",
-  description: "sales sistem",
+  title: "GazalFood - Login",
+  description: "Sistema de vendas para establecimentos",
 };
 
 export default function RootLayout({

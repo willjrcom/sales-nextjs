@@ -12,14 +12,6 @@ import { TextField } from "@/app/forms/field";
 import { useState } from "react";
 
 const PageClient = () => {
-    return (
-        <Menu>
-            <Crud />
-        </Menu>
-    );
-}
-
-const Crud = () => {
     const [nome, setNome] = useState<string>("");
     const context = useClients();
 

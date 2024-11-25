@@ -2,7 +2,6 @@
 
 import GetClientByContact from "@/app/api/client/contact/route";
 import NewOrderDelivery from "@/app/api/order-delivery/new/route";
-import Menu from "@/app/components/menu/layout"
 import Client from "@/app/entities/client/client";
 import { TextField } from "@/app/forms/field";
 import { useSession } from "next-auth/react";
@@ -12,14 +11,6 @@ import { useState } from "react";
 import { FaCheck, FaSearch } from "react-icons/fa";
 
 const PageNewOrderDelivery = () => {
-    return (
-        <Menu>
-            <Page />
-        </Menu>
-    )
-}
-
-const Page = () => {
     const [contact, setContact] = useState('');
     const [client, setClient] = useState<Client | null>();
     const { data } = useSession();

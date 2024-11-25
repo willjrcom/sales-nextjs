@@ -1,5 +1,3 @@
-'use client';
-
 import ProductForm from "@/app/forms/product/form";
 import CrudLayout from "@/app/components/crud/layout";
 import ButtonFilter from "@/app/components/crud/button-filter";
@@ -7,7 +5,6 @@ import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import ModalHandler from "@/app/components/modal/modal";
 import { useProducts } from "@/app/context/product/context";
 import "./style.css";
 

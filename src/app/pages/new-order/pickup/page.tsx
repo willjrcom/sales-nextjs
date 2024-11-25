@@ -1,25 +1,13 @@
 'use client';
 
-import GetClientByContact from "@/app/api/client/contact/route";
 import NewOrderPickup from "@/app/api/order-pickup/new/route";
-import Menu from "@/app/components/menu/layout"
-import Client from "@/app/entities/client/client";
 import { TextField } from "@/app/forms/field";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaCheck, FaSearch } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 
 const PageNewOrderPickup = () => {
-    return (
-        <Menu>
-            <Page/>
-        </Menu>
-    )
-}
-
-const Page = () => {
     const [orderName, setOrderName] = useState('');
     const router = useRouter();
     const { data } = useSession();

@@ -1,7 +1,6 @@
 'use client';
 
 import NewOrderTable from "@/app/api/order-table/new/route";
-import Menu from "@/app/components/menu/layout";
 import { usePlaces } from "@/app/context/place/context";
 import Table from "@/app/entities/table/table";
 import { SelectField } from "@/app/forms/field";
@@ -12,14 +11,6 @@ import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
 const PageNewOrderTable = () => {
-    return (
-        <Menu>
-            <Component />
-        </Menu>
-    );
-};
-
-const Component = () => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
     const [tables, setTables] = useState<Table[]>([]);

@@ -4,22 +4,12 @@ import EmployeeForm from "@/app/forms/employee/form";
 import ButtonFilter from "@/app/components/crud/button-filter";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudLayout from "@/app/components/crud/layout";
-import Menu from "@/app/components/menu/layout";
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import ModalHandler from "@/app/components/modal/modal";
-import { EmployeeProvider, useEmployees } from "@/app/context/employee/context";
+import { useEmployees } from "@/app/context/employee/context";
 
 const PageEmployee = () => {
-    return (
-        <Menu>
-            <Crud />
-        </Menu>
-    );
-};
-
-const Crud = () => {
     const context = useEmployees();
 
     if (context.getLoading()) {

@@ -1,6 +1,5 @@
 'use client';
 
-import Menu from "@/app/components/menu/layout"
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -9,14 +8,6 @@ import GetOrderByID from "@/app/api/order/[id]/route";
 import OrderManager from "../../order";
 
 const PageNewOrderPickup = () => {
-    return (
-        <Menu>
-            <Page/>
-        </Menu>
-    )
-}
-
-const Page = () => {
     const { order_id } = useParams();
     const [order, setOrder] = useState<Order | null>();
     const { data } = useSession();

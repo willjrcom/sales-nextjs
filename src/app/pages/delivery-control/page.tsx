@@ -8,14 +8,6 @@ import OrderColumns from "@/app/entities/order/table-columns";
 import { useEffect, useState } from "react";
 
 const PageOrder = () => {
-    return (
-        <Menu>
-            <Page/>
-        </Menu>
-    )
-}
-
-const Page = () => {
     const context = useOrders();
     const [orders, setOrders] = useState<Order[]>([]);
 

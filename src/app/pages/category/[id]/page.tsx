@@ -16,12 +16,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const PageCategoryEdit = () => {
-    return (
-        <Menu><Page /></Menu>
-    )
-}
-
-const Page = () => {
     const { id } = useParams();
     const [category, setCategory] = useState<Category | null>();
     const { data } = useSession();
