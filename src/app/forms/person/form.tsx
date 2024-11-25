@@ -1,8 +1,6 @@
-'use client';
-
 import { useEffect, useState } from "react";
 import{ TextField, DateField, HiddenField } from "../field";
-import CreateAddressForm from "../address/create";
+import CreateAddressForm from "../address/form";
 import Address from "@/app/entities/address/address";
 import Person from "@/app/entities/person/person";
 import Contact from "@/app/entities/contact/contact";
@@ -19,6 +17,7 @@ const PersonForm = ({person, onPersonChange}: PersonProps) => {
     const [email, setEmail] = useState(person.email);
     const [cpf, setCpf] = useState(person.cpf);
     const [birthday, setBirthday] = useState(person.birthday);
+    if (person.contact == null) person.contact = new Contact()
     const [contactDdd, setContactDdd] = useState(person.contact.ddd);
     const [contactNumber, setContactNumber] = useState(person.contact.number);
     const [address, setAddress] = useState<Address>(person.address);

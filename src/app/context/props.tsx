@@ -10,7 +10,8 @@ export interface ItemContextProps<T> {
     findByID: (id: string) => T | undefined;
     fetchData: (id?: string) => void;
     setItemsState: (items: T[]) => void;
-    addItem: (product: T) => void;
+    addItem: (item: T) => void;
+    updateItem: (item: T) => void;
     removeItem: (id: string) => void;
     updateLastUpdate: () => void;
     getError: () => string | null;
@@ -58,6 +59,10 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
         setItems((prev) => [...prev, item]);
     };
 
+    const updateItem = (item: T) => {
+        setItems((prev) => prev.map((i) => (i.id === item.id ? item : i)));
+    }
+
     const removeItem = (id: string) => {
         setItems((prev) => prev.filter((item) => item.id !== id));
     };
@@ -68,7 +73,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const getLoading = () => loading;
     const getLastUpdate = () => lastUpdate;
 
-    return { items, fetchData, findByID, filterItems, setItemsState, addItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
+    return { items, fetchData, findByID, filterItems, setItemsState, addItem, updateItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
 }
 
 export default GenericProvider

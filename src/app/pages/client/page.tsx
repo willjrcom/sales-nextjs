@@ -1,7 +1,6 @@
 'use client';
 
 import CrudLayout from "@/app/components/crud/layout";
-import Menu from "@/app/components/menu/layout";
 import ClientForm from "@/app/forms/client/form";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
@@ -29,7 +28,7 @@ const PageClient = () => {
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} />
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="cliente">
+                    <ButtonPlus name="cliente" modalName="new-client">
                         <ClientForm/>
                     </ButtonPlus>
                 }

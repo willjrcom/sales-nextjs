@@ -6,7 +6,6 @@ import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import ModalHandler from "@/app/components/modal/modal";
 import { useProcessRules } from "@/app/context/process-rule/context";
 import { SelectField } from "@/app/forms/field";
 import { useCategories } from "@/app/context/category/context";
@@ -32,7 +31,7 @@ export default function PageProcessRules () {
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="processos">
+                    <ButtonPlus modalName="new-process-rule" name="processos">
                         <ProcessRuleForm/>
                     </ButtonPlus>
                 }

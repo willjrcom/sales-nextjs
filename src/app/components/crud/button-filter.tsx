@@ -1,23 +1,24 @@
 import FilterForm from "@/app/forms/filter";
 import { FaFilter } from "react-icons/fa";
-import ModalHandler from "../modal/modal";
+import { useModal } from "@/app/context/modal/context";
 
 interface FilterButtonProps {
+    modalName: string
     children?: React.ReactNode;
 }
 
-const ButtonFilter = ({ children }: FilterButtonProps) => {
-    const handleModal = ModalHandler();
+const ButtonFilter = ({ modalName, children }: FilterButtonProps) => {
+    const handleModal = useModal();
     const newEntity = "Filtrar";
     
     return (
         <div>
-            <button onClick={() => handleModal.setShowModal(true)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+            <button onClick={() => handleModal.showModal(modalName)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                 <FaFilter />
                 <span>{newEntity}</span>
             </button>
         
-            <FilterForm show={handleModal.showModal} onClose={() => handleModal.setShowModal(false)}>
+            <FilterForm show={handleModal.isModalOpen(modalName)} onClose={() => handleModal.hideModal(modalName)}>
                 {children}
             </FilterForm>
         </div>

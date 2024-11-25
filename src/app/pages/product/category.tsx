@@ -7,7 +7,6 @@ import ButtonPlus from "@/app/components/crud/button-plus";
 import CrudTable from "@/app/components/crud/table";
 import CategoryColumns from "@/app/entities/category/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import ModalHandler from "@/app/components/modal/modal";
 import { useCategories } from "@/app/context/category/context";
 import "./style.css";
 
@@ -25,10 +24,10 @@ const PageCategories = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout title="Categorias"
                 filterButtonChildren={
-                    <ButtonFilter/>
+                    <ButtonFilter modalName="new-category"/>
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="categoria">
+                    <ButtonPlus name="categoria" modalName="new-category">
                         <CategoryForm/>
                     </ButtonPlus>
                 }

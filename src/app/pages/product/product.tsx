@@ -22,10 +22,10 @@ const PageProducts = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
             <CrudLayout title="Produtos"
                 filterButtonChildren={
-                    <ButtonFilter/>
+                    <ButtonFilter modalName="new-product"/>
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="produto">
+                    <ButtonPlus modalName="new-product" name="produto">
                         <ProductForm/>
                     </ButtonPlus>
                 }

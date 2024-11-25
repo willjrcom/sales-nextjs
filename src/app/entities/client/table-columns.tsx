@@ -13,7 +13,7 @@ const ClientColumns = (): ColumnDef<Client>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit
+        <ButtonEdit modalName="edit-client"
           name={row.original.name}>
           <ClientForm
             item={row.original}

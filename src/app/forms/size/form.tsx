@@ -15,6 +15,7 @@ interface SizeFormProps extends CreateFormsProps<Size> {
     categoryID: string
 }
 const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
+    const modalName = isUpdate ? 'edit-size' : 'new-size'
     const modalHandler = useModal();
     const size = item || new Size();
     const [id, setId] = useState(size.id);
@@ -32,11 +33,9 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
         size.category_id = categoryID
 
         try {
-            const response = isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
-    
-            if (response) {
-                modalHandler.setShowModal(false);
-            }
+            isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
+
+            modalHandler.hideModal(modalName);
 
         } catch (error) {
             setError((error as Error).message);
@@ -46,7 +45,7 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteSize(size.id, data);
-        modalHandler.setShowModal(false);
+        modalHandler.hideModal(modalName);
     }
 
     return (
@@ -57,7 +56,7 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={size.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.setShowModal(false)}/>
+            <ButtonsModal isUpdate={size.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );
 };

@@ -1,17 +1,31 @@
 import React, { createContext, useContext, ReactNode, useState } from 'react';
 
 interface ModalContextProps {
-    showModal: boolean;
-    setShowModal: (value: boolean) => void;
+    modals: Record<string, boolean>;
+    showModal: (modalName: string) => void;
+    hideModal: (modalName: string) => void;
+    isModalOpen: (modalName: string) => boolean;
 }
 
 const ContextModal = createContext<ModalContextProps | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
-    const [showModal, setShowModal] = useState(false);
-    
+    const [modals, setModals] = useState<Record<string, boolean>>({});
+
+    const showModal = (modalName: string) => {
+        setModals((prev) => ({ ...prev, [modalName]: true }));
+    };
+
+    const hideModal = (modalName: string) => {
+        setModals((prev) => ({ ...prev, [modalName]: false }));
+    };
+
+    const isModalOpen = (modalName: string) => {
+        return !!modals[modalName];
+    };
+
     return (
-        <ContextModal.Provider value={{showModal, setShowModal}}>
+        <ContextModal.Provider value={{ modals, showModal, hideModal, isModalOpen }}>
             {children}
         </ContextModal.Provider>
     );

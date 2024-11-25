@@ -13,6 +13,7 @@ import UpdateProcessRule from '@/app/api/process-rule/update/route';
 import { useModal } from '@/app/context/modal/context';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
+    const modalName = isUpdate ? 'edit-process-rule' : 'new-process-rule'
     const modalHandler = useModal();
     const processRule = item || new ProcessRule();
     const [id, setId] = useState(processRule.id);
@@ -46,10 +47,14 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         try {
             const response = isUpdate ? await UpdateProcessRule(processRule, data) : await NewProcessRule(processRule, data);
     
-            if (response) {
-                modalHandler.setShowModal(false);
+            if (!isUpdate) {
+                processRule.id = response
                 context.addItem(processRule);
+            } else {
+                context.updateItem(processRule);
             }
+
+            modalHandler.hideModal(modalName);
 
         } catch (error) {
             setError((error as Error).message);
@@ -59,7 +64,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProcessRule(processRule.id, data);
-        modalHandler.setShowModal(false);
+        modalHandler.hideModal(modalName);
         context.removeItem(processRule.id)
     }
 
@@ -78,7 +83,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={processRule.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.setShowModal(false)}/>
+            <ButtonsModal isUpdate={processRule.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );
 };

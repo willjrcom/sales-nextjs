@@ -15,6 +15,7 @@ import NewProduct from '@/app/api/product/new/route';
 import { useModal } from '@/app/context/modal/context';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
+    const modalName = isUpdate ? 'edit-product' : 'new-product'
     const modalHandler = useModal();
     const context = useProducts();
     const product = item || new Product();
@@ -48,15 +49,16 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         try {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
-    
-            if (response) {
-                modalHandler.setShowModal(false);
-            }
 
-            if (isUpdate) {
+            if (!isUpdate) {
                 product.id = response
                 context.addItem(product);
+            } else {
+                context.updateItem(product);
             }
+
+            modalHandler.hideModal(modalName);
+            
         } catch (error) {
             setError((error as Error).message);
         }
@@ -65,7 +67,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        modalHandler.setShowModal(false);
+        modalHandler.hideModal(modalName);
         context.removeItem(product.id)
     }
 
@@ -141,7 +143,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.setShowModal(false)}/>
+            <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );
 };

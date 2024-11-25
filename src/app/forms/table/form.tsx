@@ -13,6 +13,7 @@ import UpdateTable from '@/app/api/table/update/route';
 import { useModal } from '@/app/context/modal/context';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
+    const modalName = isUpdate ? 'edit-table' : 'new-table'
     const modalHandler = useModal();
     const context = useTables();
     const table = item || new Table();
@@ -30,11 +31,14 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         try {
             const response = isUpdate ? await UpdateTable(table, data) : await NewTable(table, data)
     
-            if (response) {
-                modalHandler.setShowModal(false);
+            if (!isUpdate) {
+                table.id = response
                 context.addItem(table);
+            } else {
+                context.updateItem(table);
             }
 
+            modalHandler.hideModal(modalName);
         } catch (error) {
             setError((error as Error).message);
         }
@@ -43,7 +47,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteTable(table.id, data);
-        modalHandler.setShowModal(false);
+        modalHandler.hideModal(modalName);
         context.removeItem(table.id)
     }
 
@@ -54,7 +58,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={table.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.setShowModal(false)}/>
+            <ButtonsModal isUpdate={table.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
         </>
     );
 };

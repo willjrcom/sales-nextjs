@@ -24,10 +24,10 @@ const PageEmployee = () => {
             <CrudLayout
                 title="Funcionários"
                 filterButtonChildren={
-                    <ButtonFilter><h1>meu filtro</h1></ButtonFilter>
+                    <ButtonFilter modalName="new-employee"><h1>meu filtro</h1></ButtonFilter>
                 }
                 plusButtonChildren={
-                    <ButtonPlus 
+                    <ButtonPlus modalName="new-employee"
                         name="funcionario">
                         <EmployeeForm/>
                     </ButtonPlus>

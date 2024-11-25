@@ -13,6 +13,7 @@ import UpdatePlace from '@/app/api/place/update/route';
 import { useModal } from '@/app/context/modal/context';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
+    const modalName = isUpdate ? 'edit-place' : 'new-place'
     const modalHandler = useModal();
     const context = usePlaces();
     const place = item || new Place();
@@ -32,10 +33,14 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
         try {
             const response = isUpdate ? await UpdatePlace(place, data) : await NewPlace(place, data)
     
-            if (response) {
-                modalHandler.setShowModal(false);
+            if (!isUpdate) {
+                place.id = response
                 context.addItem(place);
+            } else {
+                context.updateItem(place);
             }
+
+            modalHandler.hideModal(modalName);
 
         } catch (error) {
             setError((error as Error).message);
@@ -45,7 +50,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const onDelete = async () => {
         if (!data) return;
         DeletePlace(place.id, data);
-        modalHandler.setShowModal(false);
+        modalHandler.hideModal(modalName);
         context.removeItem(place.id)
     }
 
@@ -57,7 +62,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={place.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.setShowModal(false)}/>
+            <ButtonsModal isUpdate={place.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
         </>
     );
 };

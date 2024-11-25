@@ -15,6 +15,7 @@ interface QuantityFormProps extends CreateFormsProps<Quantity> {
     categoryID: string
 }
 const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
+    const modalName = isUpdate ? 'edit-quantity' : 'new-quantity'
     const modalHandler = useModal();
     const quantity = item || new Quantity();
     const [id, setId] = useState(quantity.id);
@@ -32,11 +33,9 @@ const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
         quantity.category_id = categoryID;
 
         try {
-            const response = isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
-    
-            if (response) {
-                modalHandler.setShowModal(false);
-            }
+            isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
+
+            modalHandler.hideModal(modalName);
 
         } catch (error) {
             setError((error as Error).message);
@@ -46,7 +45,7 @@ const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteQuantity(quantity.id, data);
-        modalHandler.setShowModal(false);
+        modalHandler.hideModal(modalName);
     }
 
     return (
@@ -57,7 +56,7 @@ const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
             <HiddenField name='id' setValue={setId} value={id}/>
 
             {error && <p className="mb-4 text-red-500">{error}</p>}
-            <ButtonsModal isUpdate={quantity.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.setShowModal(false)}/>
+            <ButtonsModal isUpdate={quantity.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>
     );
 };
