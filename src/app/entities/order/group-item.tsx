@@ -35,7 +35,7 @@ class GroupCommonAttributes extends GroupDetails {
   }
 };
 
-export class GroupItem extends GroupCommonAttributes {
+export default class GroupItem extends GroupCommonAttributes {
   id: string = "";
 
   constructor() {
