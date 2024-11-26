@@ -38,7 +38,7 @@ const PageNewOrderTable = () => {
         if (!data) return
         try {
             const response = await NewOrderTable(tableID, data)
-            router.push('/pages/new-order/table/' + response.order_id)
+            router.push('/pages/order-control/' + response.order_id)
             setError(null);
         } catch (error) {
             setError(error as RequestError);

@@ -69,7 +69,7 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
         if (!data) return
         try {
             const response = await NewOrderDelivery(client.id, data)
-            router.push('/pages/new-order/delivery/' + response.order_id)
+            router.push('/pages/order-control/' + response.order_id)
             setError(null)
         } catch (error) {
             setError(error as RequestError);

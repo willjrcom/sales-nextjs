@@ -18,7 +18,7 @@ const PageNewOrderPickup = () => {
         if (!data) return
         try {
             const response = await NewOrderPickup(name, data)
-            router.push('/pages/new-order/pickup/' + response.order_id)
+            router.push('/pages/order-control/' + response.order_id)
             setError(null)
         } catch (error) {
             setError(error as RequestError)
