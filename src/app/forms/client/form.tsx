@@ -11,6 +11,7 @@ import NewClient from '@/app/api/client/new/route';
 import UpdateClient from '@/app/api/client/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client' : 'new-client'
@@ -18,6 +19,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const context = useClients();
     const [client, setPerson] = useState<Client>(item || new Client())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     const submit = async () => {
@@ -29,7 +31,8 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         
         try {
             const response = isUpdate ? await UpdateClient(client, data) : await NewClient(client, data)
-            
+            setError(null);
+
             if (!isUpdate) {
                 client.id = response
                 context.addItem(client);
@@ -38,7 +41,9 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             }
             
             modalHandler.hideModal(modalName);
-        } catch (error) {}
+        } catch (error) {
+            setError(error as RequestError);
+        }
     }
 
     const onDelete = async () => {
@@ -51,6 +56,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     return (
         <>
             <PersonForm person={client} onPersonChange={setPerson} />
+            {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal
                 isUpdate={client.id !== ""}

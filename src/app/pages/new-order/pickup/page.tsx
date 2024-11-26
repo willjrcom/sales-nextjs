@@ -1,21 +1,28 @@
 'use client';
 
+import RequestError from "@/app/api/error";
 import NewOrderPickup from "@/app/api/order-pickup/new/route";
 import { TextField } from "@/app/forms/field";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaCheck } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 
 const PageNewOrderPickup = () => {
     const [orderName, setOrderName] = useState('');
+    const [error, setError] = useState<RequestError | null>(null)
     const router = useRouter();
     const { data } = useSession();
 
     const newOrder = async (name: string) => {
         if (!data) return
-        const response = await NewOrderPickup(name, data)
-        router.push('/pages/new-order/pickup/' + response.order_id)
+        try {
+            const response = await NewOrderPickup(name, data)
+            router.push('/pages/new-order/pickup/' + response.order_id)
+            setError(null)
+        } catch (error) {
+            setError(error as RequestError)
+        }
     }
 
     return (
@@ -30,10 +37,13 @@ const PageNewOrderPickup = () => {
                         value={orderName} 
                     />
                 </div>
-                <button onClick={() => newOrder(orderName)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
-                    <FaCheck />
-                    <span> Iniciar pedido</span>
-                </button>
+                {error && <p className="mb-4 text-red-500">{error.message}</p>}
+                <div hidden={orderName.length === 0}>
+                    <button onClick={() => newOrder(orderName)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+                        <FaPlus />
+                        <span> Iniciar pedido</span>
+                    </button>
+                </div>
             </div>
         </>
     )

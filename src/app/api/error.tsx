@@ -5,5 +5,9 @@ export default class RequestError {
     status: number = 0;
     path: string = "";
 
-    constructor() {};
+    constructor(message?: string, status?: number, path?: string) {
+        this.message = message || "";
+        this.status = status || 0;
+        this.path = path || "";
+    };
 }

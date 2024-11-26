@@ -12,6 +12,7 @@ import NewTable from '@/app/api/table/new/route';
 import UpdateTable from '@/app/api/table/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table' : 'new-table'
@@ -21,7 +22,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const [id, setId] = useState(table.id);
     const [name, setName] = useState(table.name);
     const { data } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
     const submit = async () => {
@@ -35,7 +36,8 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
         try {
             const response = isUpdate ? await UpdateTable(table, data) : await NewTable(table, data)
-    
+            setError(null);
+
             if (!isUpdate) {
                 table.id = response
                 context.addItem(table);
@@ -45,7 +47,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
             modalHandler.hideModal(modalName);
         } catch (error) {
-            setError((error as Error).message);
+            setError(error as RequestError);
         }
     }
 
@@ -61,6 +63,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
+            {error && <p className='mb-4 text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={table.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
         </>

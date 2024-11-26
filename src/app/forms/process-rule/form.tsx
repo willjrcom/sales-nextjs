@@ -12,6 +12,7 @@ import NewProcessRule from '@/app/api/process-rule/new/route';
 import UpdateProcessRule from '@/app/api/process-rule/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule' : 'new-process-rule'
@@ -29,7 +30,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const [categoryId, setCategoryId] = useState(processRule.category_id);
     
     const { data } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const context = useProcessRules()
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
@@ -52,7 +53,8 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
         try {
             const response = isUpdate ? await UpdateProcessRule(processRule, data) : await NewProcessRule(processRule, data);
-    
+            setError(null);
+
             if (!isUpdate) {
                 processRule.id = response
                 context.addItem(processRule);
@@ -63,7 +65,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError((error as Error).message);
+            setError(error as RequestError);
         }
     }
 
@@ -76,7 +78,6 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     return (
         <>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
             <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
             <TextField friendlyName='Descrição' name='description' setValue={setDescription} value={description}/>
             <NumberField friendlyName='Ordem' name='order' setValue={setOrder} value={order}/>
@@ -88,6 +89,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             <TextField friendlyName='Categoria' name='categoryId' value={categoryId} setValue={setCategoryId} disabled/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={processRule.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>

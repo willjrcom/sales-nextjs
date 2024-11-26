@@ -12,6 +12,7 @@ import NewCategory from '@/app/api/category/new/route';
 import UpdateCategory from '@/app/api/category/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category' : 'new-category'
@@ -22,7 +23,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const [name, setName] = useState(category.name);
     const [imagePath, setImagePath] = useState(category.image_path);
     const { data } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
     const submit = async () => {
@@ -37,6 +38,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
         try {
             const response = isUpdate ? await UpdateCategory(category, data) : await NewCategory(category, data)
+            setError(null);
 
             if (!isUpdate) {
                 category.id = response
@@ -48,7 +50,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError((error as Error).message);
+            setError(error as RequestError);
         }
     }
 
@@ -61,11 +63,11 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
     return (
         <>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
             <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
             <TextField friendlyName='Imagem' name='imagePath' setValue={setImagePath} value={imagePath}/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={category.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
         </>

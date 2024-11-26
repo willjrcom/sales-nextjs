@@ -11,6 +11,7 @@ import NewSize from '@/app/api/size/new/route';
 import UpdateSize from '@/app/api/size/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
     categoryID: string
@@ -23,7 +24,7 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
     const [name, setName] = useState(size.name);
     const [isActive, setIsActive] = useState(size.is_active);
     const { data } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
     const submit = async () => {
@@ -39,11 +40,12 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
 
         try {
             isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
+            setError(null);
 
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError((error as Error).message);
+            setError(error as RequestError);
         }
     }
 
@@ -55,11 +57,11 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
 
     return (
         <>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
             <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
             <CheckboxField friendlyName='Disponivel' name='is_active' setValue={setIsActive} value={isActive.toString()}/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={size.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>

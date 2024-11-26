@@ -12,6 +12,7 @@ import NewPlace from '@/app/api/place/new/route';
 import UpdatePlace from '@/app/api/place/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalName = isUpdate ? 'edit-place' : 'new-place'
@@ -22,7 +23,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const [name, setName] = useState(place.name);
     const [imagePath, setImagePath] = useState(place.image_path);
     const { data } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
     const submit = async () => {
@@ -37,7 +38,8 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
         try {
             const response = isUpdate ? await UpdatePlace(place, data) : await NewPlace(place, data)
-    
+            setError(null);
+
             if (!isUpdate) {
                 place.id = response
                 context.addItem(place);
@@ -48,7 +50,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError((error as Error).message);
+            setError(error as RequestError);
         }
     }
 
@@ -61,11 +63,11 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
     return (
         <>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
             <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
             <TextField friendlyName='Imagem' name='imagePath' setValue={setImagePath} value={imagePath}/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={place.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
         </>

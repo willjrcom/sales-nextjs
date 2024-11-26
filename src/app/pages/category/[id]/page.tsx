@@ -1,6 +1,7 @@
 'use client';
 
 import GetCategoryByID from "@/app/api/category/[id]/route";
+import RequestError from "@/app/api/error";
 import ButtonPlus from "@/app/components/crud/button-plus";
 import Menu from "@/app/components/menu/layout";
 import Category from "@/app/entities/category/category";
@@ -18,6 +19,7 @@ import { useEffect, useState } from "react";
 const PageCategoryEdit = () => {
     const { id } = useParams();
     const [category, setCategory] = useState<Category | null>();
+    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     useEffect(() => {
@@ -26,8 +28,13 @@ const PageCategoryEdit = () => {
 
     const getCategory = async () => {
         if (!id || !data || !!category) return;
-        const categoryFound = await GetCategoryByID(id as string, data);
-        setCategory(categoryFound);
+        try {
+            const categoryFound = await GetCategoryByID(id as string, data);
+            setCategory(categoryFound);
+            setError(null);
+        } catch (error) {
+            setError(error as RequestError);
+        }
     }
 
     if (!id || !category) {
@@ -39,6 +46,7 @@ const PageCategoryEdit = () => {
     return (
         <div className="flex items-center justify-center h-[80vh] bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-lg w-[600px]">
+                {error && <p className="mb-4 text-red-500">{error.message}</p>}
                 <CategoryForm item={category} />
             </div>
         </div>
@@ -53,8 +61,6 @@ const CategoryForm = ({ item }: CategoryFormProps) => {
     const category = item || new Category();
     const [name, setName] = useState(category.name);
     const [imagePath, setImagePath] = useState(category.image_path);
-    const [sizes, setSizes] = useState<Size[]>(category.sizes);
-    const [quantities, setQuantities] = useState<Quantity[]>(category.quantities);
 
     return (
         <div className="flex flex-col items-center justify-center p-4">
@@ -84,8 +90,8 @@ const ListSize = ({ item }: CategoryFormProps) => {
                         {size.name}
                     </div>
                 ))}
-                <ButtonPlus name="tamanho">
-                    <SizeForm categoryID={item!.id}/>
+                <ButtonPlus modalName="new-size" name="tamanho">
+                    <SizeForm categoryID={item!.id} />
                 </ButtonPlus>
             </div>
         </div>
@@ -107,8 +113,8 @@ const ListQuantity = ({ item }: CategoryFormProps) => {
                         {quantity.quantity}
                     </div>
                 ))}
-                <ButtonPlus name="quantidade">
-                    <QuantityForm categoryID={item!.id}/>
+                <ButtonPlus modalName="new-quantity" name="quantidade">
+                    <QuantityForm categoryID={item!.id} />
                 </ButtonPlus>
             </div>
         </div>

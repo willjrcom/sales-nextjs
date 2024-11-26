@@ -1,8 +1,11 @@
+import ButtonPlus from "@/app/components/crud/button-plus"
 import CategoryOrder from "@/app/components/order/category"
 import { useCategories } from "@/app/context/category/context"
 import { GroupItem } from "@/app/entities/order/group-item"
 import Order from "@/app/entities/order/order"
 import { useEffect, useState } from "react"
+import PageListProducts from "./list-products"
+import ButtonNewItem from "@/app/components/crud/button-new-item"
 
 interface OrderManagerProps {
     order: Order
@@ -23,6 +26,9 @@ const OrderManager = ({ order }: OrderManagerProps) => {
                 <div className="flex justify-between items-center mb-2">
                     <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
                     <button className="w-1/5 bg-green-500 text-white py-2 rounded-lg mb-4">+ Item</button>
+                    <ButtonNewItem name="item" modalName="list-products">
+                        <PageListProducts />
+                        </ButtonNewItem>
                 </div>
 
                 {Object.entries(groupedItems).map(([key, groups], index) => (

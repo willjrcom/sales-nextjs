@@ -29,7 +29,7 @@ export const SchemaAddress = z.object({
     city: z.string().min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres'),
     state: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
     delivery_tax: z.number().min(0, 'Taxa de entrega inválida'),
-    object_id: z.string().uuid("Pessoa inválida"),
+    object_id: z.string().optional(),
 });
 
 

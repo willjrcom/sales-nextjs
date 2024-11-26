@@ -14,11 +14,14 @@ import UpdateProduct from '@/app/api/product/update/route';
 import NewProduct from '@/app/api/product/new/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../error-forms';
+import RequestError from '@/app/api/error';
+import { useCategories } from '@/app/context/category/context';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product' : 'new-product'
     const modalHandler = useModal();
     const context = useProducts();
+    const contextCategories = useCategories();
     const product = item || new Product();
     const [id, setId] = useState(product.id);
     const [code, setCode] = useState(product.code);
@@ -33,7 +36,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
     const submit = async () => {
@@ -54,6 +57,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         try {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
+            setError(null);
 
             if (!isUpdate) {
                 product.id = response
@@ -65,7 +69,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             modalHandler.hideModal(modalName);
             
         } catch (error) {
-            setError((error as Error).message);
+            setError(error as RequestError);
         }
     }
 
@@ -81,23 +85,22 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             if (!data) return;
 
             try {
-                let response = await GetCategories(data);
-                setCategories(response);
+                setCategories(contextCategories.items);
 
                 let records: Record<string, string>[] = [];
 
-                if (!response) {
+                if (categories.length === 0) {
                     setRecordCategories([]);
                     return;
                 }
                 
-                for (const category of response) {
-                    records.push({ id: category.id.toString(), name: category.name })
+                for (const category of categories) {
+                    records.push({ id: category.id, name: category.name })
                 }
                 setRecordCategories(records);
 
             } catch (error) {
-                setError((error as Error).message);
+                setError(error as RequestError);
             }
         }
 
@@ -126,7 +129,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 setRecordSizes(records);
                 
             } catch (error) {
-                setError((error as Error).message);
+                setError(error as RequestError);
             }
         }
 
@@ -136,7 +139,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     return (
         <>
-            {error && <p className="mb-4 text-red-500">{error}</p>}
             <TextField friendlyName='Código de busca' name='code' setValue={setCode} value={code}/>
             <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
             <TextField friendlyName='Descrição' name='description' setValue={setDescription} value={description}/>
@@ -147,6 +149,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>
             <HiddenField name='id' setValue={setId} value={id}/>
 
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
         </>

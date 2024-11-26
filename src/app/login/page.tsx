@@ -34,7 +34,7 @@ const LoginForm = () => {
       }
 
     } catch (error) {
-      setError('Algo deu errado. Tente novamente.');
+      setError('Algo deu errado: ' + error);
     }
   };
 

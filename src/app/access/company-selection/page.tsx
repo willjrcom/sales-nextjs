@@ -1,6 +1,7 @@
 'use client';
 
 import Access from '@/app/api/auth/access/route';
+import RequestError from '@/app/api/error';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -8,29 +9,30 @@ import { useState } from 'react';
 export default function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
-    const [error, setError] = useState('');
+    const [error, setError] = useState<RequestError | null>(null);
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
 
         if (!schemaName) {
-            setError('Schema inválido!');
+            setError(new RequestError('Schema inválido!'));
             return;
         }
 
         if (!data) {
-            setError('Sessão inválida!');
+            setError(new RequestError('Sessão inválida!'));
             return;
         }
 
         if (!data.user.id) {
-            setError('Token ID inválido!');
+            setError(new RequestError('Token ID inválido!'));
             return;
         }
 
-        const response = await Access({ schema: schemaName }, data);
-        if (response) {
+        try {
+            const response = await Access({ schema: schemaName }, data);
+
             await update({
                 ...data,
                 user: {
@@ -38,8 +40,9 @@ export default function CompanySelection() {
                 },
             });
             router.push('/');
-        } else {
-            setError('Resposta inválida do servidor.');
+            setError(null);
+        } catch (error) {
+            setError(error as RequestError);
         }
     }
 
@@ -55,7 +58,7 @@ export default function CompanySelection() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-            {error && <p className="mb-4 text-red-500">{error}</p>}
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <h1 className="text-4xl mb-10">Selecione uma Empresa</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {data.user.companies.map(company => (

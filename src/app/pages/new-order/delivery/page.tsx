@@ -1,6 +1,7 @@
 'use client';
 
 import GetClientByContact from "@/app/api/client/contact/route";
+import RequestError from "@/app/api/error";
 import NewOrderDelivery from "@/app/api/order-delivery/new/route";
 import Client from "@/app/entities/client/client";
 import { TextField } from "@/app/forms/field";
@@ -13,20 +14,28 @@ import { FaCheck, FaSearch } from "react-icons/fa";
 const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
     const [client, setClient] = useState<Client | null>();
+    const [error, setError] = useState<RequestError | null>(null)
     const { data } = useSession();
 
     const search = async () => {
         if (!data) return
-        const clientFound = await GetClientByContact(contact, data);
+        try {
+            const clientFound = await GetClientByContact(contact, data);
+            if (clientFound.id !== '') {
+                setClient(clientFound)
+            }
 
-        if (clientFound.id !== '') {
-            setClient(clientFound)
+            setError(null);
+        } catch (error) {
+            setClient(null);
+            setError(error as RequestError);
         }
     }
     return (
         <>
             <div className="flex items-center space-x-4">
                 <div className="flex flex-col w-1/3">
+                    {error && <p className="mb-4 text-red-500">{error.message}</p>}
                     <label htmlFor="contato" className="text-sm font-semibold mb-1">Entrega</label>
                     <TextField
                         name="contato"
@@ -52,16 +61,22 @@ const PageNewOrderDelivery = () => {
 
 const CardClient = ({ client }: { client: Client | null | undefined }) => {
     const router = useRouter();
+    const [error, setError] = useState<RequestError | null>(null)
     const { data } = useSession();
 
     const newOrder = async (client: Client) => {
         event?.preventDefault();
         if (!data) return
-        const response = await NewOrderDelivery(client.id, data)
-        router.push('/pages/new-order/delivery/' + response.order_id)
+        try {
+            const response = await NewOrderDelivery(client.id, data)
+            router.push('/pages/new-order/delivery/' + response.order_id)
+            setError(null)
+        } catch (error) {
+            setError(error as RequestError);
+        }
     }
 
-    if (!client) return <></>
+    if (!client) return <>{error && <p className="mb-4 text-red-500">{error.message}</p>}</>
 
     return (
         <>
@@ -86,12 +101,11 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
             </div>
             <br />
 
-            <Link href={""} onClick={() => newOrder(client)}>
-                <button className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
-                    <FaCheck />
-                    <span> Confirmar cliente</span>
-                </button>
-            </Link>
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            <button onClick={() => newOrder(client)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+                <FaCheck />
+                <span> Confirmar cliente</span>
+            </button>
         </>
     )
 }
