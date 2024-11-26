@@ -15,7 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
-    const modalName = isUpdate ? 'edit-place' : 'new-place'
+    const modalName = isUpdate ? 'edit-place-' + item?.id : 'new-place'
     const modalHandler = useModal();
     const context = usePlaces();
     const place = item || new Place();

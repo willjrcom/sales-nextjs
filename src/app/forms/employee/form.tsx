@@ -15,7 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
-    const modalName = isUpdate ? 'edit-employee' : 'new-employee'
+    const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
     const modalHandler = useModal();
     const context = useEmployees();
     const [person, setPerson] = useState<Person>(item || new Person())

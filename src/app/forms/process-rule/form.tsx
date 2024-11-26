@@ -15,7 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
-    const modalName = isUpdate ? 'edit-process-rule' : 'new-process-rule'
+    const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
     const modalHandler = useModal();
     const processRule = item || new ProcessRule();
     const [id, setId] = useState(processRule.id);

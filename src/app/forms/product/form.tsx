@@ -5,7 +5,6 @@ import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
-import GetCategories from '@/app/api/category/route';
 import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/route';
@@ -18,7 +17,7 @@ import RequestError from '@/app/api/error';
 import { useCategories } from '@/app/context/category/context';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
-    const modalName = isUpdate ? 'edit-product' : 'new-product'
+    const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
     const modalHandler = useModal();
     const context = useProducts();
     const contextCategories = useCategories();
@@ -29,7 +28,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [description, setDescription] = useState(product.description);
     const [price, setPrice] = useState(product.price);
     const [cost, setCost] = useState(product.cost);
-    const [imagePath, setImagePath] = useState(product.image_path);
+    const [imagePath, setImagePath] = useState(product.image_path || "");
     const [isAvailable, setIsAvailable] = useState(product.is_available);
     const [categoryId, setCategoryId] = useState(product.category_id);
     const [sizeId, setSizeId] = useState(product.size_id);
@@ -40,6 +39,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
+    useEffect(() => {
+        console.log(item)
+    }, [])
     const submit = async () => {
         if (!data) return;
 

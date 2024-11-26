@@ -15,7 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
-    const modalName = isUpdate ? 'edit-category' : 'new-category'
+    const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
     const context = useCategories();
     const category = item || new Category();

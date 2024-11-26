@@ -17,7 +17,7 @@ interface SizeFormProps extends CreateFormsProps<Size> {
     categoryID: string
 }
 const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
-    const modalName = isUpdate ? 'edit-size' : 'new-size'
+    const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const size = item || new Size();
     const [id, setId] = useState(size.id);

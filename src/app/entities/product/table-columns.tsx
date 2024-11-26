@@ -24,23 +24,25 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     id: 'Preço',
     accessorKey: 'price',
     header: 'Preço',
-    cell: info => `$${info.getValue()}`, // example of custom cell rendering
+    cell: info => `R$${info.getValue()}`,
   },
   {
     id: 'Custo',
     accessorKey: 'cost',
     header: 'Custo',
-    cell: info => `$${info.getValue()}`,
+    cell: info => `R$${info.getValue()}`,
   },
   {
     id: 'Categoria',
-    accessorKey: 'category.name', // assuming Category has a 'name' field
+    accessorKey: 'category.name',
     header: 'Categoria',
+    cell: (info) => info.row.original.category?.name || "Sem categoria",
   },
   {
     id: 'Tamanho',
-    accessorKey: 'size.name', // assuming Size has a 'name' field
+    accessorKey: 'size.name',
     header: 'Tamanho',
+    cell: (info) => info.row.original.size?.name || "Sem tamanho",
   },
   {
     id: 'Disponível?',
@@ -54,9 +56,9 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit modalName="edit-product"
+        <ButtonEdit modalName={"edit-product-" + row.original.id }
           name={row.original.name}>
-          <ProductForm 
+          <ProductForm
             item={row.original} 
             isUpdate={true}/>
         </ButtonEdit>

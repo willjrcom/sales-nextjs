@@ -17,7 +17,7 @@ interface QuantityFormProps extends CreateFormsProps<Quantity> {
     categoryID: string
 }
 const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
-    const modalName = isUpdate ? 'edit-quantity' : 'new-quantity'
+    const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity'
     const modalHandler = useModal();
     const quantity = item || new Quantity();
     const [id, setId] = useState(quantity.id);

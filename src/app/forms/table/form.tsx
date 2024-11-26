@@ -15,7 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
-    const modalName = isUpdate ? 'edit-table' : 'new-table'
+    const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
     const modalHandler = useModal();
     const context = useTables();
     const table = item || new Table();

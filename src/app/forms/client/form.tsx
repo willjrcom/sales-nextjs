@@ -14,7 +14,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
-    const modalName = isUpdate ? 'edit-client' : 'new-client'
+    const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
     const context = useClients();
     const [client, setPerson] = useState<Client>(item || new Client())
