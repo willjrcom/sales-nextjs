@@ -22,7 +22,7 @@ const PlaceColumns = (): ColumnDef<Place>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit 
+        <ButtonEdit modalName="edit-place"
           name={row.original.name}>
           <PlaceForm 
             item={row.original}

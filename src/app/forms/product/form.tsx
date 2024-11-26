@@ -67,7 +67,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             } else {
                 context.updateItem(product);
             }
-
+            console.log(modalName)
             modalHandler.hideModal(modalName);
             
         } catch (error) {

@@ -20,7 +20,7 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit 
+        <ButtonEdit modalName="edit-process-rule"
           name={row.original.name} >
           <ProcessRuleForm 
             item={row.original}

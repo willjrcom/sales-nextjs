@@ -54,7 +54,7 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit 
+        <ButtonEdit modalName="edit-product"
           name={row.original.name}>
           <ProductForm 
             item={row.original} 
