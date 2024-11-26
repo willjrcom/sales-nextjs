@@ -1,9 +1,9 @@
 import GetPlaces from '@/app/api/place/route';
 import Place from '@/app/entities/place/place';
 import React, { createContext, useContext, ReactNode} from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 
-const ContextPlace = createContext<ItemContextProps<Place> | undefined>(undefined);
+const ContextPlace = createContext<ItemsContextProps<Place> | undefined>(undefined);
 
 export const PlaceProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Place>({ getItems: GetPlaces });

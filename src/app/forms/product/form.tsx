@@ -39,9 +39,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
-    useEffect(() => {
-        console.log(item)
-    }, [])
     const submit = async () => {
         if (!data) return;
 
@@ -69,7 +66,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             } else {
                 context.updateItem(product);
             }
-            console.log(modalName)
             modalHandler.hideModal(modalName);
             
         } catch (error) {
@@ -86,7 +82,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     useEffect(() => {
         const LoadCategories = async () => {
-            console.log()
             if (!data) return;
 
             try {

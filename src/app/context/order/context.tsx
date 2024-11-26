@@ -1,9 +1,9 @@
 import GetOrders from '@/app/api/order/route';
 import Order from '@/app/entities/order/order';
 import React, { createContext, useContext, ReactNode} from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 
-const ContextOrder = createContext<ItemContextProps<Order> | undefined>(undefined);
+const ContextOrder = createContext<ItemsContextProps<Order> | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Order>({ getItems: GetOrders });

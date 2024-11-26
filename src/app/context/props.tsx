@@ -3,8 +3,9 @@ import { useCallback, useEffect, useState } from "react";
 import { FormatRefreshTime } from "../components/crud/refresh";
 import FetchData from "../api/fetch-data";
 import { Session } from "next-auth";
+import RequestError from "../api/error";
 
-export interface ItemContextProps<T> {
+export interface ItemsContextProps<T> {
     items: T[];
     filterItems: (key: keyof T, value: string) => T[];
     findByID: (id: string) => T | undefined;
@@ -14,7 +15,7 @@ export interface ItemContextProps<T> {
     updateItem: (item: T) => void;
     removeItem: (id: string) => void;
     updateLastUpdate: () => void;
-    getError: () => string | null;
+    getError: () => RequestError | null;
     getLoading: () => boolean;
     getLastUpdate: () => string;
 }
@@ -27,7 +28,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const [items, setItems] = useState<T[]>([]);
     const { data } = useSession();
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     const idToken = data?.user.idToken;

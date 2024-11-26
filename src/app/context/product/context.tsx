@@ -3,9 +3,9 @@
 import GetProducts from '@/app/api/product/route';
 import Product from '@/app/entities/product/product';
 import React, { createContext, useContext, ReactNode } from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 
-const ContextProduct = createContext<ItemContextProps<Product> | undefined>(undefined);
+const ContextProduct = createContext<ItemsContextProps<Product> | undefined>(undefined);
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Product>({ getItems: GetProducts });

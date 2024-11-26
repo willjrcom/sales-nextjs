@@ -1,8 +1,8 @@
-import { ItemContextProps } from "@/app/context/props";
+import { ItemsContextProps } from "@/app/context/props";
 import { HiOutlineRefresh } from "react-icons/hi";
 
 interface RefreshProps<T> {
-    context: ItemContextProps<T>;
+    context: ItemsContextProps<T>;
 }
 
 const Refresh = <T,>({ context }: RefreshProps<T>) => {

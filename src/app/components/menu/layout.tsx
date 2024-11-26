@@ -9,6 +9,7 @@ import { PlaceProvider } from '@/app/context/place/context';
 import { TableProvider } from '@/app/context/table/context';
 import { OrderProvider } from '@/app/context/order/context';
 import { ModalProvider } from '@/app/context/modal/context';
+import { CurrentOrderProvider } from '@/app/context/current-order/context';
 
 const Menu = ({
   children,
@@ -25,15 +26,17 @@ const Menu = ({
                 <PlaceProvider>
                   <TableProvider>
                     <OrderProvider>
-                      <div className="flex">
-                        <Sidebar />
-                        <div className="flex-1 flex flex-col">
-                          <Topbar />
-                          <main className="p-4">
-                            {children}
-                          </main>
+                      <CurrentOrderProvider>
+                        <div className="flex">
+                          <Sidebar />
+                          <div className="flex-1 flex flex-col">
+                            <Topbar />
+                            <main className="p-4">
+                              {children}
+                            </main>
+                          </div>
                         </div>
-                      </div>
+                      </CurrentOrderProvider>
                     </OrderProvider>
                   </TableProvider>
                 </PlaceProvider>

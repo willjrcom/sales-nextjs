@@ -1,9 +1,9 @@
 import GetEmployees from '@/app/api/employee/route';
 import React, { createContext, useContext, ReactNode } from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 import Employee from '@/app/entities/employee/employee';
 
-const ContextEmployee = createContext<ItemContextProps<Employee> | undefined>(undefined);
+const ContextEmployee = createContext<ItemsContextProps<Employee> | undefined>(undefined);
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Employee>({ getItems: GetEmployees });

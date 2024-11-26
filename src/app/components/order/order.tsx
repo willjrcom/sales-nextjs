@@ -2,18 +2,18 @@ import ButtonPlus from "@/app/components/crud/button-plus"
 import CategoryOrder from "@/app/components/order/category"
 import { useCategories } from "@/app/context/category/context"
 import { GroupItem } from "@/app/entities/order/group-item"
-import Order from "@/app/entities/order/order"
 import { useEffect, useState } from "react"
 import ListProducts from "./list-products"
+import { useCurrentOrder as useCurrentOrder } from "@/app/context/current-order/context"
 
-interface OrderManagerProps {
-    order: Order
-}
-const OrderManager = ({ order }: OrderManagerProps) => {
+const OrderManager = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
-    const context = useCategories();
-
+    const contextCategories = useCategories();
+    const context = useCurrentOrder();
+    const order = context.order;
+    
     useEffect(() => {
+        if(!order) return
         const items = groupBy(order.groups, "category_id");
         setGroupedItems(items);
     }, [order])
@@ -30,9 +30,9 @@ const OrderManager = ({ order }: OrderManagerProps) => {
                 </div>
 
                 {Object.entries(groupedItems).map(([key, groups], index) => {
-                    if(context.items.length === 0) return
+                    if(contextCategories.items.length === 0) return
                     return (  
-                    <CategoryOrder key={index} categoryName={context.findByID(key)!.name} groups={groups} />
+                    <CategoryOrder key={index} categoryName={contextCategories.findByID(key)!.name} groups={groups} />
                 )})}
             </div>
 

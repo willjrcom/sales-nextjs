@@ -7,29 +7,30 @@ import Order from "@/app/entities/order/order";
 import GetOrderByID from "@/app/api/order/[id]/route";
 import RequestError from "@/app/api/error";
 import OrderManager from "@/app/components/order/order";
+import { useCurrentOrder } from "@/app/context/current-order/context";
 
 const PageEditOrderControl = () => {
     const { id } = useParams();
-    const [order, setOrder] = useState<Order | null>();
     const [error, setError] = useState<RequestError | null>(null)
     const { data } = useSession();
+    const context = useCurrentOrder();
 
     useEffect(() => {
         getOrder();
     }, [data]);
 
     const getOrder = async () => {
-        if (!id || !data || !!order) return;
+        if (!id || !data) return;
         try {
             const orderFound = await GetOrderByID(id as string, data);
-            setOrder(orderFound);
+            context.updateCurrentOrder(orderFound);
             setError(null);
         } catch (error) {
             setError(error as RequestError);
         }
     }
 
-    if (!id || !order) {
+    if (!id || !context.order) {
         return (
             <>
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
@@ -39,7 +40,7 @@ const PageEditOrderControl = () => {
     }
 
     return (
-        <OrderManager order={order} />
+        <OrderManager />
     );
 }
 export default PageEditOrderControl

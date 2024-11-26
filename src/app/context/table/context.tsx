@@ -1,9 +1,9 @@
 import GetTables from '@/app/api/table/route';
 import Table from '@/app/entities/table/table';
 import React, { createContext, useContext, ReactNode } from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 
-const ContextTable = createContext<ItemContextProps<Table> | undefined>(undefined);
+const ContextTable = createContext<ItemsContextProps<Table> | undefined>(undefined);
 
 export const TableProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Table>({ getItems: GetTables });

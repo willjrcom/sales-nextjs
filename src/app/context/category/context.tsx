@@ -1,9 +1,9 @@
 import GetCategories from '@/app/api/category/route';
 import Category from '@/app/entities/category/category';
 import React, { createContext, useContext, ReactNode} from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 
-const ContextCategory = createContext<ItemContextProps<Category> | undefined>(undefined);
+const ContextCategory = createContext<ItemsContextProps<Category> | undefined>(undefined);
 
 export const CategoryProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Category>({ getItems: GetCategories });

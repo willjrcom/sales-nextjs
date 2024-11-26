@@ -1,9 +1,9 @@
 import GetClients from '@/app/api/client/route';
 import Client from '@/app/entities/client/client';
 import React, { createContext, useContext, ReactNode} from 'react';
-import GenericProvider, { ItemContextProps } from '../props';
+import GenericProvider, { ItemsContextProps } from '../props';
 
-const ContextClient = createContext<ItemContextProps<Client> | undefined>(undefined);
+const ContextClient = createContext<ItemsContextProps<Client> | undefined>(undefined);
 
 export const ClientProvider = ({ children }: { children: ReactNode }) => {
     const values = GenericProvider<Client>({ getItems: GetClients });
