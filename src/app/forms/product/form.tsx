@@ -82,6 +82,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     useEffect(() => {
         const LoadCategories = async () => {
+            console.log()
             if (!data) return;
 
             try {
@@ -89,12 +90,12 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
                 let records: Record<string, string>[] = [];
 
-                if (categories.length === 0) {
+                if (contextCategories.items.length === 0) {
                     setRecordCategories([]);
                     return;
                 }
                 
-                for (const category of categories) {
+                for (const category of contextCategories.items) {
                     records.push({ id: category.id, name: category.name })
                 }
                 setRecordCategories(records);
@@ -105,7 +106,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         }
 
         LoadCategories();
-    }, [data]);
+    }, [data, contextCategories]);
 
     useEffect(() => {
         const LoadSizes = async () => {

@@ -1,6 +1,5 @@
 /* Estilo base para o modal */
 .modalContent {
-  width: 50%;
   /* Define uma largura maior para o modal */
   max-height: 90vh;
   /* Define a altura máxima */

@@ -20,7 +20,7 @@ const ButtonPlus = ({ modalName, name, children }: NewButtonProps) => {
                 <span>{newButton}</span>
             </button>
 
-            <Modal title={newButton} show={modalHandler.isModalOpen(modalName)}>
+            <Modal title={newButton} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
                 {children}
             </Modal>
         </div>

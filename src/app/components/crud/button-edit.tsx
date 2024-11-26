@@ -21,7 +21,7 @@ const ButtonEdit = ({ modalName, name, children }: NewButtonProps) => {
                 <FaEdit />
             </button>
         
-            <Modal title={editButton} show={modalHandler.isModalOpen(modalName)}>
+            <Modal title={editButton} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
                 {children}
             </Modal>
         </div>
