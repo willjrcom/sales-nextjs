@@ -1,4 +1,4 @@
-import FilterForm from "@/app/forms/filter";
+import FilterForm from "@/app/components/modal/filter";
 import { FaFilter } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 

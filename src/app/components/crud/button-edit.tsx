@@ -1,6 +1,6 @@
 'use client';
 
-import Modal from "@/app/forms/form";
+import Modal from "@/app/components/modal/modal";
 import { FaEdit } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 

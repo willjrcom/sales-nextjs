@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HiddenField, NumberField, TextField } from '../field';
+import { HiddenField, NumberField, TextField } from '../../components/modal/field';
 import Address from '@/app/entities/address/address';
 
 interface AddressProps {

@@ -7,7 +7,7 @@ import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import { useClients } from "@/app/context/client/context";
-import { TextField } from "@/app/forms/field";
+import { TextField } from "@/app/components/modal/field";
 import { useState } from "react";
 
 const PageClient = () => {

@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField, CheckboxField } from '../field';
+import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Size, { ValidateSizeForm } from '@/app/entities/size/size';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteSize from '@/app/api/size/delete/route';
 import NewSize from '@/app/api/size/new/route';
 import UpdateSize from '@/app/api/size/update/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 interface SizeFormProps extends CreateFormsProps<Size> {

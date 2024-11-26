@@ -5,7 +5,6 @@ import { GroupItem } from "@/app/entities/order/group-item"
 import Order from "@/app/entities/order/order"
 import { useEffect, useState } from "react"
 import ListProducts from "./list-products"
-import ButtonNewItem from "@/app/components/crud/button-new-item"
 
 interface OrderManagerProps {
     order: Order
@@ -25,9 +24,9 @@ const OrderManager = ({ order }: OrderManagerProps) => {
             <div className="flex-1 p-4 bg-white overflow-y-auto">
                 <div className="flex justify-between items-center mb-2">
                     <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
-                    <ButtonNewItem name="item" modalName="list-products">
+                    <ButtonPlus size="xl" name="item" modalName="list-products">
                         <ListProducts />
-                        </ButtonNewItem>
+                        </ButtonPlus>
                 </div>
 
                 {Object.entries(groupedItems).map(([key, groups], index) => {

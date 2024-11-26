@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, NumberField, HiddenField } from '../field';
+import { TextField, NumberField, HiddenField } from '../../components/modal/field';
 import ProcessRule, { ValidateProcessRuleForm } from '@/app/entities/process-rule/process-rule';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProcessRule from '@/app/api/process-rule/delete/route';
@@ -11,7 +11,7 @@ import { useProcessRules } from '@/app/context/process-rule/context';
 import NewProcessRule from '@/app/api/process-rule/new/route';
 import UpdateProcessRule from '@/app/api/process-rule/update/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {

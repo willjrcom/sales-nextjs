@@ -4,7 +4,7 @@ import RequestError from "@/app/api/error";
 import NewOrderTable from "@/app/api/order-table/new/route";
 import { usePlaces } from "@/app/context/place/context";
 import Table from "@/app/entities/table/table";
-import { SelectField } from "@/app/forms/field";
+import { SelectField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

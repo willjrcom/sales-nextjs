@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../field';
+import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../../components/modal/field';
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import GetCategories from '@/app/api/category/route';
 import Category from '@/app/entities/category/category';
@@ -13,7 +13,7 @@ import { useProducts } from '@/app/context/product/context';
 import UpdateProduct from '@/app/api/product/update/route';
 import NewProduct from '@/app/api/product/new/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { useCategories } from '@/app/context/category/context';
 
@@ -29,6 +29,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [description, setDescription] = useState(product.description);
     const [price, setPrice] = useState(product.price);
     const [cost, setCost] = useState(product.cost);
+    const [imagePath, setImagePath] = useState(product.image_path);
     const [isAvailable, setIsAvailable] = useState(product.is_available);
     const [categoryId, setCategoryId] = useState(product.category_id);
     const [sizeId, setSizeId] = useState(product.size_id);
@@ -48,6 +49,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         product.description = description;
         product.price = price;
         product.cost = cost;
+        product.image_path = imagePath;
         product.is_available = isAvailable;
         product.category_id = categoryId;
         product.size_id = sizeId;
@@ -145,6 +147,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <TextField friendlyName='Descrição' name='description' setValue={setDescription} value={description}/>
             <NumberField friendlyName='Preço' name='price' setValue={setPrice} value={price}/>
             <NumberField friendlyName='Custo' name='cost' setValue={setCost} value={cost}/>
+            <TextField friendlyName='Imagem' name='image_path' setValue={setImagePath} value={imagePath}/>
             <CheckboxField friendlyName='Disponível' name='is_available' setValue={setIsAvailable} value={isAvailable.toString()}/>
             <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={setCategoryId} selectedValue={categoryId} values={recordCategories}/>
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>

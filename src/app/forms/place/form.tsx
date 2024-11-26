@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField } from '../field';
+import { TextField, HiddenField } from '../../components/modal/field';
 import Place, { ValidatePlaceForm } from '@/app/entities/place/place';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeletePlace from '@/app/api/place/delete/route';
@@ -11,7 +11,7 @@ import { usePlaces } from '@/app/context/place/context';
 import NewPlace from '@/app/api/place/new/route';
 import UpdatePlace from '@/app/api/place/update/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {

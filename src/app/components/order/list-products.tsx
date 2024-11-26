@@ -1,44 +1,6 @@
 import { useModal } from "@/app/context/modal/context";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
-import { Navigation, Pagination, A11y } from "swiper/modules";
-import Product from "@/app/entities/product/product";
 import { useCategories } from "@/app/context/category/context";
-
-interface CarouselProductsProps {
-    products: Product[];
-}
-
-const CarouselProducts = ({ products }: CarouselProductsProps) => {
-    const swiper = useSwiper();
-
-    return (
-        <Swiper
-            modules={[Navigation, Pagination, A11y]}
-            navigation
-            pagination={{ clickable: true }}
-            spaceBetween={30}
-            slidesPerView={3}
-            onSlideChange={() => console.log('slide change')}
-            onSwiper={(swiper) => console.log(swiper)}
-        >
-            <button onClick={() => swiper.slidePrev()}>Prev</button>
-            {products.map((product) => (
-                <SwiperSlide key={product.id}>
-                    <div className="p-4 bg-white rounded shadow-md text-center border">
-                        <div className="bg-green-500 h-20 rounded mb-2">foto</div>
-                        <div>{product.name}</div>
-                        <div>R$ {product.price}</div>
-                        <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Adicionar</button>
-                    </div>
-                </SwiperSlide>
-            ))}
-            <button onClick={() => swiper.slideNext()}>Next</button>
-        </Swiper>
-    )
-};
+import CarouselProducts from "./carousel";
 
 export default function ListProducts() {
     const modalHandler = useModal();
@@ -99,12 +61,6 @@ export default function ListProducts() {
                         onClick={() => modalHandler.hideModal("list-products")}
                     >
                         Adicionar item
-                    </button>
-                    <button
-                        className="w-full bg-gray-300 text-black py-2 rounded mt-2"
-                        onClick={() => modalHandler.hideModal("list-products")}
-                    >
-                        Cancelar
                     </button>
                 </div>
             </div>

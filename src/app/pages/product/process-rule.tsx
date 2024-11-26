@@ -7,7 +7,7 @@ import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import { useProcessRules } from "@/app/context/process-rule/context";
-import { SelectField } from "@/app/forms/field";
+import { SelectField } from "@/app/components/modal/field";
 import { useCategories } from "@/app/context/category/context";
 import { useState } from "react";
 

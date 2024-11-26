@@ -2,7 +2,7 @@
 
 import RequestError from "@/app/api/error";
 import NewOrderPickup from "@/app/api/order-pickup/new/route";
-import { TextField } from "@/app/forms/field";
+import { TextField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

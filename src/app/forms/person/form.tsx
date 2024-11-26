@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import{ TextField, DateField, HiddenField } from "../field";
+import{ TextField, DateField, HiddenField } from "../../components/modal/field";
 import CreateAddressForm from "../address/form";
 import Address from "@/app/entities/address/address";
 import Person from "@/app/entities/person/person";

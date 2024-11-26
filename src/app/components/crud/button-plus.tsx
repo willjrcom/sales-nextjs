@@ -1,4 +1,4 @@
-import Modal from "@/app/forms/form";
+import Modal from "@/app/components/modal/modal";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
@@ -6,10 +6,11 @@ import { useModal } from "@/app/context/modal/context";
 interface NewButtonProps {
     modalName: string
     name: string;
+    size?: 'sm' | 'md' | 'lg' | 'xl'
     children: React.ReactNode;
 }
 
-const ButtonPlus = ({ modalName, name, children }: NewButtonProps) => {
+const ButtonPlus = ({ modalName, name, size = 'sm', children }: NewButtonProps) => {
     const modalHandler = useModal();
     const newButton = "Novo " + { name }.name;
 
@@ -20,7 +21,7 @@ const ButtonPlus = ({ modalName, name, children }: NewButtonProps) => {
                 <span>{newButton}</span>
             </button>
 
-            <Modal title={newButton} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
+            <Modal title={newButton} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
                 {children}
             </Modal>
         </div>

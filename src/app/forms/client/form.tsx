@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PersonForm from '../person/form';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ValidateClientForm } from '@/app/entities/client/client';
 import DateComponent from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
@@ -10,7 +10,7 @@ import { useClients } from '@/app/context/client/context';
 import NewClient from '@/app/api/client/new/route';
 import UpdateClient from '@/app/api/client/update/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {

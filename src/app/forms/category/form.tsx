@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField } from '../field';
+import { TextField, HiddenField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteCategory from '@/app/api/category/delete/route';
@@ -11,7 +11,7 @@ import { useCategories } from '@/app/context/category/context';
 import NewCategory from '@/app/api/category/new/route';
 import UpdateCategory from '@/app/api/category/update/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {

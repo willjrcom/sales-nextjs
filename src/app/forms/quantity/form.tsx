@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField, CheckboxField, NumberField } from '../field';
+import { TextField, HiddenField, CheckboxField, NumberField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
-import ButtonsModal from '../buttons-modal';
+import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteQuantity from '@/app/api/quantity/delete/route';
 import NewQuantity from '@/app/api/quantity/new/route';
 import UpdateQuantity from '@/app/api/quantity/update/route';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../error-forms';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
