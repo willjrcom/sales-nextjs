@@ -5,21 +5,29 @@ import GroupItem from "@/app/entities/order/group-item"
 import { useEffect, useState } from "react"
 import EditGroupItem from "./edit-group-item"
 import { useCurrentOrder } from "@/app/context/current-order/context"
-import Category from "@/app/entities/category/category"
 import { useGroupItem } from "@/app/context/group-item/context"
+import Order from "@/app/entities/order/order"
 
 const OrderManager = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
     const contextCategories = useCategories();
     const context = useCurrentOrder();
     const contextGroupItem = useGroupItem();
-    const order = context.order;
+    const [order, setOrder] = useState<Order | null>(context.order)
 
     useEffect(() => {
-        if (!order) return
-        const items = groupBy(order.groups, "category_id");
+        if (!context.order) return
+        const items = groupBy(context.order.groups, "category_id");
         setGroupedItems(items);
-    }, [order])
+    }, [context.order, contextGroupItem.groupItem]);
+
+    useEffect(() => {
+        if (!context.order) return
+        const newOrder = context.order;
+        newOrder.total_payable = newOrder?.groups?.reduce((total, group) => total + (group.total_price || 0), 0);
+        setOrder(newOrder)
+        console.log(newOrder)
+    }, [context.order])
 
     return (
         <div className="flex h-[80vh] bg-gray-100">
@@ -45,12 +53,16 @@ const OrderManager = () => {
             </div>
 
             {/* Lado Direito */}
-            <RightSize />
+            <ConfirmOrder order={order}/>
         </div>
     )
 };
 
-const RightSize = () => {
+interface OrderManagerProps {
+    order: Order | null;
+}
+
+const ConfirmOrder = ({ order }: OrderManagerProps) => {
     return (
         <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
             {/* Fechar Pedido */}
@@ -58,11 +70,11 @@ const RightSize = () => {
                 <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4">
                     Fechar Pedido
                 </button>
-                <p>Subtotal: R$ 15,00</p>
-                <p>Taxa de entrega: R$ 5,00</p>
-                <p>Desconto: R$ 5,00</p>
+                <p>Subtotal: R$ {order?.total_payable}</p>
+                {order?.delivery?.delivery_tax && <p>Taxa de entrega: R$ {order.delivery.delivery_tax}</p>}
+                {/* <p>Desconto: R$ 5,00</p> */}
                 <hr className="my-2" />
-                <p className="font-bold">Total: R$ 15,00</p>
+                <p className="font-bold">Total: R$ {(order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)}</p>
             </div>
 
             {/* Entrega */}
@@ -82,7 +94,7 @@ function groupBy<T extends Record<string, any>>(array: T[], key: keyof T): Recor
     if (!array || array.length === 0) {
         return {};
     }
-    return array.reduce((result, currentItem) => {
+    return array?.reduce((result, currentItem) => {
         const groupKey = currentItem[key] as string;
 
         if (!result[groupKey]) {

@@ -67,8 +67,14 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
 
     const updateGroupItem = (item: GroupItem) => {
         if (!order) return;
-        const newGroupItem = order.groups.find((groupItem) => groupItem.id === item.id);
+        if (!order.groups || order.groups.length === 0) {
+            setOrder({...order, groups: [item]});
+            return
+        }
+
+        const newGroupItem = order.groups?.find((groupItem) => groupItem.id === item.id);
         if (!newGroupItem) return;
+        
         newGroupItem.items = item.items;
         setOrder({...order, groups: order.groups.map((groupItem) => groupItem.id === item.id ? newGroupItem : groupItem)});
     }

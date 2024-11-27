@@ -44,7 +44,16 @@ const ListGroupItem = () => {
         if (contextGroupItem.groupItem?.items.length === 0) {
             contextGroupItem.resetGroupItem()
         } else if (contextGroupItem.groupItem) {
-            contextCurrentOrder.updateGroupItem(contextGroupItem.groupItem)
+            let totalPrice = contextGroupItem.groupItem.items?.reduce((total, item) => {
+                if (item.additional_items?.length) {
+                    return total + item.total_price + item.additional_items?.reduce((total, item) => total + item.total_price, 0)
+                }
+                return total + item.total_price
+            }, 0);
+
+            totalPrice += contextGroupItem.groupItem.complement_item?.price || 0
+            const groupItem = { ...contextGroupItem.groupItem, total_price: totalPrice };
+            contextCurrentOrder.updateGroupItem(groupItem)
         }
     }, [contextGroupItem.groupItem])
 

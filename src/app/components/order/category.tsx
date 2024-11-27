@@ -13,7 +13,7 @@ const CategoryOrder = ({ groups, category }: CategoryOrderProps) => {
             {/* Título da categoria com botão de edição */}
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">{category.name}</h2>
-                <p className="text-right mt-2">Subtotal: R$ {groups.reduce((total, group) => total + group.total_price, 0).toFixed(2)}</p>
+                <p className="text-right mt-2">Subtotal: R$ {groups?.reduce((total, group) => total + group.total_price, 0).toFixed(2)}</p>
             </div>
 
             {/* Container para grupos com scroll horizontal */}

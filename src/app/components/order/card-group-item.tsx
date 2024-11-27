@@ -1,6 +1,5 @@
 import GroupItem from "@/app/entities/order/group-item";
 import ButtonEdit from "../crud/button-edit";
-import { useEffect } from "react";
 import EditGroupItem from "./edit-group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
 
@@ -23,12 +22,6 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     if (!context || !groupItem) return;
     context.updateGroupItem(groupItem);
   }
-
-  useEffect(() => {
-    if (!groupItem) {
-
-    }
-  }, [])
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200">
