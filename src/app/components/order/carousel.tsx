@@ -18,8 +18,8 @@ export default function CarouselProducts ({ products }: CarouselProductsProps) {
             pagination={{ clickable: true }}
             spaceBetween={30}
             slidesPerView={3}
-            onSlideChange={() => console.log('slide change')}
-            onSwiper={(swiper) => console.log(swiper)}
+            onSlideChange={() => {}}
+            onSwiper={(swiper) => {}}
         >
             {products.map((product) => (
                 <SwiperSlide key={product.id}><ProductCard product={product} /></SwiperSlide>

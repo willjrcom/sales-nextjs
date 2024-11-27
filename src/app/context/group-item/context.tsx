@@ -9,7 +9,7 @@ import GetGroupItemByID from '@/app/api/group-item/[id]/route';
 interface GroupItemContextProps<T> {
     groupItem: T | null;
     getItemByID: (id: string) => Item[] | undefined;
-    fetchData: (id: string) => void;
+    fetchData: (id: string) => Promise<GroupItem | null | undefined>;
     resetGroupItem: () => void;
     addItem: (item: Item) => void;
     removeItem: (id: string) => void;
@@ -32,19 +32,20 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     const idToken = data?.user.idToken;
     
-    const fetchData = useCallback(async (id: string) => {
+    const fetchData = async (id: string) => {
         if (!idToken || !id) return;
         try {
             const groupItem = await GetGroupItemByID(id as string, data);
             setgroupItem(groupItem);
             setError(null);
+            setLoading(false);
+            return groupItem;
         } catch (error) {
             setError(error as RequestError);
+            setLoading(false);
+            return null;
         }
-
-        setLoading(false);
-
-    }, [idToken, setgroupItem, data, setError, setLoading]);
+    };
 
     const resetGroupItem = () => {
         setgroupItem(null);
@@ -55,23 +56,13 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const addItem = (item: Item) => {
-        setgroupItem((prev) => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                items: [...prev.items, item],
-            };
-        });
+        if (!groupItem) return;
+        setgroupItem({...groupItem, items: [...groupItem.items, item]});
     }
 
     const removeItem = (id: string) => {
-        setgroupItem((prev) => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                items: prev.items.filter((item) => item.id !== id),
-            };
-        });
+        if (!groupItem) return;
+        setgroupItem({...groupItem, items: groupItem.items.filter((item) => item.id !== id)});
     }
 
     const updateGroupItem = (groupItem: GroupItem) => {

@@ -10,8 +10,12 @@ import GroupItem from '@/app/entities/order/group-item';
 interface CurrentOrderContextProps<T> {
     order: T | null;
     getGroupByID: (id: string) => GroupItem[] | undefined;
-    fetchData: (id?: string) => void;
+    getGroupByCategoryID: (id: string) => GroupItem[] | undefined;
+    fetchData: (id?: string) => Promise<void>;
     updateCurrentOrder: (item: T) => void;
+    addGroupItem: (item: GroupItem) => void;
+    removeGroupItem: (item: GroupItem) => void;
+    updateGroupItem: (item: GroupItem) => void;
     removeCurrentOrder: () => void;
     updateLastUpdate: () => void;
     getError: () => RequestError | null;
@@ -42,14 +46,36 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
 
         setLoading(false);
 
-    }, [idToken, setOrder, data, setError, setLoading]);
+    }, [idToken, data]);
 
     const getGroupByID = (id: string) => {
         return order?.groups.filter((order) => order.id === id);
     }
 
+    const getGroupByCategoryID = (id: string) => {
+        return order?.groups.filter((order) => order.category_id === id);
+    }
+
     const updateCurrentOrder = (order: Order) => {
         setOrder(order);
+    }
+
+    const addGroupItem = (item: GroupItem) => {
+        if (!order) return;
+        setOrder({...order, groups: [...order.groups, item]});
+    }
+
+    const updateGroupItem = (item: GroupItem) => {
+        if (!order) return;
+        const newGroupItem = order.groups.find((groupItem) => groupItem.id === item.id);
+        if (!newGroupItem) return;
+        newGroupItem.items = item.items;
+        setOrder({...order, groups: order.groups.map((groupItem) => groupItem.id === item.id ? newGroupItem : groupItem)});
+    }
+
+    const removeGroupItem = (item: GroupItem) => {
+        if (!order) return;
+        setOrder({ ...order, groups: order.groups.filter((groupItem) => groupItem.id !== item.id) });
     }
 
     const removeCurrentOrder = () => {
@@ -63,7 +89,7 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     const getLastUpdate = () => lastUpdate;
 
     return (
-        <ContextCurrentOrder.Provider value={{ order, fetchData, getGroupByID, updateCurrentOrder: updateCurrentOrder, removeCurrentOrder, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextCurrentOrder.Provider value={{ order, fetchData, getGroupByID, getGroupByCategoryID, updateCurrentOrder, addGroupItem, updateGroupItem, removeGroupItem, removeCurrentOrder, updateLastUpdate, getError, getLoading, getLastUpdate }}>
             {children}
         </ContextCurrentOrder.Provider>
     );

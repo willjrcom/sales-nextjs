@@ -13,19 +13,22 @@ const Modal = ({ title, show, size = 'sm', onClose, children }: ModalProps) => {
     if (!show) return null;
 
     const sizeClasses = {
-        sm: 'max-w-[25vw]',
-        md: 'max-w-[35vw]',
-        lg: 'max-w-[50vw]',
-        xl: 'max-w-[80vw]',
+        sm: 'max-w-[25vw] h-auto',
+        md: 'max-w-[50vw] h-auto',
+        lg: 'max-w-[75vw] h-[75vh]',
+        xl: 'max-w-[90vw] h-[90vh]',
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20"
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className={`${styles.modalContent} w-full ${sizeClasses[size]} mx-4 bg-white rounded-lg shadow-lg`}
+            <div
+                className={`w-full ${sizeClasses[size]} bg-white rounded-lg shadow-lg overflow-hidden`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-6">
+                    {/* Cabeçalho do Modal */}
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-bold">{title}</h2>
                         {onClose && (
@@ -37,7 +40,10 @@ const Modal = ({ title, show, size = 'sm', onClose, children }: ModalProps) => {
                             </button>
                         )}
                     </div>
+
                     <hr className="my-4" />
+
+                    {/* Conteúdo */}
                     <div>{children}</div>
                 </div>
             </div>

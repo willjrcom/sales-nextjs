@@ -1,19 +1,20 @@
-import { useModal } from "@/app/context/modal/context";
 import { useCategories } from "@/app/context/category/context";
 import CarouselProducts from "./carousel";
 import ItemCard from "./card-item";
 import { useGroupItem} from "@/app/context/group-item/context";
+import { useEffect } from "react";
+import { useCurrentOrder } from "@/app/context/current-order/context";
 
-export default function ListProducts() {
+export default function EditGroupItem() {
     return (
         <div className="flex h-[70vh] bg-gray-200 p-4 overflow-hidden">
-            <LeftComponent />
-            <RightComponent />
+            <ListCart />
+            <ListGroupItem />
         </div >
     );
 }
 
-const LeftComponent = () => {
+const ListCart = () => {
     const contextCategory = useCategories();
 
     return (
@@ -35,9 +36,17 @@ const LeftComponent = () => {
     )
 }
 
-const RightComponent = () => {
-    const modalHandler = useModal();
+const ListGroupItem = () => {
     const contextGroupItem = useGroupItem();
+    const contextCurrentOrder = useCurrentOrder();
+
+    useEffect(() => {
+        if (contextGroupItem.groupItem?.items.length === 0) {
+            contextGroupItem.resetGroupItem()
+        } else if (contextGroupItem.groupItem) {
+            contextCurrentOrder.updateGroupItem(contextGroupItem.groupItem)
+        }
+    }, [contextGroupItem.groupItem])
 
     return (
         < div className="w-80 bg-gray-100 p-4 space-y-4 overflow-y-auto" >
@@ -46,35 +55,13 @@ const RightComponent = () => {
             {/* Produto Selecionado */}
             <div className="space-y-2">
                 {contextGroupItem.groupItem?.items.map((item, index) => (
-                    <ItemCard item={item}/>
+                    <ItemCard item={item} key={index}/>
                 ))}
-                
-                <div className="bg-white p-4 rounded shadow">
-                    <p>0.5 x item 2</p>
-                    <p className="font-bold">R$ 14,00</p>
-                    <ul className="text-sm pl-4 list-disc">
-                        <li>produto</li>
-                        <li>1 x mussarela - R$ 2,00</li>
-                        <li>2 x presunto - R$ 4,00</li>
-                    </ul>
-                </div>
-
-                <div className="bg-white p-4 rounded shadow">
-                    <p>Produto complemento</p>
-                    <p className="font-bold">1 x item 3</p>
-                    <p className="font-bold">R$ 8,00</p>
-                </div>
             </div>
 
             {/* Total e Botão */}
             <div>
-                <p className="text-xl font-bold">Total: R$ 30,00</p>
-                <button
-                    className="w-full bg-green-500 text-white py-2 rounded mt-2"
-                    onClick={() => modalHandler.hideModal("list-products")}
-                >
-                    Adicionar item
-                </button>
+                <p className="text-xl font-bold">R$ {contextGroupItem.groupItem?.total_price.toFixed(2) || "0,00"}</p>
             </div>
         </div >
     )

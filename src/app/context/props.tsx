@@ -9,7 +9,7 @@ export interface ItemsContextProps<T> {
     items: T[];
     filterItems: (key: keyof T, value: string) => T[];
     findByID: (id: string) => T | undefined;
-    fetchData: (id?: string) => void;
+    fetchData: (id?: string) => Promise<void>;
     setItemsState: (items: T[]) => void;
     addItem: (item: T) => void;
     updateItem: (item: T) => void;

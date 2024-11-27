@@ -1,7 +1,7 @@
 'use client';
 
 import Modal from "@/app/components/modal/modal";
-import { FaEdit } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 
 interface NewButtonProps {
@@ -11,18 +11,17 @@ interface NewButtonProps {
     children: React.ReactNode;
 }
 
-const ButtonEdit = ({ size = 'sm', modalName, name, children }: NewButtonProps) => {
+const ButtonDelete = ({ size = 'sm', modalName, name, children }: NewButtonProps) => {
     const modalHandler = useModal()
+    const deleteButton = "Excluir " + name;
 
-    const editButton = "Editar " + name;
-    
     return (
         <div>
             <button onClick={() => modalHandler.showModal(modalName)} className="flex items-center space-x-2 p-2 rounded-md w-max">
-                <FaEdit />
+                <FaTrash />
             </button>
         
-            <Modal title={editButton} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
+            <Modal title={deleteButton} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
                 {children}
             </Modal>
         </div>
@@ -30,4 +29,4 @@ const ButtonEdit = ({ size = 'sm', modalName, name, children }: NewButtonProps) 
     )
 }
 
-export default ButtonEdit
+export default ButtonDelete
