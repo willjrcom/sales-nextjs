@@ -1,5 +1,5 @@
 import Category from "../category/category";
-import { Item } from "./item";
+import Item from "./item";
 
 type StatusGroupItem = "Staging" | "Pending" | "Started" | "Ready" | "Canceled";
 

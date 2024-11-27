@@ -12,16 +12,15 @@ interface NewButtonProps {
 
 const ButtonPlus = ({ modalName, name, size = 'sm', children }: NewButtonProps) => {
     const modalHandler = useModal();
-    const newButton = "Novo " + { name }.name;
 
     return (
         <div>
             <button onClick={() => modalHandler.showModal(modalName)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                 <FaPlus />
-                <span>{newButton}</span>
+                {name && <span>{name}</span>}
             </button>
 
-            <Modal title={newButton} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
+            <Modal title={name} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
                 {children}
             </Modal>
         </div>

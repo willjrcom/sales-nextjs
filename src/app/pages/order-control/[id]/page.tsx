@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Order from "@/app/entities/order/order";
-import GetOrderByID from "@/app/api/order/[id]/route";
 import RequestError from "@/app/api/error";
 import OrderManager from "@/app/components/order/order";
 import { useCurrentOrder } from "@/app/context/current-order/context";
@@ -22,8 +20,7 @@ const PageEditOrderControl = () => {
     const getOrder = async () => {
         if (!id || !data) return;
         try {
-            const orderFound = await GetOrderByID(id as string, data);
-            context.updateCurrentOrder(orderFound);
+            context.fetchData(id as string);
             setError(null);
         } catch (error) {
             setError(error as RequestError);

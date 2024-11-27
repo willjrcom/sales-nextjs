@@ -1,7 +1,7 @@
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 import Product from "@/app/entities/product/product";
 import ProductCard from "./card-product";
@@ -11,8 +11,6 @@ interface CarouselProductsProps {
 }
 
 export default function CarouselProducts ({ products }: CarouselProductsProps) {
-    const swiper = useSwiper();
-
     return (
         <Swiper
             modules={[Navigation, Pagination, A11y]}

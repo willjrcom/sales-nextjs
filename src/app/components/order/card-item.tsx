@@ -1,4 +1,4 @@
-import { Item } from '@/app/entities/order/item';
+import Item from '@/app/entities/order/item';
 import React, { useState } from 'react';
 
 interface CardProps {

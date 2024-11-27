@@ -1,4 +1,4 @@
-import { GroupItem } from "@/app/entities/order/group-item"
+import GroupItem from "@/app/entities/order/group-item"
 import GroupItemOrder from "./group-item"
 
 interface CategoryOrderProps {

@@ -5,7 +5,7 @@ import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import GetOrderByID from '@/app/api/order/[id]/route';
 import Order from '@/app/entities/order/order';
-import { GroupItem } from '@/app/entities/order/group-item';
+import GroupItem from '@/app/entities/order/group-item';
 
 interface CurrentOrderContextProps<T> {
     order: T | null;
@@ -31,9 +31,10 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     const idToken = data?.user.idToken;
     
     const fetchData = useCallback(async (id?: string) => {
-        if (!idToken) return;
+        if (!idToken || !id) return;
         try {
             const order = await GetOrderByID(id as string, data);
+            setOrder(order);
             setError(null);
         } catch (error) {
             setError(error as RequestError);
@@ -41,12 +42,7 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
 
         setLoading(false);
 
-    }, [idToken, setOrder, data, setError, setLoading]); // Inclua todas as dependências necessárias
-
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+    }, [idToken, setOrder, data, setError, setLoading]);
 
     const getGroupByID = (id: string) => {
         return order?.groups.filter((order) => order.id === id);

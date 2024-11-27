@@ -2,14 +2,17 @@ import React, { createContext, useContext, ReactNode, useState, useCallback, use
 import { useSession } from 'next-auth/react';
 import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
-import GetgroupItemByID from '@/app/api/order/[id]/route';
 import GroupItem from '@/app/entities/order/group-item';
-import { Item } from '@/app/entities/order/item';
+import Item from '@/app/entities/order/item';
+import GetGroupItemByID from '@/app/api/group-item/[id]/route';
 
 interface GroupItemContextProps<T> {
     groupItem: T | null;
     getItemByID: (id: string) => Item[] | undefined;
-    fetchData: (id?: string) => void;
+    fetchData: (id: string) => void;
+    resetGroupItem: () => void;
+    addItem: (item: Item) => void;
+    removeItem: (id: string) => void;
     updateGroupItem: (item: T) => void;
     removeGroupItem: () => void;
     updateLastUpdate: () => void;
@@ -21,7 +24,7 @@ interface GroupItemContextProps<T> {
 const ContextGroupItem = createContext<GroupItemContextProps<GroupItem> | undefined>(undefined);
 
 export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
-    const [groupItem, GetgroupItem] = useState<GroupItem | null>(null);
+    const [groupItem, setgroupItem] = useState<GroupItem | null>(null);
     const { data } = useSession();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<RequestError | null>(null);
@@ -29,10 +32,11 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     const idToken = data?.user.idToken;
     
-    const fetchData = useCallback(async (id?: string) => {
-        if (!idToken) return;
+    const fetchData = useCallback(async (id: string) => {
+        if (!idToken || !id) return;
         try {
-            const order = await GetgroupItemByID(id as string, data);
+            const groupItem = await GetGroupItemByID(id as string, data);
+            setgroupItem(groupItem);
             setError(null);
         } catch (error) {
             setError(error as RequestError);
@@ -40,23 +44,42 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
 
         setLoading(false);
 
-    }, [idToken, GetgroupItem, data, setError, setLoading]); // Inclua todas as dependências necessárias
+    }, [idToken, setgroupItem, data, setError, setLoading]);
 
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+    const resetGroupItem = () => {
+        setgroupItem(null);
+    }
 
     const getItemByID = (id: string) => {
         return groupItem?.items.filter((groupItem) => groupItem.id === id);
     }
 
+    const addItem = (item: Item) => {
+        setgroupItem((prev) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                items: [...prev.items, item],
+            };
+        });
+    }
+
+    const removeItem = (id: string) => {
+        setgroupItem((prev) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                items: prev.items.filter((item) => item.id !== id),
+            };
+        });
+    }
+
     const updateGroupItem = (groupItem: GroupItem) => {
-        GetgroupItem(groupItem);
+        setgroupItem(groupItem);
     }
 
     const removeGroupItem = () => {
-        GetgroupItem(null);
+        setgroupItem(null);
     };
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
@@ -66,7 +89,7 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const getLastUpdate = () => lastUpdate;
 
     return (
-        <ContextGroupItem.Provider value={{ groupItem, fetchData, getItemByID, updateGroupItem: updateGroupItem, removeGroupItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextGroupItem.Provider value={{ groupItem, fetchData, resetGroupItem, getItemByID, addItem, removeItem, updateGroupItem: updateGroupItem, removeGroupItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
             {children}
         </ContextGroupItem.Provider>
     );

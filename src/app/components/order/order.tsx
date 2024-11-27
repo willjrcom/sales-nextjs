@@ -1,10 +1,10 @@
 import ButtonPlus from "@/app/components/crud/button-plus"
 import CategoryOrder from "@/app/components/order/category"
 import { useCategories } from "@/app/context/category/context"
-import { GroupItem } from "@/app/entities/order/group-item"
+import GroupItem from "@/app/entities/order/group-item"
 import { useEffect, useState } from "react"
 import ListProducts from "./list-products"
-import { useCurrentOrder as useCurrentOrder } from "@/app/context/current-order/context"
+import { useCurrentOrder } from "@/app/context/current-order/context"
 
 const OrderManager = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})

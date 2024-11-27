@@ -1,25 +1,29 @@
 import Product from "@/app/entities/product/product";
+import Image from "next/image";
+import AddProductCard from "@/app/forms/item/form";
+import ButtonPlus from "../crud/button-plus";
 
 interface ProductCardProps {
     product: Product;
 }
-import Image from 'next/image';
-import { FaPlus } from "react-icons/fa";
 
 const ProductCard = ({ product }: ProductCardProps) => {
     return (
-        <div className="relative p-4 bg-white rounded-lg shadow-md border hover:shadow-lg transition-shadow duration-200">
+        <div className="relative p-4 bg-white rounded-lg shadow-md border hover:shadow-lg transition-shadow duration-200 w-full max-w-sm mx-auto">
             {/* Imagem do produto */}
             <div className="relative flex justify-center items-center">
                 <Image
                     src={product.image_path}
-                    alt={product.name}
+                    alt={`Imagem do produto ${product.name}`}
                     width={200}
                     height={130}
                     className="rounded-lg mb-2 object-cover"
                 />
                 {/* Código do produto */}
-                <span className="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg opacity-80">
+                <span
+                    className="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg opacity-80"
+                    aria-label={`Código do produto ${product.code}`}
+                >
                     #&nbsp;{product.code}
                 </span>
             </div>
@@ -27,24 +31,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {/* Informações do Produto */}
             <div className="text-center">
                 <h2 className="font-bold text-lg mb-1">{product.name}</h2>
-                <p className="text-gray-600 mb-2">R$ {product.price}</p>
+                <p className="text-gray-600 mb-2">R$ {product.price.toFixed(2)}</p>
             </div>
 
             {/* Tamanhos e botão */}
             <div className="flex items-center justify-between space-x-2">
                 {/* Tamanhos */}
-                <div className="flex space-x-1">
-                <span
-                            key={product.size.name}
+                {product.size && (
+                    <div className="flex space-x-1">
+                        <span
                             className="px-2 py-1 text-xs bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 focus:ring-2 focus:ring-blue-400 transition"
+                            aria-label={`Tamanho disponível: ${product.size.name}`}
                         >
                             {product.size.name}
                         </span>
-                </div>
-                {/* Botão Adicionar */}
-                <button className="px-3 py-2 bg-gray-300 text-white rounded-lg hover:bg-gray-400 focus:ring-2 focus:ring-gray-400 transition">
-                    <FaPlus/>
-                </button>
+                    </div>
+                )}
+
+                {/* Botão para adicionar */}
+                <ButtonPlus modalName={`add-item-${product.id}`} name="">
+                    <AddProductCard product={product} />
+                </ButtonPlus>
             </div>
         </div>
     );

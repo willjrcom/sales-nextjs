@@ -1,5 +1,5 @@
 import Employee from "../employee/employee";
-import { GroupItem } from "./group-item";
+import GroupItem from "./group-item";
 import { OrderDelivery } from "./orderDelivery";
 import { OrderPickup } from "./orderPickup";
 import { OrderTable } from "./orderTable";

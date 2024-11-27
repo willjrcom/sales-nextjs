@@ -2,25 +2,18 @@ import { useModal } from "@/app/context/modal/context";
 import { useCategories } from "@/app/context/category/context";
 import CarouselProducts from "./carousel";
 import ItemCard from "./card-item";
-import { Dispatch, SetStateAction, useState } from "react";
-import { GroupItem } from "@/app/entities/order/group-item";
+import { useGroupItem} from "@/app/context/group-item/context";
 
 export default function ListProducts() {
-    const [groupItem, setGroupItem] = useState<GroupItem>(new GroupItem());
-
     return (
         <div className="flex h-[70vh] bg-gray-200 p-4 overflow-hidden">
-            <LeftComponent setGroupItem={setGroupItem}/>
-            <RightComponent groupItem={groupItem}/>
+            <LeftComponent />
+            <RightComponent />
         </div >
     );
 }
 
-interface LeftComponentProps {
-    setGroupItem: Dispatch<SetStateAction<GroupItem>>
-}
-
-const LeftComponent = ({ setGroupItem }: LeftComponentProps) => {
+const LeftComponent = () => {
     const contextCategory = useCategories();
 
     return (
@@ -42,19 +35,17 @@ const LeftComponent = ({ setGroupItem }: LeftComponentProps) => {
     )
 }
 
-interface GroupItemCardProps {
-    groupItem: GroupItem
-}
-
-const RightComponent = ({ groupItem }: GroupItemCardProps) => {
+const RightComponent = () => {
     const modalHandler = useModal();
+    const contextGroupItem = useGroupItem();
+
     return (
         < div className="w-80 bg-gray-100 p-4 space-y-4 overflow-y-auto" >
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
 
             {/* Produto Selecionado */}
             <div className="space-y-2">
-                {groupItem.items.map((item, index) => (
+                {contextGroupItem.groupItem?.items.map((item, index) => (
                     <ItemCard item={item}/>
                 ))}
                 
