@@ -46,6 +46,10 @@ export default function CompanySelection() {
         }
     }
 
+    const newCompany = () => {
+        router.push('/pages/new-company');
+    }
+    
     if (!data?.user?.companies || data.user.companies.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -71,6 +75,11 @@ export default function CompanySelection() {
                         <h2 className="text-2xl font-bold">{company.trade_name}</h2>
                     </button>
                 ))}
+                <button
+                    className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition"
+                    onClick={newCompany}>
+                    <h2 className="text-2xl font-bold">Nova empresa</h2>
+                </button>
             </div>
             <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
         </div>

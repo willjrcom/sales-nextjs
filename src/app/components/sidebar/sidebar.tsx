@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { IconType } from 'react-icons';
-import { FaUserTie, FaCog, FaPlus, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserTie, FaCog, FaPlus, FaSignOutAlt, FaRedo } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
@@ -71,6 +71,7 @@ const Sidebar = () => {
         <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
         <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
         <SidebarLinkItem icon={FaCog} label="Configurações" href="/" />
+        <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection"/>
         <SidebarItem icon={FaSignOutAlt} label="Sair" onClick={() => signOutToLogin()}/>
       </div>
     </div>
