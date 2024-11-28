@@ -25,7 +25,7 @@ export default function CompanySelection() {
             return;
         }
 
-        if (!data.user.id) {
+        if (!data.user?.id) {
             setError(new RequestError('Token ID inválido!'));
             return;
         }

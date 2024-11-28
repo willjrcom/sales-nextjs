@@ -59,6 +59,7 @@ const authOptions: NextAuthOptions = {
         },
         
         async session({ session, token }) {
+            // Transfere o idToken e outras informações do token para a sessão
             session.user = session.user || {};
             if (token.sub) session.user.id = token.sub;
             if (token.idToken) session.user.idToken = token.idToken;

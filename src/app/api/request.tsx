@@ -18,7 +18,7 @@ const jsonHeaders = {
 }
 
 const AddIdToken = async (session: Session) => {
-    if (session.user.idToken === undefined) {
+    if (session.user?.idToken === undefined) {
         throw new Error("id token not found in session");
     }
 
@@ -26,7 +26,7 @@ const AddIdToken = async (session: Session) => {
 }
 
 const AddAccessToken = async (session: Session) => {
-    if (session.user.id === undefined) {
+    if (session.user?.id === undefined) {
         throw new Error("access token not found in session");
     }
 

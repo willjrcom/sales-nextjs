@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect} from 'react';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
@@ -30,10 +30,9 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const [error, setError] = useState<RequestError | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
-    const idToken = data?.user.idToken;
     
     const fetchData = async (id: string) => {
-        if (!idToken || !id) return;
+        if (!data?.user?.idToken || !id) return;
         try {
             const groupItem = await GetGroupItemByID(id as string, data);
             setgroupItem(groupItem);

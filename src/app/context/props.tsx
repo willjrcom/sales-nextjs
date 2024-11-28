@@ -1,5 +1,5 @@
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormatRefreshTime } from "../components/crud/refresh";
 import FetchData from "../api/fetch-data";
 import { Session } from "next-auth";
@@ -26,22 +26,20 @@ interface GenericProviderProps<T> {
 
 const GenericProvider = <T extends { id: string },>({ getItems }: GenericProviderProps<T>) => {
     const [items, setItems] = useState<T[]>([]);
-    const { data } = useSession();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<RequestError | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
-    const idToken = data?.user.idToken;
+    const { data } = useSession();
 
-    const fetchData = useCallback(async () => {
-        if (!idToken) return; // Use a variável simplificada
+    const fetchData = async () => {
+        if (!data?.user?.idToken) return; 
         FetchData({ getItems, setItems, data, setError, setLoading });
-    }, [idToken, getItems, setItems, data, setError, setLoading]); // Inclua todas as dependências necessárias
-
+    };
 
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+    }, []);
 
     const filterItems = (key: keyof T, value: string) => {
         if (!value) return items;
