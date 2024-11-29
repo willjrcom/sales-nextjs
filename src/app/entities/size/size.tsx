@@ -6,7 +6,12 @@ export default class Size {
   is_active: boolean = false;
   category_id: string = "";
 
-  constructor() {}
+  constructor(id = "", name = "", is_active = false, category_id = "") {
+    this.id = id;
+    this.name = name;
+    this.is_active = is_active;
+    this.category_id = category_id;
+  }
 }
 
 const SchemaSize = z.object({

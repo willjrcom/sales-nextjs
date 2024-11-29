@@ -13,7 +13,15 @@ export default class Category {
     quantities: Quantity[] = [];
     process_rules: ProcessRule[] = [];
     
-    constructor() {}
+    constructor(id = "", image_path = "", name = "", sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = []) {
+        this.id = id;
+        this.image_path = image_path;
+        this.name = name;
+        this.sizes = sizes;
+        this.products = products;
+        this.quantities = quantities;
+        this.process_rules = process_rules;
+    }
 }
 
 const SchemaCategory = z.object({

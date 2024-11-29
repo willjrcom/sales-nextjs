@@ -2,7 +2,7 @@ import { z } from "zod";
 import Address, { SchemaAddress } from "../address/address";
 import Contact, { SchemaContact } from "../contact/contact";
 
-export class Person {
+export default class Person {
     id: string = "";
     name: string = "";
     email: string = "";
@@ -23,8 +23,6 @@ export class Person {
     }
 };
 
-export default Person
-
 const SchemaPerson = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     email: z.string().email('Email inválido'),
@@ -33,7 +31,6 @@ const SchemaPerson = z.object({
     contact: SchemaContact,
     address: SchemaAddress,
 });
-
 
 export const ValidatePersonForm = (person: Person) => {
     const validatedFields = SchemaPerson.safeParse({

@@ -8,7 +8,14 @@ export default class Company {
     trade_name: string = "";
     cnpj: string = "";
 
-    constructor() {}
+    constructor(id = "", schema_name = "", business_name = "", email = "", trade_name = "", cnpj = "") {
+        this.id = id;
+        this.schema_name = schema_name;
+        this.business_name = business_name;
+        this.email = email;
+        this.trade_name = trade_name;
+        this.cnpj = cnpj;
+    }
 }
 
 const SchemaCompany = z.object({

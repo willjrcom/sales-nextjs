@@ -1,22 +1,20 @@
 type Timestamp = string | null;
-
-// Status for Order Pickup
 type StatusOrderPickup = "Staging" | "Pending" | "Ready";
 
-// Common attributes for Order Pickup
-interface OrderPickupCommonAttributes {
-    name: string;
-    status: StatusOrderPickup;
-    orderId: string;
-}
+export default class OrderPickup {
+    id: string = "";
+    name: string = "";
+    status: StatusOrderPickup = "Staging";
+    orderId: string = "";
+    pending_at?: Timestamp = "";
+    ready_at?: Timestamp = "";
 
-// Time logs for Order Pickup
-interface PickupTimeLogs {
-    pending_at?: Timestamp;
-    ready_at?: Timestamp;
-}
-
-// Main Order Pickup structure
-export interface OrderPickup extends OrderPickupCommonAttributes, PickupTimeLogs {
-    id: string;
+    constructor(id = "", name = "", status: StatusOrderPickup = "Staging", orderId = "", pending_at = "", ready_at = "") {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.orderId = orderId;
+        this.pending_at = pending_at;
+        this.ready_at = ready_at;
+    }
 }

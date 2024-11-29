@@ -1,6 +1,5 @@
 import { z } from "zod";
 import Person, { ValidatePersonForm } from "../person/person";
-import { SchemaContact } from "../contact/contact";
 
 export default class Client extends Person {
     constructor(person: Person = new Person()) {

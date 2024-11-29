@@ -14,7 +14,18 @@ export default class Address {
     delivery_tax: number = 0;
     likeTax?: boolean = false
 
-    constructor(likeTax: boolean = false) {
+    constructor(id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, likeTax: boolean = false) {
+        this.id = id
+        this.object_id = object_id
+        this.street = street
+        this.number = number
+        this.complement = complement
+        this.reference = reference
+        this.neighborhood = neighborhood
+        this.city = city
+        this.state = state
+        this.cep = cep
+        this.delivery_tax = delivery_tax
         this.likeTax = likeTax
     }
 }

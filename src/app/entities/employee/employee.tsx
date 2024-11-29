@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Person, ValidatePersonForm } from "../person/person";
+import Person, { ValidatePersonForm } from "../person/person";
 import { User } from "../user/user";
 
 export default class Employee extends Person {

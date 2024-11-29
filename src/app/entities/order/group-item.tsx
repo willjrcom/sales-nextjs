@@ -3,14 +3,11 @@ import Item from "./item";
 
 type StatusGroupItem = "Staging" | "Pending" | "Started" | "Ready" | "Canceled";
 
-class GroupItemTimeLogs {
-  pending_at?: Date;
-  started_at?: Date;
-  ready_at?: Date;
-  canceled_at?: Date;
-};
 
-class GroupDetails extends GroupItemTimeLogs {
+export default class GroupItem {
+  id: string = "";
+  items: Item[] = [];
+  order_id: string = "";
   size: string = "";
   status: StatusGroupItem = "Staging";
   total_price: number = 0;
@@ -20,25 +17,25 @@ class GroupDetails extends GroupItemTimeLogs {
   category?: Category;
   complement_item_id?: string = "";
   complement_item?: Item;
-  
-  constructor() {
-    super();
-  }
-};
+  pending_at?: Date;
+  started_at?: Date;
+  ready_at?: Date;
+  canceled_at?: Date;
 
-class GroupCommonAttributes extends GroupDetails {
-  items: Item[] = [];
-  order_id: string = "";
-
-  constructor() {
-    super();
-  }
-};
-
-export default class GroupItem extends GroupCommonAttributes {
-  id: string = "";
-
-  constructor() {
-    super();
+  constructor(id = "", items: Item[] = [], order_id = "", size = "", status: StatusGroupItem = "Staging", total_price = 0, quantity = 0, need_print = false, category_id = "", complement_item_id = "", pending_at?: Date, started_at?: Date, ready_at?: Date, canceled_at?: Date) {
+    this.id = id;
+    this.items = items;
+    this.order_id = order_id;
+    this.size = size;
+    this.status = status;
+    this.total_price = total_price;
+    this.quantity = quantity;
+    this.need_print = need_print;
+    this.category_id = category_id;
+    this.complement_item_id = complement_item_id;
+    this.pending_at = pending_at;
+    this.started_at = started_at;
+    this.ready_at = ready_at;
+    this.canceled_at = canceled_at;
   }
 };

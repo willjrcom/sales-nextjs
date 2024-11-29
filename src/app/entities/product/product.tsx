@@ -16,7 +16,18 @@ export default class Product {
     size: Size = new Size();
     is_available: boolean = false;
 
-    constructor() {}
+    constructor(id = "", code = "", image_path = "", name = "", description = "", price = 0, cost = 0, category_id = "", size_id = "", is_available = false) {
+        this.id = id;
+        this.code = code;
+        this.image_path = image_path;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.cost = cost;
+        this.category_id = category_id;
+        this.size_id = size_id;
+        this.is_available = is_available;
+    }
 }
 
 const SchemaProduct = z.object({

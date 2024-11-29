@@ -1,4 +1,4 @@
-import { optional, z } from "zod";
+import { z } from "zod";
 
 export default class ProcessRule {
     id: string = "";
@@ -12,7 +12,18 @@ export default class ProcessRule {
     experimental_error_formatted: string = "";
     category_id: string = "";
 
-    constructor() {}
+    constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = 0, experimental_error = 0, ideal_time_formatted = "", experimental_error_formatted = "", category_id = "") {
+        this.id = id;
+        this.name = name;
+        this.order = order;
+        this.description = description;
+        this.image_path = image_path;
+        this.ideal_time = ideal_time;
+        this.experimental_error = experimental_error;
+        this.ideal_time_formatted = ideal_time_formatted;
+        this.experimental_error_formatted = experimental_error_formatted;
+        this.category_id = category_id;
+    }
 }
 
 const SchemaProcessRule = z.object({

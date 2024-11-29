@@ -6,7 +6,12 @@ export default class Quantity {
   is_active: boolean = false;
   category_id: string = "";
 
-  constructor() {}
+  constructor(id = "", quantity = 0, is_active = false, category_id = "") {
+    this.id = id;
+    this.quantity = quantity;
+    this.is_active = is_active;
+    this.category_id = category_id;
+  }
 }
 
 const SchemaQuantity = z.object({

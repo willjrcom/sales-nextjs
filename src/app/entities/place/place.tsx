@@ -9,7 +9,12 @@ export default class Place {
     is_available: boolean = false;
     tables: PlaceTable[] = [];
     
-    constructor() {}
+    constructor(id = "", name = "", image_path = "", is_available = false) {
+        this.id = id;
+        this.name = name;
+        this.image_path = image_path;
+        this.is_available = is_available;
+    }
 }
 
 const SchemaPlace = z.object({
