@@ -21,37 +21,20 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalHandler = useModal();
     const context = useProducts();
     const contextCategories = useCategories();
-    const product = item || new Product();
-    const [id, setId] = useState(product.id);
-    const [code, setCode] = useState(product.code);
-    const [name, setName] = useState(product.name);
-    const [description, setDescription] = useState(product.description);
-    const [price, setPrice] = useState(product.price);
-    const [cost, setCost] = useState(product.cost);
-    const [imagePath, setImagePath] = useState(product.image_path || "");
-    const [isAvailable, setIsAvailable] = useState(product.is_available);
-    const [categoryId, setCategoryId] = useState(product.category_id);
-    const [sizeId, setSizeId] = useState(product.size_id);
+    const [product, setProduct] = useState<Product>(item || new Product());
     const [categories, setCategories] = useState<Category[]>([]);
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    
+
+    const handleInputChange = (field: keyof Product, value: any) => {
+        setProduct(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
-
-        product.id = id;
-        product.code = code;
-        product.name = name;
-        product.description = description;
-        product.price = price;
-        product.cost = cost;
-        product.image_path = imagePath;
-        product.is_available = isAvailable;
-        product.category_id = categoryId;
-        product.size_id = sizeId;
 
         const validationErrors = ValidateProductForm(product);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -112,7 +95,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             if (!data) return;
 
             try {
-                const category = categories.find(category => category.id === categoryId);
+                const category = categories.find(category => category.id === product.category_id);
                 if (!category) return;
 
                 let records: Record<string, string>[] = [];
@@ -135,20 +118,20 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         LoadSizes();
 
-    }, [categories, categoryId, data])
+    }, [categories, product.category_id, data])
 
     return (
         <>
-            <TextField friendlyName='Código de busca' name='code' setValue={setCode} value={code}/>
-            <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
-            <TextField friendlyName='Descrição' name='description' setValue={setDescription} value={description}/>
-            <NumberField friendlyName='Preço' name='price' setValue={setPrice} value={price}/>
-            <NumberField friendlyName='Custo' name='cost' setValue={setCost} value={cost}/>
-            <TextField friendlyName='Imagem' name='image_path' setValue={setImagePath} value={imagePath}/>
-            <CheckboxField friendlyName='Disponível' name='is_available' setValue={setIsAvailable} value={isAvailable.toString()}/>
-            <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={setCategoryId} selectedValue={categoryId} values={recordCategories}/>
-            <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={setSizeId} selectedValue={sizeId} values={recordSizes}/>
-            <HiddenField name='id' setValue={setId} value={id}/>
+            <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name}/>
+            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description}/>
+            <NumberField friendlyName='Preço' name='price' setValue={value => handleInputChange('price', value)} value={product.price}/>
+            <NumberField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost}/>
+            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={product.image_path}/>
+            <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available.toString()}/>
+            <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories}/>
+            <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />

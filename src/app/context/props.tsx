@@ -1,5 +1,5 @@
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormatRefreshTime } from "../components/crud/refresh";
 import FetchData from "../api/fetch-data";
 import { Session } from "next-auth";
@@ -39,7 +39,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [data?.user?.idToken]);
 
     const filterItems = (key: keyof T, value: string) => {
         if (!value) return items;

@@ -14,15 +14,9 @@ const PageClient = () => {
     const [nome, setNome] = useState<string>("");
     const context = useClients();
 
-    if (context.getLoading()) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
     return (
         <>
-        {context.getError() && <p className="mb-4 text-red-500">{context.getError()}</p>}
+        {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
             <CrudLayout title="Clientes"
                 filterButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} />

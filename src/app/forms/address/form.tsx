@@ -1,43 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { HiddenField, NumberField, TextField } from '../../components/modal/field';
 import Address from '@/app/entities/address/address';
 
-interface AddressProps {
+interface AddressFormProps {
     address: Address;
-    onAddressChange: (updatedAddress: Address) => void;
+    setAddress: React.Dispatch<React.SetStateAction<Address>>;
 }
 
-const CreateAddressForm = ({address, onAddressChange}: AddressProps) => {
-    const [id, setId] = useState(address.id);
-    const [street, setStreet] = useState(address.street);
-    const [number, setNumber] = useState(address.number);
-    const [neighborhood, setNeighborhood] = useState(address.neighborhood);
-    const [complement, setComplement] = useState(address.complement);
-    const [reference, setReference] = useState(address.reference);
-    const [city, setCity] = useState(address.city);
-    const [state, setState] = useState(address.state);
-    const [cep, setCep] = useState(address.cep);
-    const [deliveryTax, setDeliveryTax] = useState(address.delivery_tax);
-    const [objectId, setObjectId] = useState(address.object_id);
-    const [likeTax, setLikeTax] = useState(address.likeTax);
-    
-    useEffect(() => {
-        onAddressChange({
-            id,
-            street,
-            number,
-            neighborhood,
-            complement,
-            reference,
-            city,
-            state,
-            cep,
-            object_id: objectId,
-            delivery_tax: deliveryTax,
-            likeTax,
-        });
-    }, [id, street, number, neighborhood, complement, reference, city, state, cep, objectId, deliveryTax, likeTax, onAddressChange]);
-
+const AddressForm = ({address, setAddress}: AddressFormProps) => {
+    const handleInputChange = (field: keyof Address, value: any) => {
+        setAddress(prev => ({ ...prev, [field]: value }));
+    };
 
     return (
         <>
@@ -45,28 +18,28 @@ const CreateAddressForm = ({address, onAddressChange}: AddressProps) => {
         <h2 className='text-xl'>Endereço</h2>
         <hr className="my-4" />
 
-        <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={setStreet} value={street}/>
+        <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street}/>
 
-        <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={setNumber} value={number}/>
+        <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={value => handleInputChange('number', value)} value={address.number}/>
 
-        <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={setNeighborhood} value={neighborhood}/>
+        <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={value => handleInputChange('neighborhood', value)} value={address.neighborhood}/>
 
-        <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={setComplement} value={complement}/>
+        <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={value => handleInputChange('complement', value)} value={address.complement}/>
 
-        <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={setReference} value={reference}/>
+        <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={value => handleInputChange('reference', value)} value={address.reference}/>
 
-        <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={setCity} value={city}/>
+        <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city}/>
 
-        <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={setState} value={state}/>
+        <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={value => handleInputChange('state', value)} value={address.state}/>
 
-        <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={setCep} value={cep}/>
-        {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={setDeliveryTax} value={deliveryTax}/>}
+        <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep}/>
+        {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={value => handleInputChange('delivery_tax', value)} value={address.delivery_tax}/>}
         
 
-        <HiddenField name="object_id" setValue={setObjectId} value={objectId}/>
-        <HiddenField name="id" setValue={setId} value={id}/>
+        <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id}/>
+        <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id}/>
         </>
     );
 };
 
-export default CreateAddressForm;
+export default AddressForm;

@@ -18,20 +18,17 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalName = isUpdate ? 'edit-place-' + item?.id : 'new-place'
     const modalHandler = useModal();
     const context = usePlaces();
-    const place = item || new Place();
-    const [id, setId] = useState(place.id);
-    const [name, setName] = useState(place.name);
-    const [imagePath, setImagePath] = useState(place.image_path);
+    const [place, setPlace] = useState<Place>(item || new Place());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
+    const handleInputChange = (field: keyof Place, value: any) => {
+        setPlace(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
-
-        place.id = id;
-        place.name = name;
-        place.image_path = imagePath
 
         const validationErrors = ValidatePlaceForm(place);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -63,9 +60,9 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
-            <TextField friendlyName='Imagem' name='imagePath' setValue={setImagePath} value={imagePath}/>
-            <HiddenField name='id' setValue={setId} value={id}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={place.name}/>
+            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={place.image_path}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />

@@ -17,36 +17,19 @@ import RequestError from '@/app/api/error';
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
     const modalHandler = useModal();
-    const processRule = item || new ProcessRule();
-    const [id, setId] = useState(processRule.id);
-    const [name, setName] = useState(processRule.name);
-    const [description, setDescription] = useState(processRule.description);
-    const [order, setOrder] = useState(processRule.order);
-    const [imagePath, setImagePath] = useState(processRule.image_path);
-    const [idealTime, setIdealTime] = useState(processRule.ideal_time);
-    const [experimentalError, setExperimentalError] = useState(processRule.experimental_error);
-    const [idealTimeFormatted, setIdealTimeFormatted] = useState(processRule.ideal_time_formatted);
-    const [experimentalErrorFormatted, setExperimentalErrorFormatted] = useState(processRule.experimental_error_formatted);
-    const [categoryId, setCategoryId] = useState(processRule.category_id);
+    const [processRule, setProcessRule] = useState<ProcessRule>(item || new ProcessRule());
     
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const context = useProcessRules()
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
+    const handleInputChange = (field: keyof ProcessRule, value: any) => {
+        setProcessRule(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
-
-        processRule.id = id;
-        processRule.name = name;
-        processRule.description = description;
-        processRule.order = order;
-        processRule.image_path = imagePath;
-        processRule.ideal_time = idealTime;
-        processRule.experimental_error = experimentalError;
-        processRule.ideal_time_formatted = idealTimeFormatted;
-        processRule.experimental_error_formatted = experimentalErrorFormatted;
-        processRule.category_id;
 
         const validationErrors = ValidateProcessRuleForm(processRule);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -78,16 +61,16 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
-            <TextField friendlyName='Descrição' name='description' setValue={setDescription} value={description}/>
-            <NumberField friendlyName='Ordem' name='order' setValue={setOrder} value={order}/>
-            <TextField friendlyName='Caminho da imagem' name='imagePath' setValue={setImagePath} value={imagePath}/>
-            <NumberField friendlyName='Tempo ideal' name='idealTime' setValue={setIdealTime} value={idealTime}/>
-            <NumberField friendlyName='Tempo experimental' name='experimentalError' setValue={setExperimentalError} value={experimentalError}/>
-            <TextField friendlyName='Tempo ideal formatado' name='idealTimeFormatted' setValue={setIdealTimeFormatted} value={idealTimeFormatted}/>
-            <TextField friendlyName='Tempo experimental formatado' name='experimentalErrorFormatted' setValue={setExperimentalErrorFormatted} value={experimentalErrorFormatted}/>
-            <TextField friendlyName='Categoria' name='categoryId' value={categoryId} setValue={setCategoryId} disabled/>
-            <HiddenField name='id' setValue={setId} value={id}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={processRule.name}/>
+            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={processRule.description}/>
+            <NumberField friendlyName='Ordem' name='order' setValue={value => handleInputChange('order', value)} value={processRule.order}/>
+            <TextField friendlyName='Caminho da imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={processRule.image_path}/>
+            <NumberField friendlyName='Tempo ideal' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time}/>
+            <NumberField friendlyName='Tempo experimental' name='experimental_error' setValue={value => handleInputChange('experimental_error', value)} value={processRule.experimental_error}/>
+            <TextField friendlyName='Tempo ideal formatado' name='ideal_time_formatted' setValue={value => handleInputChange('ideal_time_formatted', value)} value={processRule.ideal_time_formatted}/>
+            <TextField friendlyName='Tempo experimental formatado' name='experimental_error_formatted' setValue={value => handleInputChange('experimental_error_formatted', value)} value={processRule.experimental_error_formatted}/>
+            <TextField friendlyName='Categoria' name='category_id' value={processRule.category_id} setValue={value => handleInputChange('category_id', value)} disabled/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />

@@ -18,20 +18,17 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
     const context = useCategories();
-    const category = item || new Category();
-    const [id, setId] = useState(category.id);
-    const [name, setName] = useState(category.name);
-    const [imagePath, setImagePath] = useState(category.image_path);
+    const [category, setCategory] = useState<Category>(item || new Category());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    
+
+    const handleInputChange = (field: keyof Category, value: any) => {
+        setCategory(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
-
-        category.id = id;
-        category.name = name;
-        category.image_path = imagePath
 
         const validationErrors = ValidateCategoryForm(category);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -63,13 +60,13 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
-            <TextField friendlyName='Imagem' name='imagePath' setValue={setImagePath} value={imagePath}/>
-            <HiddenField name='id' setValue={setId} value={id}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={category.name} />
+            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={category.image_path} />
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={category.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={category.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
+            <ButtonsModal isUpdate={category.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)} />
         </>
     );
 };

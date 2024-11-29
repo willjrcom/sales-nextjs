@@ -17,7 +17,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
     const context = useClients();
-    const [client, setPerson] = useState<Client>(item || new Client())
+    const [client, setClient] = useState<Client>(item || new Client())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
@@ -55,7 +55,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
     return (
         <>
-            <PersonForm person={client} onPersonChange={setPerson} />
+            <PersonForm person={client} setPerson={setClient} />
             {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal

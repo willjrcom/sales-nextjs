@@ -1,69 +1,32 @@
-import { useEffect, useState } from "react";
 import{ TextField, DateField, HiddenField } from "../../components/modal/field";
-import CreateAddressForm from "../address/form";
-import Address from "@/app/entities/address/address";
+import AddressForm from "../address/form";
 import Person from "@/app/entities/person/person";
-import Contact from "@/app/entities/contact/contact";
-import { format } from "date-fns";
+import ContactForm from "../contact/form";
 
 interface PersonProps {
     person: Person
-    onPersonChange: (updatedPerson: Person) => void;
+    setPerson: React.Dispatch<React.SetStateAction<Person>>
 }
 
-const PersonForm = ({person, onPersonChange}: PersonProps) => {
-    const [id, setId] = useState(person.id);
-    const [name, setName] = useState(person.name);
-    const [email, setEmail] = useState(person.email);
-    const [cpf, setCpf] = useState(person.cpf);
-    const [birthday, setBirthday] = useState(person.birthday || new Date().toISOString());
-    if (person.contact == null) person.contact = new Contact()
-    const [contactDdd, setContactDdd] = useState(person.contact.ddd);
-    const [contactNumber, setContactNumber] = useState(person.contact.number);
-    const [address, setAddress] = useState<Address>(person.address);
-
-    useEffect(() => {
-        if (!birthday) return
-        setBirthday(format(birthday, "yyyy-MM-dd"));
-    }, []);
-
-    useEffect(() => {
-        const contact = new Contact()
-        contact.ddd = contactDdd
-        contact.number = contactNumber
-
-        onPersonChange({
-            id,
-            name,
-            email,
-            cpf,
-            birthday,
-            contact,
-            address,
-        });
-    }, [id, name, email, cpf, birthday, contactDdd, contactNumber, address, onPersonChange]);
+const PersonForm = ({ person, setPerson }: PersonProps) => {
+    const handleInputChange = (field: keyof Person, value: any) => {
+        setPerson(prev => ({ ...prev, [field]: value }));
+    };
 
     return (
         <>
-            <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={setName} value={name}/>
+            <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={person.name}/>
 
-            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={setEmail} value={email}/>
+            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email}/>
 
-            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={setCpf} value={cpf}/>
+            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf}/>
 
-            <DateField name="birthday" friendlyName="Nascimento" setValue={setBirthday} value={birthday} />
+            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} />
 
-            <div className="flex space-x-4">
-                <div className="w-1/3">
-                    <TextField name="ddd" friendlyName="DDD" placeholder="(xx)" setValue={setContactDdd} value={contactDdd} />
-                </div>
-                <div className="w-2/3">
-                    <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={setContactNumber} value={contactNumber} />
-                </div>
-            </div>
-            <CreateAddressForm address={address} onAddressChange={setAddress} />
+            <ContactForm contact={person.contact} setContact={value => handleInputChange('contact', value)} />
+            <AddressForm address={person.address} setAddress={value => handleInputChange('address', value)} />
 
-            <HiddenField name="id" setValue={setId} value={id}/>
+            <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={person.id}/>
         </>
     );
 }

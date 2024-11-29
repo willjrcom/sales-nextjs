@@ -3,13 +3,8 @@
 import GetCategoryByID from "@/app/api/category/[id]/route";
 import RequestError from "@/app/api/error";
 import ButtonPlus from "@/app/components/crud/button-plus";
-import Menu from "@/app/components/menu/layout";
 import Category from "@/app/entities/category/category";
-import Order from "@/app/entities/order/order";
-import Quantity from "@/app/entities/quantity/quantity";
-import Size from "@/app/entities/size/size";
 import { TextField } from "@/app/components/modal/field";
-import Modal from "@/app/components/modal/modal";
 import QuantityForm from "@/app/forms/quantity/form";
 import SizeForm from "@/app/forms/size/form";
 import { useSession } from "next-auth/react";
@@ -58,15 +53,17 @@ interface CategoryFormProps {
 }
 
 const CategoryForm = ({ item }: CategoryFormProps) => {
-    const category = item || new Category();
-    const [name, setName] = useState(category.name);
-    const [imagePath, setImagePath] = useState(category.image_path);
+    const [category, setCategory] = useState<Category>(item || new Category());
+
+    const handleInputChange = (field: keyof Category, value: any) => {
+        setCategory(prev => ({ ...prev, [field]: value }));
+    };
 
     return (
         <div className="flex flex-col items-center justify-center p-4">
             <h1 className="text-3xl font-bold mb-6">Categoria</h1>
-            <TextField friendlyName="Nome da Categoria" name="name" placeholder="nome da categoria" setValue={setName} value={name} />
-            <TextField friendlyName="Imagem" name="image_path" placeholder="caminho da imagem" setValue={setImagePath} value={imagePath} />
+            <TextField friendlyName="Nome da Categoria" name="name" placeholder="nome da categoria" setValue={value => handleInputChange('name', value)} value={category.name} />
+            <TextField friendlyName="Imagem" name="image_path" placeholder="caminho da imagem" setValue={value => handleInputChange('image_path', value)} value={category.image_path} />
 
             <ListSize item={category} />
             <ListQuantity item={category} />
