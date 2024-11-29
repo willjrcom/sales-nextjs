@@ -1,7 +1,11 @@
-import{ TextField, DateField, HiddenField } from "../../components/modal/field";
+import { TextField, DateField, HiddenField } from "../../components/modal/field";
 import AddressForm from "../address/form";
 import Person from "@/app/entities/person/person";
 import ContactForm from "../contact/form";
+import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import Contact from "@/app/entities/contact/contact";
+import Address from "@/app/entities/address/address";
 
 interface PersonProps {
     person: Person
@@ -9,9 +13,34 @@ interface PersonProps {
 }
 
 const PersonForm = ({ person, setPerson }: PersonProps) => {
+    const [contact, setContact] = useState<Contact>(person.contact)
+    const [address, setAddress] = useState<Address>(person.address)
+
     const handleInputChange = (field: keyof Person, value: any) => {
-        setPerson(prev => ({ ...prev, [field]: value }));
+        setPerson(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
+    
+    useEffect(() => {
+        handleInputChange('address', address);
+    }, [address]);
+
+    useEffect(() => {
+        handleInputChange('contact', contact);
+    }, [contact]);
+
+    useEffect(() => {
+        let birthday = person.birthday;
+
+        if (!person.birthday) {
+            birthday = new Date().toISOString()
+        }
+
+        handleInputChange('birthday', format(birthday, "yyyy-MM-dd"));
+    }, []);
+
 
     return (
         <>
@@ -23,8 +52,8 @@ const PersonForm = ({ person, setPerson }: PersonProps) => {
 
             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} />
 
-            <ContactForm contact={person.contact} setContact={value => handleInputChange('contact', value)} />
-            <AddressForm address={person.address} setAddress={value => handleInputChange('address', value)} />
+            <ContactForm contactParent={contact} setContactParent={setContact} />
+            <AddressForm addressParent={person.address} setAddressParent={setAddress} />
 
             <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={person.id}/>
         </>

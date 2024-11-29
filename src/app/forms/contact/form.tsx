@@ -1,24 +1,41 @@
-import React from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { TextField } from '../../components/modal/field';
 import Contact from '@/app/entities/contact/contact';
 
 interface ContactFormProps {
-    contact: Contact;
-    setContact: React.Dispatch<React.SetStateAction<Contact>>;
+    contactParent: Contact;
+    setContactParent: Dispatch<SetStateAction<Contact>>;
 }
 
-const ContactForm = ({ contact, setContact }: ContactFormProps) => {
+const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
+
+    // Função para atualizar o estado do contato no componente pai
     const handleInputChange = (field: keyof Contact, value: any) => {
-        setContact(prev => ({ ...prev, [field]: value }));
+        setContactParent(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     return (
         <div className="flex space-x-4">
             <div className="w-1/3">
-                <TextField name="ddd" friendlyName="DDD" placeholder="(xx)" setValue={value => handleInputChange('ddd', value)} value={contact.ddd} />
+                <TextField
+                    name="ddd"
+                    friendlyName="DDD"
+                    placeholder="(xx)"
+                    setValue={value => handleInputChange('ddd', value)}  // Atualizando o estado no componente pai
+                    value={contactParent.ddd}  // Usando o estado diretamente do componente pai
+                />
             </div>
             <div className="w-2/3">
-                <TextField name="number" friendlyName="Contato" placeholder="x xxxx-xxxx" setValue={value => handleInputChange('number', value)} value={contact.number} />
+                <TextField
+                    name="number"
+                    friendlyName="Contato"
+                    placeholder="x xxxx-xxxx"
+                    setValue={value => handleInputChange('number', value)}  // Atualizando o estado no componente pai
+                    value={contactParent.number}  // Usando o estado diretamente do componente pai
+                />
             </div>
         </div>
     );

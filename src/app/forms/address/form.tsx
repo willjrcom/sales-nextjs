@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HiddenField, NumberField, TextField } from '../../components/modal/field';
 import Address from '@/app/entities/address/address';
 
 interface AddressFormProps {
-    address: Address;
-    setAddress: React.Dispatch<React.SetStateAction<Address>>;
+    addressParent: Address;
+    setAddressParent: React.Dispatch<React.SetStateAction<Address>>;
 }
 
-const AddressForm = ({address, setAddress}: AddressFormProps) => {
+const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
+    const [address, setAddress] = useState<Address>(addressParent || new Address());
+
     const handleInputChange = (field: keyof Address, value: any) => {
         setAddress(prev => ({ ...prev, [field]: value }));
+        setAddressParent(prev => ({ ...prev, [field]: value }));
     };
 
     return (

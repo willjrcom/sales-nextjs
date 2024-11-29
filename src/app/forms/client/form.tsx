@@ -17,7 +17,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
     const context = useClients();
-    const [client, setClient] = useState<Client>(item || new Client())
+    const [client, setClient] = useState<Client>(item as Client || new Client())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
@@ -25,7 +25,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const submit = async () => {
         if (!data) return;
         client.birthday = DateComponent(client.birthday)
-        
+        console.log(client)
         const validationErrors = ValidateClientForm(client);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
         
