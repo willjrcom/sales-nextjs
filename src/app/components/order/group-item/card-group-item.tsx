@@ -1,7 +1,8 @@
-import GroupItem from "@/app/entities/order/group-item";
-import ButtonEdit from "../crud/button-edit";
-import EditGroupItem from "./edit-group-item";
+import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
+import ButtonEdit from "../../crud/button-edit";
+import EditGroupItem from "./edit-group-item";
+import { useCurrentOrder } from "@/app/context/current-order/context";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -9,13 +10,18 @@ interface GroupItemCardProps {
 
 const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   const context = useGroupItem();
+  const contextCurrentOrder = useCurrentOrder();
 
   const showStatus = (status: string) => {
-    return status === "Staging" ? "bg-gray-200 text-gray-700" :
-      status === "Pending" ? "bg-yellow-100 text-yellow-800" :
-        status === "Started" ? "bg-blue-100 text-blue-800" :
-          status === "Ready" ? "bg-green-100 text-green-800" :
-            "bg-red-100 text-red-800"
+    const selectStatus = {
+      ["Staging" as StatusGroupItem]: "bg-gray-200 text-gray-700",
+      ["Pending" as StatusGroupItem]: "bg-yellow-100 text-yellow-800",
+      ["Started" as StatusGroupItem]: "bg-blue-100 text-blue-800",
+      ["Ready" as StatusGroupItem]: "bg-green-100 text-green-800",
+      ["Finished" as StatusGroupItem]: "bg-red-100 text-red-800"
+    }
+
+    return selectStatus[status];
   };
 
   const setGroupItem = (groupItem: GroupItem) => {
@@ -32,9 +38,9 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         </span>
 
         <div onClick={() => setGroupItem(groupItem)}>
-        <ButtonEdit modalName={"edit-group-item-" + groupItem.id} name={""} size="xl">
-          <EditGroupItem key={groupItem.id} />
-        </ButtonEdit>
+          <ButtonEdit modalName={"edit-group-item-" + groupItem.id} name={""} size="xl" onCloseModal={contextCurrentOrder.fetchData}>
+            <EditGroupItem key={groupItem.id} />
+          </ButtonEdit>
         </div>
       </div>
 

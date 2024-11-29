@@ -1,9 +1,12 @@
 import { useCategories } from "@/app/context/category/context";
-import CarouselProducts from "./carousel";
-import ItemCard from "./card-item";
+import CarouselProducts from "../product/carousel";
 import { useGroupItem} from "@/app/context/group-item/context";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCurrentOrder } from "@/app/context/current-order/context";
+import ItemCard from "../item/card-item";
+import GroupItem from "@/app/entities/order/group-item";
+import GetGroupItemByID from "@/app/api/group-item/[id]/route";
+import { useSession } from "next-auth/react";
 
 export default function EditGroupItem() {
     return (
@@ -39,23 +42,20 @@ const ListCart = () => {
 const ListGroupItem = () => {
     const contextGroupItem = useGroupItem();
     const contextCurrentOrder = useCurrentOrder();
+    const { data } = useSession();
 
     useEffect(() => {
+        fetchData()
+    }, [contextGroupItem.groupItem])
+
+    const fetchData = async () => {
         if (contextGroupItem.groupItem?.items.length === 0) {
             contextGroupItem.resetGroupItem()
-        } else if (contextGroupItem.groupItem) {
-            let totalPrice = contextGroupItem.groupItem.items?.reduce((total, item) => {
-                if (item.additional_items?.length) {
-                    return total + item.total_price + item.additional_items?.reduce((total, item) => total + item.total_price, 0)
-                }
-                return total + item.total_price
-            }, 0);
-
-            totalPrice += contextGroupItem.groupItem.complement_item?.price || 0
-            const groupItem = { ...contextGroupItem.groupItem, total_price: totalPrice };
-            contextCurrentOrder.updateGroupItem(groupItem)
+        } else if (contextGroupItem.groupItem && data) {
+            const groupItemUpdated = await GetGroupItemByID(contextGroupItem.groupItem.id, data);
+            contextCurrentOrder.updateGroupItem(groupItemUpdated)
         }
-    }, [contextGroupItem.groupItem])
+    }
 
     return (
         < div className="w-80 bg-gray-100 p-4 space-y-4 overflow-y-auto" >
@@ -63,7 +63,7 @@ const ListGroupItem = () => {
 
             {/* Produto Selecionado */}
             <div className="space-y-2">
-                {contextGroupItem.groupItem?.items.map((item, index) => (
+                {contextGroupItem.groupItem?.items?.map((item, index) => (
                     <ItemCard item={item} key={index}/>
                 ))}
             </div>

@@ -1,7 +1,7 @@
 import Item from '@/app/entities/order/item';
 import React, { useState } from 'react';
-import ButtonDelete from '../crud/button-delete';
 import DeleteItemModal from './delete-item-modal';
+import ButtonDelete from '../../crud/button-delete';
 
 interface CardProps {
     item: Item;

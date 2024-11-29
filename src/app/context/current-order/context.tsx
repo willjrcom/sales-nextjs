@@ -34,7 +34,10 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
     const fetchData = async (id?: string) => {
-        if (!data?.user?.idToken || !id) return;
+        if (!data?.user?.idToken || (!id && !order?.id)) return;
+
+        if (!id && order) id = order?.id;
+
         try {
             const order = await GetOrderByID(id as string, data);
             setOrder(order);

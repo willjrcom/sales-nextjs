@@ -1,6 +1,6 @@
 import GroupItem from "@/app/entities/order/group-item"
 import Category from "@/app/entities/category/category";
-import GroupItemCard from "./card-group-item";
+import GroupItemCard from "../group-item/card-group-item";
 
 interface CategoryOrderProps {
     category: Category;

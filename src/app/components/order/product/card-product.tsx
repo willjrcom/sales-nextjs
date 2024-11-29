@@ -1,7 +1,7 @@
 import Product from "@/app/entities/product/product";
 import Image from "next/image";
 import AddProductCard from "@/app/forms/item/form";
-import ButtonPlus from "../crud/button-plus";
+import ButtonPlus from "../../crud/button-plus";
 
 interface ProductCardProps {
     product: Product;

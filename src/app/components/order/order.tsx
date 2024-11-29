@@ -1,33 +1,38 @@
 import ButtonPlus from "@/app/components/crud/button-plus"
-import CategoryOrder from "@/app/components/order/category"
+import CategoryOrder from "@/app/components/order/category/category"
 import { useCategories } from "@/app/context/category/context"
 import GroupItem from "@/app/entities/order/group-item"
 import { useEffect, useState } from "react"
-import EditGroupItem from "./edit-group-item"
+import EditGroupItem from "./group-item/edit-group-item"
 import { useCurrentOrder } from "@/app/context/current-order/context"
 import { useGroupItem } from "@/app/context/group-item/context"
 import Order from "@/app/entities/order/order"
+import GetOrderByID from "@/app/api/order/[id]/route"
+import { useSession } from "next-auth/react"
 
 const OrderManager = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
     const contextCategories = useCategories();
     const context = useCurrentOrder();
     const contextGroupItem = useGroupItem();
-    const [order, setOrder] = useState<Order | null>(context.order)
+    const [order, setOrder] = useState<Order | null>(context.order || new Order());
+    const { data } = useSession();
 
     useEffect(() => {
         if (!context.order) return
         const items = groupBy(context.order.groups, "category_id");
         setGroupedItems(items);
-    }, [context.order, contextGroupItem.groupItem]);
+    }, [context.order]);
 
     useEffect(() => {
-        if (!context.order) return
-        const newOrder = context.order;
-        newOrder.total_payable = newOrder?.groups?.reduce((total, group) => total + (group.total_price || 0), 0);
-        setOrder(newOrder)
-        console.log(newOrder)
+        fetchOrder()
     }, [context.order])
+
+    const fetchOrder = async () => {
+        if (!context.order || !data) return
+        const orderUpdated = await GetOrderByID(context.order.id, data);
+        setOrder(orderUpdated);
+    }
 
     return (
         <div className="flex h-[80vh] bg-gray-100">
