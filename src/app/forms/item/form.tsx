@@ -44,19 +44,7 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
       }
 
       const response = await NewItem(body, data)
-      console.log("item.id: " + response.item_id || response);
-
-      if (!contextGroupItem.groupItem) {
-        const groupItem = await contextGroupItem.fetchData(response.group_item_id);
-
-        if (!groupItem) return;
-        contextCurrentOrder.addGroupItem(groupItem)
-
-      } else {
-        const item = new Item(response.item_id, product.name, product.price, quantity.quantity, product.size.name, product.id, response.group_item_id, observation, product.description)
-        contextGroupItem.addItem(item);
-        contextCurrentOrder.updateGroupItem({ ...contextGroupItem.groupItem, items: [...contextGroupItem.groupItem.items, item] });
-      }
+      contextGroupItem.fetchData(response.group_item_id);
 
       modalHandler.hideModal(modalName);
     } catch (error) {

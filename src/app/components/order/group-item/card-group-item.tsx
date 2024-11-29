@@ -9,7 +9,7 @@ interface GroupItemCardProps {
 }
 
 const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
-  const context = useGroupItem();
+  const contextGroupItem = useGroupItem();
   const contextCurrentOrder = useCurrentOrder();
 
   const showStatus = (status: string) => {
@@ -25,8 +25,8 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   };
 
   const setGroupItem = (groupItem: GroupItem) => {
-    if (!context || !groupItem) return;
-    context.updateGroupItem(groupItem);
+    if (!contextGroupItem || !groupItem) return;
+    contextGroupItem.updateGroupItem(groupItem);
   }
 
   return (

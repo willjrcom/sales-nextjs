@@ -3,7 +3,6 @@ import DeleteItem from "@/app/api/item/delete/route";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
-import GroupItem from "@/app/entities/order/group-item";
 import Item from "@/app/entities/order/item";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -15,7 +14,6 @@ interface DeleteItemModalProps {
 const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
     const [error, setError] = useState<RequestError | null>(null);
     const contextGroupItem = useGroupItem();
-    const contextCurrentOrder = useCurrentOrder();
     const modalHandler = useModal();
     const { data } = useSession();
     const modalName = "delete-item-" + item.id;
@@ -27,9 +25,10 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
             setError(null)
 
             if (contextGroupItem.groupItem?.items.length === 1 && contextGroupItem.groupItem.items[0].id == item.id) {
-                contextCurrentOrder.removeGroupItem(contextGroupItem.groupItem)
+                contextGroupItem.resetGroupItem()
+            } else {
+                contextGroupItem.fetchData(contextGroupItem.groupItem?.id || "")
             }
-            contextGroupItem.removeItem(item.id)
 
             modalHandler.hideModal(modalName)
         } catch (error) {

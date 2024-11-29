@@ -1,12 +1,9 @@
 import { useCategories } from "@/app/context/category/context";
 import CarouselProducts from "../product/carousel";
-import { useGroupItem} from "@/app/context/group-item/context";
+import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
-import { useCurrentOrder } from "@/app/context/current-order/context";
 import ItemCard from "../item/card-item";
 import GroupItem from "@/app/entities/order/group-item";
-import GetGroupItemByID from "@/app/api/group-item/[id]/route";
-import { useSession } from "next-auth/react";
 
 export default function EditGroupItem() {
     return (
@@ -41,22 +38,13 @@ const ListCart = () => {
 
 const ListGroupItem = () => {
     const contextGroupItem = useGroupItem();
-    const contextCurrentOrder = useCurrentOrder();
-    const { data } = useSession();
+    const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
 
     useEffect(() => {
-        fetchData()
-    }, [contextGroupItem.groupItem])
-
-    const fetchData = async () => {
-        if (contextGroupItem.groupItem?.items.length === 0) {
-            contextGroupItem.resetGroupItem()
-        } else if (contextGroupItem.groupItem && data) {
-            const groupItemUpdated = await GetGroupItemByID(contextGroupItem.groupItem.id, data);
-            contextCurrentOrder.updateGroupItem(groupItemUpdated)
-        }
-    }
-
+        setGroupItem(contextGroupItem.groupItem);
+        console.log(contextGroupItem.groupItem)
+    }, [contextGroupItem.groupItem]);
+    
     return (
         < div className="w-80 bg-gray-100 p-4 space-y-4 overflow-y-auto" >
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
@@ -64,13 +52,13 @@ const ListGroupItem = () => {
             {/* Produto Selecionado */}
             <div className="space-y-2">
                 {contextGroupItem.groupItem?.items?.map((item, index) => (
-                    <ItemCard item={item} key={index}/>
+                    <ItemCard item={item} key={index} />
                 ))}
             </div>
 
             {/* Total e Botão */}
             <div>
-                <p className="text-xl font-bold">R$ {contextGroupItem.groupItem?.total_price.toFixed(2) || "0,00"}</p>
+                <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
             </div>
         </div >
     )
