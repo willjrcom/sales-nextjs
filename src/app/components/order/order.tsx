@@ -9,6 +9,8 @@ import { useGroupItem } from "@/app/context/group-item/context"
 import Order from "@/app/entities/order/order"
 import GetOrderByID from "@/app/api/order/[id]/route"
 import { useSession } from "next-auth/react"
+import PendingOrder from "@/app/api/order/status/pending/route"
+import RequestError from "@/app/api/error"
 
 const OrderManager = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
@@ -68,11 +70,25 @@ interface OrderManagerProps {
 }
 
 const ConfirmOrder = ({ order }: OrderManagerProps) => {
+    const { data } = useSession();
+    const [error, setError] = useState<RequestError | null>(null)
+
+    const onSubmit = async () => {
+        if (!order || !data) return
+
+        try {
+            await PendingOrder(order, data)
+            setError(null)
+        } catch(error) {
+            setError(error as RequestError)
+        }
+    }
     return (
         <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
             {/* Fechar Pedido */}
             <div className="bg-yellow-100 p-4 rounded-lg mb-4">
-                <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4">
+                {error && <p className="mb-4 text-red-500">{error.message}</p>}
+                <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
                     Fechar Pedido
                 </button>
                 <p>Subtotal: R$ {order?.total_payable}</p>
