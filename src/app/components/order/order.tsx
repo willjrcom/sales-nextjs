@@ -85,12 +85,12 @@ const ConfirmOrder = ({ order }: OrderManagerProps) => {
     }
     return (
         <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
-            {/* Fechar Pedido */}
+            {/* Lançar Pedido */}
             <div className="bg-yellow-100 p-4 rounded-lg mb-4">
                 {error && <p className="mb-4 text-red-500">{error.message}</p>}
-                <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
-                    Fechar Pedido
-                </button>
+                {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
+                    Lançar Pedido
+                </button>}
                 <p>Subtotal: R$ {order?.total_payable}</p>
                 {order?.delivery?.delivery_tax && <p>Taxa de entrega: R$ {order.delivery.delivery_tax}</p>}
                 {/* <p>Desconto: R$ 5,00</p> */}
