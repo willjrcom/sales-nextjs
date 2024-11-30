@@ -11,20 +11,13 @@ import GetOrderByID from "@/app/api/order/[id]/route"
 import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
+import ButtonEdit from "../crud/button-edit"
+import ClientForm from "@/app/forms/client/form"
 
 const OrderManager = () => {
-    const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
-    const contextCategories = useCategories();
     const context = useCurrentOrder();
-    const contextGroupItem = useGroupItem();
     const [order, setOrder] = useState<Order | null>(context.order || new Order());
     const { data } = useSession();
-
-    useEffect(() => {
-        if (!context.order) return
-        const items = groupBy(context.order.groups, "category_id");
-        setGroupedItems(items);
-    }, [context.order]);
 
     useEffect(() => {
         fetchOrder()
@@ -38,32 +31,50 @@ const OrderManager = () => {
 
     return (
         <div className="flex h-[80vh] bg-gray-100">
-            {/* Lado Esquerdo */}
-            <div className="flex-1 p-4 bg-white overflow-y-auto">
-                <div className="flex justify-between items-center mb-2">
-                    <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
-                    <div onClick={() => contextGroupItem.resetGroupItem()}>
-                        <ButtonPlus size="xl" name="item" modalName="edit-group-item">
-                            <EditGroupItem />
-                        </ButtonPlus>
-                    </div>
-                </div>
 
-                {Object.entries(groupedItems).map(([key, groups], index) => {
-                    if (contextCategories.items.length === 0) return
-                    const category = contextCategories.findByID(key)
-                    if (!category) return
-                    return (
-                        <CategoryOrder key={index} category={category} groups={groups} />
-                    )
-                })}
-            </div>
-
-            {/* Lado Direito */}
+            <Cart order={order} />
             <ConfirmOrder order={order}/>
         </div>
     )
 };
+
+interface CartProps {
+    order: Order | null;
+}
+
+const Cart = ({ order }: CartProps) => {
+    const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
+    const contextCategories = useCategories();
+    const contextGroupItem = useGroupItem();
+
+    useEffect(() => {
+        if (!order) return
+        const items = groupBy(order.groups, "category_id");
+        setGroupedItems(items);
+    }, [order]);
+
+    return (
+        <div className="flex-1 p-4 bg-white overflow-y-auto">
+        <div className="flex justify-between items-center mb-2">
+            <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
+            <div onClick={() => contextGroupItem.resetGroupItem()}>
+                <ButtonPlus size="xl" name="item" modalName="edit-group-item">
+                    <EditGroupItem />
+                </ButtonPlus>
+            </div>
+        </div>
+
+        {Object.entries(groupedItems).map(([key, groups], index) => {
+            if (contextCategories.items.length === 0) return
+            const category = contextCategories.findByID(key)
+            if (!category) return
+            return (
+                <CategoryOrder key={index} category={category} groups={groups} />
+            )
+        })}
+    </div>
+    )
+}
 
 interface OrderManagerProps {
     order: Order | null;
@@ -98,18 +109,36 @@ const ConfirmOrder = ({ order }: OrderManagerProps) => {
                 <p className="font-bold">Total: R$ {(order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)}</p>
             </div>
 
-            {/* Entrega */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="font-bold mb-2">Entrega</h2>
-                <p>William A. G. Junior</p>
-                <p>Endereço: Rua Piedade 226, Jardim Leocadia</p>
-                <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg">
-                    Alterar Endereço
-                </button>
-            </div>
+            {order?.delivery && <DeliveryCard order={order} />}
         </div>
     );
 };
+
+interface DeliveryCardProps {
+    order: Order | null
+}
+
+const DeliveryCard = ({ order }: DeliveryCardProps) => {
+    const client = order?.delivery?.client;
+    console.log(client)
+    const address = client?.address;
+    return (
+        <div className="bg-white p-4 rounded-lg shadow-md">
+                <div className="flex justify-between items-center">
+                    <h2 className="font-bold mb-2">Entrega</h2>
+                    <ButtonEdit modalName={"edit-client" + order?.delivery?.client_id} name="Cliente" size="md">
+                        <ClientForm isUpdate={true} item={order?.delivery?.client}/>
+                    </ButtonEdit>
+                </div>
+
+                <p>{client?.name}</p>
+                <p>Endereço: {address?.street}, {address?.number}</p>
+                <p>Bairro: {address?.neighborhood}</p>
+                <p>Cidade: {address?.city}</p>
+                <p>Cep: {address?.cep}</p>
+            </div>
+    )
+}
 
 function groupBy<T extends Record<string, any>>(array: T[], key: keyof T): Record<string, T[]> {
     if (!array || array.length === 0) {

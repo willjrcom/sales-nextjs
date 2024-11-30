@@ -8,7 +8,6 @@ interface ContactFormProps {
 }
 
 const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
-
     // Função para atualizar o estado do contato no componente pai
     const handleInputChange = (field: keyof Contact, value: any) => {
         setContactParent(prev => ({

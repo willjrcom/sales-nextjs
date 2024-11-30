@@ -42,7 +42,6 @@ const ListGroupItem = () => {
 
     useEffect(() => {
         setGroupItem(contextGroupItem.groupItem);
-        console.log(contextGroupItem.groupItem)
     }, [contextGroupItem.groupItem]);
     
     return (
