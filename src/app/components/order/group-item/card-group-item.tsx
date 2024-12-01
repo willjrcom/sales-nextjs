@@ -54,6 +54,12 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         </p>
 
       </div>
+
+      {/* Schedule */}
+      {groupItem.start_at && <p className="text-sm font-bold text-gray-800">
+        {groupItem.start_at?.toLocaleString("pt-BR", { timeZone: "UTC" })}
+      </p>}
+
       {/* Itens */}
       <div className="space-y-3">
         <h3 className="text-md font-semibold border-b pb-2">Itens</h3>

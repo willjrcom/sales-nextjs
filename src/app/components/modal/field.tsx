@@ -20,11 +20,19 @@ interface NumberFieldProps {
 }
 
 interface DateFieldProps {
-    friendlyName: string
-    name: string
-    disabled?: boolean
-    value: string
-    setValue: Dispatch<SetStateAction<string>>
+    friendlyName: string;
+    name: string;
+    disabled?: boolean;
+    value?: Date | null; // Permitir undefined além de Date e null
+    setValue: Dispatch<SetStateAction<Date | null>>; // Continua permitindo null como valor inicial
+}
+
+interface DateTimeFieldProps {
+    friendlyName: string;
+    name: string;
+    disabled?: boolean;
+    value: Date | null | undefined; // Permite null para valores não definidos
+    setValue: React.Dispatch<React.SetStateAction<Date | null | undefined>>;
 }
 
 interface CheckboxFieldProps {
@@ -66,9 +74,9 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
     return (
         <div className="mb-4">
             {friendlyName !== '' &&
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
-                {friendlyName}
-            </label>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
+                    {friendlyName}
+                </label>
             }
 
             <input
@@ -86,7 +94,7 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
 }
 
 const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue }: NumberFieldProps) => {
-    
+
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
@@ -109,21 +117,51 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
 const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldProps) => {
     return (
         <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
                 {friendlyName}
             </label>
 
             <input
-                className={InputClassName}
+                className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 id={name}
                 type="date"
                 disabled={disabled}
-                value={value}
-                onChange={e => setValue(e.target.value)}
+                value={value ? value.toISOString().split('T')[0] : ""}
+                onChange={e => setValue(new Date(e.target.value))}
             />
         </div>
-    )
-}
+    );
+};
+
+const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTimeFieldProps) => {
+    const formatDateTime = (date: Date | null | undefined): string => {
+        const newDate = date ? new Date(date) : null;
+        // Verifica se o valor é um objeto Date válido
+        if (!newDate || !(newDate instanceof Date) || isNaN(newDate.getTime())) return ""; 
+        
+        return newDate.toISOString().slice(0, 16); // Formata para YYYY-MM-DDTHH:mm
+    };
+
+    return (
+        <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+                {friendlyName}
+            </label>
+
+            <input
+                className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                id={name}
+                type="datetime-local"
+                disabled={disabled}
+                value={formatDateTime(value)} // Formata o valor para o input
+                onChange={(e) => {
+                    const dateValue = e.target.value ? new Date(e.target.value) : undefined;
+                    setValue(dateValue); // Atualiza para `Date` ou `undefined`
+                }}
+            />
+        </div>
+    );
+};
 
 const CheckboxField = ({ friendlyName, name, placeholder, disabled, value, setValue }: CheckboxFieldProps) => {
     return (
@@ -185,22 +223,22 @@ const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setS
             {friendlyName}
         </label>
         {values.length === 0 && <p className="text-gray-600">Nenhuma opção disponível</p>}
-        {values.length > 0 && 
-        <select
-            id={name}
-            name={name}
-            disabled={disabled}
-            value={selectedValue}
-            onChange={(e) => setSelectedValue(e.target.value)}
-            className="form-select block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-        >
-            <option value="" disabled>Selecione uma opção</option>
-            {values.map((valueObj) => (
-                <option key={valueObj.id} value={valueObj.id}>{valueObj.name}</option>
-            ))}
-        </select>
+        {values.length > 0 &&
+            <select
+                id={name}
+                name={name}
+                disabled={disabled}
+                value={selectedValue}
+                onChange={(e) => setSelectedValue(e.target.value)}
+                className="form-select block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+                <option value="" disabled>Selecione uma opção</option>
+                {values.map((valueObj) => (
+                    <option key={valueObj.id} value={valueObj.id}>{valueObj.name}</option>
+                ))}
+            </select>
         }
     </div>
 );
 
-export { TextField, NumberField, DateField, CheckboxField, RadioField, HiddenField, SelectField }
+export { TextField, NumberField, DateField, DateTimeField, CheckboxField, RadioField, HiddenField, SelectField }

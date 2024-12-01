@@ -3,8 +3,10 @@ import CarouselProducts from "../product/carousel";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
 import ItemCard from "../item/card-item";
-import GroupItem from "@/app/entities/order/group-item";
+import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import Category from "@/app/entities/category/category";
+import ButtonPlus from "../../crud/button-plus";
+import GroupItemForm from "@/app/forms/group-item/form";
 
 export default function EditGroupItem() {
     return (
@@ -21,7 +23,6 @@ const ListCartToAdd = () => {
     const contextGroupItem = useGroupItem();
 
     useEffect(() => {
-        console.log(contextGroupItem.groupItem)
         if (contextGroupItem.groupItem?.category_id) {
             setCategories(categories.filter((category) => category.id === contextGroupItem.groupItem?.category_id));
             return
@@ -68,10 +69,10 @@ const ListGroupItem = () => {
                 ))}
             </div>
 
-            {/* Total e Botão */}
-            <div>
-                <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
-            </div>
-        </div >
+            <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
+            {groupItem?.status == "Staging" as StatusGroupItem && 
+                <GroupItemForm item={groupItem} />
+            }
+        </div>
     )
 }

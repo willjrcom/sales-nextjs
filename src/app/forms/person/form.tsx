@@ -33,11 +33,6 @@ const PersonForm = ({ person, setPerson }: PersonProps) => {
 
     useEffect(() => {
         let birthday = person.birthday;
-
-        if (!person.birthday) {
-            birthday = new Date().toISOString()
-        }
-
         handleInputChange('birthday', format(birthday, "yyyy-MM-dd"));
     }, []);
 
