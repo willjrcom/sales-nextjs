@@ -12,11 +12,11 @@ import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
 import ButtonEdit from "../crud/button-edit"
-import ClientForm from "@/app/forms/client/form"
+import ClientAddressForm from "@/app/forms/client/update-address-order"
 
 const OrderManager = () => {
     const context = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(context.order || new Order());
+    const [order, setOrder] = useState<Order | null>(context.order);
     const { data } = useSession();
 
     useEffect(() => {
@@ -126,8 +126,8 @@ const DeliveryCard = ({ order }: DeliveryCardProps) => {
         <div className="bg-white p-4 rounded-lg shadow-md">
                 <div className="flex justify-between items-center">
                     <h2 className="font-bold mb-2">Entrega</h2>
-                    <ButtonEdit modalName={"edit-client" + order?.delivery?.client_id} name="Cliente" size="md">
-                        <ClientForm isUpdate={true} item={order?.delivery?.client}/>
+                    <ButtonEdit modalName={"edit-client-" + order?.delivery?.client_id} name="Cliente" size="md">
+                        <ClientAddressForm item={order?.delivery?.client} deliveryOrderId={order?.delivery?.id}/>
                     </ButtonEdit>
                 </div>
 

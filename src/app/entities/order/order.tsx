@@ -4,8 +4,6 @@ import OrderDelivery from "./orderDelivery";
 import OrderPickup from "./orderPickup";
 import OrderTable from "./orderTable";
 
-type Timestamp = string | null;
-
 type StatusOrder = "Staging" | "Pending" | "Finished" | "Canceled" | "Archived";
 
 export default class Order {
@@ -25,13 +23,12 @@ export default class Order {
     delivery?: OrderDelivery = new OrderDelivery();
     table?: OrderTable = new OrderTable();
     pickup?: OrderPickup = new OrderPickup();
-    start_at?: Timestamp = "";
-    pending_at?: Timestamp = "";
-    finished_at?: Timestamp = "";
-    canceled_at?: Timestamp = "";
-    archived_at?: Timestamp = "";
+    pending_at?: Date;
+    finished_at?: Date;
+    canceled_at?: Date;
+    archived_at?: Date;
 
-    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", groups: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", start_at = "", pending_at = "", finished_at = "", canceled_at = "", archived_at = "") {
+    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", groups: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", pending_at: Date, finished_at: Date, canceled_at: Date, archived_at: Date) {
         this.id = id;
         this.order_number = order_number;
         this.status = status;
@@ -43,7 +40,6 @@ export default class Order {
         this.quantity_items = quantity_items;
         this.observation = observation;
         this.attendant_id = attendant_id;
-        this.start_at = start_at;
         this.pending_at = pending_at;
         this.finished_at = finished_at;
         this.canceled_at = canceled_at;
@@ -51,8 +47,8 @@ export default class Order {
     }
 }
 
-interface PaymentOrder {
-    id: string;
-    amount: number;
-    method: string;
+export class PaymentOrder {
+    id: string = "";
+    amount: number = 0;
+    method: string = "";
 }
