@@ -7,11 +7,17 @@ interface NewButtonProps {
     modalName: string
     name: string;
     size?: 'sm' | 'md' | 'lg' | 'xl'
+    onCloseModal?: () => void;
     children: React.ReactNode;
 }
 
-const ButtonPlus = ({ modalName, name, size = 'sm', children }: NewButtonProps) => {
+const ButtonPlus = ({ modalName, name, size = 'sm', onCloseModal, children }: NewButtonProps) => {
     const modalHandler = useModal();
+
+    const onClose = () => {
+        if (onCloseModal) onCloseModal();
+        modalHandler.hideModal(modalName)
+    }
 
     return (
         <div>
@@ -20,7 +26,7 @@ const ButtonPlus = ({ modalName, name, size = 'sm', children }: NewButtonProps) 
                 {name && <span>{name}</span>}
             </button>
 
-            <Modal title={name} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
+            <Modal title={name} size={size} show={modalHandler.isModalOpen(modalName)} onClose={onClose}>
                 {children}
             </Modal>
         </div>

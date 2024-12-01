@@ -4,24 +4,37 @@ import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
 import ItemCard from "../item/card-item";
 import GroupItem from "@/app/entities/order/group-item";
+import Category from "@/app/entities/category/category";
 
 export default function EditGroupItem() {
     return (
         <div className="flex h-[70vh] bg-gray-200 p-4 overflow-hidden">
-            <ListCart />
+            <ListCartToAdd />
             <ListGroupItem />
         </div >
     );
 }
 
-const ListCart = () => {
-    const contextCategory = useCategories();
+const ListCartToAdd = () => {
+    const allCategories = useCategories().items
+    const [categories, setCategories] = useState<Category[]>(allCategories);
+    const contextGroupItem = useGroupItem();
+
+    useEffect(() => {
+        console.log(contextGroupItem.groupItem)
+        if (contextGroupItem.groupItem?.category_id) {
+            setCategories(categories.filter((category) => category.id === contextGroupItem.groupItem?.category_id));
+            return
+        }
+
+        setCategories(allCategories);
+    }, [contextGroupItem.groupItem])
 
     return (
         <div className="flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto">
             <h1 className="text-2xl font-bold">Produtos</h1>
             <div>
-                {contextCategory.items.map((category) => {
+                {categories?.map((category) => {
                     if (!category.products) return;
                     return (
                         <div key={category.id} className="mb-6">

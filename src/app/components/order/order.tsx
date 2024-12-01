@@ -32,7 +32,7 @@ const OrderManager = () => {
     return (
         <div className="flex h-[80vh] bg-gray-100">
 
-            <Cart order={order} />
+            <CartAdded order={order} />
             <ConfirmOrder order={order}/>
         </div>
     )
@@ -42,10 +42,11 @@ interface CartProps {
     order: Order | null;
 }
 
-const Cart = ({ order }: CartProps) => {
+const CartAdded = ({ order }: CartProps) => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
     const contextCategories = useCategories();
     const contextGroupItem = useGroupItem();
+    const contextCurrentOrder = useCurrentOrder();
 
     useEffect(() => {
         if (!order) return
@@ -58,7 +59,7 @@ const Cart = ({ order }: CartProps) => {
         <div className="flex justify-between items-center mb-2">
             <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
             <div onClick={() => contextGroupItem.resetGroupItem()}>
-                <ButtonPlus size="xl" name="item" modalName="edit-group-item">
+                <ButtonPlus size="xl" name="item" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
                     <EditGroupItem />
                 </ButtonPlus>
             </div>
@@ -120,7 +121,6 @@ interface DeliveryCardProps {
 
 const DeliveryCard = ({ order }: DeliveryCardProps) => {
     const client = order?.delivery?.client;
-    console.log(client)
     const address = client?.address;
     return (
         <div className="bg-white p-4 rounded-lg shadow-md">

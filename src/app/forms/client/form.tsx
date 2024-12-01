@@ -25,7 +25,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const submit = async () => {
         if (!data) return;
         client.birthday = DateComponent(client.birthday)
-        console.log(client)
         const validationErrors = ValidateClientForm(client);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
         
