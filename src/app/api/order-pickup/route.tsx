@@ -1,6 +1,6 @@
 import RequestApi, { AddIdToken } from "../request";
 import { Session } from "next-auth";
-import { OrderPickup } from "@/app/entities/order/orderPickup";
+import { OrderPickup } from "@/app/entities/order/order-pickup";
 
 const GetOrderPickups = async (session: Session): Promise<OrderPickup[]> => {
     const response = await RequestApi<null, OrderPickup[]>({

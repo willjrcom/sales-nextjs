@@ -1,8 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonEdit from "@/app/components/crud/button-edit";
 import Order from "./order";
 import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
+import { showStatus } from "@/app/utils/status";
 
 const OrderColumns = (): ColumnDef<Order>[] => [
   {
@@ -14,6 +14,7 @@ const OrderColumns = (): ColumnDef<Order>[] => [
     id: 'Status',
     accessorKey: 'status',
     header: 'Status',
+    accessorFn: row => showStatus(row.status),
   },
   {
     id: 'Tipo',

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './topbar.module.css';
 import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
 import { FaExclamation, FaExclamationCircle } from 'react-icons/fa';
+import { useCurrentOrder } from '@/app/context/current-order/context';
 
 interface TopbarItemProps {
   label: string;
@@ -36,21 +37,34 @@ const TopbarItemAlert: React.FC<TopbarItemIconProps> = ({ label, icon: Icon, hre
   </Link>
 );
 
-const Topbar = () => (
-  <div className={`${styles.topbar} flex justify-between`}>
-    <div className="flex space-x-4">
-      <TopbarItem label="Pedidos" href="/pages/order-control" />
-      <TopbarItem label="Mesas" href="/pages/order-table-control" />
-      <TopbarItem label="Entregas" href="/pages/delivery-control" />
-      <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href="/pages/current-order" />
-    </div>
+const Topbar = () => {
+  const contextCurrentOrder = useCurrentOrder();
+  const [showCurrentOrder, setCurrentOrder] = useState(false);
 
-    <div className="flex space-x-4">
-      <TopbarItem label="Turno" href="/pages/shift" color='green'/>
-      <div>&nbsp;</div>
-      <TopbarItemIcon icon={IoIosNotifications} href="/" />
+  useEffect(() => {
+    if (contextCurrentOrder.order?.status === "Staging") {
+      setCurrentOrder(true);
+    } else {
+      setCurrentOrder(false);
+    }
+  }, [contextCurrentOrder.order]);
+
+  return (
+    <div className={`${styles.topbar} flex justify-between`}>
+      <div className="flex space-x-4">
+        <TopbarItem label="Pedidos" href="/pages/order-control" />
+        <TopbarItem label="Mesas" href="/pages/order-table-control" />
+        <TopbarItem label="Entregas" href="/pages/delivery-control" />
+        {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
+      </div>
+
+      <div className="flex space-x-4">
+        <TopbarItem label="Turno" href="/pages/shift" color='green'/>
+        <div>&nbsp;</div>
+        <TopbarItemIcon icon={IoIosNotifications} href="/" />
+      </div>
     </div>
-  </div>
-);
+  )
+};
 
 export default Topbar;

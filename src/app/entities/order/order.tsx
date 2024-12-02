@@ -1,8 +1,8 @@
 import Employee from "../employee/employee";
 import GroupItem from "./group-item";
-import OrderDelivery from "./orderDelivery";
-import OrderPickup from "./orderPickup";
-import OrderTable from "./orderTable";
+import OrderDelivery from "./order-delivery";
+import OrderPickup from "./order-pickup";
+import OrderTable from "./order-table";
 
 type StatusOrder = "Staging" | "Pending" | "Finished" | "Canceled" | "Archived";
 

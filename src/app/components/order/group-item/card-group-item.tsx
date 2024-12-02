@@ -5,6 +5,7 @@ import EditGroupItem from "./edit-group-item";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { FaClock } from "react-icons/fa";
+import { showStatus } from "@/app/utils/status";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -14,7 +15,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   const contextGroupItem = useGroupItem();
   const contextCurrentOrder = useCurrentOrder();
 
-  const showStatus = (status: string) => {
+  const styleStatus = (status: string) => {
     const selectStatus = {
       ["Staging" as StatusGroupItem]: "bg-gray-200 text-gray-700",
       ["Pending" as StatusGroupItem]: "bg-yellow-100 text-yellow-800",
@@ -35,8 +36,8 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <span className={`px-3 py-1 text-sm font-semibold rounded-full ${showStatus(groupItem.status)}`}>
-          {groupItem.status}
+        <span className={`px-3 py-1 text-sm font-semibold rounded-full ${styleStatus(groupItem.status)}`}>
+          {showStatus(groupItem.status)}
         </span>
 
         <div onClick={() => setGroupItem(groupItem)}>

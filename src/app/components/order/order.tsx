@@ -13,6 +13,7 @@ import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
 import ButtonEdit from "../crud/button-edit"
 import ClientAddressForm from "@/app/forms/client/update-address-order"
+import { showStatus } from "@/app/utils/status"
 
 const OrderManager = () => {
     const context = useCurrentOrder();
@@ -33,7 +34,7 @@ const OrderManager = () => {
         <div className="flex h-[80vh] bg-gray-100">
 
             <CartAdded order={order} />
-            <ConfirmOrder order={order}/>
+            <ConfirmOrder order={order} />
         </div>
     )
 };
@@ -56,24 +57,24 @@ const CartAdded = ({ order }: CartProps) => {
 
     return (
         <div className="flex-1 p-4 bg-white overflow-y-auto">
-        <div className="flex justify-between items-center mb-2">
-            <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
-            <div onClick={() => contextGroupItem.resetGroupItem()}>
-                <ButtonPlus size="xl" name="item" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
-                    <EditGroupItem />
-                </ButtonPlus>
+            <div className="flex justify-between items-center mb-2">
+                <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
+                <div onClick={() => contextGroupItem.resetGroupItem()}>
+                    <ButtonPlus size="xl" name="item" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
+                        <EditGroupItem />
+                    </ButtonPlus>
+                </div>
             </div>
-        </div>
 
-        {Object.entries(groupedItems).map(([key, groups], index) => {
-            if (contextCategories.items.length === 0) return
-            const category = contextCategories.findByID(key)
-            if (!category) return
-            return (
-                <CategoryOrder key={index} category={category} groups={groups} />
-            )
-        })}
-    </div>
+            {Object.entries(groupedItems).map(([key, groups], index) => {
+                if (contextCategories.items.length === 0) return
+                const category = contextCategories.findByID(key)
+                if (!category) return
+                return (
+                    <CategoryOrder key={index} category={category} groups={groups} />
+                )
+            })}
+        </div>
     )
 }
 
@@ -82,6 +83,23 @@ interface OrderManagerProps {
 }
 
 const ConfirmOrder = ({ order }: OrderManagerProps) => {
+
+
+    return (
+        <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
+            {/* Lançar Pedido */}
+
+            <DataOrderCard order={order} />
+            {order?.delivery && <DeliveryCard order={order} />}
+        </div>
+    );
+};
+
+interface DataOrderCardProps {
+    order: Order | null;
+}
+
+const DataOrderCard = ({ order }: DataOrderCardProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
 
@@ -91,30 +109,27 @@ const ConfirmOrder = ({ order }: OrderManagerProps) => {
         try {
             await PendingOrder(order, data)
             setError(null)
-        } catch(error) {
+        } catch (error) {
             setError(error as RequestError)
         }
     }
+
     return (
-        <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
-            {/* Lançar Pedido */}
-            <div className="bg-yellow-100 p-4 rounded-lg mb-4">
-                {error && <p className="mb-4 text-red-500">{error.message}</p>}
-                {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
-                    Lançar Pedido
-                </button>}
-                <p>Subtotal: R$ {order?.total_payable}</p>
-                {order?.delivery?.delivery_tax && <p>Taxa de entrega: R$ {order.delivery.delivery_tax}</p>}
-                {/* <p>Desconto: R$ 5,00</p> */}
-                <hr className="my-2" />
-                <p className="font-bold">Total: R$ {(order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)}</p>
-            </div>
-
-            {order?.delivery && <DeliveryCard order={order} />}
+        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
+            {order?.status && <p><strong>Status:</strong> {showStatus(order?.status)}</p>}
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
+                Lançar Pedido
+            </button>}
+            <p><strong>Subtotal:</strong> R$ {order?.total_payable}</p>
+            {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax}</p>}
+            {/* <p>Desconto: R$ 5,00</p> */}
+            <hr className="my-2" />
+            <p><strong>Total:</strong> R$ {(order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)}</p>
         </div>
-    );
-};
-
+    )
+}
 interface DeliveryCardProps {
     order: Order | null
 }
@@ -123,20 +138,20 @@ const DeliveryCard = ({ order }: DeliveryCardProps) => {
     const client = order?.delivery?.client;
     const address = client?.address;
     return (
-        <div className="bg-white p-4 rounded-lg shadow-md">
-                <div className="flex justify-between items-center">
-                    <h2 className="font-bold mb-2">Entrega</h2>
-                    <ButtonEdit modalName={"edit-client-" + order?.delivery?.client_id} name="Cliente" size="md">
-                        <ClientAddressForm item={order?.delivery?.client} deliveryOrderId={order?.delivery?.id}/>
-                    </ButtonEdit>
-                </div>
-
-                <p>{client?.name}</p>
-                <p>Endereço: {address?.street}, {address?.number}</p>
-                <p>Bairro: {address?.neighborhood}</p>
-                <p>Cidade: {address?.city}</p>
-                <p>Cep: {address?.cep}</p>
+        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <div className="flex justify-between items-center">
+                <h2 className="font-bold mb-2">Entrega</h2>
+                <ButtonEdit modalName={"edit-client-" + order?.delivery?.client_id} name="Cliente" size="md">
+                    <ClientAddressForm item={order?.delivery?.client} deliveryOrderId={order?.delivery?.id} />
+                </ButtonEdit>
             </div>
+
+            <p>{client?.name}</p>
+            <p>Endereço: {address?.street}, {address?.number}</p>
+            <p>Bairro: {address?.neighborhood}</p>
+            <p>Cidade: {address?.city}</p>
+            <p>Cep: {address?.cep}</p>
+        </div>
     )
 }
 
