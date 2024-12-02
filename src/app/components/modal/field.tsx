@@ -23,16 +23,16 @@ interface DateFieldProps {
     friendlyName: string;
     name: string;
     disabled?: boolean;
-    value?: Date | null; // Permitir undefined além de Date e null
-    setValue: Dispatch<SetStateAction<Date | null>>; // Continua permitindo null como valor inicial
+    value?: string | null | undefined; // Permitir undefined além de Date e null
+    setValue: Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
 }
 
 interface DateTimeFieldProps {
     friendlyName: string;
     name: string;
     disabled?: boolean;
-    value: Date | null | undefined; // Permite null para valores não definidos
-    setValue: React.Dispatch<React.SetStateAction<Date | null | undefined>>;
+    value: string | null | undefined; // Permite null para valores não definidos
+    setValue: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 }
 
 interface CheckboxFieldProps {
@@ -115,6 +115,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
 }
 
 const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldProps) => {
+    console.log(value)
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
@@ -126,15 +127,15 @@ const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldP
                 id={name}
                 type="date"
                 disabled={disabled}
-                value={value ? value.toISOString().split('T')[0] : ""}
-                onChange={e => setValue(new Date(e.target.value))}
+                value={value ? new Date(value).toISOString().split('T')[0] : ""}
+                onChange={e => setValue(e.target.value)}
             />
         </div>
     );
 };
 
 const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTimeFieldProps) => {
-    const formatDateTime = (date: Date | null | undefined): string => {
+    const formatDateTime = (date: string | null | undefined): string => {
         const newDate = date ? new Date(date) : null;
         // Verifica se o valor é um objeto Date válido
         if (!newDate || !(newDate instanceof Date) || isNaN(newDate.getTime())) return ""; 
@@ -154,10 +155,7 @@ const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTi
                 type="datetime-local"
                 disabled={disabled}
                 value={formatDateTime(value)} // Formata o valor para o input
-                onChange={(e) => {
-                    const dateValue = e.target.value ? new Date(e.target.value) : undefined;
-                    setValue(dateValue); // Atualiza para `Date` ou `undefined`
-                }}
+                onChange={(e) => setValue(e.target.value)}
             />
         </div>
     );

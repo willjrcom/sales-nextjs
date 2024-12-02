@@ -5,12 +5,11 @@ import { useEffect, useState } from "react";
 import ItemCard from "../item/card-item";
 import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import Category from "@/app/entities/category/category";
-import ButtonPlus from "../../crud/button-plus";
 import GroupItemForm from "@/app/forms/group-item/form";
 
 export default function EditGroupItem() {
     return (
-        <div className="flex h-[70vh] bg-gray-200 p-4 overflow-hidden">
+        <div className="flex h-[80vh] bg-gray-200 p-4 overflow-hidden">
             <ListCartToAdd />
             <ListGroupItem />
         </div >
@@ -32,7 +31,7 @@ const ListCartToAdd = () => {
     }, [contextGroupItem.groupItem])
 
     return (
-        <div className="flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto">
+        <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto">
             <h1 className="text-2xl font-bold">Produtos</h1>
             <div>
                 {categories?.map((category) => {
@@ -59,7 +58,7 @@ const ListGroupItem = () => {
     }, [contextGroupItem.groupItem]);
     
     return (
-        < div className="w-80 bg-gray-100 p-4 space-y-4 overflow-y-auto" >
+        < div className="max-w-[30vw] bg-gray-100 p-4 space-y-4 overflow-y-auto" >
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
 
             {/* Produto Selecionado */}

@@ -17,13 +17,13 @@ export default class GroupItem {
   category?: Category;
   complement_item_id?: string = "";
   complement_item?: Item;
-  start_at?: Date;
-  pending_at?: Date;
-  started_at?: Date;
-  ready_at?: Date;
-  canceled_at?: Date;
+  start_at?: string;
+  pending_at?: string;
+  started_at?: string;
+  ready_at?: string;
+  canceled_at?: string;
 
-  constructor(id = "", items: Item[] = [], order_id = "", size = "", status: StatusGroupItem = "Staging", total_price = 0, quantity = 0, need_print = false, category_id = "", complement_item_id = "", start_at?: Date, pending_at?: Date, started_at?: Date, ready_at?: Date, canceled_at?: Date) {
+  constructor(id = "", items: Item[] = [], order_id = "", size = "", status: StatusGroupItem = "Staging", total_price = 0, quantity = 0, need_print = false, category_id = "", complement_item_id = "", start_at?: string, pending_at?: string, started_at?: string, ready_at?: string, canceled_at?: string) {
     this.id = id;
     this.items = items;
     this.order_id = order_id;

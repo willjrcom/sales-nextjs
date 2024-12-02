@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import PersonForm from '../person/form';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ValidateClientForm } from '@/app/entities/client/client';
-import DateComponent from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import DeleteClient from '@/app/api/client/delete/route';
 import { useClients } from '@/app/context/client/context';
-import NewClient from '@/app/api/client/new/route';
 import UpdateClient from '@/app/api/client/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
@@ -36,7 +32,6 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
 
     const submit = async () => {
         if (!data || !deliveryOrderId) return;
-        client.birthday = DateComponent(client.birthday)
         const validationErrors = ValidateClientForm(client);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
         

@@ -14,6 +14,7 @@ const FetchData = async <T,>({ getItems, setItems, data, setError, setLoading }:
     try {
         setLoading(true);
         const items = await getItems(data)
+        console.log(items)
         setItems(items);
         setError(null);
     } catch (error) {

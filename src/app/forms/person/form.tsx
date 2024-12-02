@@ -2,7 +2,6 @@ import { TextField, DateField, HiddenField } from "../../components/modal/field"
 import AddressForm from "../address/form";
 import Person from "@/app/entities/person/person";
 import ContactForm from "../contact/form";
-import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
@@ -30,12 +29,6 @@ const PersonForm = ({ person, setPerson }: PersonProps) => {
     useEffect(() => {
         handleInputChange('contact', contact);
     }, [contact]);
-
-    useEffect(() => {
-        let birthday = person.birthday;
-        handleInputChange('birthday', format(birthday, "yyyy-MM-dd"));
-    }, []);
-
 
     return (
         <>

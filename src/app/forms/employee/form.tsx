@@ -4,7 +4,6 @@ import Person from '@/app/entities/person/person';
 import Employee, { ValidateEmployeeForm } from '@/app/entities/employee/employee';
 import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
-import DateComponent from '@/app/utils/date';
 import CreateFormsProps from '../create-forms-props';
 import DeleteEmployee from '@/app/api/employee/delete/route';
 import { useEmployees } from '@/app/context/employee/context';
@@ -13,12 +12,13 @@ import UpdateEmployee from '@/app/api/employee/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import { ToIsoDate } from '@/app/utils/date';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
     const modalHandler = useModal();
     const context = useEmployees();
-    const [person, setPerson] = useState<Person>(item || new Person())
+    const [person, setPerson] = useState<Person>(item || new Employee());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
@@ -26,7 +26,10 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const submit = async () => {
         if (!data) return;
         let employee = new Employee(person)
-        employee.birthday = DateComponent(person.birthday)
+
+        if (employee.birthday) {
+            employee.birthday = ToIsoDate(employee.birthday)
+        }
 
         const validationErrors = ValidateEmployeeForm(employee);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);

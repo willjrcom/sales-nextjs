@@ -3,6 +3,8 @@ import { useGroupItem } from "@/app/context/group-item/context";
 import ButtonEdit from "../../crud/button-edit";
 import EditGroupItem from "./edit-group-item";
 import { useCurrentOrder } from "@/app/context/current-order/context";
+import { ToUtcDatetime } from "@/app/utils/date";
+import { FaClock } from "react-icons/fa";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -56,8 +58,8 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
       </div>
 
       {/* Schedule */}
-      {groupItem.start_at && <p className="text-sm font-bold text-gray-800">
-        {groupItem.start_at?.toLocaleString("pt-BR", { timeZone: "UTC" })}
+      {groupItem.start_at && <p className="text-sm font-bold text-gray-800 flex items-center">
+        <FaClock/>&nbsp;Agendado para: {ToUtcDatetime(groupItem.start_at)}
       </p>}
 
       {/* Itens */}
