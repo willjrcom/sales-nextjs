@@ -2,7 +2,7 @@
 
 import CategoryForm from "@/app/forms/category/form";
 import CrudLayout from "@/app/components/crud/layout";
-import ButtonIconText from "@/app/components/crud/button-icon-text";
+import ButtonIconText from "@/app/components/button/button-icon-text";
 import CrudTable from "@/app/components/crud/table";
 import CategoryColumns from "@/app/entities/category/table-columns";
 import Refresh from "@/app/components/crud/refresh";

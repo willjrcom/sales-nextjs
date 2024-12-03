@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Client from "./client";
-import ButtonIcon from "@/app/components/crud/button-icon";
+import ButtonIcon from "@/app/components/button/button-icon";
 import PersonColumns from "../person/table-columns";
 import ClientForm from "@/app/forms/client/form";
 

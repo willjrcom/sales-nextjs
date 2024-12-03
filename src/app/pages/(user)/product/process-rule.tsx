@@ -2,7 +2,7 @@
 
 import ProcessRuleForm from "@/app/forms/process-rule/form";
 import CrudLayout from "@/app/components/crud/layout";
-import ButtonIconText from "@/app/components/crud/button-icon-text";
+import ButtonIconText from "@/app/components/button/button-icon-text";
 import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";
 import Refresh from "@/app/components/crud/refresh";

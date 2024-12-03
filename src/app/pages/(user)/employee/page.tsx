@@ -1,7 +1,7 @@
 'use client';
 
 import EmployeeForm from "@/app/forms/employee/form";
-import ButtonIconText from "@/app/components/crud/button-icon-text";
+import ButtonIconText from "@/app/components/button/button-icon-text";
 import CrudLayout from "@/app/components/crud/layout";
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";

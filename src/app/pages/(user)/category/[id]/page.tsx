@@ -2,7 +2,7 @@
 
 import GetCategoryByID from "@/app/api/category/[id]/route";
 import RequestError from "@/app/api/error";
-import ButtonIconText from "@/app/components/crud/button-icon-text";
+import ButtonIconText from "@/app/components/button/button-icon-text";
 import Category from "@/app/entities/category/category";
 import { TextField } from "@/app/components/modal/field";
 import QuantityForm from "@/app/forms/quantity/form";

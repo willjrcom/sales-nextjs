@@ -1,11 +1,11 @@
-import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
+import GroupItem from "@/app/entities/order/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
-import ButtonIcon from "../../crud/button-icon";
+import ButtonIcon from "../../button/button-icon";
 import EditGroupItem from "./edit-group-item";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { FaClock } from "react-icons/fa";
-import { showStatus } from "@/app/utils/status";
+import StatusComponent from "../../button/show-status";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -14,18 +14,6 @@ interface GroupItemCardProps {
 const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   const contextGroupItem = useGroupItem();
   const contextCurrentOrder = useCurrentOrder();
-
-  const styleStatus = (status: string) => {
-    const selectStatus = {
-      ["Staging" as StatusGroupItem]: "bg-gray-200 text-gray-700",
-      ["Pending" as StatusGroupItem]: "bg-yellow-100 text-yellow-800",
-      ["Started" as StatusGroupItem]: "bg-blue-100 text-blue-800",
-      ["Ready" as StatusGroupItem]: "bg-green-100 text-green-800",
-      ["Finished" as StatusGroupItem]: "bg-red-100 text-red-800"
-    }
-
-    return selectStatus[status];
-  };
 
   const setGroupItem = (groupItem: GroupItem) => {
     if (!contextGroupItem || !groupItem) return;
@@ -36,9 +24,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <span className={`px-3 py-1 text-sm font-semibold rounded-full ${styleStatus(groupItem.status)}`}>
-          {showStatus(groupItem.status)}
-        </span>
+        <StatusComponent status={groupItem.status} />
 
         <div onClick={() => setGroupItem(groupItem)}>
           <ButtonIcon modalName={"edit-group-item-" + groupItem.id} size="xl" onCloseModal={contextCurrentOrder.fetchData}>
@@ -60,7 +46,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
 
       {/* Schedule */}
       {groupItem.start_at && <p className="text-sm font-bold text-gray-800 flex items-center">
-        <FaClock/>&nbsp;Agendado para: {ToUtcDatetime(groupItem.start_at)}
+        <FaClock />&nbsp;Agendado para: {ToUtcDatetime(groupItem.start_at)}
       </p>}
 
       {/* Itens */}

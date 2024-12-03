@@ -1,4 +1,4 @@
-import ButtonIconText from "@/app/components/crud/button-icon-text"
+import ButtonIconText from "@/app/components/button/button-icon-text"
 import CategoryOrder from "@/app/components/order/category/category"
 import { useCategories } from "@/app/context/category/context"
 import GroupItem from "@/app/entities/order/group-item"
@@ -11,10 +11,10 @@ import GetOrderByID from "@/app/api/order/[id]/route"
 import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
-import { showStatus } from "@/app/utils/status"
 import DeliveryCard from "./delivery-order"
 import PickupCard from "./pickup-order"
 import TableCard from "./table-order"
+import StatusComponent from "../button/show-status"
 
 const OrderManager = () => {
     const context = useCurrentOrder();
@@ -110,7 +110,7 @@ const DataOrderCard = ({ order }: CartProps) => {
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
-            {order?.status && <p><strong>Status:</strong> {showStatus(order?.status)}</p>}
+            {order?.status && <p><strong>Status:</strong> <StatusComponent status={order?.status} /></p>}
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
 
             {/* Total do pedido */}

@@ -1,7 +1,8 @@
 import ClientAddressForm from "@/app/forms/client/update-address-order";
-import ButtonIcon from "../crud/button-icon";
+import ButtonIcon from "../button/button-icon";
 import Order from "@/app/entities/order/order";
 import { showStatus } from "@/app/utils/status";
+import StatusComponent from "../button/show-status";
 
 interface OrderProps {
     order: Order | null;
@@ -21,7 +22,7 @@ const DeliveryCard = ({ order }: OrderProps) => {
             </div>
 
             <p>{client?.name}</p>
-            {delivery?.status && <p>Status: {showStatus(delivery?.status)}</p>}
+            {delivery?.status && <p><strong>Status:</strong> <StatusComponent status={delivery?.status} /></p>}
             <p>Endereço: {address?.street}, {address?.number}</p>
             <p>Bairro: {address?.neighborhood}</p>
             <p>Cidade: {address?.city}</p>

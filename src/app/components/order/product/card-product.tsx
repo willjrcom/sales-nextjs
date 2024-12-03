@@ -1,7 +1,7 @@
 import Product from "@/app/entities/product/product";
 import Image from "next/image";
 import AddProductCard from "@/app/forms/item/form";
-import ButtonIconText from "../../crud/button-icon-text";
+import ButtonIconText from "../../button/button-icon-text";
 
 interface ProductCardProps {
     product: Product;

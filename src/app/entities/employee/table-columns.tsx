@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Employee  from "./employee";
-import ButtonIcon from "@/app/components/crud/button-icon";
+import ButtonIcon from "@/app/components/button/button-icon";
 import PersonColumns from "../person/table-columns";
 import EmployeeForm from "@/app/forms/employee/form";
 

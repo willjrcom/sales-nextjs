@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonIcon from "@/app/components/crud/button-icon";
+import ButtonIcon from "@/app/components/button/button-icon";
 import PlaceForm from "@/app/forms/place/form";
 import UpdatePlace from "@/app/api/place/update/route";
 import Place from "./place";

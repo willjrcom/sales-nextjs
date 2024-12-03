@@ -1,6 +1,6 @@
-import { showStatus } from "@/app/utils/status";
-import ButtonIcon from "../crud/button-icon";
+import ButtonIcon from "../button/button-icon";
 import Order from "@/app/entities/order/order";
+import StatusComponent from "../button/show-status";
 
 interface OrderProps {
     order: Order | null;
@@ -19,7 +19,7 @@ const TableCard = ({ order }: OrderProps) => {
             </div>
 
             <p>{table?.name}</p>
-            {table?.status && <p>Status: {showStatus(table?.status)}</p>}
+            {table?.status && <p><strong>Status:</strong> <StatusComponent status={table?.status} /></p>}
         </div>
     )
 }

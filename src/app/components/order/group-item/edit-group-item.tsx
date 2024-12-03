@@ -6,6 +6,8 @@ import ItemCard from "../item/card-item";
 import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import Category from "@/app/entities/category/category";
 import GroupItemForm from "@/app/forms/group-item/form";
+import { group } from "console";
+import StatusComponent from "../../button/show-status";
 
 export default function EditGroupItem() {
     return (
@@ -69,6 +71,7 @@ const ListGroupItem = () => {
             </div>
 
             <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
+            {groupItem?.status && <p><strong>Status:</strong> <StatusComponent status={groupItem.status} /></p>}
             {groupItem?.status == "Staging" as StatusGroupItem && 
                 <GroupItemForm item={groupItem} />
             }

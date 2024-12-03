@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonIcon from "@/app/components/crud/button-icon";
+import ButtonIcon from "@/app/components/button/button-icon";
 import ProcessRuleForm from "@/app/forms/process-rule/form";
 import ProcessRule from "./process-rule";
 

@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Product from "./product";
-import ButtonIcon from "@/app/components/crud/button-icon";
+import ButtonIcon from "@/app/components/button/button-icon";
 import ProductForm from "@/app/forms/product/form";
 
 const ProductColumns = (): ColumnDef<Product>[] => [
