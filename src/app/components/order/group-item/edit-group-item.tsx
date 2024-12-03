@@ -11,12 +11,20 @@ import ProductCard from "../product/card-product";
 
 export default function EditGroupItem() {
     return (
-        <div className="flex h-[68vh] bg-gray-200 p-4 overflow-hidden">
-            <ListCartToAdd />
-            <ListGroupItem />
-        </div >
+        <div className="flex h-[75vh] bg-gray-200 p-4 overflow-hidden">
+            {/* Componente à esquerda: ocupa 70% da tela */}
+            <div className="flex-1 lg:w-[70vw]"> {/* flex-1 para ocupar todo o espaço em telas pequenas */}
+                <ListCartToAdd />
+            </div>
+
+            {/* Componente à direita: escondido em telas pequenas e visível em telas grandes */}
+            <div className="hidden lg:block lg:w-[30vw]"> {/* Escondido em telas pequenas */}
+                <ListGroupItem />
+            </div>
+        </div>
     );
 }
+
 
 const ListCartToAdd = () => {
     const allCategories = useCategories().items
@@ -33,15 +41,16 @@ const ListCartToAdd = () => {
     }, [contextGroupItem?.groupItem?.category_id])
 
     return (
-        <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto">
+        <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto h-full">
             <h1 className="text-2xl font-bold">Produtos</h1>
             <div>
                 {categories?.map((category) => {
                     if (!category.products) return null;
                     return (
                         <div key={category.id} className="mb-6">
-                            <hr className="mb-2" />
                             <span className="text-lg font-semibold">{category.name}</span>
+                            <hr className="mb-2" />
+                            {/* Ajuste o tamanho do Carousel com responsividade */}
                             <Carousel items={category.products}>
                                 {(product) => <ProductCard key={product.id} product={product} />}
                             </Carousel>
@@ -60,9 +69,10 @@ const ListGroupItem = () => {
     useEffect(() => {
         setGroupItem(contextGroupItem.groupItem);
     }, [contextGroupItem.groupItem]);
-    
+
     return (
-        < div className="max-w-[30vw] bg-gray-100 p-4 space-y-4 overflow-y-auto" >
+        <div className="bg-gray-100 p-4 space-y-4 overflow-y-auto min-h-[250px] lg:min-h-[300px] lg:block hidden">
+            {/* Defina o min-h para o tamanho mínimo em telas pequenas, e lg:block para visibilidade em telas grandes */}
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
 
             {/* Produto Selecionado */}
@@ -78,5 +88,5 @@ const ListGroupItem = () => {
                 <GroupItemForm item={groupItem} />
             }
         </div>
-    )
+    );
 }

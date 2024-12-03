@@ -8,7 +8,7 @@ interface OrderProps {
 
 const TableCard = ({ order }: OrderProps) => {
     const table = order?.table;
-    console.log(table)
+    
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <div className="flex justify-between items-center">
