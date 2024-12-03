@@ -5,7 +5,7 @@ import GetOrderByID from "@/app/api/order/[id]/route";
 import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const PageOrderEdit = () => {
     const { id } = useParams();
@@ -13,11 +13,7 @@ const PageOrderEdit = () => {
     const [error, setError] = useState<RequestError | null>(null)
     const { data } = useSession();
 
-    useEffect(() => {
-        getOrder();
-    }, [data]);
-
-    const getOrder = async () => {
+    const getOrder = useCallback(async () => {
         if (!id || !data || !!order) return;
         try {
             const orderFound = await GetOrderByID(id as string, data);
@@ -26,7 +22,12 @@ const PageOrderEdit = () => {
         } catch (error) {
             setError(error as RequestError);
         }
-    }
+    }, [order, data, id]);
+
+    useEffect(() => {
+        getOrder();
+    }, [data, getOrder]);
+
 
     if (!id || !order) {
         return (

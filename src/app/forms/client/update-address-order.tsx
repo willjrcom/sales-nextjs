@@ -28,7 +28,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
 
     useEffect(() => {
         setClient({ ...client, address: address })
-    }, [address])
+    }, [address, client])
 
     const submit = async () => {
         if (!data || !deliveryOrderId) return;

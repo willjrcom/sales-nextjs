@@ -17,7 +17,7 @@ const PageOrder = () => {
                 setOrders([...orders, order])
             }
         }
-    }, [context]);
+    }, [context.items, orders]);
 
     return (
         <>

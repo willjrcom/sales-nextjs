@@ -2,7 +2,7 @@ import ButtonIconText from "@/app/components/button/button-icon-text"
 import CategoryOrder from "@/app/components/order/category/category"
 import { useCategories } from "@/app/context/category/context"
 import GroupItem from "@/app/entities/order/group-item"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import EditGroupItem from "./group-item/edit-group-item"
 import { useCurrentOrder } from "@/app/context/current-order/context"
 import { useGroupItem } from "@/app/context/group-item/context"
@@ -21,15 +21,15 @@ const OrderManager = () => {
     const [order, setOrder] = useState<Order | null>(context.order);
     const { data } = useSession();
 
-    useEffect(() => {
-        fetchOrder()
-    }, [context.order])
-
-    const fetchOrder = async () => {
+    const fetchOrder = useCallback(async () => {
         if (!context.order || !data) return
         const orderUpdated = await GetOrderByID(context.order.id, data);
         setOrder(orderUpdated);
-    }
+    }, [context.order, data]);
+
+    useEffect(() => {
+        fetchOrder()
+    }, [context.order, fetchOrder])
 
     return (
         <div className="flex h-[80vh] bg-gray-100 max-w-[85vw]">

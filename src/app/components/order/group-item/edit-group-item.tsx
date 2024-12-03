@@ -38,7 +38,7 @@ const ListCartToAdd = () => {
         }
 
         setCategories(allCategories);
-    }, [contextGroupItem?.groupItem?.category_id])
+    }, [allCategories, categories, contextGroupItem.groupItem?.category_id])
 
     return (
         <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto h-full">

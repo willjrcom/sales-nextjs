@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/api/error";
@@ -13,11 +13,7 @@ const PageEditOrderControl = () => {
     const { data } = useSession();
     const context = useCurrentOrder();
 
-    useEffect(() => {
-        getOrder();
-    }, [data]);
-
-    const getOrder = async () => {
+    const getOrder = useCallback(async () => {
         if (!id || !data) return;
         try {
             context.fetchData(id as string);
@@ -25,7 +21,12 @@ const PageEditOrderControl = () => {
         } catch (error) {
             setError(error as RequestError);
         }
-    }
+    }, [data, id, context]);
+
+    useEffect(() => {
+        getOrder();
+    }, [data, getOrder]);
+
 
     if (!id || !context.order) {
         return (

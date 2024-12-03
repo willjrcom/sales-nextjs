@@ -9,7 +9,7 @@ import QuantityForm from "@/app/forms/quantity/form";
 import SizeForm from "@/app/forms/size/form";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
@@ -17,11 +17,7 @@ const PageCategoryEdit = () => {
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
-    useEffect(() => {
-        getCategory();
-    }, [data]);
-
-    const getCategory = async () => {
+    const getCategory = useCallback(async () => {
         if (!id || !data || !!category) return;
         try {
             const categoryFound = await GetCategoryByID(id as string, data);
@@ -30,7 +26,12 @@ const PageCategoryEdit = () => {
         } catch (error) {
             setError(error as RequestError);
         }
-    }
+    }, [category, data, id]);
+
+    useEffect(() => {
+        getCategory();
+    }, [data, getCategory]);
+
 
     if (!id || !category) {
         return (

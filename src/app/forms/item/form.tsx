@@ -90,10 +90,10 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
   const [quantities, setQuantities] = useState<Quantity[]>([]);
 
   useEffect(() => {
-    if (!contextCategory) return;
+    if (!contextCategory.items) return;
     const category = contextCategory.findByID(categoryID);
     setQuantities(category?.quantities || []);
-  }, [categoryID])
+  }, [categoryID, contextCategory, contextCategory.items])
 
   return (
     <div className="mb-4">
