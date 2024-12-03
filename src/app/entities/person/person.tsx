@@ -7,11 +7,11 @@ export default class Person {
     name: string = "";
     email: string = "";
     cpf: string = "";
-    birthday?: string;
+    birthday?: string = "";
     contact: Contact = new Contact();
     address: Address = new Address();
 
-    constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string, contact: Contact = new Contact(), address: Address = new Address(), likeTax: boolean = false) {
+    constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), likeTax: boolean = false) {
         this.id = id;
         this.name = name;
         this.email = email;

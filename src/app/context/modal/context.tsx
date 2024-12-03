@@ -1,5 +1,5 @@
 import Modal from "@/app/components/modal/modal";
-import React, { createContext, useContext, ReactNode, useState } from "react";
+import React, { createContext, useContext, ReactNode, useState, useEffect } from "react";
 
 // Interface para as propriedades de um modal
 interface ModalData {
@@ -26,6 +26,12 @@ const ContextModal = createContext<ModalContextProps | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [modals, setModals] = useState<Record<string, ModalData>>({});
+    const [isClient, setIsClient] = useState(false);
+
+    // Garantir que o componente só renderize após o lado do cliente estar disponível
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const showModal = (
         modalName: string,
@@ -55,6 +61,8 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
     const isModalOpen = (modalName: string) => !!modals[modalName];
 
+    if (!isClient) return null; // Previne erros de hidratação
+
     return (
         <ContextModal.Provider value={{ modals, showModal, hideModal, isModalOpen }}>
             {children}
@@ -66,7 +74,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                     title={title}
                     show={true}
                     size={size}
-                    onClose={() => hideModal(modalName)} // Garante o fechamento dinâmico
+                    onClose={onClose} // Garante o fechamento dinâmico
                 >
                     {content}
                 </Modal>

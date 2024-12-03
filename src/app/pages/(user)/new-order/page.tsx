@@ -15,7 +15,7 @@ const PageNewOrder = () => {
   ];
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 min-w-[80vw]">
       {options.map((option) => (
         <Link href={option.route} 
         key={option.id}

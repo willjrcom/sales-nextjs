@@ -14,7 +14,7 @@ const OrderColumns = (): ColumnDef<Order>[] => [
     id: 'Status',
     accessorKey: 'status',
     header: 'Status',
-    accessorFn: row => showStatus(row.status),
+    accessorFn: row => showStatus[row.status],
   },
   {
     id: 'Tipo',

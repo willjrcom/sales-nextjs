@@ -12,11 +12,26 @@ import { ModalProvider } from '@/app/context/modal/context';
 import { CurrentOrderProvider } from '@/app/context/current-order/context';
 import { GroupItemProvider } from '@/app/context/group-item/context';
 
-const Menu = ({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) => {
+const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+  return (
+    <ContextProviders>
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 flex flex-col">
+          <Topbar />
+          <main className="p-4 h-[90vh] min-w-[40vw] max-w-[98vw] overflow-y-auto flex  justify-center">
+            {/* Conteúdo do componente que precisa ser centralizado */}
+            <div className="bg-white p-6 rounded-md shadow-md">
+              {children}
+            </div>
+          </main>
+        </div>
+      </div>
+    </ContextProviders>
+  );
+}
+
+const ContextProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <EmployeeProvider>
       <ClientProvider>
@@ -29,15 +44,7 @@ const Menu = ({
                     <CurrentOrderProvider>
                       <GroupItemProvider>
                         <ModalProvider>
-                          <div className="flex">
-                            <Sidebar />
-                            <div className="flex-1 flex flex-col">
-                              <Topbar />
-                              <main className="p-4 max-h-[90vh] max-w-[98vw] overflow-y-auto">
-                                {children}
-                              </main>
-                            </div>
-                          </div>
+                          {children}
                         </ModalProvider>
                       </GroupItemProvider>
                     </CurrentOrderProvider>
@@ -49,7 +56,7 @@ const Menu = ({
         </CategoryProvider>
       </ClientProvider>
     </EmployeeProvider>
-  );
+  )
 }
 
 export default Menu;

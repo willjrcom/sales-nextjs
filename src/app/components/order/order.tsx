@@ -32,8 +32,7 @@ const OrderManager = () => {
     }
 
     return (
-        <div className="flex h-[80vh] bg-gray-100">
-
+        <div className="flex h-[80vh] bg-gray-100 max-w-[85vw]">
             <CartAdded order={order} />
             <OrderOptions order={order} />
         </div>
@@ -57,7 +56,7 @@ const CartAdded = ({ order }: CartProps) => {
     }, [order]);
 
     return (
-        <div className="flex-1 p-4 bg-white overflow-y-auto">
+        <div className="flex-1 p-4 bg-white overflow-y-auto overflow-x-auto">
             <div className="flex justify-between items-center mb-2">
                 <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
@@ -95,6 +94,7 @@ const OrderOptions = ({ order }: CartProps) => {
 const DataOrderCard = ({ order }: CartProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
+    const contextCurrentOrder = useCurrentOrder();
 
     const onSubmit = async () => {
         if (!order || !data) return
@@ -102,17 +102,23 @@ const DataOrderCard = ({ order }: CartProps) => {
         try {
             await PendingOrder(order, data)
             setError(null)
+            contextCurrentOrder.fetchData();
         } catch (error) {
             setError(error as RequestError)
         }
     }
 
+    const isStatusStagingOrPending = order?.status == "Staging" || order?.status == "Pending"
+    const haveGroups = order && order?.groups?.length > 0
+    const isAnyGroupsStaging = haveGroups && order?.groups?.some((group) => group.status == "Staging")
+    const isThrowButton = isStatusStagingOrPending && isAnyGroupsStaging
+
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
-            {order?.status && <p><strong>Status:</strong> <StatusComponent status={order?.status} /></p>}
+            {order?.status && <p><StatusComponent status={order?.status} /></p>}
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
-
+            <br/>
             {/* Total do pedido */}
             <p><strong>Subtotal:</strong> R$ {order?.total_payable.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
@@ -120,7 +126,7 @@ const DataOrderCard = ({ order }: CartProps) => {
             <hr className="my-2" />
             <p><strong>Total:</strong> R$ {((order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)).toFixed(2)}</p>
             <br/>
-            {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
+            {isThrowButton && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
                 Lançar Pedido
             </button>}
         </div>

@@ -20,9 +20,7 @@ const Modal = ({ title, show, size = 'md', onClose, children }: ModalProps) => {
     };
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div
                 className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
                 onClick={(e) => e.stopPropagation()}

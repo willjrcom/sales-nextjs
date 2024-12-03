@@ -22,7 +22,7 @@ const DeliveryCard = ({ order }: OrderProps) => {
             </div>
 
             <p>{client?.name}</p>
-            {delivery?.status && <p><strong>Status:</strong> <StatusComponent status={delivery?.status} /></p>}
+            {delivery?.status && <p><StatusComponent status={delivery?.status} /></p>}
             <p>Endereço: {address?.street}, {address?.number}</p>
             <p>Bairro: {address?.neighborhood}</p>
             <p>Cidade: {address?.city}</p>

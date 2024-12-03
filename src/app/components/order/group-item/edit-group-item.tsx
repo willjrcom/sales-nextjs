@@ -1,17 +1,17 @@
 import { useCategories } from "@/app/context/category/context";
-import CarouselProducts from "../product/carousel";
+import Carousel from "../../carousel/carousel";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
 import ItemCard from "../item/card-item";
 import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import Category from "@/app/entities/category/category";
 import GroupItemForm from "@/app/forms/group-item/form";
-import { group } from "console";
 import StatusComponent from "../../button/show-status";
+import ProductCard from "../product/card-product";
 
 export default function EditGroupItem() {
     return (
-        <div className="flex h-[80vh] bg-gray-200 p-4 overflow-hidden">
+        <div className="flex h-[68vh] bg-gray-200 p-4 overflow-hidden">
             <ListCartToAdd />
             <ListGroupItem />
         </div >
@@ -37,18 +37,20 @@ const ListCartToAdd = () => {
             <h1 className="text-2xl font-bold">Produtos</h1>
             <div>
                 {categories?.map((category) => {
-                    if (!category.products) return;
+                    if (!category.products) return null; // Verificação para garantir que há produtos
                     return (
                         <div key={category.id} className="mb-6">
                             <hr className="mb-2" />
                             <span className="text-lg font-semibold">{category.name}</span>
-                            <CarouselProducts products={category.products} />
+                            <Carousel items={category.products}>
+                                {(product) => <ProductCard key={product.id} product={product} />}
+                            </Carousel>
                         </div>
                     );
                 })}
             </div>
         </div>
-    )
+    );
 }
 
 const ListGroupItem = () => {

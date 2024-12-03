@@ -53,9 +53,9 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
             {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal
-                isUpdate={client.id !== ""}
+                item={client}
+                name='Editar endereço'
                 onSubmit={submit}
-                onCancel={() => modalHandler.hideModal(modalName)}
             />
         </>
     );

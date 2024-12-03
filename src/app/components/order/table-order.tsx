@@ -19,7 +19,7 @@ const TableCard = ({ order }: OrderProps) => {
             </div>
 
             <p>{table?.name}</p>
-            {table?.status && <p><strong>Status:</strong> <StatusComponent status={table?.status} /></p>}
+            {table?.status && <p><StatusComponent status={table?.status} /></p>}
         </div>
     )
 }
