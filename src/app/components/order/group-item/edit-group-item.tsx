@@ -76,7 +76,12 @@ const ListGroupItem = () => {
                 ))}
             </div>
 
-            <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
+            <div className="flex justify-between items-center">
+                <p className="text-lg font-bold">Total:</p>
+                <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
+            </div>
+            <hr className="my-4" />
+            
             {groupItem?.status && <p><strong>Status:</strong> <StatusComponent status={groupItem.status} /></p>}
             {groupItem?.status == "Staging" as StatusGroupItem && 
                 <GroupItemForm item={groupItem} />

@@ -21,13 +21,15 @@ const EditItem = ({ item }: EditItemProps) => {
                     {item.quantity} x {item.name}
                 </div>
                 <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
-                <div className="text-lg font-bold">R$ {item.price}</div>
-                <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full">
-                    {item.additional_items?.length || 0}
-                </div>
             </div>
 
             <AdditionalItemList item={item} />
+
+            <hr className="my-4" />
+            <div className="flex justify-between items-center">
+                <p className="text-lg font-bold">Total</p>
+                <p className="text-lg font-bold">R$ {item.price.toFixed(2)}</p>
+            </div>
         </div>
     );
 };

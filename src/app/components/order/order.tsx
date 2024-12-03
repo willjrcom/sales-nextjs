@@ -32,7 +32,7 @@ const OrderManager = () => {
     }, [context.order, fetchOrder])
 
     return (
-        <div className="flex h-[80vh] bg-gray-100 max-w-[85vw]">
+        <div className="flex h-[80vh] bg-gray-100">
             <CartAdded order={order} />
             <OrderOptions order={order} />
         </div>

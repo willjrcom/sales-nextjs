@@ -9,14 +9,20 @@ interface NewButtonProps {
     modalName: string
     name: string;
     children: React.ReactNode;
+    onCloseModal?: () => void
 }
 
-const ButtonDelete = ({ size = 'md', modalName, name, children }: NewButtonProps) => {
+const ButtonDelete = ({ size = 'md', modalName, name, children, onCloseModal }: NewButtonProps) => {
     const modalHandler = useModal()
     const deleteButton = "Excluir " + name;
 
+    const onClose = () => {
+        if (onCloseModal) onCloseModal();
+        modalHandler.hideModal(modalName)
+    }
+
     return (
-        <button onClick={() => modalHandler.showModal(modalName, deleteButton, children, size)} className="flex items-center space-x-2 p-2 rounded-md w-max">
+        <button onClick={() => modalHandler.showModal(modalName, deleteButton, children, size, onClose)} className="flex items-center space-x-2 p-2 rounded-md w-max">
             <FaTrash />
         </button>
     )
