@@ -6,21 +6,29 @@ import Size from "../size/size";
 
 export default class Category {
     id: string = "";
-    image_path: string = "";
     name: string = "";
+    image_path: string = "";
+    need_print: boolean = false;
+    removable_ingredients: string[] = [];
     sizes: Size[] = [];
     products: Product[] = [];
     quantities: Quantity[] = [];
     process_rules: ProcessRule[] = [];
+    product_category_to_additional: Category[] = [];
+    product_category_to_complement: Category[] = [];
     
-    constructor(id = "", image_path = "", name = "", sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = []) {
+    constructor(id = "", name = "", image_path = "", need_print = false, removable_ingredients: string[] = [], sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = [], product_category_to_additional: Category[] = [], product_category_to_complement: Category[] = []) {
         this.id = id;
-        this.image_path = image_path;
         this.name = name;
+        this.image_path = image_path;
+        this.need_print = need_print;
         this.sizes = sizes;
+        this.removable_ingredients = removable_ingredients;
         this.products = products;
         this.quantities = quantities;
         this.process_rules = process_rules;
+        this.product_category_to_additional = product_category_to_additional;
+        this.product_category_to_complement = product_category_to_complement;
     }
 }
 

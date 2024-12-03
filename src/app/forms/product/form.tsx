@@ -43,6 +43,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
             setError(null);
 
+            product.category.name = recordCategories.filter(category => category.id === product.category_id)[0].name;
+            product.size.name = recordSizes.filter(size => size.id === product.size_id)[0].name;
+
             if (!isUpdate) {
                 product.id = response
                 context.addItem(product);
@@ -106,7 +109,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 }
 
                 for (const size of category.sizes) {
-                    records.push({ id: size.id.toString(), name: size.name })
+                    records.push({ id: size.id, name: size.name })
                 }
     
                 setRecordSizes(records);

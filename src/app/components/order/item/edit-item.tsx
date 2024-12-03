@@ -1,9 +1,8 @@
 import Item from '@/app/entities/order/item';
-import React, { useState } from 'react';
+import React from 'react';
 import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../button/button-delete';
-import { useModal } from '@/app/context/modal/context';
-import ItemCard from './card-item';
+import AdditionalItemList from './list-additional-item';
 
 interface EditItemProps {
     item: Item;
@@ -28,12 +27,7 @@ const EditItem = ({ item }: EditItemProps) => {
                 </div>
             </div>
 
-            {/* Hover para detalhes */}
-            {item.additional_items && (
-                item.additional_items?.map((additionalItem, index) => (
-                    <ItemCard key={index} item={additionalItem} />
-                ))
-            )}
+            <AdditionalItemList item={item} />
         </div>
     );
 };
