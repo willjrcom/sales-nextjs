@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction } from "react"
 
 interface TextFieldProps {
-    friendlyName?: string
-    name: string
-    placeholder?: string
-    disabled?: boolean
-    value?: string
-    setValue: Dispatch<SetStateAction<string>>
-    pattern?: string
+    friendlyName?: string;
+    name: string;
+    placeholder?: string;
+    disabled?: boolean;
+    value: string;
+    setValue: (value: string) => void;
+    pattern?: string;
 }
 
 interface NumberFieldProps {
@@ -73,11 +73,11 @@ const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 t
 const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern }: TextFieldProps) => {
     return (
         <div className="mb-4">
-            {friendlyName !== '' &&
+            {friendlyName && (
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
                     {friendlyName}
                 </label>
-            }
+            )}
 
             <input
                 className={InputClassName}
@@ -86,15 +86,14 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}
-                onChange={e => setValue(e.target.value.replace(pattern!, ""))}
+                onChange={(e) => setValue(e.target.value)} // A função setValue agora aceita diretamente o valor
                 pattern={pattern}
             />
         </div>
-    )
-}
+    );
+};
 
 const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue }: NumberFieldProps) => {
-
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>

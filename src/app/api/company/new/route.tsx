@@ -2,8 +2,13 @@ import Company from "@/app/entities/company/company";
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 
-const NewCompany = async (company: Company, session: Session): Promise<string> => {
-    const response = await RequestApi<Company, string>({
+interface NewCompanyResponseProps {
+    company_id: string;
+    schema: string;
+}
+
+const NewCompany = async (company: Company, session: Session): Promise<NewCompanyResponseProps> => {
+    const response = await RequestApi<Company, NewCompanyResponseProps>({
         path: "/company/new", 
         method: "POST",
         body: company,
