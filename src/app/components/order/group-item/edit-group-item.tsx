@@ -11,16 +11,10 @@ import ProductCard from "../product/card-product";
 
 export default function EditGroupItem() {
     return (
-        <div className="flex h-[75vh] bg-gray-200 p-4 overflow-hidden">
+        <div className="flex h-[68vh] bg-gray-200 p-4 overflow-hidden">
             {/* Componente à esquerda: ocupa 70% da tela */}
-            <div className="flex-1 lg:w-[70vw]"> {/* flex-1 para ocupar todo o espaço em telas pequenas */}
-                <ListCartToAdd />
-            </div>
-
-            {/* Componente à direita: escondido em telas pequenas e visível em telas grandes */}
-            <div className="hidden lg:block lg:w-[30vw]"> {/* Escondido em telas pequenas */}
-                <ListGroupItem />
-            </div>
+            <ListCartToAdd />
+            <ListGroupItem />
         </div>
     );
 }
@@ -41,7 +35,7 @@ const ListCartToAdd = () => {
     }, [allCategories, categories, contextGroupItem.groupItem?.category_id])
 
     return (
-        <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto h-full">
+        <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto h-full flex-1">
             <h1 className="text-2xl font-bold">Produtos</h1>
             <div>
                 {categories?.map((category) => {
@@ -71,7 +65,7 @@ const ListGroupItem = () => {
     }, [contextGroupItem.groupItem]);
 
     return (
-        <div className="bg-gray-100 p-4 space-y-4 overflow-y-auto min-h-[250px] lg:min-h-[300px] lg:block hidden">
+        <div className="bg-gray-100 p-4 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[20vw]">
             {/* Defina o min-h para o tamanho mínimo em telas pequenas, e lg:block para visibilidade em telas grandes */}
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
 
