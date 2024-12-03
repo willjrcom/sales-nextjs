@@ -18,37 +18,37 @@ const Menu = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <ModalProvider>
-      <EmployeeProvider>
-        <ClientProvider>
-          <CategoryProvider>
-            <ProductProvider>
-              <ProcessRuleProvider>
-                <PlaceProvider>
-                  <TableProvider>
-                    <OrderProvider>
-                      <CurrentOrderProvider>
-                        <GroupItemProvider>
+    <EmployeeProvider>
+      <ClientProvider>
+        <CategoryProvider>
+          <ProductProvider>
+            <ProcessRuleProvider>
+              <PlaceProvider>
+                <TableProvider>
+                  <OrderProvider>
+                    <CurrentOrderProvider>
+                      <GroupItemProvider>
+                        <ModalProvider>
                           <div className="flex">
                             <Sidebar />
                             <div className="flex-1 flex flex-col">
                               <Topbar />
-                              <main className="p-4">
+                              <main className="p-4 max-h-[90vh] max-w-[98vw] overflow-y-auto">
                                 {children}
                               </main>
                             </div>
                           </div>
-                        </GroupItemProvider>
-                      </CurrentOrderProvider>
-                    </OrderProvider>
-                  </TableProvider>
-                </PlaceProvider>
-              </ProcessRuleProvider>
-            </ProductProvider>
-          </CategoryProvider>
-        </ClientProvider>
-      </EmployeeProvider>
-    </ModalProvider>
+                        </ModalProvider>
+                      </GroupItemProvider>
+                    </CurrentOrderProvider>
+                  </OrderProvider>
+                </TableProvider>
+              </PlaceProvider>
+            </ProcessRuleProvider>
+          </ProductProvider>
+        </CategoryProvider>
+      </ClientProvider>
+    </EmployeeProvider>
   );
 }
 

@@ -16,16 +16,9 @@ const ButtonDelete = ({ size = 'md', modalName, name, children }: NewButtonProps
     const deleteButton = "Excluir " + name;
 
     return (
-        <div>
-            <button onClick={() => modalHandler.showModal(modalName)} className="flex items-center space-x-2 p-2 rounded-md w-max">
-                <FaTrash />
-            </button>
-        
-            <Modal title={deleteButton} size={size} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
-                {children}
-            </Modal>
-        </div>
-
+        <button onClick={() => modalHandler.showModal(modalName, deleteButton, children, size)} className="flex items-center space-x-2 p-2 rounded-md w-max">
+            <FaTrash />
+        </button>
     )
 }
 

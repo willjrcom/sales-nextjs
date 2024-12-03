@@ -1,6 +1,6 @@
 import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
-import ButtonEdit from "../../crud/button-edit";
+import ButtonIcon from "../../crud/button-icon";
 import EditGroupItem from "./edit-group-item";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { ToUtcDatetime } from "@/app/utils/date";
@@ -41,9 +41,9 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         </span>
 
         <div onClick={() => setGroupItem(groupItem)}>
-          <ButtonEdit modalName={"edit-group-item-" + groupItem.id} name={""} size="xl" onCloseModal={contextCurrentOrder.fetchData}>
+          <ButtonIcon modalName={"edit-group-item-" + groupItem.id} size="xl" onCloseModal={contextCurrentOrder.fetchData}>
             <EditGroupItem key={groupItem.id} />
-          </ButtonEdit>
+          </ButtonIcon>
         </div>
       </div>
 

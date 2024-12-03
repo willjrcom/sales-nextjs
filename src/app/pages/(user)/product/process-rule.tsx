@@ -2,7 +2,7 @@
 
 import ProcessRuleForm from "@/app/forms/process-rule/form";
 import CrudLayout from "@/app/components/crud/layout";
-import ButtonPlus from "@/app/components/crud/button-plus";
+import ButtonIconText from "@/app/components/crud/button-icon-text";
 import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";
 import Refresh from "@/app/components/crud/refresh";
@@ -31,9 +31,9 @@ export default function PageProcessRules () {
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
                 }
                 plusButtonChildren={
-                    <ButtonPlus modalName="new-process-rule" name="processos">
+                    <ButtonIconText modalName="new-process-rule" title="Novo processo">
                         <ProcessRuleForm/>
-                    </ButtonPlus>
+                    </ButtonIconText>
                 }
                 refreshButton={
                     <Refresh 

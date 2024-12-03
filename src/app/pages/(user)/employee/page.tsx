@@ -1,13 +1,13 @@
 'use client';
 
 import EmployeeForm from "@/app/forms/employee/form";
-import ButtonFilter from "@/app/components/crud/button-filter";
-import ButtonPlus from "@/app/components/crud/button-plus";
+import ButtonIconText from "@/app/components/crud/button-icon-text";
 import CrudLayout from "@/app/components/crud/layout";
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import { useEmployees } from "@/app/context/employee/context";
+import { FaFilter } from "react-icons/fa";
 
 const PageEmployee = () => {
     const context = useEmployees();
@@ -24,13 +24,15 @@ const PageEmployee = () => {
             <CrudLayout
                 title="Funcionários"
                 filterButtonChildren={
-                    <ButtonFilter modalName="filter-employee"></ButtonFilter>
+                    <ButtonIconText modalName="filter-employee" icon={FaFilter}>
+                        <h1>Filtro</h1>
+                    </ButtonIconText>
                 }
                 plusButtonChildren={
-                    <ButtonPlus modalName="new-employee"
-                        name="funcionario">
+                    <ButtonIconText modalName="new-employee"
+                        title="Novo funcionario">
                         <EmployeeForm/>
-                    </ButtonPlus>
+                    </ButtonIconText>
                 }
                 refreshButton={
                     <Refresh

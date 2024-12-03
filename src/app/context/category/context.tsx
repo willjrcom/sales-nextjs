@@ -18,7 +18,7 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
 export const useCategories = () => {
     const context = useContext(ContextCategory);
     if (!context) {
-        throw new Error('useItems must be used within a CategoryProvider');
+        throw new Error('useCategories must be used within a CategoryProvider');
     }
     return context;
 };

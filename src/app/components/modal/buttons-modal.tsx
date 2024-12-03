@@ -29,6 +29,16 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
         }
     }
     
+    const ModalDelete = () => {
+        return (
+            <>
+                <div className="text-center mb-4"><h2>Tem certeza que deseja excluir {item.name}?</h2></div>
+                {error && <p className="text-red-500 mb-4">{error.message}</p>}
+                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onDelete}>Excluir</button>
+            </>
+        )
+    }
+
     return (
         <div>
             <div className="flex items-center justify-between mt-6">
@@ -36,15 +46,9 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
                 {item.id !== '' ? 'Atualizar' : 'Cadastrar'}
             </button>
 
-            {item.id !== '' && onDelete &&
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => modalHandler.showModal(modalName)} >
+            {item.id !== '' && deleteItem &&
+            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => modalHandler.showModal(modalName, "Excluir " + item.name, <ModalDelete />, "md")} >
                 Excluir
-                
-                <Modal title={"Excluir " + name} show={modalHandler.isModalOpen(modalName)} onClose={() => modalHandler.hideModal(modalName)}>
-                    <div className="text-center mb-4"><h2>Tem certeza que deseja excluir {item.name}?</h2></div>
-                    {error && <p className="text-red-500 mb-4">{error.message}</p>}
-                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onDelete}>Excluir</button>
-                </Modal>
             </button>
             }
         </div>

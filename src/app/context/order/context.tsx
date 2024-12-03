@@ -18,7 +18,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 export const useOrders = () => {
     const context = useContext(ContextOrder);
     if (!context) {
-        throw new Error('useItems must be used within a OrderProvider');
+        throw new Error('useOrders must be used within a OrderProvider');
     }
     return context;
 };

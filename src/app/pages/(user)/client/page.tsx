@@ -2,7 +2,7 @@
 
 import CrudLayout from "@/app/components/crud/layout";
 import ClientForm from "@/app/forms/client/form";
-import ButtonPlus from "@/app/components/crud/button-plus";
+import ButtonIconText from "@/app/components/crud/button-icon-text";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
 import Refresh from "@/app/components/crud/refresh";
@@ -22,9 +22,9 @@ const PageClient = () => {
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} />
                 }
                 plusButtonChildren={
-                    <ButtonPlus name="cliente" modalName="new-client">
+                    <ButtonIconText title="Novo cliente" modalName="new-client">
                         <ClientForm/>
-                    </ButtonPlus>
+                    </ButtonIconText>
                 }
                 refreshButton={
                     <Refresh 

@@ -20,7 +20,7 @@ export const ProcessRuleProvider = ({ children }: { children: ReactNode }) => {
 export const useProcessRules = () => {
     const context = useContext(ContextProcessRule);
     if (!context) {
-        throw new Error('useItems must be used within a ProcessRuleProvider');
+        throw new Error('useProcessRules must be used within a ProcessRuleProvider');
     }
     return context;
 };

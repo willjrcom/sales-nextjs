@@ -105,7 +105,7 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
 export const useCurrentOrder = () => {
     const context = useContext(ContextCurrentOrder);
     if (!context) {
-        throw new Error('useItems must be used within a CurrentOrderProvider');
+        throw new Error('useCurrentOrder must be used within a CurrentOrderProvider');
     }
     return context;
 };

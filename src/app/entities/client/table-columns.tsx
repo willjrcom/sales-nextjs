@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Client from "./client";
-import ButtonEdit from "@/app/components/crud/button-edit";
+import ButtonIcon from "@/app/components/crud/button-icon";
 import PersonColumns from "../person/table-columns";
 import ClientForm from "@/app/forms/client/form";
 
@@ -13,12 +13,12 @@ const ClientColumns = (): ColumnDef<Client>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit modalName={"edit-client-" + row.original.id }
-          name={row.original.name}>
+        <ButtonIcon modalName={"edit-client-" + row.original.id }
+          title={"Editar " + row.original.name}>
           <ClientForm
             item={row.original}
             isUpdate={true}/>
-        </ButtonEdit>
+        </ButtonIcon>
       )
     },
   },

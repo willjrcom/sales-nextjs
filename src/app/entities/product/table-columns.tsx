@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Product from "./product";
-import ButtonEdit from "@/app/components/crud/button-edit";
+import ButtonIcon from "@/app/components/crud/button-icon";
 import ProductForm from "@/app/forms/product/form";
 
 const ProductColumns = (): ColumnDef<Product>[] => [
@@ -56,12 +56,12 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit modalName={"edit-product-" + row.original.id }
-          name={row.original.name}>
+        <ButtonIcon modalName={"edit-product-" + row.original.id }
+          title={"Editar " + row.original.name}>
           <ProductForm
             item={row.original} 
             isUpdate={true}/>
-        </ButtonEdit>
+        </ButtonIcon>
       )
     },
   },

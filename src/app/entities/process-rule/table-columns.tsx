@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonEdit from "@/app/components/crud/button-edit";
+import ButtonIcon from "@/app/components/crud/button-icon";
 import ProcessRuleForm from "@/app/forms/process-rule/form";
 import ProcessRule from "./process-rule";
 
@@ -20,12 +20,12 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit modalName={"edit-process-rule" + row.original.id }
-          name={row.original.name} >
+        <ButtonIcon modalName={"edit-process-rule" + row.original.id }
+        title={"Editar " + row.original.name}>
           <ProcessRuleForm 
             item={row.original}
             isUpdate={true} />
-        </ButtonEdit>
+        </ButtonIcon>
       )
     },
   },

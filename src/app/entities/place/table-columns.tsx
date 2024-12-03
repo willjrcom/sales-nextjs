@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonEdit from "@/app/components/crud/button-edit";
+import ButtonIcon from "@/app/components/crud/button-icon";
 import PlaceForm from "@/app/forms/place/form";
 import UpdatePlace from "@/app/api/place/update/route";
 import Place from "./place";
@@ -22,12 +22,12 @@ const PlaceColumns = (): ColumnDef<Place>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit modalName={"edit-place" + row.original.id }
-          name={row.original.name}>
+        <ButtonIcon modalName={"edit-place" + row.original.id }
+        title={"Editar " + row.original.name}>
           <PlaceForm 
             item={row.original}
             isUpdate={true}/>
-        </ButtonEdit>
+        </ButtonIcon>
       )
     },
   },

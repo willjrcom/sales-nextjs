@@ -18,7 +18,7 @@ export const PlaceProvider = ({ children }: { children: ReactNode }) => {
 export const usePlaces = () => {
     const context = useContext(ContextPlace);
     if (!context) {
-        throw new Error('useItems must be used within a PlaceProvider');
+        throw new Error('usePlaces must be used within a PlaceProvider');
     }
     return context;
 };

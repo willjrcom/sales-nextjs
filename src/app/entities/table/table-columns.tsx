@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import ButtonEdit from "@/app/components/crud/button-edit";
+import ButtonIcon from "@/app/components/crud/button-icon";
 import TableForm from "@/app/forms/table/form";
 import Table from "./table";
 
@@ -21,12 +21,12 @@ const TableColumns = (): ColumnDef<Table>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonEdit modalName={"edit-table" + row.original.id }
-          name={row.original.name}>
+        <ButtonIcon modalName={"edit-table" + row.original.id }
+          title={"Editar " + row.original.name}>
           <TableForm 
             item={row.original}
             isUpdate={true}/>
-        </ButtonEdit>
+        </ButtonIcon>
       )
     },
   },

@@ -2,7 +2,7 @@
 
 import GetCategoryByID from "@/app/api/category/[id]/route";
 import RequestError from "@/app/api/error";
-import ButtonPlus from "@/app/components/crud/button-plus";
+import ButtonIconText from "@/app/components/crud/button-icon-text";
 import Category from "@/app/entities/category/category";
 import { TextField } from "@/app/components/modal/field";
 import QuantityForm from "@/app/forms/quantity/form";
@@ -87,9 +87,9 @@ const ListSize = ({ item }: CategoryFormProps) => {
                         {size.name}
                     </div>
                 ))}
-                <ButtonPlus modalName="new-size" name="tamanho">
+                <ButtonIconText modalName="new-size" title="Novo tamanho">
                     <SizeForm categoryID={item!.id} />
-                </ButtonPlus>
+                </ButtonIconText>
             </div>
         </div>
     )
@@ -110,9 +110,9 @@ const ListQuantity = ({ item }: CategoryFormProps) => {
                         {quantity.quantity}
                     </div>
                 ))}
-                <ButtonPlus modalName="new-quantity" name="quantidade">
+                <ButtonIconText modalName="new-quantity" title="Nova quantidade">
                     <QuantityForm categoryID={item!.id} />
-                </ButtonPlus>
+                </ButtonIconText>
             </div>
         </div>
     )

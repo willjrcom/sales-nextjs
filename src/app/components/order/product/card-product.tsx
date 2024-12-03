@@ -1,7 +1,7 @@
 import Product from "@/app/entities/product/product";
 import Image from "next/image";
 import AddProductCard from "@/app/forms/item/form";
-import ButtonPlus from "../../crud/button-plus";
+import ButtonIconText from "../../crud/button-icon-text";
 
 interface ProductCardProps {
     product: Product;
@@ -49,9 +49,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 )}
 
                 {/* Botão para adicionar */}
-                <ButtonPlus modalName={`add-item-${product.id}`} name="">
+                <ButtonIconText modalName={`add-item-${product.id}`}>
                     <AddProductCard product={product} />
-                </ButtonPlus>
+                </ButtonIconText>
             </div>
         </div>
     );

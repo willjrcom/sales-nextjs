@@ -77,7 +77,7 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
     if (!contextCategory) return;
     const category = contextCategory.findByID(categoryID);
     setQuantities(category?.quantities || []);
-  }, [contextCategory])
+  }, [categoryID])
 
   return (
     <div className="mb-4">

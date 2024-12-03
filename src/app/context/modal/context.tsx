@@ -1,8 +1,23 @@
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+import Modal from "@/app/components/modal/modal";
+import React, { createContext, useContext, ReactNode, useState } from "react";
+
+// Interface para as propriedades de um modal
+interface ModalData {
+    title: string;
+    content: ReactNode;
+    size?: "sm" | "md" | "lg" | "xl";
+    onClose?: () => void;
+}
 
 interface ModalContextProps {
-    modals: Record<string, boolean>;
-    showModal: (modalName: string) => void;
+    modals: Record<string, ModalData>;
+    showModal: (
+        modalName: string,
+        title: string,
+        content: ReactNode,
+        size?: "sm" | "md" | "lg" | "xl",
+        onClose?: () => void
+    ) => void;
     hideModal: (modalName: string) => void;
     isModalOpen: (modalName: string) => boolean;
 }
@@ -10,23 +25,52 @@ interface ModalContextProps {
 const ContextModal = createContext<ModalContextProps | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
-    const [modals, setModals] = useState<Record<string, boolean>>({});
+    const [modals, setModals] = useState<Record<string, ModalData>>({});
 
-    const showModal = (modalName: string) => {
-        setModals((prev) => ({ ...prev, [modalName]: true }));
+    const showModal = (
+        modalName: string,
+        title: string,
+        content: ReactNode,
+        size: "sm" | "md" | "lg" | "xl" = "md",
+        onClose?: () => void
+    ) => {
+        setModals((prev) => ({
+            ...prev,
+            [modalName]: { title, content, size, onClose },
+        }));
     };
 
     const hideModal = (modalName: string) => {
-        setModals((prev) => ({ ...prev, [modalName]: false }));
+        const onClose = modals[modalName]?.onClose;
+
+        if (onClose) {
+            onClose(); // Executa a função customizada de fechamento, se fornecida
+        }
+
+        setModals((prev) => {
+            const { [modalName]: _, ...rest } = prev;
+            return rest;
+        });
     };
 
-    const isModalOpen = (modalName: string) => {
-        return !!modals[modalName];
-    };
+    const isModalOpen = (modalName: string) => !!modals[modalName];
 
     return (
         <ContextModal.Provider value={{ modals, showModal, hideModal, isModalOpen }}>
             {children}
+
+            {/* Renderizar modais dinâmicos */}
+            {Object.entries(modals).map(([modalName, { title, content, size, onClose }]) => (
+                <Modal
+                    key={modalName}
+                    title={title}
+                    show={true}
+                    size={size}
+                    onClose={() => hideModal(modalName)} // Garante o fechamento dinâmico
+                >
+                    {content}
+                </Modal>
+            ))}
         </ContextModal.Provider>
     );
 };
@@ -34,7 +78,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 export const useModal = () => {
     const context = useContext(ContextModal);
     if (!context) {
-        throw new Error('useModal must be used within a ModalProvider');
+        throw new Error("useModal must be used within a ModalProvider");
     }
     return context;
 };

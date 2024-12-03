@@ -1,4 +1,4 @@
-import ButtonPlus from "@/app/components/crud/button-plus"
+import ButtonIconText from "@/app/components/crud/button-icon-text"
 import CategoryOrder from "@/app/components/order/category/category"
 import { useCategories } from "@/app/context/category/context"
 import GroupItem from "@/app/entities/order/group-item"
@@ -11,7 +11,7 @@ import GetOrderByID from "@/app/api/order/[id]/route"
 import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
-import ButtonEdit from "../crud/button-edit"
+import ButtonIcon from "../crud/button-icon"
 import ClientAddressForm from "@/app/forms/client/update-address-order"
 import { showStatus } from "@/app/utils/status"
 
@@ -60,9 +60,9 @@ const CartAdded = ({ order }: CartProps) => {
             <div className="flex justify-between items-center mb-2">
                 <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
-                    <ButtonPlus size="xl" name="item" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
+                    <ButtonIconText size="xl" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
                         <EditGroupItem />
-                    </ButtonPlus>
+                    </ButtonIconText>
                 </div>
             </div>
 
@@ -83,8 +83,6 @@ interface OrderManagerProps {
 }
 
 const ConfirmOrder = ({ order }: OrderManagerProps) => {
-
-
     return (
         <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
             {/* Lançar Pedido */}
@@ -122,11 +120,11 @@ const DataOrderCard = ({ order }: DataOrderCardProps) => {
             {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
                 Lançar Pedido
             </button>}
-            <p><strong>Subtotal:</strong> R$ {order?.total_payable}</p>
-            {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax}</p>}
+            <p><strong>Subtotal:</strong> R$ {order?.total_payable.toFixed(2)}</p>
+            {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
             {/* <p>Desconto: R$ 5,00</p> */}
             <hr className="my-2" />
-            <p><strong>Total:</strong> R$ {(order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)}</p>
+            <p><strong>Total:</strong> R$ {((order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)).toFixed(2)}</p>
         </div>
     )
 }
@@ -141,9 +139,9 @@ const DeliveryCard = ({ order }: DeliveryCardProps) => {
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <div className="flex justify-between items-center">
                 <h2 className="font-bold mb-2">Entrega</h2>
-                <ButtonEdit modalName={"edit-client-" + order?.delivery?.client_id} name="Cliente" size="md">
+                <ButtonIcon modalName={"edit-client-" + order?.delivery?.client_id} title="Editar cliente" size="md">
                     <ClientAddressForm item={order?.delivery?.client} deliveryOrderId={order?.delivery?.id} />
-                </ButtonEdit>
+                </ButtonIcon>
             </div>
 
             <p>{client?.name}</p>

@@ -17,7 +17,7 @@ export const TableProvider = ({ children }: { children: ReactNode }) => {
 export const useTables = () => {
     const context = useContext(ContextTable);
     if (!context) {
-        throw new Error('useItems must be used within a TableProvider');
+        throw new Error('useTables must be used within a TableProvider');
     }
     return context;
 };
