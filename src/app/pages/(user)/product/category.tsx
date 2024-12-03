@@ -9,6 +9,7 @@ import Refresh from "@/app/components/crud/refresh";
 import { useCategories } from "@/app/context/category/context";
 import "./style.css";
 import { FaFilter } from "react-icons/fa";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
 
 const PageCategories = () => {
     const context = useCategories();
@@ -24,12 +25,12 @@ const PageCategories = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
             <CrudLayout title="Categorias"
                 filterButtonChildren={
-                    <ButtonIconText modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconText>
+                    <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <ButtonIconText title="Nova categoria" modalName="new-category">
+                    <ButtonIconTextFloat title="Nova categoria" modalName="new-category" position="bottom-right">
                         <CategoryForm/>
-                    </ButtonIconText>
+                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh 

@@ -50,7 +50,7 @@ const Topbar = () => {
   }, [contextCurrentOrder.order]);
 
   return (
-    <div className={`${styles.topbar} flex justify-between`}>
+    <div className={`${styles.topbar} flex justify-between pl-[65px] pr-4`} > {/* Ajustamos o padding left dinamicamente */}
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />

@@ -9,10 +9,12 @@
   align-items: left;
   transition: width 0.3s; /* Transição suave para a largura */
   text-align: left; /* Alinha o texto à esquerda */
+  position: fixed; /* Fixa a sidebar à esquerda da tela */
+  z-index: 10; /* Garante que a sidebar fique sobre outros elementos */
 }
 
 .sidebar:hover {
-  width: 200px; /* Largura do sidebar ao passar o mouse */
+  width: 210px; /* Largura do sidebar ao passar o mouse */
 }
 
 .sidebarContainer {
@@ -58,6 +60,7 @@
 }
 
 .label {
+  text-align: left;
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
@@ -66,7 +69,7 @@
 }
 
 .sidebar:hover .label {
-  max-width: 140px; /* Largura máxima do texto ao passar o mouse */
+  max-width: 160px; /* Largura máxima do texto ao passar o mouse */
 }
 
 .sidebar:hover .description {

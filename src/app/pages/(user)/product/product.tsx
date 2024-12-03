@@ -7,6 +7,7 @@ import Refresh from "@/app/components/crud/refresh";
 import { useProducts } from "@/app/context/product/context";
 import "./style.css";
 import { FaFilter } from "react-icons/fa";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
 
 const PageProducts = () => {
     const context = useProducts();
@@ -22,12 +23,12 @@ const PageProducts = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
             <CrudLayout title="Produtos"
                 filterButtonChildren={
-                    <ButtonIconText modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconText>
+                    <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <ButtonIconText modalName="new-product" title="Novo produto">
+                    <ButtonIconTextFloat modalName="new-product" title="Novo produto" position="bottom-right">
                         <ProductForm/>
-                    </ButtonIconText>
+                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh 

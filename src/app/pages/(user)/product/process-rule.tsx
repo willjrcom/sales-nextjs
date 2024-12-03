@@ -10,6 +10,7 @@ import { useProcessRules } from "@/app/context/process-rule/context";
 import { SelectField } from "@/app/components/modal/field";
 import { useCategories } from "@/app/context/category/context";
 import { useState } from "react";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
 
 export default function PageProcessRules () {
     const [categoryID, setCategoryID] = useState("");
@@ -31,9 +32,9 @@ export default function PageProcessRules () {
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
                 }
                 plusButtonChildren={
-                    <ButtonIconText modalName="new-process-rule" title="Novo processo">
+                    <ButtonIconTextFloat modalName="new-process-rule" title="Novo processo" position="bottom-right">
                         <ProcessRuleForm/>
-                    </ButtonIconText>
+                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh 

@@ -8,9 +8,13 @@ import EmployeeColumns from "@/app/entities/employee/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import { useEmployees } from "@/app/context/employee/context";
 import { FaFilter } from "react-icons/fa";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import { TextField } from "@/app/components/modal/field";
+import { useState } from "react";
 
 const PageEmployee = () => {
     const context = useEmployees();
+    const [nome, setNome] = useState<string>("");
 
     if (context.getLoading()) {
         return (
@@ -23,16 +27,19 @@ const PageEmployee = () => {
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
             <CrudLayout
                 title="Funcionários"
+                searchButtonChildren={
+                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do funcionário" setValue={setNome} value={nome} />
+                }
                 filterButtonChildren={
-                    <ButtonIconText modalName="filter-employee" icon={FaFilter}>
+                    <ButtonIconTextFloat modalName="filter-employee" icon={FaFilter}>
                         <h1>Filtro</h1>
-                    </ButtonIconText>
+                    </ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <ButtonIconText modalName="new-employee"
+                    <ButtonIconTextFloat modalName="new-employee" position="bottom-right"
                         title="Novo funcionario">
                         <EmployeeForm/>
-                    </ButtonIconText>
+                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh
@@ -42,7 +49,7 @@ const PageEmployee = () => {
                 tableChildren={
                     <CrudTable 
                         columns={EmployeeColumns()} 
-                        data={context.items} />
+                        data={context.filterItems('name', nome)} />
                 }
             />
         </>

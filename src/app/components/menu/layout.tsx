@@ -17,11 +17,10 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     <ContextProviders>
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col ml-[65px]"> {/* Adicionamos a margem esquerda para a Sidebar */}
           <Topbar />
-          <main className="p-4 h-[90vh] min-w-[40vw] max-w-[98vw] overflow-y-auto flex  justify-center">
-            {/* Conteúdo do componente que precisa ser centralizado */}
-            <div className="bg-white p-6 rounded-md shadow-md">
+          <main className="p-4 h-[90vh] min-w-0 max-w-full flex justify-center">
+            <div className="bg-white p-6 rounded-md shadow-md w-[90vw] overflow-y-auto">
               {children}
             </div>
           </main>
@@ -30,6 +29,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     </ContextProviders>
   );
 }
+
 
 const ContextProviders = ({ children }: { children: React.ReactNode }) => {
   return (

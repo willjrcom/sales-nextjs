@@ -40,8 +40,8 @@ const PageCategoryEdit = () => {
     }
 
     return (
-        <div className="flex items-center justify-center h-[80vh] bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-[600px]">
+        <div className="flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-lg">
                 {error && <p className="mb-4 text-red-500">{error.message}</p>}
                 <CategoryForm item={category} />
             </div>
