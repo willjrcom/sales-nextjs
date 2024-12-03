@@ -11,9 +11,10 @@ import GetOrderByID from "@/app/api/order/[id]/route"
 import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
-import ButtonIcon from "../crud/button-icon"
-import ClientAddressForm from "@/app/forms/client/update-address-order"
 import { showStatus } from "@/app/utils/status"
+import DeliveryCard from "./delivery-order"
+import PickupCard from "./pickup-order"
+import TableCard from "./table-order"
 
 const OrderManager = () => {
     const context = useCurrentOrder();
@@ -34,7 +35,7 @@ const OrderManager = () => {
         <div className="flex h-[80vh] bg-gray-100">
 
             <CartAdded order={order} />
-            <ConfirmOrder order={order} />
+            <OrderOptions order={order} />
         </div>
     )
 };
@@ -78,26 +79,20 @@ const CartAdded = ({ order }: CartProps) => {
     )
 }
 
-interface OrderManagerProps {
-    order: Order | null;
-}
-
-const ConfirmOrder = ({ order }: OrderManagerProps) => {
+const OrderOptions = ({ order }: CartProps) => {
     return (
         <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
             {/* Lançar Pedido */}
 
             <DataOrderCard order={order} />
             {order?.delivery && <DeliveryCard order={order} />}
+            {order?.pickup && <PickupCard order={order} />}
+            {order?.table && <TableCard order={order} />}
         </div>
     );
 };
 
-interface DataOrderCardProps {
-    order: Order | null;
-}
-
-const DataOrderCard = ({ order }: DataOrderCardProps) => {
+const DataOrderCard = ({ order }: CartProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
 
@@ -117,41 +112,22 @@ const DataOrderCard = ({ order }: DataOrderCardProps) => {
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
             {order?.status && <p><strong>Status:</strong> {showStatus(order?.status)}</p>}
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
-                Lançar Pedido
-            </button>}
+
+            {/* Total do pedido */}
             <p><strong>Subtotal:</strong> R$ {order?.total_payable.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
             {/* <p>Desconto: R$ 5,00</p> */}
             <hr className="my-2" />
             <p><strong>Total:</strong> R$ {((order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)).toFixed(2)}</p>
+            <br/>
+            {order?.status == "Staging" && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
+                Lançar Pedido
+            </button>}
         </div>
     )
 }
-interface DeliveryCardProps {
-    order: Order | null
-}
 
-const DeliveryCard = ({ order }: DeliveryCardProps) => {
-    const client = order?.delivery?.client;
-    const address = client?.address;
-    return (
-        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-            <div className="flex justify-between items-center">
-                <h2 className="font-bold mb-2">Entrega</h2>
-                <ButtonIcon modalName={"edit-client-" + order?.delivery?.client_id} title="Editar cliente" size="md">
-                    <ClientAddressForm item={order?.delivery?.client} deliveryOrderId={order?.delivery?.id} />
-                </ButtonIcon>
-            </div>
 
-            <p>{client?.name}</p>
-            <p>Endereço: {address?.street}, {address?.number}</p>
-            <p>Bairro: {address?.neighborhood}</p>
-            <p>Cidade: {address?.city}</p>
-            <p>Cep: {address?.cep}</p>
-        </div>
-    )
-}
 
 function groupBy<T extends Record<string, any>>(array: T[], key: keyof T): Record<string, T[]> {
     if (!array || array.length === 0) {
