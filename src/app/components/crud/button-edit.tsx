@@ -12,7 +12,7 @@ interface NewButtonProps {
     children: React.ReactNode;
 }
 
-const ButtonEdit = ({ size = 'sm', modalName, name, onCloseModal, children }: NewButtonProps) => {
+const ButtonEdit = ({ size = 'md', modalName, name, onCloseModal, children }: NewButtonProps) => {
     const modalHandler = useModal()
 
     const editButton = "Editar " + name;

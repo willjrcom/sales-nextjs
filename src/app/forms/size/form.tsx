@@ -19,20 +19,18 @@ interface SizeFormProps extends CreateFormsProps<Size> {
 const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
-    const size = item || new Size();
-    const [id, setId] = useState(size.id);
-    const [name, setName] = useState(size.name);
-    const [isActive, setIsActive] = useState(size.is_active);
+    const [size, setSize] = useState<Size>(item || new Size());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
+    const handleInputChange = (field: keyof Size, value: any) => {
+        setSize(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
 
-        size.id = id;
-        size.name = name;
-        size.is_active = isActive
         size.category_id = categoryID
 
         const validationErrors = ValidateSizeForm(size);
@@ -57,13 +55,14 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={setName} value={name}/>
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={setIsActive} value={isActive.toString()}/>
-            <HiddenField name='id' setValue={setId} value={id}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name}/>
+            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active.toString()}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id}/>
+            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={categoryID}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={size.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
+            <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };

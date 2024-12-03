@@ -64,10 +64,10 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal
-                isUpdate={client.id !== ""}
+                item={client}
+                name="Cliente"
                 onSubmit={submit}
-                onDelete={onDelete}
-                onCancel={() => modalHandler.hideModal(modalName)}
+                deleteItem={onDelete}
             />
         </>
     );

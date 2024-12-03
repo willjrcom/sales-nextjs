@@ -66,7 +66,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={category.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)} />
+            <ButtonsModal item={category} name='categoria' onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };

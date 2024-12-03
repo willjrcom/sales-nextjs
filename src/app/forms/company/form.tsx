@@ -50,9 +50,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal
-                isUpdate={company.id !== ""}
+                item={company}
+                name="Empresa"
                 onSubmit={submit}
-                onCancel={() => modalHandler.hideModal(modalName)}
             />
         </>
     );

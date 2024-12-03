@@ -11,7 +11,7 @@ interface NewButtonProps {
     children: React.ReactNode;
 }
 
-const ButtonDelete = ({ size = 'sm', modalName, name, children }: NewButtonProps) => {
+const ButtonDelete = ({ size = 'md', modalName, name, children }: NewButtonProps) => {
     const modalHandler = useModal()
     const deleteButton = "Excluir " + name;
 

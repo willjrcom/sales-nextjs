@@ -9,7 +9,7 @@ interface ModalProps {
     children: React.ReactNode;
 }
 
-const Modal = ({ title, show, size = 'sm', onClose, children }: ModalProps) => {
+const Modal = ({ title, show, size = 'md', onClose, children }: ModalProps) => {
     if (!show) return null;
 
     const sizeClasses = {
@@ -24,7 +24,7 @@ const Modal = ({ title, show, size = 'sm', onClose, children }: ModalProps) => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
             <div
-                className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white rounded-lg shadow-lg overflow-hidden`}
+                className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-6">

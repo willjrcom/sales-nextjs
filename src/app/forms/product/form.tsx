@@ -135,7 +135,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={product.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
+            <ButtonsModal item={product} name='produto' onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };

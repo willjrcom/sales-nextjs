@@ -115,7 +115,6 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
 }
 
 const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldProps) => {
-    console.log(value)
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>

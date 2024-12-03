@@ -11,7 +11,7 @@ interface NewButtonProps {
     children: React.ReactNode;
 }
 
-const ButtonPlus = ({ modalName, name, size = 'sm', onCloseModal, children }: NewButtonProps) => {
+const ButtonPlus = ({ modalName, name, size = 'md', onCloseModal, children }: NewButtonProps) => {
     const modalHandler = useModal();
 
     const onClose = () => {

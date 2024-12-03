@@ -65,7 +65,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
             {error && <p className='text-red-500'>{error.message}</p>}
             <PersonForm person={person} setPerson={setPerson} />
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={person.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)} />
+            <ButtonsModal item={person} name="Funcionário" onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };

@@ -66,7 +66,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={place.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() =>modalHandler.hideModal(modalName)}/>
+            <ButtonsModal item={place} name="Local" onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };

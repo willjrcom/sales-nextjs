@@ -58,7 +58,7 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
       <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} />
       {error && <p className="mb-4 text-red-500">{error.message}</p>}
       <ErrorForms errors={errors} />
-      <ButtonsModal onSubmit={submit} onCancel={() => modalHandler.hideModal(modalName)} />
+      <ButtonsModal item={product} name="produto" onSubmit={submit} />
     </div>
   )
 }

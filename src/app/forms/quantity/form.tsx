@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField, CheckboxField, NumberField } from '../../components/modal/field';
+import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -19,20 +19,19 @@ interface QuantityFormProps extends CreateFormsProps<Quantity> {
 const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity'
     const modalHandler = useModal();
-    const quantity = item || new Quantity();
-    const [id, setId] = useState(quantity.id);
-    const [quantityName, setQuantityName] = useState((quantity.quantity as unknown) as string);
-    const [isActive, setIsActive] = useState(quantity.is_active);
+    const [quantity, setQuantity] = useState<Quantity>(item || new Quantity());
+    
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
+    const handleInputChange = (field: keyof Quantity, value: any) => {
+        setQuantity(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
 
-        quantity.id = id;
-        quantity.quantity = Number(quantityName);
-        quantity.is_active = isActive;
         quantity.category_id = categoryID;
 
         const validationErrors = ValidateQuantityForm(quantity);
@@ -57,13 +56,14 @@ const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={setQuantityName} value={quantityName}/>
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={setIsActive} value={isActive.toString()}/>
-            <HiddenField name='id' setValue={setId} value={id}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('quantity', Number(value) || 0)} value={quantity.quantity.toString()}/>
+            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={quantity.is_active.toString()}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id}/>
+            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={quantity.category_id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal isUpdate={quantity.id !== ''} onSubmit={submit} onDelete={onDelete} onCancel={() => modalHandler.hideModal(modalName)}/>
+            <ButtonsModal item={quantity} name="Quantidade" onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };
