@@ -7,7 +7,6 @@ import { useCategories } from "@/app/context/category/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
-import Item from "@/app/entities/order/item";
 import Product from "@/app/entities/product/product";
 import Quantity from "@/app/entities/quantity/quantity";
 import { useSession } from "next-auth/react";
@@ -53,12 +52,29 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
   }
 
   return (
-    <div className="overflow-y-auto h-[15vh]">
+    <div className="overflow-y-auto">
+      <h3 className="text-lg font-semibold mb-4">{product.name}</h3>
+      <p className="text-sm">{product.description}</p>
+      <p className="text-lg font-bold">Tamanho {product.size.name}</p>
       <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
       <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} />
+      <hr className="my-4" />
+      
+      {/* Valor unitario */}
+      <div className="flex justify-between">
+        <p className="text-lg font-bold">Valor unitário:</p>
+        <p className="text-lg font-bold">R$ {product.price.toFixed(2)}</p>
+      </div>
+
+      {/* Total do item */}
+      <div className="flex justify-between">
+        <p className="text-lg font-bold">Total:</p>
+        <p className="text-lg font-bold">R$ {(product.price * (quantity.quantity || 1)).toFixed(2)}</p>
+      </div>
+
       {error && <p className="mb-4 text-red-500">{error.message}</p>}
       <ErrorForms errors={errors} />
-      <ButtonsModal item={product} name="produto" onSubmit={submit} />
+      <ButtonsModal item={product} name="produto" onSubmit={submit} isAddItem={true} />
     </div>
   )
 }

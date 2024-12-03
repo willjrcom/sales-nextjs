@@ -20,32 +20,37 @@ const Modal = ({ title, show, size = 'md', onClose, children }: ModalProps) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div
-                className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="p-6">
-                    {/* Cabeçalho do Modal */}
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold">{title}</h2>
-                        {onClose && (
-                            <button
-                                onClick={onClose}
-                                className="text-gray-500 hover:text-gray-700"
-                            >
-                                &#10005;
-                            </button>
-                        )}
+        <>
+            {/* Modal background */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+
+                {/* Modal */}
+                <div
+                    className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="p-6">
+                        {/* Cabeçalho do Modal */}
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold">{title}</h2>
+                            {onClose && (
+                                <button
+                                    onClick={onClose}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    &#10005;
+                                </button>
+                            )}
+                        </div>
+
+                        <hr className="my-4" />
+
+                        {/* Conteúdo */}
+                        <div>{children}</div>
                     </div>
-
-                    <hr className="my-4" />
-
-                    {/* Conteúdo */}
-                    <div>{children}</div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

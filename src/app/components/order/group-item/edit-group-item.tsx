@@ -30,14 +30,14 @@ const ListCartToAdd = () => {
         }
 
         setCategories(allCategories);
-    }, [contextGroupItem.groupItem])
+    }, [contextGroupItem?.groupItem?.category_id])
 
     return (
         <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto">
             <h1 className="text-2xl font-bold">Produtos</h1>
             <div>
                 {categories?.map((category) => {
-                    if (!category.products) return null; // Verificação para garantir que há produtos
+                    if (!category.products) return null;
                     return (
                         <div key={category.id} className="mb-6">
                             <hr className="mb-2" />

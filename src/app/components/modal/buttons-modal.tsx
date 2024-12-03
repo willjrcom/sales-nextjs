@@ -9,9 +9,10 @@ interface ModalProps<T> {
     name: string;
     onSubmit: () => void   
     deleteItem?: () => void;
+    isAddItem?: boolean
 }
 
-const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onSubmit, deleteItem }: ModalProps<T>) => {
+const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onSubmit, deleteItem, isAddItem }: ModalProps<T>) => {
     const [error, setError] = useState<RequestError | null>(null);
     const modalHandler = useModal();
     const { data } = useSession();
@@ -39,11 +40,14 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
         )
     }
 
+    let buttonName = item.id !== '' ? 'Atualizar' : 'Cadastrar'
+    buttonName = isAddItem ? 'Adicionar' : buttonName
+
     return (
         <div>
             <div className="flex items-center justify-between mt-6">
             <button onClick={onSubmit} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                {item.id !== '' ? 'Atualizar' : 'Cadastrar'}
+                {buttonName}
             </button>
 
             {item.id !== '' && deleteItem &&
