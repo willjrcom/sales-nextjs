@@ -3,33 +3,25 @@ import React, { useState } from 'react';
 import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../button/button-delete';
 import { useModal } from '@/app/context/modal/context';
-import EditItem from './edit-item';
+import ItemCard from './card-item';
 
-interface CardProps {
+interface EditItemProps {
     item: Item;
 }
 
-const ItemCard = ({ item }: CardProps) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const modalHandler = useModal();
-    const modalName = "edit-item-" + item.id;
-
-    const onClose = () => {
-        modalHandler.hideModal(modalName);
-    };
+const EditItem = ({ item }: EditItemProps) => {
+    if (!item) return
 
     return (
         <div
             className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
         >
             {/* Estado padrão */}
-            <div className="flex justify-between items-center" onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}>
+            <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">
                     {item.quantity} x {item.name}
                 </div>
-                {/* <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete> */}
+                <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
                 <div className="text-lg font-bold">R$ {item.price}</div>
                 <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full">
                     {item.additional_items?.length || 0}
@@ -37,7 +29,7 @@ const ItemCard = ({ item }: CardProps) => {
             </div>
 
             {/* Hover para detalhes */}
-            {isHovered && (
+            {item.additional_items && (
                 item.additional_items?.map((additionalItem, index) => (
                     <ItemCard key={index} item={additionalItem} />
                 ))
@@ -46,4 +38,4 @@ const ItemCard = ({ item }: CardProps) => {
     );
 };
 
-export default ItemCard;
+export default EditItem;
