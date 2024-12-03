@@ -3,7 +3,7 @@ import Link from 'next/link';
 import styles from './topbar.module.css';
 import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
-import { FaExclamation, FaExclamationCircle } from 'react-icons/fa';
+import { FaExclamationCircle } from 'react-icons/fa';
 import { useCurrentOrder } from '@/app/context/current-order/context';
 
 interface TopbarItemProps {

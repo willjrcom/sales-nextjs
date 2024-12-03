@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Company, { ValidateCompanyForm } from '@/app/entities/company/company';
 import { useSession } from 'next-auth/react';
@@ -6,7 +6,6 @@ import CreateFormsProps from '../create-forms-props';
 import NewCompany from '@/app/api/company/new/route';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
-import { useModal } from '@/app/context/modal/context';
 import { HiddenField, TextField } from '@/app/components/modal/field';
 import Access from '@/app/api/auth/access/route';
 import { useRouter } from 'next/navigation';

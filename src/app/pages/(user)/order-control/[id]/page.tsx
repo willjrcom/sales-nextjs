@@ -25,7 +25,7 @@ const PageEditOrderControl = () => {
 
     useEffect(() => {
         getOrder();
-    }, [data, getOrder]);
+    }, [data]);
 
 
     if (!id || !context.order) {
