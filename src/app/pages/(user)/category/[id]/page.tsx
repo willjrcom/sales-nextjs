@@ -40,18 +40,18 @@ const PageCategoryEdit = () => {
     }
 
     return (
-        <Modal show={true} title="Editar categoria" withoutBackground>
-        <div className="flex flex-col p-6 space-y-6">
-            <CategoryForm isUpdate={true} item={category} />
+        <div className="flex items-center justify-between">
+            <div className=" w-[80vw]">
+            <CategoryForm isUpdate={true} item={category} setItem={setCategory} />
 
             <hr className="my-4" />
 
-            <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <ListSize category={category} />
                 <ListQuantity category={category} />
             </div>
+            </div>
         </div>
-        </Modal>
     );
 }
 

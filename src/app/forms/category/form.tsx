@@ -16,8 +16,12 @@ import RequestError from '@/app/api/error';
 import RemovableItensComponent from './removable-ingredients';
 import AdditionalCategorySelector from './additional-category';
 import ComplementCategorySelector from './complement-category';
+import { useRouter } from 'next/navigation';
 
-const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
+interface CategoryFormProps extends CreateFormsProps<Category> {
+    setItem: (item: Category) => void
+}
+const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
     const context = useCategories();
@@ -26,6 +30,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const router = useRouter();
 
     useEffect(() => {
         if (item?.is_additional) setSelectedType("Adicional");
@@ -50,6 +55,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const submit = async () => {
         if (!data) return;
 
+        console.log(category)
         const validationErrors = ValidateCategoryForm(category);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
@@ -60,11 +66,11 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
             if (!isUpdate) {
                 category.id = response
                 context.addItem(category);
+                modalHandler.hideModal(modalName);
             } else {
                 context.updateItem(category);
+                setItem(category)
             }
-
-            modalHandler.hideModal(modalName);
 
         } catch (error) {
             setError(error as RequestError);
@@ -75,28 +81,96 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
         if (!data) return;
         DeleteCategory(category.id, data);
         context.removeItem(category.id)
-        modalHandler.hideModal(modalName);
+
+        if (!isUpdate) {
+            modalHandler.hideModal(modalName);
+        } else {
+            router.back();
+        }
     }
 
     const isUpdated = JSON.stringify(category) !== JSON.stringify(item)
 
     return (
-        <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={category.name} />
-            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={category.image_path} />
-            <CheckboxField friendlyName='Deseja imprimir no pedido?' name='need_print' setValue={value => handleInputChange('need_print', value)} value={category.need_print} />
-            <RemovableItensComponent item={category} setItem={setCategory} />
-            <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
-            {selectedType === "Normal" && <AdditionalCategorySelector additionalCategories={context.items} selectedCategory={category} setSelectedCategory={setCategory} />}
-            {selectedType === "Normal" && <ComplementCategorySelector complementCategories={context.items} selectedCategory={category} setSelectedCategory={setCategory} />}
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={category.id} />
+        <div className="w-[80vw]">
+            {/* Bloco de Dados Básicos */}
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 className="text-2xl font-medium mb-4">Dados Básicos</h2>
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+                <TextField
+                    friendlyName="Nome"
+                    name="name"
+                    setValue={value => handleInputChange('name', value)}
+                    value={category.name}
+                />
+                <TextField
+                    friendlyName="Imagem"
+                    name="image_path"
+                    setValue={value => handleInputChange('image_path', value)}
+                    value={category.image_path}
+                />
+                <CheckboxField
+                    friendlyName="Deseja imprimir no pedido?"
+                    name="need_print"
+                    setValue={value => handleInputChange('need_print', value)}
+                    value={category.need_print}
+                />
+            </div>
+
+            {/* Bloco de Ingredientes Removíveis */}
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 className="text-2xl font-medium mb-4">Ingredientes Removíveis</h2>
+                <RemovableItensComponent item={category} setItem={setCategory} />
+            </div>
+
+            {/* Bloco de Tipo de Categoria */}
+            {!isUpdate && (
+                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h2 className="text-2xl font-medium mb-4">Selecione o Tipo de Categoria</h2>
+                    <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
+                </div>
+            )}
+
+            {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
+            {selectedType === "Normal" && (
+                <>
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <AdditionalCategorySelector
+                            additionalCategories={context.items}
+                            selectedCategory={category}
+                            setSelectedCategory={setCategory}
+                        />
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <ComplementCategorySelector
+                            complementCategories={context.items}
+                            selectedCategory={category}
+                            setSelectedCategory={setCategory}
+                        />
+                    </div>
+                </>
+            )}
+
+            {/* Campo Oculto para ID */}
+            <HiddenField
+                name="id"
+                setValue={value => handleInputChange('id', value)}
+                value={category.id}
+            />
+
+            {/* Exibição de Erros */}
+            {error && <p className="mb-4 text-red-500 text-center">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <hr className="my-4" />
-            {isUpdated && <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />}
-            {!isUpdated && <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />}
-        </>
+
+            <hr className="my-6" />
+
+            {/* Botões para Atualizar ou Excluir */}
+            {isUpdated ? (
+                <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />
+            ) : (
+                <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />
+            )}
+        </div>
     );
 };
 

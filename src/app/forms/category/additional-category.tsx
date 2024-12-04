@@ -47,7 +47,7 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
 
     return (
         <div>
-            <h4 className="text-lg font-bold">Categorias adicional</h4>
+            <h4 className="text-2xl font-medium mb-4">Categorias adicional</h4>
                 <Carousel items={filteredCategories}>
                     {(category) => (
                     <div

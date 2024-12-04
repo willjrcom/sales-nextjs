@@ -1,4 +1,5 @@
 import ButtonIconText from "@/app/components/button/button-icon-text";
+import Carousel from "@/app/components/carousel/carousel";
 import { useModal } from "@/app/context/modal/context";
 import Category from "@/app/entities/category/category";
 import Quantity from "@/app/entities/quantity/quantity";
@@ -28,15 +29,16 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Quantidades</h2>
             <div className="flex items-center space-x-4">
-                {category?.quantities?.map((quantity, index) => (
-                    <div onClick={() => onEdit(quantity)}
-                        key={index}
+                <Carousel items={category?.quantities || []}>
+                    {(quantity) => (<div onClick={() => onEdit(quantity)}
+                        key={quantity.id}
                         className="border p-2 rounded-md text-center bg-white w-16"
                     >
                         {quantity.quantity}
-                    </div>
-                ))}
-                <ButtonIconText modalName="new-quantity" title="Nova quantidade">
+                    </div>)}
+
+                </Carousel>
+                <ButtonIconText modalName="new-quantity" title="Quantidade">
                     <QuantityForm category={category} />
                 </ButtonIconText>
             </div>

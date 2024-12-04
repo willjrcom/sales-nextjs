@@ -41,7 +41,7 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
 
     return (
         <div>
-            <h4 className="text-lg font-bold">Categorias complemento</h4>
+            <h4 className="text-2xl font-medium mb-4">Categorias complemento</h4>
                 <Carousel items={filteredCategories}>
                     {(category) => (
                     <div
