@@ -7,9 +7,14 @@ import { useProducts } from "@/app/context/product/context";
 import "./style.css";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
+import { SelectField } from "@/app/components/modal/field";
+import { useState } from "react";
+import { useCategories } from "@/app/context/category/context";
 
 const PageProducts = () => {
+    const [categoryID, setCategoryID] = useState("");
     const context = useProducts();
+    const contextCategory = useCategories();
 
     if (context.getLoading()) {
         return (
@@ -21,6 +26,10 @@ const PageProducts = () => {
         <>
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
             <CrudLayout title="Produtos"
+                searchButtonChildren={
+                    <SelectField 
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
+                }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
                 }
@@ -37,7 +46,7 @@ const PageProducts = () => {
                 tableChildren={
                     <CrudTable 
                         columns={ProductColumns()} 
-                        data={context.items}>
+                        data={context.filterItems('category_id', categoryID)}>
                     </CrudTable>
                 } 
                 />
