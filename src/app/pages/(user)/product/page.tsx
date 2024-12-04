@@ -22,7 +22,7 @@ const PageWithTabs = () => {
     };
 
     return (
-        <div className="container">
+        <div>
             <div className="tabs">
                 <button
                     className={`tab ${activeTab === 'produtos' ? 'active' : ''}`}
