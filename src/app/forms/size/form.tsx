@@ -12,26 +12,28 @@ import UpdateSize from '@/app/api/size/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import Category from '@/app/entities/category/category';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
-    categoryID: string
+    category?: Category
 }
-const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
+
+const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const [size, setSize] = useState<Size>(item || new Size());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    
+    console.log(size)
     const handleInputChange = (field: keyof Size, value: any) => {
         setSize(prev => ({ ...prev, [field]: value }));
     };
 
     const submit = async () => {
-        if (!data) return;
+        if (!data || !category) return;
 
-        size.category_id = categoryID
+        size.category_id = category.id
 
         const validationErrors = ValidateSizeForm(size);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -39,6 +41,15 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
         try {
             isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
             setError(null);
+
+            if (isUpdate) {
+                const index = category.sizes.findIndex(s => s.id === size.id);
+                if (index !== -1) {
+                    category.sizes[index] = size;
+                }
+            } else {
+                category.sizes.push(size);
+            }
 
             modalHandler.hideModal(modalName);
 
@@ -50,15 +61,20 @@ const SizeForm = ({ item, isUpdate, categoryID }: SizeFormProps) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteSize(size.id, data);
+
+        if (category) {
+            category.sizes = category.sizes.filter(q => q.id !== size.id);
+        }
+
         modalHandler.hideModal(modalName);
     }
 
     return (
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name}/>
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active.toString()}/>
+            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active}/>
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id}/>
-            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={categoryID}/>
+            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />

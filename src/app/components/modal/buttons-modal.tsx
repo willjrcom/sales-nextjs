@@ -40,6 +40,14 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
         )
     }
 
+    const onClose = () => {
+        modalHandler.hideModal(modalName)
+    }
+
+    const onCloseModal = () => {
+        modalHandler.showModal(modalName, "Excluir " + item.name, <ModalDelete />, "md", onClose)
+    }
+
     let buttonName = item.id !== '' ? 'Atualizar' : 'Cadastrar'
     buttonName = isAddItem ? 'Adicionar' : buttonName
 
@@ -51,7 +59,7 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
             </button>
 
             {item.id !== '' && deleteItem &&
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => modalHandler.showModal(modalName, "Excluir " + item.name, <ModalDelete />, "md")} >
+            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onCloseModal} >
                 Excluir
             </button>
             }

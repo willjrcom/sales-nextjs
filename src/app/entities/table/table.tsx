@@ -3,9 +3,9 @@ import { z } from "zod";
 export default class Table {
     id: string = "";
     name: string = "";
-    is_available: boolean = false;
+    is_available: boolean = true;
     
-    constructor(id = "", name = "", is_available = false) {
+    constructor(id = "", name = "", is_available = true) {
         this.id = id;
         this.name = name;
         this.is_available = is_available;

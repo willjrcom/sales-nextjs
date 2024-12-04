@@ -6,10 +6,11 @@ interface ModalProps {
     show: boolean;
     size?: 'sm' | 'md' | 'lg' | 'xl'; // Suporte para tamanhos diferentes
     onClose?: () => void; // Suporte para fechar modal
+    withoutBackground?: boolean;
     children: React.ReactNode;
 }
 
-const Modal = ({ title, show, size = 'md', onClose, children }: ModalProps) => {
+const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children }: ModalProps) => {
     if (!show) return null;
 
     const sizeClasses = {
@@ -19,10 +20,12 @@ const Modal = ({ title, show, size = 'md', onClose, children }: ModalProps) => {
         xl: 'max-w-[90vw] h-[90vh]',
     };
 
+    const backgroundClasses = withoutBackground ? "" : "fixed inset-0 z-50  bg-black bg-opacity-50"
+
     return (
         <>
             {/* Modal background */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className={backgroundClasses + " flex items-center justify-center"}>
 
                 {/* Modal */}
                 <div

@@ -3,10 +3,10 @@ import { z } from "zod";
 export default class Size {
   id: string = "";
   name: string = "";
-  is_active: boolean = false;
+  is_active: boolean = true;
   category_id: string = "";
 
-  constructor(id = "", name = "", is_active = false, category_id = "") {
+  constructor(id = "", name = "", is_active = true, category_id = "") {
     this.id = id;
     this.name = name;
     this.is_active = is_active;

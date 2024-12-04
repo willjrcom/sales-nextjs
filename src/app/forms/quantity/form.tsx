@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -12,34 +12,54 @@ import UpdateQuantity from '@/app/api/quantity/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import Category from '@/app/entities/category/category';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
-    categoryID: string
+    category?: Category
+    setCategory?: (category: Category) => void
 }
-const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
+
+const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity'
     const modalHandler = useModal();
-    const [quantity, setQuantity] = useState<Quantity>(item || new Quantity());
+    const [quantity, setQuantity] = useState<Quantity>(new Quantity());
     
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     
+    useEffect(() => {
+        if (item && item.id !== quantity.id) {
+            setQuantity(item); // Atualiza o estado apenas se o 'item' for realmente novo
+        }
+    }, [item]); // Vai ser chamado apenas quando 'item' mudar
+    
+
     const handleInputChange = (field: keyof Quantity, value: any) => {
         setQuantity(prev => ({ ...prev, [field]: value }));
     };
 
     const submit = async () => {
-        if (!data) return;
+        if (!data || !category) return;
 
-        quantity.category_id = categoryID;
+        quantity.category_id = category.id;
 
+        console.log(quantity)
         const validationErrors = ValidateQuantityForm(quantity);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
             isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
             setError(null);
+
+            if (isUpdate) {
+                const index = category.quantities.findIndex(q => q.id === quantity.id);
+                if (index !== -1) {
+                    category.quantities[index] = quantity;
+                }
+            } else {
+                category.quantities.push(quantity);
+            }
 
             modalHandler.hideModal(modalName);
 
@@ -50,20 +70,24 @@ const QuantityForm = ({ item, isUpdate, categoryID }: QuantityFormProps) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteQuantity(quantity.id, data);
+        await DeleteQuantity(quantity.id, data);
+        
+        if (category) {
+            category.quantities = category.quantities.filter(q => q.id !== quantity.id);
+        }
+
         modalHandler.hideModal(modalName);
     }
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('quantity', Number(value) || 0)} value={quantity.quantity.toString()}/>
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={quantity.is_active.toString()}/>
+            <TextField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', Number(value) || 0)} value={quantity.quantity.toString()}/>
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id}/>
-            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={quantity.category_id}/>
+            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal item={quantity} name="Quantidade" onSubmit={submit} deleteItem={onDelete} />
+            <ButtonsModal item={{...quantity, name: quantity.quantity.toString()}} name="quantity" onSubmit={submit} deleteItem={onDelete} />
         </>
     );
 };

@@ -14,9 +14,9 @@ export default class Product {
     category: Category = new Category();
     size_id: string = "";
     size: Size = new Size();
-    is_available: boolean = false;
+    is_available: boolean = true;
 
-    constructor(id = "", code = "", image_path = "", name = "", description = "", price = 0, cost = 0, category_id = "", size_id = "", is_available = false) {
+    constructor(id = "", code = "", image_path = "", name = "", description = "", price = 0, cost = 0, category_id = "", size_id = "", is_available = true) {
         this.id = id;
         this.code = code;
         this.image_path = image_path;

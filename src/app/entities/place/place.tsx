@@ -6,10 +6,10 @@ export default class Place {
     id: string = "";
     name: string = "";
     image_path: string = "";
-    is_available: boolean = false;
+    is_available: boolean = true;
     tables: PlaceTable[] = [];
     
-    constructor(id = "", name = "", image_path = "", is_available = false) {
+    constructor(id = "", name = "", image_path = "", is_available = true) {
         this.id = id;
         this.name = name;
         this.image_path = image_path;
