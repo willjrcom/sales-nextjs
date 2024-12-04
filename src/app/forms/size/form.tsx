@@ -25,7 +25,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    console.log(size)
+    
     const handleInputChange = (field: keyof Size, value: any) => {
         setSize(prev => ({ ...prev, [field]: value }));
     };

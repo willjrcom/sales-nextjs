@@ -12,7 +12,7 @@ interface CarouselProps<T> {
 const Carousel = <T extends { id: string }>({ items, children }: CarouselProps<T>) => {
     return (
         <Swiper
-        className="min-w-[50vw]"
+        className="w-full"
             modules={[Navigation, Pagination, A11y]}
             navigation
             pagination={{ clickable: true }}

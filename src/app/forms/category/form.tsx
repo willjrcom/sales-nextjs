@@ -13,6 +13,9 @@ import UpdateCategory from '@/app/api/category/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import RemovableItensComponent from './removable-ingredients';
+import AdditionalCategorySelector from './additional-category';
+import ComplementCategorySelector from './complement-category';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
@@ -23,6 +26,12 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+    useEffect(() => {
+        if (item?.is_additional) setSelectedType("Adicional");
+        if (item?.is_complement) setSelectedType("Complemento");
+        if (!item?.is_additional && !item?.is_complement) setSelectedType("Normal");
+    }, [item])
 
     useEffect(() => {
         const setType: Record<TypeCategory, () => void> = {
@@ -69,16 +78,24 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
         modalHandler.hideModal(modalName);
     }
 
+    const isUpdated = JSON.stringify(category) !== JSON.stringify(item)
+
     return (
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={category.name} />
             <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={category.image_path} />
+            <CheckboxField friendlyName='Deseja imprimir no pedido?' name='need_print' setValue={value => handleInputChange('need_print', value)} value={category.need_print} />
+            <RemovableItensComponent item={category} setItem={setCategory} />
             <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
+            {selectedType === "Normal" && <AdditionalCategorySelector additionalCategories={context.items} selectedCategory={category} setSelectedCategory={setCategory} />}
+            {selectedType === "Normal" && <ComplementCategorySelector complementCategories={context.items} selectedCategory={category} setSelectedCategory={setCategory} />}
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={category.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal item={category} name='categoria' onSubmit={submit} deleteItem={onDelete} />
+            <hr className="my-4" />
+            {isUpdated && <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />}
+            {!isUpdated && <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />}
         </>
     );
 };
@@ -126,3 +143,4 @@ const TypeCategorySelector = ({ selectedType, setSelectedType }: TypeCategorySel
 };
 
 export default CategoryForm;
+export { TypeCategorySelector }

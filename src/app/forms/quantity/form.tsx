@@ -16,10 +16,9 @@ import Category from '@/app/entities/category/category';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
     category?: Category
-    setCategory?: (category: Category) => void
 }
 
-const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormProps) => {
+const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity'
     const modalHandler = useModal();
     const [quantity, setQuantity] = useState<Quantity>(new Quantity());
@@ -44,7 +43,6 @@ const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormPro
 
         quantity.category_id = category.id;
 
-        console.log(quantity)
         const validationErrors = ValidateQuantityForm(quantity);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 

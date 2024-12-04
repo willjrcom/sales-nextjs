@@ -57,8 +57,6 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
                 return setItemList([]); // Se não houver produtos, retorna lista vazia
             }
 
-            console.log(additionalCategories)
-
             // Passo 4: Filtrar qualquer produto inválido antes de converter
             const validItems = additionalItems.filter(item => item != null && item !== undefined);
 

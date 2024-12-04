@@ -1,10 +1,14 @@
 import ButtonIconText from "@/app/components/button/button-icon-text";
 import Size from "@/app/entities/size/size";
 import SizeForm from "@/app/forms/size/form";
-import { CategoryFormProps } from "./page";
 import { useModal } from "@/app/context/modal/context";
+import Category from "@/app/entities/category/category";
 
-const ListSize = ({ item: category, setItem: setCategory }: CategoryFormProps) => {
+interface ListSizeProps {
+    category: Category;
+}
+
+const ListSize = ({ category }: ListSizeProps) => {
     const modalHandler = useModal();
     if (category?.sizes === undefined || category?.sizes.length === 0) category!.sizes = [];
 

@@ -9,7 +9,7 @@ import RequestError from '@/app/api/error';
 import { HiddenField, TextField } from '@/app/components/modal/field';
 import Access from '@/app/api/auth/access/route';
 import { useRouter } from 'next/navigation';
-import ContactsFormArray from '../contact/form-array';
+import FormArray from '../../components/modal/form-array';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const [company, setCompany] = useState<Company>(item || new Company());
@@ -78,11 +78,13 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <TextField friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
             <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
             
-            <ContactsFormArray
-                contacts={company.contacts}
-                onAddContact={handleAddContact}
-                onRemoveContact={handleRemoveContact}
-                onContactChange={handleContactChange}
+            <FormArray
+                title='Contatos'
+                singleItemName='Contato'
+                items={company.contacts}
+                onAdd={handleAddContact}
+                onRemove={handleRemoveContact}
+                onChange={handleContactChange}
             />
             
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />

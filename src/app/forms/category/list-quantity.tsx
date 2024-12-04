@@ -1,10 +1,14 @@
 import ButtonIconText from "@/app/components/button/button-icon-text";
 import { useModal } from "@/app/context/modal/context";
+import Category from "@/app/entities/category/category";
 import Quantity from "@/app/entities/quantity/quantity";
 import QuantityForm from "@/app/forms/quantity/form";
-import { CategoryFormProps } from "./page";
 
-const ListQuantity = ({ item: category, setItem: setCategory }: CategoryFormProps) => {
+interface ListQuantityProps {
+    category: Category;
+}
+
+const ListQuantity = ({ category }: ListQuantityProps) => {
     const modalHandler = useModal();
     if (category?.quantities === undefined || category?.quantities?.length === 0) category!.quantities = [];
 
@@ -16,7 +20,7 @@ const ListQuantity = ({ item: category, setItem: setCategory }: CategoryFormProp
     const onEdit = (quantity: Quantity) => {
         const modalName = "edit-quantity-" + quantity.id;
         const title = "Editar quantidade: " + quantity.quantity;
-        const elem = <QuantityForm category={category} setCategory={setCategory} isUpdate={true} item={quantity} />
+        const elem = <QuantityForm category={category} isUpdate={true} item={quantity} />
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(quantity.id))
     }
 
@@ -33,7 +37,7 @@ const ListQuantity = ({ item: category, setItem: setCategory }: CategoryFormProp
                     </div>
                 ))}
                 <ButtonIconText modalName="new-quantity" title="Nova quantidade">
-                    <QuantityForm category={category} setCategory={setCategory} />
+                    <QuantityForm category={category} />
                 </ButtonIconText>
             </div>
         </div>
