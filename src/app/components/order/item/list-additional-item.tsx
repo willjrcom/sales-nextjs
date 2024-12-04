@@ -1,6 +1,9 @@
+import DeleteAdditionalItem from '@/app/api/item/delete/additional/route';
+import NewAdditionalItem from '@/app/api/item/update/additional/route';
 import { useCategories } from '@/app/context/category/context';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';
+import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 
 interface ItemAdditional {
@@ -28,8 +31,8 @@ const convertProductToItem = (products: Product[]) => {
 
 const AdditionalItemList = ({ item }: ItemListProps) => {
     const contextCategories = useCategories();
-
     const [itemList, setItemList] = useState<ItemAdditional[]>([]);
+    const { data } = useSession(); 
 
     useEffect(() => {
         try {
@@ -75,18 +78,42 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         }
     }, [item.id]);
 
-    const handleIncrement = (id: string) => {
+    const onAdd = async(idProduct: string) => {
+        if (!data) return
+
+        try {
+            NewAdditionalItem(item.id, { product_id: idProduct, quantity_id: ""}, data)
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const onRemove = async (idProduct: string) => {
+        if (!data) return
+
+        try {
+            DeleteAdditionalItem(idProduct, data)
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleIncrement = async (idProduct: string) => {
+        await onAdd(idProduct)
         setItemList((prev) =>
             prev.map((item) =>
-                item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+                item.id === idProduct ? { ...item, quantity: item.quantity + 1 } : item
             )
         );
     };
 
-    const handleDecrement = (id: string) => {
+    const handleDecrement = async (idProduct: string) => {
+        await onRemove(idProduct)
         setItemList((prev) =>
             prev.map((item) =>
-                item.id === id && item.quantity > 0
+                item.id === idProduct && item.quantity > 0
                     ? { ...item, quantity: item.quantity - 1 }
                     : item
             )

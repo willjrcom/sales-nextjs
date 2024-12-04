@@ -92,8 +92,14 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
   useEffect(() => {
     if (!contextCategory.items) return;
     const category = contextCategory.findByID(categoryID);
-    setQuantities(category?.quantities || []);
-  }, [categoryID, contextCategory, contextCategory.items])
+    setQuantities(category?.quantities.sort((a, b) => a.quantity - b.quantity) || []);
+  }, [categoryID])
+
+  useEffect(() => {
+    quantities.forEach((quantity) => {
+      if (quantity.quantity === 1) setSelectedQuantity(quantity);
+    })
+  }, [quantities])
 
   return (
     <div className="mb-4">
