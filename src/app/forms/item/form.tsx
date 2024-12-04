@@ -59,7 +59,7 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
       <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
       <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} />
       <hr className="my-4" />
-      
+
       {/* Valor unitario */}
       <div className="flex justify-between">
         <p className="text-lg font-bold">Valor unitário:</p>

@@ -14,10 +14,12 @@ export default class Category {
     products: Product[] = [];
     quantities: Quantity[] = [];
     process_rules: ProcessRule[] = [];
+    is_additional: boolean = false;
+    is_complement: boolean = false;
     product_category_to_additional: Category[] = [];
     product_category_to_complement: Category[] = [];
     
-    constructor(id = "", name = "", image_path = "", need_print = false, removable_ingredients: string[] = [], sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = [], product_category_to_additional: Category[] = [], product_category_to_complement: Category[] = []) {
+    constructor(id = "", name = "", image_path = "", need_print = false, removable_ingredients: string[] = [], sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = [], is_additional = false, is_complement = false, product_category_to_additional: Category[] = [], product_category_to_complement: Category[] = []) {
         this.id = id;
         this.name = name;
         this.image_path = image_path;
@@ -27,6 +29,8 @@ export default class Category {
         this.products = products;
         this.quantities = quantities;
         this.process_rules = process_rules;
+        this.is_additional = is_additional;
+        this.is_complement = is_complement;
         this.product_category_to_additional = product_category_to_additional;
         this.product_category_to_complement = product_category_to_complement;
     }
