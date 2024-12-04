@@ -22,6 +22,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity'
     const modalHandler = useModal();
     const [quantity, setQuantity] = useState<Quantity>(new Quantity());
+    const [quantityValue, setQuantityValue] = useState("0");
     
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
@@ -33,6 +34,15 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         }
     }, [item, quantity.id]); // Vai ser chamado apenas quando 'item' mudar
     
+
+    useEffect(() => {
+        let num = Number(quantityValue);
+        if (quantityValue.includes(',')) {
+            num = Number(quantityValue.replace(',', '.'));
+        }
+
+        handleInputChange('quantity', Number(num));
+    }, [quantityValue]);
 
     const handleInputChange = (field: keyof Quantity, value: any) => {
         setQuantity(prev => ({ ...prev, [field]: value }));
@@ -79,7 +89,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
     return (
         <>
-            <TextField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', Number(value) || 0)} value={quantity.quantity.toString()}/>
+            <TextField friendlyName='Quantidade' name='quantity' setValue={setQuantityValue} value={quantityValue}/>
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id}/>
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
 

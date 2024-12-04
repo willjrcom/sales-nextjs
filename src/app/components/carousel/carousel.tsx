@@ -15,7 +15,7 @@ const Carousel = <T extends { id: string }>({ items, children }: CarouselProps<T
         className="w-full"
             modules={[Navigation, Pagination, A11y]}
             navigation
-            pagination={{ clickable: true }}
+            pagination={{ clickable: true, dynamicBullets: true }}
             breakpoints={{
                 // Define diferentes valores para slidesPerView com base no tamanho da tela
                 768: {
