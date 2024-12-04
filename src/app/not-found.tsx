@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 const NotFound = () => {
-
     return (
         <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-teal-500">
             <div className="text-center max-w-md">

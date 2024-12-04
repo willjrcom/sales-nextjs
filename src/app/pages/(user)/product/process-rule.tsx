@@ -27,9 +27,12 @@ export default function PageProcessRules () {
         <>
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
             <CrudLayout title="Processos"
-                filterButtonChildren={
+                searchButtonChildren={
                     <SelectField 
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
+                }
+                filterButtonChildren={
+                    <h1>Filtro</h1>
                 }
                 plusButtonChildren={
                     <ButtonIconTextFloat modalName="new-process-rule" title="Novo processo" position="bottom-right">
