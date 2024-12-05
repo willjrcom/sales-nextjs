@@ -39,7 +39,7 @@ const PageClient = () => {
                 tableChildren={
                     <CrudTable
                         columns={ClientColumns()}
-                        data={context.filterItems('name', nome)}>
+                        data={context.filterItems('name', nome).sort((a, b) => a.name.localeCompare(b.name))}>
                     </CrudTable>
                 }
             />

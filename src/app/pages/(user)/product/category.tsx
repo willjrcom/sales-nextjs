@@ -28,7 +28,7 @@ const PageCategories = () => {
                 }
                 plusButtonChildren={
                     <ButtonIconTextFloat title="Nova categoria" modalName="new-category" position="bottom-right">
-                        <CategoryForm/>
+                        <CategoryForm />
                     </ButtonIconTextFloat>
                 }
                 refreshButton={
@@ -39,7 +39,7 @@ const PageCategories = () => {
                 tableChildren={
                     <CrudTable 
                         columns={CategoryColumns()} 
-                        data={context.items}>
+                        data={context.items.sort((a, b) => a.name.localeCompare(b.name))}>
                     </CrudTable>
                 } 
                 />

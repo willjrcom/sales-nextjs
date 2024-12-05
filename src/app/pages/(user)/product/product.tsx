@@ -46,7 +46,7 @@ const PageProducts = () => {
                 tableChildren={
                     <CrudTable 
                         columns={ProductColumns()} 
-                        data={context.filterItems('category_id', categoryID)}>
+                        data={context.filterItems('category_id', categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
                     </CrudTable>
                 } 
                 />

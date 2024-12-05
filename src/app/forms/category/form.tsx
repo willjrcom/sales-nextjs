@@ -19,7 +19,7 @@ import ComplementCategorySelector from './complement-category';
 import { useRouter } from 'next/navigation';
 
 interface CategoryFormProps extends CreateFormsProps<Category> {
-    setItem: (item: Category) => void
+    setItem?: (item: Category) => void
 }
 const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
@@ -68,7 +68,8 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 modalHandler.hideModal(modalName);
             } else {
                 context.updateItem(category);
-                setItem(category)
+
+                if (setItem) setItem(category)
             }
 
         } catch (error) {

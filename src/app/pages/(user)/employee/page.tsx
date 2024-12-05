@@ -49,7 +49,7 @@ const PageEmployee = () => {
                 tableChildren={
                     <CrudTable 
                         columns={EmployeeColumns()} 
-                        data={context.filterItems('name', nome)} />
+                        data={context.filterItems('name', nome).sort((a, b) => a.name.localeCompare(b.name))} />
                 }
             />
         </>
