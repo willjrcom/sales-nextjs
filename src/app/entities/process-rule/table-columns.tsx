@@ -5,6 +5,11 @@ import ProcessRule from "./process-rule";
 
 const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
   {
+    id: 'Ordem',
+    accessorKey: 'order',
+    header: 'Ordem',
+  },
+  {
     id: 'Nome',
     accessorKey: 'name',
     header: 'Nome',
@@ -20,7 +25,7 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-process-rule" + row.original.id }
+        <ButtonIcon modalName={"edit-process-rule-" + row.original.id }
         title={"Editar " + row.original.name}>
           <ProcessRuleForm 
             item={row.original}

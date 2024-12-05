@@ -35,6 +35,14 @@ interface DateTimeFieldProps {
     setValue: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 }
 
+interface TimeFieldProps {
+    friendlyName: string;
+    name: string;
+    disabled?: boolean;
+    value?: string | null | undefined; // Permitir undefined além de string e null
+    setValue: Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
+}
+
 interface CheckboxFieldProps {
     friendlyName: string
     name: string
@@ -106,7 +114,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}
-                onChange={e => setValue(Number(e.target.value))}
+                onChange={e => setValue(e.target.valueAsNumber)}
             />
         </div>
     )
@@ -153,6 +161,25 @@ const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTi
                 disabled={disabled}
                 value={formatDateTime(value)} // Formata o valor para o input
                 onChange={(e) => setValue(e.target.value)}
+            />
+        </div>
+    );
+};
+
+const TimeField = ({ friendlyName, name, disabled, setValue, value }: TimeFieldProps) => {
+    return (
+        <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+                {friendlyName}
+            </label>
+
+            <input
+                className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                id={name}
+                type="time"
+                disabled={disabled}
+                value={value ? new Date(`1970-01-01T${value}Z`).toISOString().split('T')[1].slice(0, 5) : ""}
+                onChange={e => setValue(e.target.value)}
             />
         </div>
     );
@@ -235,4 +262,4 @@ const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setS
     </div>
 );
 
-export { TextField, NumberField, DateField, DateTimeField, CheckboxField, RadioField, HiddenField, SelectField }
+export { TextField, NumberField, DateField, DateTimeField, TimeField, CheckboxField, RadioField, HiddenField, SelectField }

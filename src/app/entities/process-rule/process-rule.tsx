@@ -5,14 +5,12 @@ export default class ProcessRule {
     name: string = "";
     order: number = 0;
     description: string = "";
-    image_path: string = "";
-    ideal_time: number = 0;
-    experimental_error: number = 0;
-    ideal_time_formatted: string = "";
-    experimental_error_formatted: string = "";
+    image_path?: string = "";
+    ideal_time: string = "";
+    experimental_error: string = "";
     category_id: string = "";
 
-    constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = 0, experimental_error = 0, ideal_time_formatted = "", experimental_error_formatted = "", category_id = "") {
+    constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = "", experimental_error = "", category_id = "") {
         this.id = id;
         this.name = name;
         this.order = order;
@@ -20,34 +18,27 @@ export default class ProcessRule {
         this.image_path = image_path;
         this.ideal_time = ideal_time;
         this.experimental_error = experimental_error;
-        this.ideal_time_formatted = ideal_time_formatted;
-        this.experimental_error_formatted = experimental_error_formatted;
         this.category_id = category_id;
     }
 }
 
 const SchemaProcessRule = z.object({
-    image_path: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     order: z.number().min(1, 'A primeira ordem deve ser 1'),
     description: z.string().optional(),
-    ideal_time: z.number().min(1, 'Tempo ideal inválido'),
-    experimental_error: z.number().min(1, 'Erro experimental inválido'),
-    ideal_time_formatted: z.string().optional(),
-    experimental_error_formatted: z.string().optional(),
+    ideal_time: z.string(),
+    experimental_error: z.string(),
     category_id: z.string().uuid("Categoria inválida"),
 });
 
 export const ValidateProcessRuleForm = (category: ProcessRule) => {
     const validatedFields = SchemaProcessRule.safeParse({
-        image_path: category.image_path,
         name: category.name,
         order: category.order,
         description: category.description,
         ideal_time: category.ideal_time,
         experimental_error: category.experimental_error,
-        ideal_time_formatted: category.ideal_time_formatted,
-        experimental_error_formatted: category.experimental_error_formatted
+        category_id: category.category_id
     });
 
     if (!validatedFields.success) {
