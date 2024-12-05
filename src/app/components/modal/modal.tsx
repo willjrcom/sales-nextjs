@@ -32,7 +32,7 @@ const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children 
                     className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="p-6">
+                    <div className="p-1">
                         {/* Cabeçalho do Modal */}
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold">{title}</h2>

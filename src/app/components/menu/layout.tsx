@@ -19,7 +19,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         <Sidebar />
         <div className="flex-1 flex flex-col ml-[65px]">
           <Topbar />
-          <main className="p-4 h-[93vh] min-w-0 max-w-full flex justify-center">
+          <main className="p-4 h-[89vh] min-w-0 max-w-full flex justify-center">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto ">
               <div className='min-w-[80vw] max-w-[90vw]'>
               {children}

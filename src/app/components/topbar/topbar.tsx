@@ -26,13 +26,13 @@ const TopbarItem: React.FC<TopbarItemProps> = ({ label, href, color }: TopbarIte
 );
 
 const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => (
-  <Link href={href} className={styles.icon}>
+  <Link href={href} className="text-2xl self-center">
       <Icon/>
   </Link>
 );
 
 const TopbarItemAlert: React.FC<TopbarItemIconProps> = ({ label, icon: Icon, href }) => (
-  <Link href={href} className={styles.alert}>
+  <Link href={href} className="self-center">
     <div className="inline-flex items-center text-red-500"><Icon/>&nbsp;{label}</div>
   </Link>
 );
@@ -50,7 +50,7 @@ const Topbar = () => {
   }, [contextCurrentOrder.order]);
 
   return (
-    <div className={`${styles.topbar} flex justify-between pl-[65px] pr-4`} > {/* Ajustamos o padding left dinamicamente */}
+    <div className="flex justify-between pl-[65px] pr-4 w-full items-center h-[8vh] box-border bg-[#333] text-[#fff] pl-2"> {/* Ajustamos o padding left dinamicamente */}
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />

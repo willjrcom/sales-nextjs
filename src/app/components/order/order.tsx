@@ -32,7 +32,7 @@ const OrderManager = () => {
     }, [context.order, fetchOrder])
 
     return (
-        <div className="flex h-[80vh] bg-gray-100">
+        <div className="flex h-full bg-gray-100">
             <CartAdded order={order} />
             <OrderOptions order={order} />
         </div>
@@ -56,9 +56,9 @@ const CartAdded = ({ order }: CartProps) => {
     }, [order]);
 
     return (
-        <div className="flex-1 p-4 bg-white overflow-y-auto overflow-x-auto">
-            <div className="flex justify-between items-center mb-2">
-                <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
+        <div className="bg-white max-w-[60vw]">
+            <div className=" mb-2">
+                <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
                     <ButtonIconTextFloat size="xl" position="bottom-right" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
                         <EditGroupItem />
@@ -66,6 +66,7 @@ const CartAdded = ({ order }: CartProps) => {
                 </div>
             </div>
 
+            <div className="overflow-y-auto overflow-x-auto h-[76vh]">
             {Object.entries(groupedItems).map(([key, groups], index) => {
                 if (contextCategories.items.length === 0) return
                 const category = contextCategories.findByID(key)
@@ -74,13 +75,14 @@ const CartAdded = ({ order }: CartProps) => {
                     <CategoryOrder key={key} category={category} groups={groups} />
                 )
             })}
+            </div>
         </div>
     )
 }
 
 const OrderOptions = ({ order }: CartProps) => {
     return (
-        <div className="w-80 bg-gray-50 p-4 overflow-y-auto">
+        <div className="w-80 bg-gray-50 p-3 overflow-y-auto">
             {/* Lançar Pedido */}
 
             <DataOrderCard order={order} />

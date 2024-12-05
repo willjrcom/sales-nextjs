@@ -5,6 +5,7 @@ import EditItem from './edit-item';
 import ButtonDelete from '../../button/button-delete';
 import DeleteItemModal from './delete-item-modal';
 import { useGroupItem } from '@/app/context/group-item/context';
+import AdditionalItemCard from './additional-item';
 
 interface CardProps {
     item: Item;
@@ -28,21 +29,26 @@ const ItemCard = ({ item }: CardProps) => {
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Estado padrão */}
-            <div className="flex justify-between items-center" onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}>
-                <div className="text-sm font-medium">
-                    {item.quantity} x {item.name}
+            <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center space-x-4" onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}>
+                    <div className="text-sm font-medium">
+                        {item.quantity} x {item.name}
+                    </div>
+                    <div className="text-lg font-bold">R$ {item.price.toFixed(2)}</div>
+                    {item.item_to_additional?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full">
+                        {item.item_to_additional?.reduce((total, item) => total + item.quantity, 0)}
+                    </div>}
                 </div>
-                <div className="text-lg font-bold">R$ {item.price.toFixed(2)}</div>
-                <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full">
-                    {item.item_to_additional?.length || 0}
+                &nbsp;
+                <div className='bg-red-100 p-1 rounded-full'>
+                    <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
                 </div>
-                <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
             </div>
 
             {/* Hover para detalhes */}
             {isHovered && (
                 item.item_to_additional?.map((additionalItem, index) => (
-                    <ItemCard key={index} item={additionalItem} />
+                    <AdditionalItemCard key={index} item={additionalItem} />
                 ))
             )}
         </div>

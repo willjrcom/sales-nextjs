@@ -13,14 +13,13 @@ import ComplementItemList from "./list-complement-item";
 
 export default function EditGroupItem() {
     return (
-        <div className="flex h-[68vh] bg-gray-200 p-4 overflow-hidden">
+        <div className="flex h-[68vh]">
             {/* Componente à esquerda: ocupa 70% da tela */}
             <ListCartToAdd />
             <ListGroupItem />
         </div>
     );
 }
-
 
 const ListCartToAdd = () => {
     const allCategories = useCategories().items
@@ -37,7 +36,7 @@ const ListCartToAdd = () => {
     }, [contextGroupItem.groupItem?.category_id])
 
     return (
-        <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto h-full flex-1">
+        <div className="max-w-[60vw] flex-auto p-4 bg-gray-100 space-y-3 mr-4 overflow-y-auto h-full">
             <h1 className="text-2xl font-bold">Carrinho</h1>
             <div>
                 {categories?.map((category) => {
@@ -67,7 +66,7 @@ const ListGroupItem = () => {
     }, [contextGroupItem.groupItem]);
 
     return (
-        <div className="bg-gray-100 p-4 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[20vw]">
+        <div className="bg-gray-100 p-3 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[30vw]">
             {/* Defina o min-h para o tamanho mínimo em telas pequenas, e lg:block para visibilidade em telas grandes */}
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
 
