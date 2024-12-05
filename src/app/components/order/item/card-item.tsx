@@ -4,6 +4,7 @@ import { useModal } from '@/app/context/modal/context';
 import EditItem from './edit-item';
 import ButtonDelete from '../../button/button-delete';
 import DeleteItemModal from './delete-item-modal';
+import { useGroupItem } from '@/app/context/group-item/context';
 
 interface CardProps {
     item: Item;
@@ -11,10 +12,12 @@ interface CardProps {
 
 const ItemCard = ({ item }: CardProps) => {
     const [isHovered, setIsHovered] = useState(false);
+    const contextGroupItem = useGroupItem();
     const modalHandler = useModal();
     const modalName = "edit-item-" + item.id;
 
     const onClose = () => {
+        contextGroupItem.fetchData(contextGroupItem.groupItem?.id || "");
         modalHandler.hideModal(modalName);
     };
 
@@ -31,14 +34,14 @@ const ItemCard = ({ item }: CardProps) => {
                 </div>
                 <div className="text-lg font-bold">R$ {item.price.toFixed(2)}</div>
                 <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full">
-                    {item.additional_items?.length || 0}
+                    {item.item_to_additional?.length || 0}
                 </div>
                 <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
             </div>
 
             {/* Hover para detalhes */}
             {isHovered && (
-                item.additional_items?.map((additionalItem, index) => (
+                item.item_to_additional?.map((additionalItem, index) => (
                     <ItemCard key={index} item={additionalItem} />
                 ))
             )}

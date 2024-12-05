@@ -55,7 +55,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const submit = async () => {
         if (!data) return;
 
-        console.log(category)
         const validationErrors = ValidateCategoryForm(category);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 

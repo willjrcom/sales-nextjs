@@ -8,22 +8,25 @@ import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 
 interface ItemAdditional {
-    id: string;
     name: string;
     quantity: number;
     category_id: string;
+    product_id: string;
+    additional_item_id?: string
 }
 
 interface ItemListProps {
     item: Item;
 }
 
-const convertProductToItem = (products: Product[]) => {
+const convertProductToItem = (products: Product[], additionalItemsAdded: Item[]) => {
     const items: ItemAdditional[] = products?.map((product) => {
+        const itemAdded = additionalItemsAdded.find(item => item.product_id === product.id)
         const item: ItemAdditional = {
-            id: product.id,
+            product_id: product.id,
             name: product.name,
-            quantity: 0,
+            quantity: itemAdded?.quantity || 0,
+            additional_item_id: itemAdded?.id,
             category_id: product.category_id
         }
         return item
@@ -36,8 +39,8 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
     const contextCategories = useCategories();
     const [itemList, setItemList] = useState<ItemAdditional[]>([]);
     const [error, setError] = useState<RequestError | null>(null);
-    const { data } = useSession(); 
-    
+    const { data } = useSession();
+
     useEffect(() => {
         try {
             // Passo 1: Buscar a categoria atual do item
@@ -65,7 +68,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             const validItems = additionalItems.filter(item => item != null && item !== undefined);
 
             // Passo 5: Converter os produtos válidos para itens
-            const items = convertProductToItem(validItems);
+            const items = convertProductToItem(validItems, item.item_to_additional || []);
             // Passo 6: Verificar se após conversão existem itens válidos
             if (!items || items.length === 0) {
                 return setItemList([]); // Se não houver itens válidos após a conversão, retorna lista vazia
@@ -80,26 +83,28 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         }
     }, [item.id]);
 
-    const onChange = async(itemAdditional: ItemAdditional) => {
+    const onChange = async (itemAdditional: ItemAdditional) => {
         if (!data) return
 
         if (itemAdditional.quantity === 0) {
+            if (!itemAdditional.additional_item_id) return setError(new RequestError("Item indisponivel"))
+                
             try {
-            await DeleteAdditionalItem(itemAdditional.id, data)
-            setError(null)
+                await DeleteAdditionalItem(itemAdditional.additional_item_id, data)
+                setError(null)
             } catch (error) {
                 setError(error as RequestError)
             }
             return
         }
-        
+
         const category = contextCategories.findByID(itemAdditional.category_id)
         const quantity = category?.quantities.find(quantity => quantity.quantity === itemAdditional.quantity)
 
         if (!quantity) return setError(new RequestError("Quantidade indisponivel"))
 
         try {
-            await NewAdditionalItem(item.id, { product_id: itemAdditional.id, quantity_id: quantity?.id}, data)
+            await NewAdditionalItem(item.id, { product_id: itemAdditional.product_id, quantity_id: quantity?.id }, data)
             setError(null)
         } catch (error) {
             setError(error as RequestError)
@@ -111,7 +116,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         onChange(itemAdditional)
         setItemList((prev) =>
             prev.map((item) =>
-                item.id === itemAdditional.id ? { ...item, quantity: item.quantity } : item
+                item.product_id === itemAdditional.product_id ? { ...item, quantity: item.quantity } : item
             )
         );
     };
@@ -121,7 +126,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         onChange(itemAdditional)
         setItemList((prev) =>
             prev.map((item) =>
-                item.id === itemAdditional.id && item.quantity > 0
+                item.product_id === itemAdditional.product_id && item.quantity > 0
                     ? { ...item, quantity: item.quantity }
                     : item
             )
@@ -135,7 +140,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {itemList?.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4">
+                    <div key={item.product_id} className="flex items-center space-x-4">
                         <div className="flex-1">{item.name}</div>
                         <div className="flex items-center space-x-2">
                             <button
