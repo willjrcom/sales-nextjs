@@ -3,7 +3,7 @@ import GroupItem from '@/app/entities/order/group-item';
 import Product from '@/app/entities/product/product';
 import React, { useEffect, useState } from 'react';
 import Carousel from '../../carousel/carousel';
-import ComplementCard from './card-complement-item';
+import AddComplementCard from './add-card-complement-item';
 
 interface ItemListProps {
     groupItem?: GroupItem | null;
@@ -57,7 +57,7 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
             <h4 className="text-2md font-bold">Itens adicionais</h4>
             <div className="space-y-4">
                 <Carousel items={complementItems}>
-                    {(product) => <ComplementCard key={product.id} groupItem={groupItem} product={product} />}
+                    {(product) => <AddComplementCard key={product.id} groupItem={groupItem} product={product} />}
                 </Carousel>
             </div>
         </div>

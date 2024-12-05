@@ -34,8 +34,8 @@ const ItemCard = ({ item }: CardProps) => {
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>
-                    <div className="text-lg font-bold">R$ {item.price.toFixed(2)}</div>
-                    {item.item_to_additional?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full">
+                    <div className="text-sm font-bold">R$ {item.price.toFixed(2)}</div>
+                    {item.item_to_additional?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-sm font-bold rounded-full">
                         {item.item_to_additional?.reduce((total, item) => total + item.quantity, 0)}
                     </div>}
                 </div>

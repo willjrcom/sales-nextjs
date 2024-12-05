@@ -35,6 +35,7 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
         if (!data?.user?.idToken || !id) return;
         try {
             const groupItem = await GetGroupItemByID(id as string, data);
+            console.log(groupItem)
             setgroupItem(groupItem);
             setError(null);
             setLoading(false);

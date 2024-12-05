@@ -10,6 +10,11 @@ import StatusComponent from "../../button/show-status";
 import ProductCard from "../product/card-product";
 import ButtonIconText from "../../button/button-icon-text";
 import ComplementItemList from "./list-complement-item";
+import AdditionalItemCard from "../item/additional-item";
+import ButtonDelete from "../../button/button-delete";
+import DeleteComplementItemModal from "./delete-complement-modal";
+import ComplementItemCard from "./complement-item";
+import Item from "@/app/entities/order/item";
 
 export default function EditGroupItem() {
     return (
@@ -60,9 +65,16 @@ const ListCartToAdd = () => {
 const ListGroupItem = () => {
     const contextGroupItem = useGroupItem();
     const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
+    const [complementItem, setComplementItem] = useState<Item | null>();
 
     useEffect(() => {
         setGroupItem(contextGroupItem.groupItem);
+        
+        if (contextGroupItem.groupItem?.complement_item) {
+            setComplementItem(contextGroupItem.groupItem.complement_item)
+        } else {
+            setComplementItem(null)
+        }
     }, [contextGroupItem.groupItem]);
 
     return (
@@ -77,9 +89,15 @@ const ListGroupItem = () => {
                 ))}
             </div>
 
-            <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
+            {/* Adicionar complemento */}
+            <p className="text-lg font-semibold">Complemento</p>
+            {!complementItem && <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
                 <ComplementItemList groupItem={groupItem} />
-            </ButtonIconText>
+            </ButtonIconText>}
+
+            {complementItem && 
+                <ComplementItemCard item={groupItem} />
+            }
 
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total:</p>

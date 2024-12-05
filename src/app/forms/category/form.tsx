@@ -95,7 +95,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
         <div className="w-[80vw]">
             {/* Bloco de Dados Básicos */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h2 className="text-2xl font-medium mb-4">Dados Básicos</h2>
+                <h2 className="text-md font-medium mb-4">Dados Básicos</h2>
 
                 <TextField
                     friendlyName="Nome"
@@ -119,14 +119,12 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
             {/* Bloco de Ingredientes Removíveis */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h2 className="text-2xl font-medium mb-4">Ingredientes Removíveis</h2>
                 <RemovableItensComponent item={category} setItem={setCategory} />
             </div>
 
             {/* Bloco de Tipo de Categoria */}
             {!isUpdate && (
                 <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 className="text-2xl font-medium mb-4">Selecione o Tipo de Categoria</h2>
                     <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
                 </div>
             )}

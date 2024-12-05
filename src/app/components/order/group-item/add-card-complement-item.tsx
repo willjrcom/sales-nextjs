@@ -1,5 +1,6 @@
 import RequestError from "@/app/api/error";
 import NewComplementGroupItem from "@/app/api/group-item/update/complement/route";
+import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";
 import Product from "@/app/entities/product/product";
@@ -13,17 +14,19 @@ interface ComplementCardProps {
     product: Product;
 }
 
-const ComplementCard = ({ groupItem, product }: ComplementCardProps) => {
+const AddComplementCard = ({ groupItem, product }: ComplementCardProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
+    const contextGroupItem = useGroupItem();
     const modalHandler = useModal();
 
     const submit = async () => {
         if (!data) return
 
         try {
-            NewComplementGroupItem(groupItem?.id || "", product.id, data)
+            await NewComplementGroupItem(groupItem?.id || "", product.id, data)
             setError(null)
+            contextGroupItem.fetchData(groupItem?.id || "")
             modalHandler.hideModal("add-complement-item-group-item-" + groupItem?.id)
         } catch (error) {
             setError(error as RequestError)
@@ -72,4 +75,4 @@ const ComplementCard = ({ groupItem, product }: ComplementCardProps) => {
     );
 };
 
-export default ComplementCard;
+export default AddComplementCard;

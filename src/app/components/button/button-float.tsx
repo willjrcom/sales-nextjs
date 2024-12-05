@@ -53,7 +53,7 @@ const ButtonIconTextFloat = ({
             onClick={() => modalHandler.showModal(modalName, title, children, size, onClose)}
             className={`fixed ${positionClasses} flex items-center justify-center space-x-2 p-4 bg-${color}-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-${color}-600 w-max z-50`}
         >
-            <Icon className="text-lg" /> {/* Ajustando o tamanho do ícone */}
+            <Icon className="text-sm" /> {/* Ajustando o tamanho do ícone */}
             {title && <span className="text-sm">{title}</span>}
         </button>
     );

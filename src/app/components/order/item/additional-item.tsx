@@ -14,7 +14,7 @@ const AdditionalItemCard = ({ item }: AdditionalItemCardProps) => {
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>
-                    <div className="text-lg font-bold">R$ {(item.quantity * item.price).toFixed(2)}</div>
+                    <div className="text-sm font-bold">R$ {(item.quantity * item.price).toFixed(2)}</div>
                 </div>
             </div>
         </div>

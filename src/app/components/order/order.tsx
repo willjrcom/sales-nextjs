@@ -20,7 +20,7 @@ const OrderManager = () => {
     const context = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(context.order);
     const { data } = useSession();
-
+    console.log(order)
     const fetchOrder = useCallback(async () => {
         if (!context.order || !data) return
         const orderUpdated = await GetOrderByID(context.order.id, data);

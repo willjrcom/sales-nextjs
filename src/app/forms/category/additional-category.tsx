@@ -47,16 +47,16 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
 
     return (
         <div>
-            <h4 className="text-2xl font-medium mb-4">Categorias adicional</h4>
+            <h4 className="text-md font-medium mb-4">Categorias adicional</h4>
                 <Carousel items={filteredCategories}>
                     {(category) => (
                     <div
                         key={category.id}
-                        className={`border p-4 rounded-lg cursor-pointer ${selectedCategories?.some(cat => cat.id === category.id) ? 'bg-blue-100' : 'bg-white'}`}
+                        className={`border p-3 rounded-lg cursor-pointer ${selectedCategories?.some(cat => cat.id === category.id) ? 'bg-blue-100' : 'bg-white'}`}
                         onClick={() => handleCategorySelection(category)}
                     >
                         <img src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />
-                        <h3 className="text-lg font-bold text-center">{category.name}</h3>
+                        <h3 className="text-md font-bold text-center">{category.name}</h3>
                     </div>
                     )}
                 </Carousel>
