@@ -8,6 +8,8 @@ import Category from "@/app/entities/category/category";
 import GroupItemForm from "@/app/forms/group-item/form";
 import StatusComponent from "../../button/show-status";
 import ProductCard from "../product/card-product";
+import ButtonIconText from "../../button/button-icon-text";
+import ComplementItemList from "./list-complement-item";
 
 export default function EditGroupItem() {
     return (
@@ -36,7 +38,7 @@ const ListCartToAdd = () => {
 
     return (
         <div className="max-w-[70vw] flex-1 p-4 bg-gray-100 space-y-6 mr-4 overflow-y-auto h-full flex-1">
-            <h1 className="text-2xl font-bold">Produtos</h1>
+            <h1 className="text-2xl font-bold">Carrinho</h1>
             <div>
                 {categories?.map((category) => {
                     if (!category.products) return null;
@@ -71,10 +73,14 @@ const ListGroupItem = () => {
 
             {/* Produto Selecionado */}
             <div className="space-y-2">
-                {contextGroupItem.groupItem?.items?.map((item, index) => (
+                {groupItem?.items?.map((item) => (
                     <ItemCard item={item} key={item.id} />
                 ))}
             </div>
+
+            <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
+                <ComplementItemList groupItem={groupItem} />
+            </ButtonIconText>
 
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total:</p>

@@ -1,4 +1,3 @@
-import ButtonIconText from "@/app/components/button/button-icon-text"
 import CategoryOrder from "@/app/components/order/category/category"
 import { useCategories } from "@/app/context/category/context"
 import GroupItem from "@/app/entities/order/group-item"
@@ -15,6 +14,7 @@ import DeliveryCard from "./delivery-order"
 import PickupCard from "./pickup-order"
 import TableCard from "./table-order"
 import StatusComponent from "../button/show-status"
+import ButtonIconTextFloat from "../button/button-float"
 
 const OrderManager = () => {
     const context = useCurrentOrder();
@@ -60,9 +60,9 @@ const CartAdded = ({ order }: CartProps) => {
             <div className="flex justify-between items-center mb-2">
                 <h1 className="text-xl font-bold mb-4">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
-                    <ButtonIconText size="xl" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
+                    <ButtonIconTextFloat size="xl" position="bottom-right" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
                         <EditGroupItem />
-                    </ButtonIconText>
+                    </ButtonIconTextFloat>
                 </div>
             </div>
 

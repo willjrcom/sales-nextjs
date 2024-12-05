@@ -57,7 +57,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
 
             // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
             const additionalItems = additionalCategories
-                .map((internalCategory) => contextCategories.findByID(internalCategory.id)?.products) // Obter os produtos de cada categoria adicional
+                .map((additionalCategory) => contextCategories.findByID(additionalCategory.id)?.products) // Obter os produtos de cada categoria adicional
                 .flat(); // "Flatten" para uma lista única de produtos
 
             if (!additionalItems || additionalItems.length === 0) {
