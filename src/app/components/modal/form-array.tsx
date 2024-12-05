@@ -16,7 +16,7 @@ const FormArray = ({ title, singleItemName, items, onAdd, onRemove, onChange }: 
             <h3 className="text-lg font-semibold">{title}</h3>
             <div className="space-y-2 grid grid-cols-2">
                 {items?.map((item, index) => (
-                    <div key={index} className="flex items-center space-x-4">
+                    <div key={item} className="flex items-center space-x-4">
                         <TextField
                             friendlyName={`${singleItemName} ${index + 1}`}
                             name={`${singleItemName}-${index}`}

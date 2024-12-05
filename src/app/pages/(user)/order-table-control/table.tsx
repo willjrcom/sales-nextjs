@@ -41,7 +41,7 @@ const Tables = () => {
       <div className="flex flex-wrap">
         {tables.map((status, index) => (
           <Table 
-            key={index} 
+            key={status} 
             status={status} 
             onClick={() => handleTableClick(index)}
           />

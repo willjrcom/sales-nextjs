@@ -71,7 +71,7 @@ const CartAdded = ({ order }: CartProps) => {
                 const category = contextCategories.findByID(key)
                 if (!category) return
                 return (
-                    <CategoryOrder key={index} category={category} groups={groups} />
+                    <CategoryOrder key={key} category={category} groups={groups} />
                 )
             })}
         </div>

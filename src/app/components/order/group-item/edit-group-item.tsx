@@ -72,7 +72,7 @@ const ListGroupItem = () => {
             {/* Produto Selecionado */}
             <div className="space-y-2">
                 {contextGroupItem.groupItem?.items?.map((item, index) => (
-                    <ItemCard item={item} key={index} />
+                    <ItemCard item={item} key={item.id} />
                 ))}
             </div>
 

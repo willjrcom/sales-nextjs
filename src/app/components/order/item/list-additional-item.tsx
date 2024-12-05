@@ -1,3 +1,4 @@
+import RequestError from '@/app/api/error';
 import DeleteAdditionalItem from '@/app/api/item/delete/additional/route';
 import NewAdditionalItem from '@/app/api/item/update/additional/route';
 import { useCategories } from '@/app/context/category/context';
@@ -10,6 +11,7 @@ interface ItemAdditional {
     id: string;
     name: string;
     quantity: number;
+    category_id: string;
 }
 
 interface ItemListProps {
@@ -21,7 +23,8 @@ const convertProductToItem = (products: Product[]) => {
         const item: ItemAdditional = {
             id: product.id,
             name: product.name,
-            quantity: 0
+            quantity: 0,
+            category_id: product.category_id
         }
         return item
     })
@@ -32,8 +35,9 @@ const convertProductToItem = (products: Product[]) => {
 const AdditionalItemList = ({ item }: ItemListProps) => {
     const contextCategories = useCategories();
     const [itemList, setItemList] = useState<ItemAdditional[]>([]);
+    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession(); 
-
+    
     useEffect(() => {
         try {
             // Passo 1: Buscar a categoria atual do item
@@ -76,43 +80,49 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         }
     }, [item.id]);
 
-    const onAdd = async(idProduct: string) => {
+    const onChange = async(itemAdditional: ItemAdditional) => {
         if (!data) return
 
+        if (itemAdditional.quantity === 0) {
+            try {
+            await DeleteAdditionalItem(itemAdditional.id, data)
+            setError(null)
+            } catch (error) {
+                setError(error as RequestError)
+            }
+            return
+        }
+        
+        const category = contextCategories.findByID(itemAdditional.category_id)
+        const quantity = category?.quantities.find(quantity => quantity.quantity === itemAdditional.quantity)
+
+        if (!quantity) return setError(new RequestError("Quantidade indisponivel"))
+
         try {
-            NewAdditionalItem(item.id, { product_id: idProduct, quantity_id: ""}, data)
-            
+            await NewAdditionalItem(item.id, { product_id: itemAdditional.id, quantity_id: quantity?.id}, data)
+            setError(null)
         } catch (error) {
-            console.log(error)
+            setError(error as RequestError)
         }
     }
 
-    const onRemove = async (idProduct: string) => {
-        if (!data) return
-
-        try {
-            DeleteAdditionalItem(idProduct, data)
-            
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handleIncrement = async (idProduct: string) => {
-        await onAdd(idProduct)
+    const handleIncrement = (itemAdditional: ItemAdditional) => {
+        itemAdditional.quantity += 1
+        onChange(itemAdditional)
         setItemList((prev) =>
             prev.map((item) =>
-                item.id === idProduct ? { ...item, quantity: item.quantity + 1 } : item
+                item.id === itemAdditional.id ? { ...item, quantity: item.quantity } : item
             )
         );
     };
 
-    const handleDecrement = async (idProduct: string) => {
-        await onRemove(idProduct)
+    const handleDecrement = (itemAdditional: ItemAdditional) => {
+        itemAdditional.quantity -= 1
+        onChange(itemAdditional)
         setItemList((prev) =>
             prev.map((item) =>
-                item.id === idProduct && item.quantity > 0
-                    ? { ...item, quantity: item.quantity - 1 }
+                item.id === itemAdditional.id && item.quantity > 0
+                    ? { ...item, quantity: item.quantity }
                     : item
             )
         );
@@ -122,20 +132,21 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         <div>
             <br className="my-4" />
             <h4 className="text-2md font-bold">Itens adicionais</h4>
+            {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {itemList?.map((item) => (
                     <div key={item.id} className="flex items-center space-x-4">
                         <div className="flex-1">{item.name}</div>
                         <div className="flex items-center space-x-2">
                             <button
-                                onClick={() => handleDecrement(item.id)}
+                                onClick={() => handleDecrement(item)}
                                 className="bg-red-500 text-white px-3 py-1 rounded"
                             >
                                 -
                             </button>
                             <span>{item.quantity}</span>
                             <button
-                                onClick={() => handleIncrement(item.id)}
+                                onClick={() => handleIncrement(item)}
                                 className="bg-green-500 text-white px-3 py-1 rounded"
                             >
                                 +
