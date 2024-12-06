@@ -59,20 +59,20 @@ function App() {
 
     return (
         <DndContext onDragEnd={handleDragEnd}>
-            <div className="flex space-x-4">
+            <div className="flex space-x-6 p-6">
                 {/* Pendentes */}
                 <Droppable id="Pending" orders={orders.pending}>
-                    <h2>Pendentes</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">Pendentes</h2>
                 </Droppable>
 
                 {/* Em andamento */}
                 <Droppable id="InProgress" orders={orders.inProgress}>
-                    <h2>Em Andamento</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">Em Andamento</h2>
                 </Droppable>
 
                 {/* Finalizados */}
                 <Droppable id="Finished" orders={orders.finished}>
-                    <h2>Finalizados</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">Finalizados</h2>
                 </Droppable>
             </div>
         </DndContext>
@@ -91,22 +91,28 @@ function Droppable({ id, orders, children }: OrderProps) {
     });
 
     const style = {
-        color: isOver ? 'green' : undefined,
-        padding: '20px',
-        border: '1px dashed black',
-        width: '200px',
-        minHeight: '300px',
-        backgroundColor: isOver ? '#d3f9d8' : '#ffffff', // Cor de fundo muda enquanto arrasta
-        transition: 'background-color 0.3s ease', // Suaviza a mudança de cor
+        padding: '16px',
+        borderRadius: '8px',
+        border: '2px dashed #d1d5db',
+        minHeight: '400px',
+        backgroundColor: isOver ? '#f0fdf4' : '#ffffff',
+        boxShadow: isOver ? '0 4px 10px rgba(0, 128, 0, 0.2)' : 'none',
+        transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+        width: '33vw',
+        display: 'flex',
+        alignItems: 'center', // Centraliza os cards na coluna
+        justifyContent: 'flex-start' // Alinha os cards no topo, mas você pode mudar para 'center' se quiser centralizar também verticalmente
     };
 
     return (
-        <div ref={setNodeRef} style={style}>
+        <div ref={setNodeRef} style={style} className="flex flex-col items-center">
             {children}
-            <div>
+            <div className="mt-4 flex flex-col w-full">
                 {orders.map((order) => (
                     <Draggable key={order.id} order={order}>
-                        {order.order_number}
+                        <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200">
+                            {order.order_number}
+                        </div>
                     </Draggable>
                 ))}
             </div>
@@ -124,16 +130,22 @@ function Draggable({ order, children }: DraggableProps) {
         id: `${order.status}-${order.id}`, // Garantir que o id é único
     });
 
-    // Adicionar estilo condicional com base em isDragging
     const style = {
         ...(transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : {}),
         backgroundColor: isDragging ? '#f0f8ff' : 'white', // Cor de fundo enquanto arrasta
         border: isDragging ? '2px solid #007bff' : '1px solid #ccc', // Borda enquanto arrasta
-        transition: 'background-color 0.2s, border 0.2s', // Suaviza a transição
+        borderRadius: '8px',
+        padding: '8px 12px',
+        fontSize: '16px',
+        fontWeight: 'bold',
+        cursor: 'move',
+        transition: 'background-color 0.2s, border 0.2s',
+        justifyContent: 'center' as const,
+        textAlign: 'center' as const, // Corrigido para tipo literal 'center'
     };
 
     return (
-        <button ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <button ref={setNodeRef} className='w-full' style={style} {...listeners} {...attributes}>
             {children}
         </button>
     );
