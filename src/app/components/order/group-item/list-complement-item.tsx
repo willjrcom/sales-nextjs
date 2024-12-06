@@ -41,9 +41,7 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
             // Passo 4: Filtrar qualquer produto inválido antes de converter
             const validItems = complementItems.filter(item => item != null && item !== undefined);
 
-            console.log(validItems)
             const validSizeItems = validItems.filter(item => item.size.name === groupItem.size);
-            console.log(validSizeItems)
             setComplementItems(validSizeItems);
         } catch (error) {
             console.error("Erro ao buscar itens adicionais:", error);

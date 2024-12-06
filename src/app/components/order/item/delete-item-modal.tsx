@@ -18,15 +18,15 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
     const modalName = "delete-item-" + item.id;
 
     const onDelete = async () => {
-        if (!data) return;
+        if (!data || !contextGroupItem.groupItem) return;
         try {
             await DeleteItem(item.id, data)
             setError(null)
 
-            if (contextGroupItem.groupItem?.items.length === 1 && contextGroupItem.groupItem.items[0].id == item.id) {
+            if (contextGroupItem.groupItem.items.length === 1 && contextGroupItem.groupItem.items[0].id == item.id) {
                 contextGroupItem.resetGroupItem()
             } else {
-                contextGroupItem.fetchData(contextGroupItem.groupItem?.id || "")
+                contextGroupItem.fetchData(contextGroupItem.groupItem.id)
             }
 
             modalHandler.hideModal(modalName)

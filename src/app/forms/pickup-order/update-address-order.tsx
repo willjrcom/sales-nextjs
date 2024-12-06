@@ -32,7 +32,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
         try {
             await UpdatePickupOrderName(pickupOrderId, name, data);
             setError(null);
-            await contextCurrentOrder.fetchData();
+            contextCurrentOrder.fetchData();
             modalHandler.hideModal(modalName);
         } catch (error) {
             setError(error as RequestError);

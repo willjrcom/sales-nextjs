@@ -18,12 +18,12 @@ const DeleteComplementItemModal = ({ item }: DeleteComplementItemModalProps) => 
     const modalName = "delete-complement-item-" + item.id;
 
     const onDelete = async () => {
-        if (!data) return;
+        if (!data || !contextGroupItem.groupItem) return;
         try {
             await DeleteComplementGroupItem(item.id, data)
             setError(null)
 
-            contextGroupItem.fetchData(contextGroupItem.groupItem?.id || "")
+            contextGroupItem.fetchData(contextGroupItem.groupItem.id)
 
             modalHandler.hideModal(modalName)
         } catch (error) {

@@ -23,7 +23,7 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
             await ScheduleGroupItem(groupItem, data, newStartAt);
             setGroupItem({ ...groupItem, start_at: newStartAt });
             setStartAt(newStartAt);
-            await contextGroupItem.fetchData(groupItem.id);
+            contextGroupItem.fetchData(groupItem.id);
             setError(null);
         } catch (error) {
             setError(error as RequestError);

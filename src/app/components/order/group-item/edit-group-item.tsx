@@ -74,6 +74,8 @@ const ListGroupItem = () => {
         }
     }, [contextGroupItem.groupItem]);
 
+    const containItems = groupItem?.items && groupItem?.items.length > 0
+
     return (
         <div className="bg-gray-100 p-3 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[30vw]">
             {/* Defina o min-h para o tamanho mínimo em telas pequenas, e lg:block para visibilidade em telas grandes */}
@@ -87,12 +89,12 @@ const ListGroupItem = () => {
             </div>
 
             {/* Adicionar complemento */}
-            <p className="text-lg font-semibold">Complemento</p>
-            {!complementItem && <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
+            {containItems && <p className="text-lg font-semibold">Complemento</p>}
+            {containItems && !complementItem && <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
                 <ComplementItemList groupItem={groupItem} />
             </ButtonIconText>}
 
-            {complementItem && 
+            {containItems && complementItem && 
                 <ComplementItemCard item={groupItem} />
             }
 

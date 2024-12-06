@@ -34,15 +34,12 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const fetchData = async (id: string) => {
         if (!data?.user?.idToken || !id) return;
         try {
-            const groupItem = await GetGroupItemByID(id as string, data);
-            console.log(groupItem)
+            const groupItem = await GetGroupItemByID(id, data);
             setgroupItem(groupItem);
             setError(null);
-            setLoading(false);
             return groupItem;
         } catch (error) {
             setError(error as RequestError);
-            setLoading(false);
             return null;
         }
     };
