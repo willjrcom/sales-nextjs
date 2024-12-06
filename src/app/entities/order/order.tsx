@@ -4,7 +4,7 @@ import OrderDelivery from "./order-delivery";
 import OrderPickup from "./order-pickup";
 import OrderTable from "./order-table";
 
-type StatusOrder = "Staging" | "Pending" | "Finished" | "Canceled" | "Archived";
+type StatusOrder = "Staging" | "Pending" | "InProgress" | "Finished" | "Canceled" | "Archived";
 
 export default class Order {
     id: string = "";
@@ -28,7 +28,7 @@ export default class Order {
     canceled_at?: Date;
     archived_at?: Date;
 
-    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", groups: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", pending_at: Date, finished_at: Date, canceled_at: Date, archived_at: Date) {
+    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", groups: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", pending_at?: Date, finished_at?: Date, canceled_at?: Date, archived_at?: Date) {
         this.id = id;
         this.order_number = order_number;
         this.status = status;

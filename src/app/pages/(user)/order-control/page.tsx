@@ -24,7 +24,7 @@ const PageOrder = () => {
                 />
             }
             tableChildren={
-                <CrudTable columns={OrderColumns()} data={context.items.sort((a, b) => a.order_number - b.order_number)}/>
+                <CrudTable columns={OrderColumns()} data={context.items?.sort((a, b) => a.order_number - b.order_number)}/>
             }
         />
     </>

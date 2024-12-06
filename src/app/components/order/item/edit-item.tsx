@@ -22,7 +22,7 @@ const EditItem = ({ item }: EditItemProps) => {
                 </div>
                 <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
             </div>
-
+            {item.observation && <p className="text-sm text-gray-600">{item.observation}</p>}
             <AdditionalItemList item={item} />
 
             <hr className="my-4" />
