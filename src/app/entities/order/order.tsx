@@ -4,7 +4,7 @@ import OrderDelivery from "./order-delivery";
 import OrderPickup from "./order-pickup";
 import OrderTable from "./order-table";
 
-type StatusOrder = "Staging" | "Pending" | "InProgress" | "Finished" | "Canceled" | "Archived";
+type StatusOrder = "Staging" | "Pending" | "Ready" | "Finished" | "Canceled" | "Archived";
 
 export default class Order {
     id: string = "";
