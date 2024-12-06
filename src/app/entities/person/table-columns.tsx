@@ -11,33 +11,6 @@ const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
     header: 'Nome',
   },
   {
-    id: 'E-mail',
-    accessorKey: 'email',
-    header: 'E-mail',
-  },
-  {
-    id: 'Cpf',
-    accessorKey: 'cpf',
-    header: 'Cpf',
-  },
-  {
-    id: 'Nascimento',
-    accessorKey: 'birthday',
-    header: 'Nascimento',
-    accessorFn: row => {
-      if (!row.birthday) return "--/--/--"
-
-      // Converte a data original para o fuso horário correto
-      const utcDate = new Date(row.birthday);
-      const zonedDate = toZonedTime(utcDate, "UTC"); // Usa UTC para evitar problemas de fuso horário
-
-      // Formata a data corretamente
-      const formattedDate = format(zonedDate, "dd/MM/yyyy", { timeZone: "UTC" });
-
-      return formattedDate;
-    }
-  },
-  {
     id: 'Contato',
     header: 'Contato',
     accessorFn: row => {
@@ -49,6 +22,11 @@ const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
         return contact.ddd + " " + contact.number
       }
     },
+  },
+  {
+    id: 'Cpf',
+    accessorKey: 'cpf',
+    header: 'Cpf',
   },
   {
     id: 'Endereço',

@@ -15,21 +15,9 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Nome',
   },
   {
-    id: 'Descrição',
-    accessorKey: 'description',
-    header: 'Descrição',
-    maxSize: 10
-  },
-  {
     id: 'Preço',
     accessorKey: 'price',
     header: 'Preço',
-    cell: info => `R$${info.getValue()}`,
-  },
-  {
-    id: 'Custo',
-    accessorKey: 'cost',
-    header: 'Custo',
     cell: info => `R$${info.getValue()}`,
   },
   {
