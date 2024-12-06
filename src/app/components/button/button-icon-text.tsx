@@ -1,4 +1,3 @@
-import Modal from "@/app/components/modal/modal";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";

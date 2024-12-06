@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import Order from "@/app/entities/order/order";
 
@@ -6,9 +5,9 @@ interface DraggableProps {
     order: Order;
     children: React.ReactNode;
 }
-
+  
 function Draggable({ order, children }: DraggableProps) {
-    const [isClicking, setIsClicking] = useState(false);
+
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: `${order.status}-${order.id}`, // Garantir que o id é único
         data: order,
@@ -29,13 +28,6 @@ function Draggable({ order, children }: DraggableProps) {
         textAlign: 'center' as const, // Corrigido para tipo literal 'center'
     };
 
-    const handleClick = () => {
-        // Se o item não está sendo arrastado, exibe o alerta
-        if (!isDragging) {
-            setIsClicking(true);
-            alert(`Você clicou no card ${order.order_number}`);
-        }
-    };
 
     return (
         <button
@@ -44,7 +36,6 @@ function Draggable({ order, children }: DraggableProps) {
             style={style}
             {...listeners}
             {...attributes}
-            onClick={handleClick}
         >
             {children}
         </button>

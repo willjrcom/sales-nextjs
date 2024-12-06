@@ -30,7 +30,7 @@ function Droppable({ id, orders, children }: OrderProps) {
     return (
         <div ref={setNodeRef} style={style} className="flex flex-col items-center">
             {children}
-            <div className="mt-4 flex flex-col w-full">
+            <div className="mt-4 flex flex-col w-full h-full">
                 {orders.map((order) => (
                     <Draggable key={order.id} order={order}>
                         <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200">
