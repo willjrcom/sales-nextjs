@@ -1,13 +1,12 @@
 'use client';
 
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const LoginForm = () => {
   const router = useRouter();
-  const { data } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +36,6 @@ const LoginForm = () => {
       setError('Algo deu errado: ' + error);
     }
   };
-
-  useEffect(() => {
-    if (data) {
-      router.push('/access/company-selection');
-    }
-  }, [data, router]);
 
   return (
     <div className="flex h-screen">
