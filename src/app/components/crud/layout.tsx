@@ -2,7 +2,7 @@ const CrudLayout = ({
     title, plusButtonChildren, searchButtonChildren, filterButtonChildren, refreshButton, tableChildren
 }: Readonly<{
     title: string
-    plusButtonChildren: React.ReactNode;
+    plusButtonChildren?: React.ReactNode;
     searchButtonChildren?: React.ReactNode;
     filterButtonChildren: React.ReactNode;
     refreshButton?: React.ReactNode;
