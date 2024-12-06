@@ -56,7 +56,7 @@ const CartAdded = ({ order }: CartProps) => {
     }, [order]);
 
     return (
-        <div className="bg-white max-w-[60vw]">
+        <div className="bg-white w-full">
             <div className=" mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>

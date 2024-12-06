@@ -10,9 +10,6 @@ import StatusComponent from "../../button/show-status";
 import ProductCard from "../product/card-product";
 import ButtonIconText from "../../button/button-icon-text";
 import ComplementItemList from "./list-complement-item";
-import AdditionalItemCard from "../item/additional-item";
-import ButtonDelete from "../../button/button-delete";
-import DeleteComplementItemModal from "./delete-complement-modal";
 import ComplementItemCard from "./complement-item";
 import Item from "@/app/entities/order/item";
 
