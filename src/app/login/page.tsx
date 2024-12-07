@@ -3,7 +3,7 @@
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -11,8 +11,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
     setError(''); // Reset error state before attempting sign-in
 
     try {
@@ -50,7 +49,7 @@ const LoginForm = () => {
         <div className="w-full max-w-md px-8 py-10">
           <h2 className="text-2xl mb-6">Conecte-se</h2>
           {error && <p className="mb-4 text-red-500">{error}</p>}
-          <form className="flex flex-col" onSubmit={handleSubmit}>
+          <div className="flex flex-col">
             <label htmlFor="email" className="mb-2 text-gray-700">Email</label>
             <input
               type="email"
@@ -77,12 +76,12 @@ const LoginForm = () => {
               <input type="checkbox" id="remember" name="remember" className="mr-2" />
               <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
             </div>
-            <button type="submit" className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Conectar</button>
+            <button onClick={handleSubmit} className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Conectar</button>
             <div className="flex justify-between mt-4 text-yellow-500">
               <a href="#" className="hover:underline">Esqueceu a senha?</a>
               <a href="#" className="hover:underline">Alterar senha</a>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

@@ -3,23 +3,14 @@ import { useEffect, useState } from "react";
 import Order, { StatusOrder } from "@/app/entities/order/order";
 import Droppable from "./droppable";
 import { useOrders } from "@/app/context/order/context";
-import { useModal } from "@/app/context/modal/context";
-import OrderManager from "../order/order";
-import EditGroupItem from "../order/group-item/edit-group-item";
 
 function App() {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
     const [finishedOrders, setFinishedOrders] = useState<Order[]>([]);
-    const [lastClickTime, setLastClickTime] = useState<number | null>(null);
-    const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
-    const modalHandler = useModal();
-    const contextOrder = useOrders();
+    const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
 
-    useEffect(() => {
-        setPreventDrag(false); // Ativa a flag para prevenir o arrasto
-        setLastClickTime(null);
-    }, [preventDrag]);
+    const contextOrder = useOrders();
 
     // Atualiza as listas com base no contexto
     useEffect(() => {
@@ -28,7 +19,12 @@ function App() {
         setFinishedOrders(contextOrder.items.filter(order => order.status === "Finished"));
     }, [contextOrder.items]);
 
+    const handleDragStart = (event: { active: any }) => {
+        setActiveId(event.active.id); // Atualiza o ID do item ativo
+    };
+
     const handleDragEnd = (event: { active: any; over: any }) => {
+        setActiveId(null); // Reseta o ID ativo ao final do arrasto
 
         const { active, over } = event;
 
@@ -37,7 +33,7 @@ function App() {
         const draggedOrderId = active.data.current?.id;
         if (!draggedOrderId) return;
 
-        const moveOrder = (source: Order[], target: Order[], status: StatusOrder) => {
+        const moveOrder = (source: Order[], status: StatusOrder) => {
             const draggedOrder = source.find(order => order.id === draggedOrderId);
             if (!draggedOrder) return;
 
@@ -55,48 +51,48 @@ function App() {
 
         // Decide para qual lista mover com base no ID do droppable
         if (over.id === "Ready" && active.id.startsWith("Pending-")) {
-            moveOrder(pendingOrders, readyOrders, "Ready");
+            moveOrder(pendingOrders, "Ready");
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
-            moveOrder(readyOrders, finishedOrders, "Finished");
+            moveOrder(readyOrders, "Finished");
         }
     };
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
-            activationConstraint: {
-                // Evita a ativação do arrasto se o preventDrag estiver true
-                distance: preventDrag ? Infinity : 5,
-            },
-            onActivation: () => {
-                const now = Date.now();
-
-                // Verifica se o último clique foi dentro de 300ms (double click)
-                if (lastClickTime && now - lastClickTime < 300) {
-                    setLastClickTime(null); // Reseta o estado após o double click
-                    setPreventDrag(true); // Ativa a flag para prevenir o arrasto
-                    modalHandler.showModal("edit-group-item", "Novo Pedido", <EditGroupItem/>, "xl", () => modalHandler.hideModal("edit-group-item"));
-                } else {
-                    setLastClickTime(now); // Atualiza o tempo do último clique
-                }
-            },
+            activationConstraint: { distance: 5 },
         })
     );
 
     return (
-        <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="flex space-x-6 p-6">
                 {/* Pendentes */}
-                <Droppable id="Pending" orders={pendingOrders}>
+                <Droppable
+                    id="Pending"
+                    orders={pendingOrders}
+                    activeId={activeId}
+                    canReceive={() => activeId?.startsWith("Pending-") || false}
+                >
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Pendentes</h2>
                 </Droppable>
 
                 {/* Em andamento */}
-                <Droppable id="Ready" orders={readyOrders}>
+                <Droppable
+                    id="Ready"
+                    orders={readyOrders}
+                    activeId={activeId}
+                    canReceive={() => activeId?.startsWith("Pending-") || activeId?.startsWith("Ready-") || false}
+                >
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Prontos</h2>
                 </Droppable>
 
                 {/* Finalizados */}
-                <Droppable id="Finished" orders={finishedOrders}>
+                <Droppable
+                    id="Finished"
+                    orders={finishedOrders}
+                    activeId={activeId}
+                    canReceive={() => activeId?.startsWith("Ready-") || activeId?.startsWith("Finished-") || false}
+                >
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Finalizados</h2>
                 </Droppable>
             </div>
