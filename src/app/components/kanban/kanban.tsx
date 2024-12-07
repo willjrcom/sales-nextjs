@@ -3,15 +3,25 @@ import { useEffect, useState } from "react";
 import Order, { StatusOrder } from "@/app/entities/order/order";
 import Droppable from "./droppable";
 import { useOrders } from "@/app/context/order/context";
+import { useModal } from "@/app/context/modal/context";
+import EditGroupItem from "../order/group-item/edit-group-item";
 
 function App() {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
     const [finishedOrders, setFinishedOrders] = useState<Order[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
+    const [lastClickTime, setLastClickTime] = useState<number | null>(null);
+    const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
+    const modalHandler = useModal();
 
     const contextOrder = useOrders();
 
+    useEffect(() => {
+        setPreventDrag(false); // Ativa a flag para prevenir o arrasto
+        setLastClickTime(null);
+    }, [preventDrag]);
+    
     // Atualiza as listas com base no contexto
     useEffect(() => {
         setPendingOrders(contextOrder.items.filter(order => order.status === "Pending"));
@@ -59,7 +69,22 @@ function App() {
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
-            activationConstraint: { distance: 5 },
+            activationConstraint: {
+                // Evita a ativação do arrasto se o preventDrag estiver true
+                distance: preventDrag ? Infinity : 5,
+            },
+            onActivation: () => {
+                const now = Date.now();
+
+                // Verifica se o último clique foi dentro de 300ms (double click)
+                if (lastClickTime && now - lastClickTime < 300) {
+                    setLastClickTime(null); // Reseta o estado após o double click
+                    setPreventDrag(true); // Ativa a flag para prevenir o arrasto
+                    modalHandler.showModal("edit-group-item", "Novo Pedido", <EditGroupItem />, "xl", () => modalHandler.hideModal("edit-group-item"));
+                } else {
+                    setLastClickTime(now); // Atualiza o tempo do último clique
+                }
+            },
         })
     );
 
