@@ -1,62 +1,44 @@
 import { useDraggable } from "@dnd-kit/core";
-import { useRef } from "react";
 import Order from "@/app/entities/order/order";
-import { useModal } from "@/app/context/modal/context";
-import EditGroupItem from "../order/group-item/edit-group-item";
 
 interface DraggableProps {
     order: Order;
     children: React.ReactNode;
 }
-
+  
 function Draggable({ order, children }: DraggableProps) {
+
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: `${order.status}-${order.id}`, // ID único do item
+        id: `${order.status}-${order.id}`, // Garantir que o id é único
         data: order,
     });
 
-    const mouseDownTimeRef = useRef<number | null>(null);
-    const modalHandler = useModal();
-
-    const handleMouseDown = () => {
-        mouseDownTimeRef.current = Date.now(); // Registra o tempo do clique
-    };
-
-    const handleMouseUp = () => {
-        const now = Date.now();
-        const mouseDownTime = mouseDownTimeRef.current;
-
-        if (mouseDownTime && now - mouseDownTime < 300) {
-            // Clique curto detectado
-            modalHandler.showModal("edit-group-item", "Novo Pedido", <EditGroupItem />, "xl", () => modalHandler.hideModal("edit-group-item"));
-        }
-
-        mouseDownTimeRef.current = null; // Reseta o tempo do clique
-    };
-
+    // Estilo do item
     const style = {
         ...(transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : {}),
-        backgroundColor: isDragging ? "#f0f8ff" : "white",
-        border: isDragging ? "2px solid #007bff" : "1px solid #ccc",
-        borderRadius: "8px",
-        padding: "8px 12px",
-        fontSize: "16px",
-        fontWeight: "bold",
-        cursor: "move",
-        transition: "background-color 0.2s, border 0.2s",
+        backgroundColor: isDragging ? '#f0f8ff' : 'white', // Cor de fundo enquanto arrasta
+        border: isDragging ? '2px solid #007bff' : '1px solid #ccc', // Borda enquanto arrasta
+        borderRadius: '8px',
+        padding: '8px 12px',
+        fontSize: '16px',
+        fontWeight: 'bold',
+        cursor: 'move',
+        transition: 'background-color 0.2s, border 0.2s',
+        justifyContent: 'center' as const,
+        textAlign: 'center' as const, // Corrigido para tipo literal 'center'
     };
 
+
     return (
-        <div
+        <button
             ref={setNodeRef}
+            className="w-full"
             style={style}
-            {...attributes}
             {...listeners}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+            {...attributes}
         >
             {children}
-        </div>
+        </button>
     );
 }
 

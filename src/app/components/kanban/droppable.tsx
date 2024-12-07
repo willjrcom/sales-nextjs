@@ -20,19 +20,19 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
             : "#fad1d1" // Vermelho
         : "#ffffff"; // Branco padrão
 
-        const style = {
-            padding: '16px',
-            borderRadius: '8px',
-            border: '2px dashed #d1d5db',
-            minHeight: '400px',
-            backgroundColor,
-            boxShadow: isOver ? '0 4px 10px rgba(0, 128, 0, 0.2)' : 'none',
-            transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-            width: '33vw',
-            display: 'flex',
-            alignItems: 'center', // Centraliza os cards na coluna
-            justifyContent: 'flex-start' // Alinha os cards no topo, mas você pode mudar para 'center' se quiser centralizar também verticalmente
-        };
+    const style = {
+        padding: "16px",
+        borderRadius: "8px",
+        border: "2px dashed #d1d5db",
+        minHeight: "400px",
+        backgroundColor,
+        boxShadow: isOver ? "0 4px 10px rgba(0, 128, 0, 0.2)" : "none",
+        transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+        width: "33vw",
+        display: "flex",
+        alignItems: "center", // Centraliza os cards na coluna
+        justifyContent: "flex-start", // Alinha os cards no topo
+    };
 
     return (
         <div ref={setNodeRef} style={style} className="flex flex-col items-center">
