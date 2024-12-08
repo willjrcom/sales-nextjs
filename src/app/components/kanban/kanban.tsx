@@ -4,7 +4,7 @@ import Order, { StatusOrder } from "@/app/entities/order/order";
 import Droppable from "./droppable";
 import { useOrders } from "@/app/context/order/context";
 import { useModal } from "@/app/context/modal/context";
-import EditGroupItem from "../order/group-item/edit-group-item";
+import CardOrder from "../order/card-order";
 
 function App() {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
@@ -21,7 +21,7 @@ function App() {
         setPreventDrag(false); // Ativa a flag para prevenir o arrasto
         setLastClickTime(null);
     }, [preventDrag]);
-    
+
     // Atualiza as listas com base no contexto
     useEffect(() => {
         setPendingOrders(contextOrder.items.filter(order => order.status === "Pending"));
@@ -67,29 +67,42 @@ function App() {
         }
     };
 
+    const isDoubleClick = (now: number) => lastClickTime && now - lastClickTime < 300;
+
+    const handleDoubleClick = (orderId: string) => {
+        modalHandler.showModal(
+            "edit-group-item",
+            "Novo Pedido",
+            <CardOrder orderId={orderId} />,
+            "xl",
+            () => modalHandler.hideModal("edit-group-item")
+        );
+    };
+
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint: {
-                // Evita a ativação do arrasto se o preventDrag estiver true
                 distance: preventDrag ? Infinity : 5,
             },
             onActivation: () => {
                 const now = Date.now();
-
-                // Verifica se o último clique foi dentro de 300ms (double click)
-                if (lastClickTime && now - lastClickTime < 300) {
-                    setLastClickTime(null); // Reseta o estado após o double click
-                    setPreventDrag(true); // Ativa a flag para prevenir o arrasto
-                    modalHandler.showModal("edit-group-item", "Novo Pedido", <EditGroupItem />, "xl", () => modalHandler.hideModal("edit-group-item"));
+                if (isDoubleClick(now)) {
+                    setLastClickTime(null);
+                    setPreventDrag(true);
+                    const indexId = activeId?.indexOf("-");
+                    const orderId = activeId?.substring(indexId ? indexId + 1 : 0);
+                    console.log("orderId", orderId);
+                    if (!orderId) return;
+                    handleDoubleClick(orderId);
                 } else {
-                    setLastClickTime(now); // Atualiza o tempo do último clique
+                    setLastClickTime(now);
                 }
             },
         })
     );
 
     return (
-        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragPending={(event) => setActiveId(event.id as string)}>
             <div className="flex space-x-6 p-6">
                 {/* Pendentes */}
                 <Droppable

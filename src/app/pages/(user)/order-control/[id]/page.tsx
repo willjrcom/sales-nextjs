@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/api/error";
-import OrderManager from "@/app/components/order/order";
+import OrderManager from "@/app/components/order/order-manager";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 
 const PageEditOrderControl = () => {

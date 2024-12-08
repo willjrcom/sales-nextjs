@@ -39,7 +39,7 @@ const LoginForm = () => {
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-yellow-500 relative">
-        <Image src="/img_login.jpg" alt="Login" className="w-full h-full" layout="fill" objectFit="cover" />
+        <Image src="/img_login.jpg" alt="Login" fill style={{ objectFit: 'cover' }} />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
           <h2 className="text-2xl mb-2">GazalTech</h2>
           <p>Conecte-se a sua conta.</p>
