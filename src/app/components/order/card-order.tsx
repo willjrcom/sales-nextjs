@@ -11,9 +11,10 @@ import FinishOrder from "@/app/api/order/status/finish/route";
 import CancelOrder from "@/app/api/order/status/cancel/route";
 import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
-import { FaCheck, FaClipboardCheck, FaTimes } from "react-icons/fa";
+import { FaCheck, FaClipboardCheck, FaEdit, FaTimes } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
+import Link from "next/link";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -185,6 +186,9 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
                         <StatusComponent status={order?.status} />
+                        <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + contextCurrentOrder.order?.id}>
+                        <FaEdit/>
+                        </Link>
                     </div>
                     <p className="text-gray-700">
                         <strong>Comanda N°:</strong> {order.order_number}
