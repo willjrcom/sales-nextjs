@@ -1,5 +1,5 @@
 import { Session } from "next-auth"
-import RequestError from "./error"
+import RequestError, { translateError } from "./error"
 
 interface RequestApiProps<T> {
     path: string
@@ -54,9 +54,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
         const error = new RequestError();
         error.message = body.message || "Erro desconhecido";
 
-        if (error.message == "sql: no rows in result set") {
-            error.message = "Não encontrado";
-        }
+        error.message = translateError(error.message)
 
         error.status = res.status;
         error.path = fullPath;

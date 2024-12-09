@@ -8,16 +8,18 @@ import CreateFormsProps from '../create-forms-props';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
-import { PaymentOrder, payMethods, payMethodsWithId, ValidatePaymentForm } from '@/app/entities/order/order-payment';
+import { PaymentOrder, payMethodsWithId, ValidatePaymentForm } from '@/app/entities/order/order-payment';
 import Order from '@/app/entities/order/order';
 import PayOrder from '@/app/api/order/payment/route';
 import { useCurrentOrder } from '@/app/context/current-order/context';
 
 interface PaymentFormProps extends CreateFormsProps<PaymentOrder> {
     order?: Order;
+    setOrderPaymentError: (error: RequestError | null) => void;
+    setOrderError: (error: RequestError | null) => void;
 }
 
-const PaymentForm = ({ item, isUpdate, order }: PaymentFormProps) => {
+const PaymentForm = ({ item, isUpdate, order, setOrderPaymentError, setOrderError }: PaymentFormProps) => {
     const modalName = isUpdate ? 'edit-payment-' + item?.id : 'add-payment'
     const modalHandler = useModal();
     const [payment, setPayment] = useState<PaymentOrder>(item || new PaymentOrder());
@@ -41,18 +43,15 @@ const PaymentForm = ({ item, isUpdate, order }: PaymentFormProps) => {
         try {
             await PayOrder(payment, data)
             setError(null);
+            setOrderPaymentError(null);
+            setOrderError(null);
 
             contextCurrentOrder.fetchData();
 
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            const err = error as RequestError
-            if (err.message === "total paid is invalid") {
-                err.message = "O total pago deve ser maior que 0"
-            }
-            
-            setError(err);
+            setError(error as RequestError);
         }
     }
 

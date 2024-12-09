@@ -5,6 +5,10 @@ import Droppable from "./droppable";
 import { useOrders } from "@/app/context/order/context";
 import { useModal } from "@/app/context/modal/context";
 import CardOrder from "../order/card-order";
+import ReadyOrder from "@/app/api/order/status/ready/route";
+import { useSession } from "next-auth/react";
+import FinishOrder from "@/app/api/order/status/finish/route";
+import RequestError from "@/app/api/error";
 
 function App() {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
@@ -14,8 +18,8 @@ function App() {
     const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
     const modalHandler = useModal();
-
     const contextOrder = useOrders();
+    const { data } = useSession();
 
     useEffect(() => {
         setPreventDrag(false); // Ativa a flag para prevenir o arrasto
@@ -33,7 +37,7 @@ function App() {
         setActiveId(event.active.id); // Atualiza o ID do item ativo
     };
 
-    const handleDragEnd = (event: { active: any; over: any }) => {
+    const handleDragEnd = async (event: { active: any; over: any }) => {
         setActiveId(null); // Reseta o ID ativo ao final do arrasto
 
         const { active, over } = event;
@@ -48,7 +52,7 @@ function App() {
             if (!draggedOrder) return;
 
             const updatedOrder: Order = { ...draggedOrder, status };
-
+            console.log(status)
             // Atualiza as listas de forma imutável
             setPendingOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
             setReadyOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
@@ -59,23 +63,39 @@ function App() {
             if (over.id === "Finished") setFinishedOrders(prev => [...prev, updatedOrder]);
         };
 
+        const indexId = activeId?.indexOf("-");
+        const orderId = activeId?.substring(indexId ? indexId + 1 : 0);
+
         // Decide para qual lista mover com base no ID do droppable
         if (over.id === "Ready" && active.id.startsWith("Pending-")) {
             moveOrder(pendingOrders, "Ready");
+            
+            if (!orderId || !data) return;
+            try {
+                await ReadyOrder(orderId, data);
+            } catch (error) {}
+
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
-            moveOrder(readyOrders, "Finished");
+            if (!orderId || !data) return;
+
+            try {
+                await FinishOrder(orderId, data);
+                moveOrder(readyOrders, "Finished");
+            } catch (error) {
+                handleDoubleClick(orderId, error as RequestError);
+            }
         }
     };
 
     const isDoubleClick = (now: number) => lastClickTime && now - lastClickTime < 300;
 
-    const handleDoubleClick = (orderId: string) => {
+    const handleDoubleClick = (orderId: string, error?: RequestError | null) => {
         modalHandler.showModal(
-            "edit-group-item",
-            "Novo Pedido",
-            <CardOrder orderId={orderId} />,
+            "show-order-" + orderId,
+            "Ver Pedido",
+            <CardOrder orderId={orderId} errorRequest={error}/>,
             "xl",
-            () => modalHandler.hideModal("edit-group-item")
+            () => modalHandler.hideModal("show-order-" + orderId)
         );
     };
 
@@ -91,7 +111,6 @@ function App() {
                     setPreventDrag(true);
                     const indexId = activeId?.indexOf("-");
                     const orderId = activeId?.substring(indexId ? indexId + 1 : 0);
-                    console.log("orderId", orderId);
                     if (!orderId) return;
                     handleDoubleClick(orderId);
                 } else {

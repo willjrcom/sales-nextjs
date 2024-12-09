@@ -47,11 +47,7 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
 
       modalHandler.hideModal(modalName);
     } catch (error) {
-      const err = error as RequestError
-      if (err.message === "group item not staging") {
-        err.message = "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens."
-      }
-      setError(err);
+      setError(error as RequestError);
     }
   }
 

@@ -13,14 +13,18 @@ import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
 import { FaCheck, FaClipboardCheck, FaTimes } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
+import { useCurrentOrder } from "@/app/context/current-order/context";
 
 interface CardOrderProps {
     orderId: string | null;
+    errorRequest?: RequestError | null;
 }
 
-const CardOrder = ({ orderId }: CardOrderProps) => {
-    const [order, setOrder] = useState<Order | null>(null);
+const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
+    const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const [error, setError] = useState<RequestError | null>(null);
+    const [errorPayment, setErrorPayment] = useState<RequestError | null>(errorRequest || null);
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -28,8 +32,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         if (!data || !orderId) return;
 
         try {
-            const orderFound = await GetOrderByID(orderId, data);
-            setOrder(orderFound);
+            await contextCurrentOrder.fetchData(orderId);
             setError(null);
         } catch (error) {
             setError(error as RequestError);
@@ -37,48 +40,53 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         }
     };
 
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order);
+    }, [contextCurrentOrder.order]);
+
     const handleReady = async () => {
         if (!order || !data) return;
 
         try {
-            await ReadyOrder(order, data);
+            await ReadyOrder(order.id, data);
             setError(null);
+            setErrorPayment(null);
             fetchOrder();
-            modalHandler.hideModal("ready-order-" + order.id);
         } catch (error) {
             setError(error as RequestError);
         }
+
+        modalHandler.hideModal("ready-order-" + order.id);
     };
 
     const handleFinished = async () => {
         if (!order || !data) return;
 
         try {
-            await FinishOrder(order, data);
+            await FinishOrder(order.id, data);
             setError(null);
+            setErrorPayment(null);
             fetchOrder();
-            modalHandler.hideModal("finish-order-" + order.id);
         } catch (error) {
-            const err = error as RequestError
-            if (err.message === "order paid less than total") {
-                err.message = "O total pago deve ser maior que o total do pedido"
-            }
-            
-            setError(err);
+            setError(error as RequestError);
         }
+
+        modalHandler.hideModal("finish-order-" + order.id);
     };
 
     const handleCancel = async () => {
         if (!order || !data) return;
 
         try {
-            await CancelOrder(order, data);
+            await CancelOrder(order.id, data);
             setError(null);
+            setErrorPayment(null);
             fetchOrder();
-            modalHandler.hideModal("cancel-order-" + order.id);
         } catch (error) {
             setError(error as RequestError);
         }
+
+        modalHandler.hideModal("cancel-order-" + order.id);
     };
 
     useEffect(() => {
@@ -294,46 +302,47 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             </div>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            {errorPayment && <p className="mb-4 text-red-500">{errorPayment.message}</p>}
 
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
-                {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md">
-                    <PaymentForm order={order} />
+                {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" onCloseModal={() => setErrorPayment(null)}>
+                    <PaymentForm order={order} setOrderPaymentError={setErrorPayment} setOrderError={setError} />
                 </ButtonIconText>}
 
                 <div className="flex justify-end items-center gap-4">
                     {isOrderStatusPending &&
-                    <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck}>
-                        <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
-                        <button
-                            onClick={handleReady}
-                            className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200"
-                        >
-                            Confirmar
-                        </button>
+                        <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck}>
+                            <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
+                            <button
+                                onClick={handleReady}
+                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200"
+                            >
+                                Confirmar
+                            </button>
                         </ButtonIconText>}
 
                     {isOrderStatusReady &&
-                    <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck}>
-                        <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
-                        <button
-                            onClick={handleFinished}
-                            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
-                        >
-                            Confirmar
-                        </button>
+                        <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck}>
+                            <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
+                            <button
+                                onClick={handleFinished}
+                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+                            >
+                                Confirmar
+                            </button>
                         </ButtonIconText>}
 
-                    {!isOrderStatusCanceled && 
-                    <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes}>
-                        <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
-                        <button
-                            onClick={handleCancel}
-                            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
-                        >
-                            Confirmar
-                        </button>
-                    </ButtonIconText>}
+                    {!isOrderStatusCanceled &&
+                        <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes}>
+                            <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
+                            <button
+                                onClick={handleCancel}
+                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                            >
+                                Confirmar
+                            </button>
+                        </ButtonIconText>}
                 </div>
             </div>
         </div>

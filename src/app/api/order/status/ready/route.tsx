@@ -1,10 +1,9 @@
-import Order from "@/app/entities/order/order";
 import RequestApi, { AddIdToken } from "../../../request";
 import { Session } from "next-auth";
 
-const ReadyOrder = async (order: Order, session: Session): Promise<string> => {
+const ReadyOrder = async (order_id: string, session: Session): Promise<string> => {
     const response = await RequestApi<null, string>({
-        path: "/order/ready/" + order.id, 
+        path: "/order/ready/" + order_id, 
         method: "POST",
         headers: await AddIdToken(session),
     });

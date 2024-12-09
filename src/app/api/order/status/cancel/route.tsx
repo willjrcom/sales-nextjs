@@ -1,10 +1,9 @@
-import Order from "@/app/entities/order/order";
 import RequestApi, { AddIdToken } from "../../../request";
 import { Session } from "next-auth";
 
-const CancelOrder = async (order: Order, session: Session): Promise<string> => {
+const CancelOrder = async (order_id: string, session: Session): Promise<string> => {
     const response = await RequestApi<null, string>({
-        path: "/order/cancel/" + order.id, 
+        path: "/order/cancel/" + order_id, 
         method: "POST",
         headers: await AddIdToken(session),
     });
