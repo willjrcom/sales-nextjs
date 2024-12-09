@@ -5,7 +5,7 @@ interface StatusComponentProps {
 }
 
 const StatusComponent = ({ status }: StatusComponentProps) => (
-    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor[status]}`}>
+    <span className={`ml-2 px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor[status]}`}>
     {showStatus[status]}
   </span>
 )
