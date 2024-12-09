@@ -13,7 +13,7 @@ const ToIsoDate = (dateString: string) => {
     return formatDate(dateString)
 };
 
-const ToUtcDate = (dateString: string) => {
+const ToUtcDate = (dateString?: string) => {
     if (!dateString) return "--/--/--"
 
     const date = new Date(dateString);
@@ -25,7 +25,7 @@ const ToUtcDate = (dateString: string) => {
     return formattedDate;
 }
 
-const ToUtcDatetime = (dateString: string) => {
+const ToUtcDatetime = (dateString?: string) => {
     if (!dateString) return "--/--/-- --:--"
 
     const date = new Date(dateString);

@@ -2,8 +2,6 @@ import Address from "../address/address";
 import Client from "../client/client";
 import Employee from "../employee/employee";
 
-type Timestamp = string | null;
-
 type StatusOrderDelivery = "Staging" | "Pending" | "Ready" | "Shipped" | "Delivered";
 
 export default class OrderDelivery {
@@ -17,9 +15,9 @@ export default class OrderDelivery {
     driver_id?: string = "";
     driver?: Employee;
     order_id: string = "";
-    pending_at?: Timestamp = "";
-    shipped_at?: Timestamp = "";
-    delivered_at?: Timestamp = "";
+    pending_at?: string = "";
+    shipped_at?: string = "";
+    delivered_at?: string = "";
 
     constructor(id = "", status: StatusOrderDelivery = "Staging", delivery_tax = 0, client_id = "", address_id = "", driver_id = "", order_id = "", pending_at = "", shipped_at = "", delivered_at = "") {
         this.id = id;

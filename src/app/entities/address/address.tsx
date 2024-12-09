@@ -28,6 +28,22 @@ export default class Address {
         this.delivery_tax = delivery_tax
         this.likeTax = likeTax
     }
+
+    toString() {
+        const parts = [
+            this.street,
+            this.number,
+            this.complement && `Complemento: ${this.complement}`,
+            this.reference && `Referência: ${this.reference}`,
+            this.neighborhood,
+            this.city,
+            this.state,
+            this.cep && `CEP: ${this.cep}`
+        ];
+    
+        // Filtra os campos que são null, undefined ou strings vazias
+        return parts.filter(Boolean).join(", ");
+    }    
 }
 
 export const SchemaAddress = z.object({

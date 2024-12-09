@@ -1,4 +1,3 @@
-type Timestamp = string | null;
 type StatusOrderPickup = "Staging" | "Pending" | "Ready";
 
 export default class OrderPickup {
@@ -6,8 +5,8 @@ export default class OrderPickup {
     name: string = "";
     status: StatusOrderPickup = "Staging";
     orderId: string = "";
-    pending_at?: Timestamp = "";
-    ready_at?: Timestamp = "";
+    pending_at?: string = "";
+    ready_at?: string = "";
 
     constructor(id = "", name = "", status: StatusOrderPickup = "Staging", orderId = "", pending_at = "", ready_at = "") {
         this.id = id;
