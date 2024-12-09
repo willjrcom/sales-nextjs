@@ -5,12 +5,14 @@ import { useSession } from "next-auth/react";
 import GetOrderByID from "@/app/api/order/[id]/route";
 import RequestError from "@/app/api/error";
 import RoundComponent from "../button/round-component";
-import { ToUtcDate, ToUtcDatetime } from "@/app/utils/date";
+import { ToUtcDatetime } from "@/app/utils/date";
 import ReadyOrder from "@/app/api/order/status/ready/route";
 import FinishOrder from "@/app/api/order/status/finish/route";
 import CancelOrder from "@/app/api/order/status/cancel/route";
 import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
+import { FaCheck, FaClipboardCheck, FaTimes } from "react-icons/fa";
+import { useModal } from "@/app/context/modal/context";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -20,6 +22,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
     const [order, setOrder] = useState<Order | null>(null);
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
+    const modalHandler = useModal();
 
     const fetchOrder = async () => {
         if (!data || !orderId) return;
@@ -41,6 +44,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             await ReadyOrder(order, data);
             setError(null);
             fetchOrder();
+            modalHandler.hideModal("ready-order-" + order.id);
         } catch (error) {
             setError(error as RequestError);
         }
@@ -53,6 +57,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             await FinishOrder(order, data);
             setError(null);
             fetchOrder();
+            modalHandler.hideModal("finish-order-" + order.id);
         } catch (error) {
             const err = error as RequestError
             if (err.message === "order paid less than total") {
@@ -70,6 +75,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             await CancelOrder(order, data);
             setError(null);
             fetchOrder();
+            modalHandler.hideModal("cancel-order-" + order.id);
         } catch (error) {
             setError(error as RequestError);
         }
@@ -83,6 +89,8 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
     const isOrderStatusPending = order.status === "Pending";
     const isOrderStatusReady = order.status === "Ready";
+    const isOrderStatusCanceled = order.status === "Canceled";
+    const isOrderStatusFinished = order.status === "Finished";
     const totalRest = order.total_payable - order.total_paid;
 
     const renderOrderTypeDetails = () => {
@@ -253,7 +261,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                         <span className="font-semibold">Total Restante:</span>{" "}
                         <span className="text-gray-600">R$ {totalRest.toFixed(2)}</span>
                     </p>}
-                    
+
                     {/* Troco */}
                     {order.total_change > 0 && <p>
                         <span className="font-semibold">Troco:</span>{" "}
@@ -289,31 +297,43 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
-                <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" onCloseModal={fetchOrder}>
+                {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md">
                     <PaymentForm order={order} />
-                </ButtonIconText>
+                </ButtonIconText>}
 
                 <div className="flex justify-end items-center gap-4">
                     {isOrderStatusPending &&
+                    <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck}>
+                        <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
                         <button
                             onClick={handleReady}
                             className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200"
                         >
-                            Deixar pronto
-                        </button>}
+                            Confirmar
+                        </button>
+                        </ButtonIconText>}
+
                     {isOrderStatusReady &&
+                    <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck}>
+                        <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
                         <button
                             onClick={handleFinished}
                             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
                         >
-                            Finalizar
-                        </button>}
-                    <button
-                        onClick={handleCancel}
-                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
-                    >
-                        Cancelar
-                    </button>
+                            Confirmar
+                        </button>
+                        </ButtonIconText>}
+
+                    {!isOrderStatusCanceled && 
+                    <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes}>
+                        <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
+                        <button
+                            onClick={handleCancel}
+                            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                        >
+                            Confirmar
+                        </button>
+                    </ButtonIconText>}
                 </div>
             </div>
         </div>
