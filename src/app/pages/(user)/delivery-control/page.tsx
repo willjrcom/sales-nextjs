@@ -1,29 +1,26 @@
 'use client';
 
 import CrudTable from "@/app/components/crud/table";
-import { useOrders } from "@/app/context/order/context";
-import Order from "@/app/entities/order/order";
-import OrderColumns from "@/app/entities/order/table-columns";
+import { useDeliveryOrders } from "@/app/context/order-delivery/context";
+import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
+import OrderDelivery from "@/app/entities/order/order-delivery";
 import { useEffect, useState } from "react";
 
-const PageOrder = () => {
-    const context = useOrders();
-    const [orders, setOrders] = useState<Order[]>([]);
+const PageDeliveryOrder = () => {
+    const contextDeliveryOrder = useDeliveryOrders();
+    const [deliveryOrders, setDeliveryOrders] = useState<OrderDelivery[]>(contextDeliveryOrder.items);
 
     useEffect(() => {
-        for (const order of context.items) {
-            if (order.delivery) {
-                setOrders([...orders, order])
-            }
-        }
-    }, [context.items, orders]);
+        console.log(contextDeliveryOrder.items)
+        setDeliveryOrders(contextDeliveryOrder.items);
+    }, [contextDeliveryOrder.items]);
 
     return (
         <>
-            <h1 className="p-2">Pedidos</h1>
-            <CrudTable columns={OrderColumns()} data={orders}/>
+            <h1 className="p-2">Entregas</h1>
+            <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders}/>
         </>
     )
 }
 
-export default PageOrder
+export default PageDeliveryOrder

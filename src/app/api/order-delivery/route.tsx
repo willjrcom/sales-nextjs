@@ -1,14 +1,14 @@
-import Order from "@/app/entities/order/order";
 import RequestApi, { AddIdToken } from "../request";
 import { Session } from "next-auth";
+import OrderDelivery from "@/app/entities/order/order-delivery";
 
-const GetOrders = async (session: Session): Promise<Order[]> => {
-    const response = await RequestApi<null, Order[]>({
-        path: "/order/all", 
+const GetDeliveryOrders = async (session: Session): Promise<OrderDelivery[]> => {
+    const response = await RequestApi<null, OrderDelivery[]>({
+        path: "/order-delivery/all", 
         method: "GET",
         headers: await AddIdToken(session),
     });
     return response.data
 };
 
-export default GetOrders
+export default GetDeliveryOrders

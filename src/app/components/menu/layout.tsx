@@ -11,6 +11,7 @@ import { OrderProvider } from '@/app/context/order/context';
 import { ModalProvider } from '@/app/context/modal/context';
 import { CurrentOrderProvider } from '@/app/context/current-order/context';
 import { GroupItemProvider } from '@/app/context/group-item/context';
+import { DeliveryOrderProvider } from '@/app/context/order-delivery/context';
 
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
@@ -22,7 +23,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
           <main className="p-4 h-[89vh] min-w-0 max-w-full flex justify-center">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto ">
               <div className='min-w-[80vw] max-w-[90vw]'>
-              {children}
+                {children}
               </div>
             </div>
           </main>
@@ -44,9 +45,11 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
                   <OrderProvider>
                     <CurrentOrderProvider>
                       <GroupItemProvider>
-                        <ModalProvider>
-                          {children}
-                        </ModalProvider>
+                        <DeliveryOrderProvider>
+                          <ModalProvider>
+                            {children}
+                          </ModalProvider>
+                        </DeliveryOrderProvider>
                       </GroupItemProvider>
                     </CurrentOrderProvider>
                   </OrderProvider>
