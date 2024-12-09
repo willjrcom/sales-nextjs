@@ -1,6 +1,7 @@
 'use client';
 
 import Access from '@/app/api/auth/access/route';
+import GetCompany from '@/app/api/company/route';
 import RequestError from '@/app/api/error';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -36,9 +37,20 @@ export default function CompanySelection() {
             await update({
                 ...data,
                 user: {
-                    idToken: response
+                    idToken: response,
                 },
             });
+
+            data.user.idToken = response;
+            const company = await GetCompany(data);
+
+            await update({
+                ...data,
+                user: {
+                    ...data.user,
+                    currentCompany: company,
+                },
+            })
             router.push('/');
             setError(null);
         } catch (error) {

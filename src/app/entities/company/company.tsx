@@ -9,7 +9,7 @@ export default class Company {
     trade_name: string = "";
     cnpj: string = "";
     contacts: string[] = [];
-    address?: Address = new Address();
+    address: Address = new Address();
 
     constructor(id = "", schema_name = "", business_name = "", email = "", trade_name = "", cnpj = "", contacts = [""], address = new Address()) {
         this.id = id;

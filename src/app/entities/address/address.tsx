@@ -29,16 +29,13 @@ export default class Address {
         this.likeTax = likeTax
     }
 
-    toString() {
+    public toString() {
         const parts = [
             this.street,
             this.number,
-            this.complement && `Complemento: ${this.complement}`,
-            this.reference && `Referência: ${this.reference}`,
             this.neighborhood,
             this.city,
             this.state,
-            this.cep && `CEP: ${this.cep}`
         ];
     
         // Filtra os campos que são null, undefined ou strings vazias

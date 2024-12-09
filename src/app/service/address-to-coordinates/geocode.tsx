@@ -16,6 +16,7 @@ const geocodeAddressOpenCage = async (address: string, apiKey: string): Promise<
         const result = response.data.results[0];
         if (result) {
             const { lat, lng } = result.geometry;
+            console.log("Coordenadas geocodificadas:", { lat, lng });
             return { lat, lng };
         } else {
             console.error("Endereço não encontrado.");

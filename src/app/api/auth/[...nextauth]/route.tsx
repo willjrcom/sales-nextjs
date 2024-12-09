@@ -47,6 +47,7 @@ const authOptions: NextAuthOptions = {
         async jwt({ token, user, trigger, session }) {
             if (trigger === "update" && session.user.idToken) {
                 token.idToken = session.user.idToken;
+                token.currentCompany = session.user.currentCompany;
             }
 
             if (user) {
@@ -64,6 +65,7 @@ const authOptions: NextAuthOptions = {
             if (token.sub) session.user.id = token.sub;
             if (token.idToken) session.user.idToken = token.idToken;
             if (token.companies) session.user.companies = token.companies;
+            if (token.currentCompany) session.user.currentCompany = token.currentCompany;
         
             return session
         },
@@ -90,6 +92,7 @@ declare module "next-auth/jwt" {
         id: string;
         idToken?: string;
         companies: Company[];
+        currentCompany?: Company;
     }
 }
 
@@ -102,6 +105,7 @@ declare module "next-auth" {
         id: string;
         idToken?: string;
         companies: Company[];
+        currentCompany?: Company;
     }
 }
 
