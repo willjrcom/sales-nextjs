@@ -6,6 +6,9 @@ import GetOrderByID from "@/app/api/order/[id]/route";
 import RequestError from "@/app/api/error";
 import RoundComponent from "../button/round-component";
 import { ToUtcDate, ToUtcDatetime } from "@/app/utils/date";
+import ReadyOrder from "@/app/api/order/status/ready/route";
+import FinishOrder from "@/app/api/order/status/finish/route";
+import CancelOrder from "@/app/api/order/status/cancel/route";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -29,22 +32,64 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         }
     };
 
+    const handleAddPayment = () => {
+        console.log("Adicionar pagamento");
+        // Adicione a lógica para adicionar pagamento ao pedido
+    }
+
+    const handleReady = async () => {
+        if (!order || !data) return;
+
+        try {
+            await ReadyOrder(order, data);
+            setError(null);
+            fetchOrder();
+        } catch (error) {
+            setError(error as RequestError);
+        }
+    };
+
+    const handleFinished = async () => {
+        if (!order || !data) return;
+
+        try {
+            await FinishOrder(order, data);
+            setError(null);
+            fetchOrder();
+        } catch (error) {
+            setError(error as RequestError);
+        }
+    };
+
+    const handleCancel = async () => {
+        if (!order || !data) return;
+
+        try {
+            await CancelOrder(order, data);
+            setError(null);
+            fetchOrder();
+        } catch (error) {
+            setError(error as RequestError);
+        }
+    };
+
     useEffect(() => {
         fetchOrder();
     }, [orderId]);
 
-    if (error) return <p className="mb-4 text-red-500">{error.message}</p>;
     if (!order) return null;
+
+    const isOrderStatusPending = order.status === "Pending";
+    const isOrderStatusReady = order.status === "Ready";
 
     const renderOrderTypeDetails = () => {
         if (order.delivery) {
             return (
                 <div className="text-gray-700">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Entrega</h3>
-                    <p>
-                        <strong>Status da Entrega:</strong>{" "}
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Entrega</h3>
                         <StatusComponent status={order.delivery.status} />
-                    </p>
+                    </div>
                     <p>
                         <strong>Taxa de Entrega:</strong>{" "}
                         R$ {order.delivery.delivery_tax?.toFixed(2) || "0.00"}
@@ -73,10 +118,12 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         if (order.table) {
             return (
                 <div className="mb-4">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Mesa</h3>
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Mesa</h3>
+                        <StatusComponent status={order.table.status} />
+                    </div>
                     <p><strong>Mesa:</strong> {order.table.name}</p>
                     <p><strong>Contato:</strong> {order.table.contact}</p>
-                    <p><strong>Status da Mesa:</strong> <StatusComponent status={order.table.status} /></p>
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>
                         <ul className="list-disc ml-4">
@@ -91,9 +138,11 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         if (order.pickup) {
             return (
                 <div className="mb-4">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Retirada</h3>
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Retirada</h3>
+                        <StatusComponent status={order.pickup.status} />
+                    </div>
                     <p><strong>Nome:</strong> {order.pickup.name}</p>
-                    <p><strong>Status:</strong> <StatusComponent status={order.pickup.status} /></p>
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>
                         <ul className="list-disc ml-4">
@@ -114,13 +163,12 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 mb-6">
                 {/* Informações Básicas */}
                 <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
+                        <StatusComponent status={order?.status} />
+                    </div>
                     <p className="text-gray-700">
                         <strong>Comanda N°:</strong> {order.order_number}
-                    </p>
-                    <p className="text-gray-700 flex items-center">
-                        <strong>Status:</strong>{" "}
-                        <StatusComponent status={order?.status} />
                     </p>
                     <p className="text-gray-700">
                         <strong>Tipo:</strong>{" "}
@@ -151,7 +199,6 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                                 <li key={group.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
                                     <div className="flex justify-between items-center mb-2">
                                         <p className="text-gray-700 font-semibold">
-                                            <strong>Grupo:</strong>
                                             <span className="ml-2">
                                                 <StatusComponent status={group?.status} />
                                             </span>
@@ -183,33 +230,85 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                 )}
             </div>
 
-            {/* Detalhes do Pedido */}
+            {/* Resumo Financeiro */}
             <div className="mb-4">
-                <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes</h3>
+                <h3 className="text-xl font-bold mb-2 text-gray-800">Resumo Financeiro</h3>
                 <div className="space-y-2 text-gray-700">
+                    {/* Total a Pagar */}
                     <p>
                         <span className="font-semibold">Total a Pagar:</span>{" "}
-                        <span className="text-green-600">R$ {order.total_payable.toFixed(2)}</span>
+                        <span className="text-red-600">R$ {order.total_payable.toFixed(2)}</span>
                     </p>
+
+                    {/* Total Pago */}
                     <p>
                         <span className="font-semibold">Total Pago:</span>{" "}
-                        <span className="text-blue-600">R$ {order.total_paid.toFixed(2)}</span>
+                        <span className="text-green-600">R$ {order.total_paid.toFixed(2)}</span>
                     </p>
-                    <p>
-                        <span className="font-semibold">Troco:</span> R$ {order.total_change.toFixed(2)}
-                    </p>
-                    <p className="flex justify-between items-center">
-                        <span>
-                            <span className="font-semibold">Observação:</span>{" "}
-                            {order.observation || "Sem observação"}
-                        </span>
+
+                    {/* Troco */}
+                    {order.total_change > 0 && <p>
+                        <span className="font-semibold">Troco:</span>{" "}
+                        <span className="text-gray-600">R$ {order.total_change.toFixed(2)}</span>
+                    </p>}
+                </div>
+            </div>
+
+            {/* Detalhes do Pagamento */}
+            <div className="mb-6">
+                <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos</h3>
+                {order.payments && order.payments.length > 0 ? (
+                    <ul className="space-y-4">
+                        {order.payments.map((payment) => (
+                            <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
+                                <div className="flex justify-between items-center">
+                                    <p className="text-gray-700">
+                                        <strong>Método:</strong> {payment.method}
+                                    </p>
+                                    <p className="text-gray-700">
+                                        <strong>Valor:</strong> R$ {payment.amount.toFixed(2)}
+                                    </p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-700">Nenhum pagamento registrado.</p>
+                )}
+            </div>
+
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+
+            {/* Botões de Ação */}
+            <div className="flex justify-between items-center gap-4">
+                <button
+                    onClick={handleAddPayment}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
+                >
+                    Adicionar pagamento
+                </button>
+                <div className="flex justify-end items-center gap-4">
+
+                    {isOrderStatusPending &&
                         <button
-                            onClick={() => console.log("Atualizar Observação")}
-                            className="text-blue-500 underline hover:text-blue-700"
+                            onClick={handleReady}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200"
                         >
-                            Atualizar
-                        </button>
-                    </p>
+                            Deixar pronto
+                        </button>}
+                    {isOrderStatusReady &&
+                        <button
+                            onClick={handleFinished}
+                            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+                        >
+                            Finalizar
+                        </button>}
+                    <button
+                        onClick={handleCancel}
+                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                    >
+                        Cancelar
+                    </button>
                 </div>
             </div>
         </div>
