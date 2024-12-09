@@ -15,6 +15,7 @@ import { FaCheck, FaClipboardCheck, FaEdit, FaTimes } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import Link from "next/link";
+import Carousel from "../carousel/carousel";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -287,9 +288,10 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                 <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos</h3>
                 {order.payments && order.payments.length > 0 ? (
                     <ul className="space-y-4">
-                        {order.payments.map((payment) => (
-                            <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                                <div className="flex justify-between items-center">
+                        <Carousel items={order.payments}>
+                            {(payment) => (
+                                <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
+                                <div className="text-center">
                                     <p className="text-gray-700">
                                         <strong>Método:</strong> {payment.method}
                                     </p>
@@ -298,7 +300,8 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                                     </p>
                                 </div>
                             </li>
-                        ))}
+                            )}
+                        </Carousel>
                     </ul>
                 ) : (
                     <p className="text-gray-700">Nenhum pagamento registrado.</p>
