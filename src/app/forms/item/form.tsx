@@ -51,7 +51,7 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
       if (err.message === "group item not staging") {
         err.message = "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens."
       }
-      setError(err as RequestError);
+      setError(err);
     }
   }
 

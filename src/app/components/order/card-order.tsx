@@ -9,6 +9,8 @@ import { ToUtcDate, ToUtcDatetime } from "@/app/utils/date";
 import ReadyOrder from "@/app/api/order/status/ready/route";
 import FinishOrder from "@/app/api/order/status/finish/route";
 import CancelOrder from "@/app/api/order/status/cancel/route";
+import ButtonIconText from "../button/button-icon-text";
+import PaymentForm from "@/app/forms/order-payment/form";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -32,11 +34,6 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         }
     };
 
-    const handleAddPayment = () => {
-        console.log("Adicionar pagamento");
-        // Adicione a lógica para adicionar pagamento ao pedido
-    }
-
     const handleReady = async () => {
         if (!order || !data) return;
 
@@ -57,7 +54,12 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             setError(null);
             fetchOrder();
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError
+            if (err.message === "order paid less than total") {
+                err.message = "O total pago deve ser maior que o total do pedido"
+            }
+            
+            setError(err);
         }
     };
 
@@ -81,6 +83,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
     const isOrderStatusPending = order.status === "Pending";
     const isOrderStatusReady = order.status === "Ready";
+    const totalRest = order.total_payable - order.total_paid;
 
     const renderOrderTypeDetails = () => {
         if (order.delivery) {
@@ -246,6 +249,11 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                         <span className="text-green-600">R$ {order.total_paid.toFixed(2)}</span>
                     </p>
 
+                    {totalRest > 0 && <p>
+                        <span className="font-semibold">Total Restante:</span>{" "}
+                        <span className="text-gray-600">R$ {totalRest.toFixed(2)}</span>
+                    </p>}
+                    
                     {/* Troco */}
                     {order.total_change > 0 && <p>
                         <span className="font-semibold">Troco:</span>{" "}
@@ -266,7 +274,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                                         <strong>Método:</strong> {payment.method}
                                     </p>
                                     <p className="text-gray-700">
-                                        <strong>Valor:</strong> R$ {payment.amount.toFixed(2)}
+                                        <strong>Valor:</strong> R$ {payment.total_paid.toFixed(2)}
                                     </p>
                                 </div>
                             </li>
@@ -281,14 +289,11 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
-                <button
-                    onClick={handleAddPayment}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
-                >
-                    Adicionar pagamento
-                </button>
-                <div className="flex justify-end items-center gap-4">
+                <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" onCloseModal={fetchOrder}>
+                    <PaymentForm order={order} />
+                </ButtonIconText>
 
+                <div className="flex justify-end items-center gap-4">
                     {isOrderStatusPending &&
                         <button
                             onClick={handleReady}

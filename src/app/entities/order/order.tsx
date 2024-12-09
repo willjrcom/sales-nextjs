@@ -1,6 +1,7 @@
 import Employee from "../employee/employee";
 import GroupItem from "./group-item";
 import OrderDelivery from "./order-delivery";
+import { PaymentOrder } from "./order-payment";
 import OrderPickup from "./order-pickup";
 import OrderTable from "./order-table";
 
@@ -45,10 +46,4 @@ export default class Order {
         this.canceled_at = canceled_at;
         this.archived_at = archived_at;
     }
-}
-
-export class PaymentOrder {
-    id: string = "";
-    amount: number = 0;
-    method: string = "";
 }
