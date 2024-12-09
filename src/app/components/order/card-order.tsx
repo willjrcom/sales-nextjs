@@ -285,7 +285,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
             {/* Detalhes do Pagamento */}
             <div className="mb-6">
-                <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos</h3>
+                <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos: {order.payments?.length || 0}</h3>
                 {order.payments && order.payments.length > 0 ? (
                     <ul className="space-y-4">
                         <Carousel items={order.payments}>
