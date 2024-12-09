@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/route";
 import RequestError from "@/app/api/error";
 
-function App() {
+function OrderKanban() {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
     const [finishedOrders, setFinishedOrders] = useState<Order[]>([]);
@@ -157,4 +157,4 @@ function App() {
     );
 }
 
-export default App;
+export default OrderKanban;

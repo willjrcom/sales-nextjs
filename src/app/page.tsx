@@ -9,7 +9,6 @@ const Home = () => {
   return (
     <Menu>
       <h1>Home {data && <p>{status}</p>}</h1>
-      <Kanban />
     </Menu>
   );
 }

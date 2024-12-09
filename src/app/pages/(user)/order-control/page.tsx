@@ -3,9 +3,8 @@
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudLayout from "@/app/components/crud/layout";
 import Refresh from "@/app/components/crud/refresh";
-import CrudTable from "@/app/components/crud/table";
+import OrderKanban from "@/app/components/kanban/kanban";
 import { useOrders } from "@/app/context/order/context";
-import OrderColumns from "@/app/entities/order/table-columns";
 import { FaFilter } from "react-icons/fa";
 
 const PageOrder = () => {
@@ -24,7 +23,7 @@ const PageOrder = () => {
                 />
             }
             tableChildren={
-                <CrudTable columns={OrderColumns()} data={context.items?.sort((a, b) => a.order_number - b.order_number)}/>
+                <OrderKanban />
             }
         />
     </>
