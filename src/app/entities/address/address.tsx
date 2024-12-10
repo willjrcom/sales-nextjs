@@ -13,8 +13,9 @@ export default class Address {
     cep: string = '';
     delivery_tax: number = 0;
     likeTax?: boolean = false
+    coordinates: Coordinates = new Coordinates();
 
-    constructor(id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, likeTax: boolean = false) {
+    constructor(id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, likeTax: boolean = false, coordinates?: Coordinates) {
         this.id = id
         this.object_id = object_id
         this.street = street
@@ -27,6 +28,7 @@ export default class Address {
         this.cep = cep
         this.delivery_tax = delivery_tax
         this.likeTax = likeTax
+        this.coordinates = coordinates || new Coordinates()
     }
 
     public toString() {
@@ -41,6 +43,16 @@ export default class Address {
         // Filtra os campos que são null, undefined ou strings vazias
         return parts.filter(Boolean).join(", ");
     }    
+}
+
+export class Coordinates {
+    latitude: number = 0;
+    longitude: number = 0;
+
+    constructor(latitude = 0, longitude = 0) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
 
 export const SchemaAddress = z.object({

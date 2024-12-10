@@ -6,7 +6,6 @@ import { useDeliveryOrders } from "@/app/context/order-delivery/context";
 import Address from "@/app/entities/address/address";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import OrderDelivery from "@/app/entities/order/order-delivery";
-import geocodeAddressOpenCage, { apiKey } from "@/app/service/address-to-coordinates/geocode";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -17,12 +16,6 @@ const PageDeliveryOrder = () => {
     const [points, setPoints] = useState<{ id: string; lat: number; lng: number; label: string }[]>([]);
     const { data } = useSession();
 
-    const fetchAddress = async (address: string) => {
-        const coordinates = await geocodeAddressOpenCage(address, apiKey)
-        if (!coordinates) return
-        const point = { id: "4", lat: coordinates.lat, lng: coordinates.lng, label: address }
-        setPoints([point])
-    }
     useEffect(() => {
         setDeliveryOrders(contextDeliveryOrder.items);
     }, [contextDeliveryOrder.items]);
@@ -31,9 +24,10 @@ const PageDeliveryOrder = () => {
         if (!data || !data?.user?.currentCompany?.address) return
         // Converte o objeto plain em uma instância de Address
         const addressInstance = Object.assign(new Address(), data.user.currentCompany.address);
-    
+        console.log(addressInstance.coordinates)
         // Agora o método toString deve funcionar
-        fetchAddress(addressInstance.toString())
+        const point = { id: "4", lat: data.user.currentCompany.address.coordinates?.latitude, lng: data.user.currentCompany.address.coordinates?.longitude, label: addressInstance.toString() };
+        setPoints([point]);
     }, [data])
 
     return (
