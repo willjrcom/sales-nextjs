@@ -1,5 +1,31 @@
 import { z } from "zod";
 
+export const addressTypes = [
+    'house',
+    'apartment',
+    'condominium',
+    'work',
+    'hotel',
+    'shed'
+] as const;
+
+export const AddressTypesWithId: { id: string; name: string }[] = Array.from(addressTypes, (type) => ({
+    id: type,
+    name: translateToPortuguese(type),
+}));
+
+function translateToPortuguese(type: string): string {
+    const translations: Record<string, string> = {
+        house: 'Casa',
+        apartment: 'Apartamento',
+        condominium: 'Condomínio',
+        work: 'Trabalho',
+        hotel: 'Hotel',
+        shed: 'Galpão',
+    };
+    return translations[type] || type;
+}
+
 export default class Address {
     id: string = '';
     object_id: string = '';
@@ -14,8 +40,9 @@ export default class Address {
     delivery_tax: number = 0;
     likeTax?: boolean = false
     coordinates: Coordinates = new Coordinates();
+    address_type: string = '';
 
-    constructor(id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, likeTax: boolean = false, coordinates?: Coordinates) {
+    constructor(likeTax: boolean = false, id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, adress_type = '', coordinates?: Coordinates) {
         this.id = id
         this.object_id = object_id
         this.street = street
@@ -29,9 +56,30 @@ export default class Address {
         this.delivery_tax = delivery_tax
         this.likeTax = likeTax
         this.coordinates = coordinates || new Coordinates()
+        this.address_type = adress_type
     }
 
-    public toString() {
+    public getSmallAddress() {
+        const parts = [
+            this.street,
+            this.number,
+            this.neighborhood,
+        ];
+
+        return parts.filter(Boolean).join(", ");
+    }
+
+    public getMediumAddress() {
+        const parts = [
+            this.street,
+            this.number,
+            this.complement,
+            this.neighborhood,
+        ];
+
+        return parts.filter(Boolean).join(", ");
+    }
+    toString() {
         const parts = [
             this.street,
             this.number,

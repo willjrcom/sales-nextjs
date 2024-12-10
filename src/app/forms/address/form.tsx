@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { HiddenField, NumberField, TextField } from '../../components/modal/field';
-import Address from '@/app/entities/address/address';
+import { HiddenField, NumberField, SelectField, TextField } from '../../components/modal/field';
+import Address, { AddressTypesWithId } from '@/app/entities/address/address';
 
 interface AddressFormProps {
     addressParent: Address;
@@ -9,7 +9,7 @@ interface AddressFormProps {
 
 const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
     const [address, setAddress] = useState<Address>(addressParent || new Address());
-
+    console.log(address)
     const handleInputChange = (field: keyof Address, value: any) => {
         setAddress(prev => ({ ...prev, [field]: value }));
         setAddressParent(prev => ({ ...prev, [field]: value }));
@@ -34,6 +34,8 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
         <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city}/>
 
         <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={value => handleInputChange('state', value)} value={address.state}/>
+        
+        <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId}/>
 
         <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep}/>
         {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={value => handleInputChange('delivery_tax', value)} value={address.delivery_tax}/>}

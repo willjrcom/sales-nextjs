@@ -8,7 +8,8 @@ import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
 import styles from './sidebar.module.css';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import Address from '@/app/entities/address/address';
 
 interface SidebarLinkItemProps {
   icon: IconType;
@@ -32,14 +33,28 @@ const SidebarLinkItem: React.FC<SidebarLinkItemProps> = ({ icon: Icon, label, hr
 }
 
 const SidebarItemCompany: React.FC<SidebarItemProps> = ({ icon: Icon, label }) => {
+  const { data } = useSession();
+
+  const showData = () => {
+    if (!data?.user.currentCompany) return null;
+
+    const company = data?.user.currentCompany;
+    const address = Object.assign(new Address(), company.address);
+    
+    return (
+      <div>
+          <span>{address.toString()}</span>
+        <span>{company.contacts.join(', ')}</span>
+      </div>
+    )
+  }
   return (
     <div className={styles.menuItemCompany}>
       <Icon className={styles.icon} />
       <div className='grid'>
         <span className={styles.label}>{label}</span>
         <div className={styles.description}>
-          <span>Rua Piedade 226, Jd. Leocadia</span>
-          <span>(11) 96384-9111</span>
+          {data?.user.currentCompany && showData()}
         </div>
       </div>
     </div>
