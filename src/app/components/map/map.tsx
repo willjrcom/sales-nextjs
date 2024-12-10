@@ -5,17 +5,27 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 
-interface MapProps {
-    points: { id: string; lat: number; lng: number; label: string }[];
+export interface Point {
+    id: string;
+    lat: number;
+    lng: number;
+    label: string;
 }
 
-const Map = ({ points }: MapProps) => {
-    if (!points || points.length === 0) {
+export interface MapProps {
+    centerPoint?: Point | null;
+    points: Point[];
+}
+
+const Map = ({ centerPoint, points }: MapProps) => {
+    if (!centerPoint) {
         return <div>Carregando...</div>;
     }
     return (
         <MapContainer
-            center={[points[0].lat, points[0].lng]} // Centraliza no primeiro ponto
+        className=" mr-4"
+            dragging={true}
+            center={[centerPoint.lat, centerPoint.lng]} // Centraliza no primeiro ponto
             zoom={13} // Nível de zoom inicial
             style={{ height: "500px", width: "100%" }}
         >
@@ -25,14 +35,28 @@ const Map = ({ points }: MapProps) => {
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             />
             
+
+            <Marker
+                    key={centerPoint.id}
+                    position={[centerPoint.lat, centerPoint.lng]}
+                    icon={L.icon({
+                        iconUrl: "/location-house.png",
+                        iconSize: [40, 40],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                    })}
+                >
+                    <Popup>{centerPoint.label}</Popup>
+                </Marker>
+
             {/* Adiciona os pontos como marcadores */}
             {points?.map((point) => (
                 <Marker
                     key={point.id}
                     position={[point.lat, point.lng]}
                     icon={L.icon({
-                        iconUrl: "/location-map.png", // Você pode personalizar o ícone
-                        iconSize: [25, 25],
+                        iconUrl: "/location-map.png",
+                        iconSize: [30, 30],
                         iconAnchor: [12, 41],
                         popupAnchor: [1, -34],
                     })}

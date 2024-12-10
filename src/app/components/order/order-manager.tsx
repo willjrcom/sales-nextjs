@@ -102,7 +102,7 @@ const DataOrderCard = ({ order }: CartProps) => {
         if (!order || !data) return
 
         try {
-            await PendingOrder(order, data)
+            await PendingOrder(order.id, data)
             setError(null)
             contextCurrentOrder.fetchData();
         } catch (error) {
@@ -114,7 +114,8 @@ const DataOrderCard = ({ order }: CartProps) => {
     const haveGroups = order && order?.groups?.length > 0
     const isAnyGroupsStaging = haveGroups && order?.groups?.some((group) => group.status == "Staging")
     const isThrowButton = isStatusStagingOrPending && isAnyGroupsStaging
-
+    const subTotal = (order?.total_payable || 0) - (order?.delivery?.delivery_tax || 0)
+    
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
@@ -122,11 +123,12 @@ const DataOrderCard = ({ order }: CartProps) => {
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <br/>
             {/* Total do pedido */}
-            <p><strong>Subtotal:</strong> R$ {order?.total_payable.toFixed(2)}</p>
+            <p><strong>Subtotal:</strong> R$ {subTotal.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
+
             {/* <p>Desconto: R$ 5,00</p> */}
             <hr className="my-2" />
-            <p><strong>Total:</strong> R$ {((order?.total_payable || 0) + (order?.delivery?.delivery_tax || 0)).toFixed(2)}</p>
+            <p><strong>Total:</strong> R$ {(order?.total_payable || 0).toFixed(2)}</p>
             <br/>
             {isThrowButton && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
                 Lançar Pedido

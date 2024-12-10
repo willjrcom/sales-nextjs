@@ -1,7 +1,7 @@
 'use client';
 
 import CrudTable from "@/app/components/crud/table";
-import Map from "@/app/components/map/map";
+import Map, { Point } from "@/app/components/map/map";
 import { useDeliveryOrders } from "@/app/context/order-delivery/context";
 import Address from "@/app/entities/address/address";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
@@ -13,7 +13,8 @@ import { useEffect, useState } from "react";
 const PageDeliveryOrder = () => {
     const contextDeliveryOrder = useDeliveryOrders();
     const [deliveryOrders, setDeliveryOrders] = useState<OrderDelivery[]>(contextDeliveryOrder.items);
-    const [points, setPoints] = useState<{ id: string; lat: number; lng: number; label: string }[]>([]);
+    const [centerPoint, setCenterPoint] = useState<Point | null>(null);
+    const [points, setPoints] = useState<Point[]>([]);
     const { data } = useSession();
 
     useEffect(() => {
@@ -21,21 +22,38 @@ const PageDeliveryOrder = () => {
     }, [contextDeliveryOrder.items]);
 
     useEffect(() => {
-        if (!data || !data?.user?.currentCompany?.address) return
-        // Converte o objeto plain em uma instância de Address
-        const addressInstance = Object.assign(new Address(), data.user.currentCompany.address);
-        console.log(addressInstance.coordinates)
-        // Agora o método toString deve funcionar
-        const point = { id: "4", lat: data.user.currentCompany.address.coordinates?.latitude, lng: data.user.currentCompany.address.coordinates?.longitude, label: addressInstance.toString() };
-        setPoints([point]);
+        if (!data || !data?.user?.currentCompany?.address) return     
+        const company = data?.user?.currentCompany;   
+        const coordinates = company.address.coordinates
+
+        const point = {id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name} as Point;
+        setCenterPoint(point);
     }, [data])
+
+    useEffect(() => {
+        const newPoints: Point[] = [];
+        for (let deliveryOrder of deliveryOrders) {
+            const address = Object.assign(new Address(), deliveryOrder.address);
+            console.log(address)
+            if (!address) continue;
+
+            const coordinates = address.coordinates
+            if (!coordinates) continue;
+
+            const point = {id: deliveryOrder.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress()} as Point;
+            newPoints.push(point);
+        }
+    
+        console.log(newPoints)
+        setPoints(newPoints);
+    }, [deliveryOrders])
 
     return (
         <>
             <h1 className="p-2">Entregas</h1>
             <div className="flex items-center justify-between">
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders}/>
-                <Map points={points} />
+                <Map centerPoint={centerPoint} points={points} />
             </div>
         </>
     )

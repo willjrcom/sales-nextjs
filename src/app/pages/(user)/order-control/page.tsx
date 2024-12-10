@@ -13,10 +13,6 @@ const PageOrder = () => {
         <>
         {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
         <CrudLayout title="Pedidos"
-            filterButtonChildren={
-                <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
-            }
-
             refreshButton={
                 <Refresh
                     context={context}

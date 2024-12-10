@@ -25,7 +25,6 @@ export default class Person {
 
 const SchemaPerson = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    email: z.string().email('Email inválido'),
     cpf: z.string().optional(),
     birthday: z.string().nullable(),
     contact: SchemaContact,
@@ -35,7 +34,6 @@ const SchemaPerson = z.object({
 export const ValidatePersonForm = (person: Person) => {
     const validatedFields = SchemaPerson.safeParse({
         name: person.name,
-        email: person.email,
         cpf: person.cpf,
         birthday: person.birthday,
         contact: person.contact,

@@ -4,7 +4,7 @@ const CrudLayout = ({
     title: string
     plusButtonChildren?: React.ReactNode;
     searchButtonChildren?: React.ReactNode;
-    filterButtonChildren: React.ReactNode;
+    filterButtonChildren?: React.ReactNode;
     refreshButton?: React.ReactNode;
     tableChildren: React.ReactNode;
 
