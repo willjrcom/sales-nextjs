@@ -10,7 +10,7 @@ const geocodeAddressOpenCage = async (address: string, apiKey: string): Promise<
             params: {
                 q: address,
                 key: apiKey,
-            },
+            }, 
         });
 
         const result = response.data.results[0];
