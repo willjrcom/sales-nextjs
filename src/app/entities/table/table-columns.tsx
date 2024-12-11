@@ -21,7 +21,7 @@ const TableColumns = (): ColumnDef<Table>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-table" + row.original.id }
+        <ButtonIcon modalName={"edit-table-" + row.original.id }
           title={"Editar " + row.original.name}>
           <TableForm 
             item={row.original}

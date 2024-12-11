@@ -13,7 +13,7 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-employee" + row.original.id }
+        <ButtonIcon modalName={"edit-employee-" + row.original.id }
           title={"Editar " + row.original.name}>
           <EmployeeForm
             item={row.original}
