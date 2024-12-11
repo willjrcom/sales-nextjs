@@ -11,6 +11,7 @@ import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/api/error';
 import { SelectField } from '@/app/components/modal/field';
 import { useEmployees } from '@/app/context/employee/context';
+import Employee from '@/app/entities/employee/employee';
 
 const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>) => {
     const modalName = isUpdate ? 'edit-delivery-driver-' + item?.id : 'new-delivery-driver'
@@ -19,8 +20,15 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const contextEmployees = useEmployees();
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
+    const [employees, setEmployees] = useState<Employee[]>([]);
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
+
+    useEffect(() => {
+        // remove repeted employees between deliveryDrivers and employees
+        const employeesFiltered = contextEmployees.items.filter(employee => !contextDeliveryDrivers.items.some(deliveryDriver => deliveryDriver.employee_id === employee.id))
+        setEmployees(employeesFiltered)
+    }, [contextDeliveryDrivers.items, contextEmployees.items]);;
 
     const submit = async () => {
         if (!data) return;
@@ -61,7 +69,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     return (
         <>
             {error && <p className='text-red-500'>{error.message}</p>}
-            <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={contextEmployees.items} />
+            <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={employees} />
             <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} deleteItem={onDelete} />
         </>
     );
