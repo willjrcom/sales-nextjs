@@ -23,11 +23,10 @@ const Map = ({ centerPoint, points }: MapProps) => {
     }
     return (
         <MapContainer
-        className=" mr-4"
             dragging={true}
             center={[centerPoint.lat, centerPoint.lng]} // Centraliza no primeiro ponto
             zoom={13} // Nível de zoom inicial
-            style={{ height: "500px", width: "100%" }}
+            style={{ height: "68vh", width: "100%" }}
         >
             {/* TileLayer fornece o fundo do mapa */}
             <TileLayer
@@ -35,7 +34,6 @@ const Map = ({ centerPoint, points }: MapProps) => {
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             />
             
-
             <Marker
                     key={centerPoint.id}
                     position={[centerPoint.lat, centerPoint.lng]}

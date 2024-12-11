@@ -2,38 +2,45 @@ import { ColumnDef } from "@tanstack/react-table";
 import Order from "./order";
 import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
-import { showStatus } from "@/app/utils/status";
-import OrderDelivery from "./order-delivery";
+import Address from "../address/address";
 
-const DeliveryOrderColumns = (): ColumnDef<OrderDelivery>[] => [
+const DeliveryOrderColumns = (): ColumnDef<Order>[] => [
+  {
+    id: 'Enviar',
+    accessorKey: 'id',
+    header: 'Enviar',
+    cell: ({ row }) => {
+      return (
+        <Link href={'/pages/order-control/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
+          <FaEdit />
+        </Link>
+      )
+    },
+  },
   {
     id: 'Cliente',
     accessorKey: 'name',
     header: 'Cliente',
-    accessorFn: row => row.client?.name || 'Sem cliente',
+    accessorFn: row => {
+      const name = row.delivery?.client?.name
+      if (!name) return 'Sem cliente'
+
+      const splitName = name.split(' ');
+      if (!splitName) return name.substring(0, 15);
+
+      if (splitName.length > 1) return splitName[0] + ' ' + splitName[splitName.length - 1];
+      return splitName[0];
+    },
   },
   {
-    id: 'Status',
-    accessorKey: 'status',
-    header: 'Status',
-    accessorFn: row => showStatus[row.status],
-  },
- {
-  id: 'Endereço',
-  accessorKey: 'address',
-  header: 'Endereço',
-  accessorFn: row => row.address?.street || 'Sem endereço',
- },
-  {
-    id: 'Editar',
-    accessorKey: 'id',
-    header: 'Editar',
-    cell: ({ row }) => {
-      return (
-        <Link href={'/pages/order-control/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
-            <FaEdit />
-        </Link>
-      )
+    id: 'Endereço',
+    accessorKey: 'address',
+    header: 'Endereço',
+    accessorFn: row => {
+      const address = Object.assign(new Address(), row.delivery?.address);
+      if (!address) return 'Sem endereço';
+
+      return address.getSmallAddress();
     },
   },
 ];

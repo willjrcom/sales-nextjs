@@ -90,12 +90,16 @@ function OrderKanban() {
     const isDoubleClick = (now: number) => lastClickTime && now - lastClickTime < 300;
 
     const handleDoubleClick = (orderId: string, error?: RequestError | null) => {
+        const onClose = () => {
+            contextOrder.fetchData();
+            modalHandler.hideModal("show-order-" + orderId)
+        }
         modalHandler.showModal(
             "show-order-" + orderId,
             "Ver Pedido",
             <CardOrder orderId={orderId} errorRequest={error}/>,
             "xl",
-            () => modalHandler.hideModal("show-order-" + orderId)
+            onClose
         );
     };
 

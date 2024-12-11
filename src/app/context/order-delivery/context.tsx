@@ -1,13 +1,13 @@
 
 import React, { createContext, useContext, ReactNode} from 'react';
 import GenericProvider, { ItemsContextProps } from '../props';
-import GetDeliveryOrders from '@/app/api/order-delivery/route';
-import OrderDelivery from '@/app/entities/order/order-delivery';
+import GetOrdersWithDelivery from '@/app/api/order/all/delivery/route';
+import Order from '@/app/entities/order/order';
 
-const ContextDeliveryOrder = createContext<ItemsContextProps<OrderDelivery> | undefined>(undefined);
+const ContextDeliveryOrder = createContext<ItemsContextProps<Order> | undefined>(undefined);
 
 export const DeliveryOrderProvider = ({ children }: { children: ReactNode }) => {
-    const values = GenericProvider<OrderDelivery>({ getItems: GetDeliveryOrders });
+    const values = GenericProvider<Order>({ getItems: GetOrdersWithDelivery });
 
     return (
         <ContextDeliveryOrder.Provider value={values}>

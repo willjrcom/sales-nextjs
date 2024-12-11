@@ -2,7 +2,6 @@ import Order from "@/app/entities/order/order";
 import StatusComponent from "../button/show-status";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import GetOrderByID from "@/app/api/order/[id]/route";
 import RequestError from "@/app/api/error";
 import RoundComponent from "../button/round-component";
 import { ToUtcDatetime } from "@/app/utils/date";
@@ -316,6 +315,8 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                 {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" onCloseModal={() => setErrorPayment(null)}>
                     <PaymentForm order={order} setOrderPaymentError={setErrorPayment} setOrderError={setError} />
                 </ButtonIconText>}
+
+                {isOrderStatusFinished && <div>&nbsp;</div>}
 
                 <div className="flex justify-end items-center gap-4">
                     {isOrderStatusPending &&

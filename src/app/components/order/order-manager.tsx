@@ -110,10 +110,10 @@ const DataOrderCard = ({ order }: CartProps) => {
         }
     }
 
-    const isStatusStagingOrPending = order?.status == "Staging" || order?.status == "Pending"
+    const isStatusStagingOrPendingOrReady = order?.status == "Staging" || order?.status == "Pending" || order?.status == "Ready"
     const haveGroups = order && order?.groups?.length > 0
     const isAnyGroupsStaging = haveGroups && order?.groups?.some((group) => group.status == "Staging")
-    const isThrowButton = isStatusStagingOrPending && isAnyGroupsStaging
+    const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging
     const subTotal = (order?.total_payable || 0) - (order?.delivery?.delivery_tax || 0)
     
     return (
