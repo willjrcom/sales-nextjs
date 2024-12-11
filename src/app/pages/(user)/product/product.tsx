@@ -4,7 +4,6 @@ import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import { useProducts } from "@/app/context/product/context";
-import "./style.css";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { SelectField } from "@/app/components/modal/field";

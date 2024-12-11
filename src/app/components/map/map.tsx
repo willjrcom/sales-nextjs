@@ -26,7 +26,7 @@ const Map = ({ centerPoint, points }: MapProps) => {
             dragging={true}
             center={[centerPoint.lat, centerPoint.lng]} // Centraliza no primeiro ponto
             zoom={13} // Nível de zoom inicial
-            style={{ height: "68vh", width: "100%" }}
+            style={{ height: "58vh", width: "100%" }}
         >
             {/* TileLayer fornece o fundo do mapa */}
             <TileLayer

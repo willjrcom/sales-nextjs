@@ -4,6 +4,7 @@ import { useState } from 'react';
 import PageProducts from './product';
 import PageCategories from './category';
 import PageProcessRules from './process-rule';
+import "./style.css";
 
 const PageWithTabs = () => {
     const [activeTab, setActiveTab] = useState<'produtos' | 'categorias' | 'processos'>('produtos');

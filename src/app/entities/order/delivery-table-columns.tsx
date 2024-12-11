@@ -6,18 +6,6 @@ import Address from "../address/address";
 
 const DeliveryOrderColumns = (): ColumnDef<Order>[] => [
   {
-    id: 'Enviar',
-    accessorKey: 'id',
-    header: 'Enviar',
-    cell: ({ row }) => {
-      return (
-        <Link href={'/pages/order-control/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
-          <FaEdit />
-        </Link>
-      )
-    },
-  },
-  {
     id: 'Cliente',
     accessorKey: 'name',
     header: 'Cliente',
