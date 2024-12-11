@@ -1,3 +1,4 @@
+import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
 import { useDeliveryOrders } from "@/app/context/order-delivery/context";
@@ -6,6 +7,7 @@ import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { FaPaperPlane } from "react-icons/fa";
 
 const DeliveryOrderToShip = () => {
     const contextDeliveryOrder = useDeliveryOrders();
@@ -18,10 +20,6 @@ const DeliveryOrderToShip = () => {
     useEffect(() => {
         setDeliveryOrders(contextDeliveryOrder.items);
     }, [contextDeliveryOrder.items]);
-
-    useEffect(() => {
-        console.log(selectedRows)
-    }, [selectedRows])
     
     useEffect(() => {
         if (!data || !data?.user?.currentCompany?.address) return
@@ -60,6 +58,9 @@ const DeliveryOrderToShip = () => {
                     <Map centerPoint={centerPoint} points={points} />
                 </div>
             </div>
+            <ButtonIconTextFloat modalName="ship-delivery" icon={FaPaperPlane} title="Enviar entrega" position="bottom-right">
+                <h1>Enviar entrega(s)</h1>
+            </ButtonIconTextFloat>
         </>
     )
 }

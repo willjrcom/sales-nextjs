@@ -1,7 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Order from "./order";
-import Link from "next/link";
-import { FaEdit } from "react-icons/fa";
 import Address from "../address/address";
 
 const DeliveryOrderColumns = (): ColumnDef<Order>[] => [
