@@ -1,44 +1,43 @@
 import { ItemsContextProps } from "@/app/context/props";
-import { GenericSlice } from "@/redux/slices/generics";
+import { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import { HiOutlineRefresh } from "react-icons/hi";
+import { useDispatch } from "react-redux";
 
-interface RefreshProps<T extends { id: string }> {
-    slice?: GenericSlice<T>;
+interface RefreshProps<T> {
+    fetchItems?: (session: Session) => any; // Ajuste para refletir o tipo de ação válida
     context?: ItemsContextProps<T>;
-    
+    lastUpdate: string;
 }
 
-const Refresh = <T extends { id: string },>({ context, slice }: RefreshProps<T>) => {
+const Refresh = <T extends { id: string }>({ context, fetchItems, lastUpdate }: RefreshProps<T>) => {
+    const dispatch = useDispatch();
+    const { data } = useSession();
+
     const handleRefresh = async () => {
         try {
-            if(!context) return
-            context.fetchData();
-            context.updateLastUpdate();
-        } catch (error) {
-            console.error(error);
-        }
+            if (!data || !fetchItems) return;
 
-        try {
-            if(!slice) return
-            
+            // Dispara a ação do Redux para buscar os itens
+            dispatch(fetchItems(data)); // Passa a session para o thunk
         } catch (error) {
-            console.error(error);
+            console.error("Erro ao atualizar os dados:", error);
         }
-    }
+    };
 
     return (
         <div className="flex items-center gap-3">
             <button onClick={handleRefresh}><HiOutlineRefresh /></button>
-            <label className="text-gray-800">Atualizado em {context?.getLastUpdate()}</label>
+            <label className="text-gray-800">Atualizado em {lastUpdate}</label>
         </div>
     );
-}
+};
 
 const FormatRefreshTime = (lastUpdate: Date): string => {
-    const hours = lastUpdate.getHours() 
+    const hours = lastUpdate.getHours();
     const minutes = lastUpdate.getMinutes() < 10 ? '0' + lastUpdate.getMinutes() : lastUpdate.getMinutes();
-    return hours + ':' +  minutes
-}
+    return hours + ':' + minutes;
+};
 
-export default Refresh
+export default Refresh;
 export { FormatRefreshTime };

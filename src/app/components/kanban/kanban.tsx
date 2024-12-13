@@ -2,13 +2,14 @@ import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import Order, { StatusOrder } from "@/app/entities/order/order";
 import Droppable from "./droppable";
-import { useOrders } from "@/app/context/order/context";
 import { useModal } from "@/app/context/modal/context";
 import CardOrder from "../order/card-order";
 import ReadyOrder from "@/app/api/order/status/ready/route";
 import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/route";
 import RequestError from "@/app/api/error";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 function OrderKanban() {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
@@ -18,7 +19,7 @@ function OrderKanban() {
     const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
     const modalHandler = useModal();
-    const contextOrder = useOrders();
+    const orders = useSelector((state: RootState) => state.orders);
     const { data } = useSession();
 
     useEffect(() => {
@@ -28,10 +29,10 @@ function OrderKanban() {
 
     // Atualiza as listas com base no contexto
     useEffect(() => {
-        setPendingOrders(contextOrder.items.filter(order => order.status === "Pending"));
-        setReadyOrders(contextOrder.items.filter(order => order.status === "Ready"));
-        setFinishedOrders(contextOrder.items.filter(order => order.status === "Finished"));
-    }, [contextOrder.items]);
+        setPendingOrders(orders.items.filter(order => order.status === "Pending"));
+        setReadyOrders(orders.items.filter(order => order.status === "Ready"));
+        setFinishedOrders(orders.items.filter(order => order.status === "Finished"));
+    }, [orders.items]);
 
     const handleDragStart = (event: { active: any }) => {
         setActiveId(event.active.id); // Atualiza o ID do item ativo
@@ -91,7 +92,7 @@ function OrderKanban() {
 
     const handleDoubleClick = (orderId: string, error?: RequestError | null) => {
         const onClose = () => {
-            contextOrder.fetchData();
+            
             modalHandler.hideModal("show-order-" + orderId)
         }
         modalHandler.showModal(
