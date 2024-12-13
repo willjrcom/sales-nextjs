@@ -1,6 +1,7 @@
 import { EmployeeProvider } from '@/app/context/employee/context';
 import Sidebar from '../sidebar/sidebar';
 import Topbar from '../topbar/topbar';
+import { Provider } from 'react-redux';
 import { ClientProvider } from '@/app/context/client/context';
 import { CategoryProvider } from '@/app/context/category/context';
 import { ProductProvider } from '@/app/context/product/context';
@@ -13,6 +14,7 @@ import { CurrentOrderProvider } from '@/app/context/current-order/context';
 import { GroupItemProvider } from '@/app/context/group-item/context';
 import { DeliveryOrderProvider } from '@/app/context/order-delivery/context';
 import { DeliveryDriverProvider } from '@/app/context/delivery-driver/context';
+import { store } from '@/redux/store';
 
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
@@ -36,6 +38,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
 const ContextProviders = ({ children }: { children: React.ReactNode }) => {
   return (
+    <Provider store={store}>
     <EmployeeProvider>
       <ClientProvider>
         <CategoryProvider>
@@ -43,7 +46,6 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
             <ProcessRuleProvider>
               <PlaceProvider>
                 <TableProvider>
-                  <OrderProvider>
                     <CurrentOrderProvider>
                       <GroupItemProvider>
                         <DeliveryOrderProvider>
@@ -55,7 +57,6 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
                         </DeliveryOrderProvider>
                       </GroupItemProvider>
                     </CurrentOrderProvider>
-                  </OrderProvider>
                 </TableProvider>
               </PlaceProvider>
             </ProcessRuleProvider>
@@ -63,6 +64,7 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
         </CategoryProvider>
       </ClientProvider>
     </EmployeeProvider>
+    </Provider>
   )
 }
 

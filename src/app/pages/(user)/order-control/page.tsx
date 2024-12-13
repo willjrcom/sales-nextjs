@@ -1,21 +1,20 @@
 'use client';
 
-import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudLayout from "@/app/components/crud/layout";
 import Refresh from "@/app/components/crud/refresh";
 import OrderKanban from "@/app/components/kanban/kanban";
-import { useOrders } from "@/app/context/order/context";
-import { FaFilter } from "react-icons/fa";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 const PageOrder = () => {
-    const context = useOrders();
+    const orders = useSelector((state: RootState) => state.orders);
+
     return (
         <>
-        {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
         <CrudLayout title="Pedidos"
             refreshButton={
                 <Refresh
-                    context={context}
+                    slice={orders}
                 />
             }
             tableChildren={
