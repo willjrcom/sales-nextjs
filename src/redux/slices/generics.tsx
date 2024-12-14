@@ -32,7 +32,7 @@ const createGenericSlice = <T extends { name: any; id: string }>({ name, getItem
     });
 
     // Criar o thunk assíncrono para buscar dados
-    const fetchItems = createAsyncThunk(`${name}/fetchItems`, async (session: Session, { rejectWithValue }) => {
+    const fetchItems = createAsyncThunk(`${name}/fetch`, async (session: Session, { rejectWithValue }) => {
         try {
             const items = await getItems(session);
             return items;
@@ -49,10 +49,10 @@ const createGenericSlice = <T extends { name: any; id: string }>({ name, getItem
             addItem: (state, action) => {
                 adapter.addOne(state, action.payload);
             }, // Adiciona um item
-            updateItem: (state, action) => {
+            removeItem: (state, action) => {
                 adapter.updateOne(state, action.payload);
             }, // Atualiza um item
-            removeItem: (state, action) => {
+            updateItem: (state, action) => {
                 adapter.removeOne(state, action.payload);
             }, // Remove um item
         },
@@ -77,7 +77,7 @@ const createGenericSlice = <T extends { name: any; id: string }>({ name, getItem
     return {
         reducer: slice.reducer,
         actions: slice.actions,
-        fetchItems,
+        fetchItems: fetchItems,
         adapterSelectors: adapter.getSelectors((state: any) => state[name]), // Seletores do adapter
     };
 };
