@@ -29,10 +29,10 @@ function OrderKanban() {
 
     // Atualiza as listas com base no contexto
     useEffect(() => {
-        setPendingOrders(orders.items.filter(order => order.status === "Pending"));
-        setReadyOrders(orders.items.filter(order => order.status === "Ready"));
-        setFinishedOrders(orders.items.filter(order => order.status === "Finished"));
-    }, [orders.items]);
+        setPendingOrders(Object.values(orders.entities).filter(order => order.status === "Pending"));
+        setReadyOrders(Object.values(orders.entities).filter(order => order.status === "Ready"));
+        setFinishedOrders(Object.values(orders.entities).filter(order => order.status === "Finished"));
+    }, [orders.entities]);
 
     const handleDragStart = (event: { active: any }) => {
         setActiveId(event.active.id); // Atualiza o ID do item ativo

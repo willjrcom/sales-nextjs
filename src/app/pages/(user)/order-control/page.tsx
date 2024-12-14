@@ -10,15 +10,24 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const PageOrder = () => {
-    const orders = useSelector((state: RootState) => state.orders);
-    const dispatch = useDispatch<AppDispatch>();  // Tipagem correta do dispatch
+    const ordersSlice = useSelector((state: RootState) => state.orders);
+    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
     useEffect(() => {
-        if (!data) return;
-        dispatch(fetchOrders(data)); // Dispara a ação assíncrona corretamente
-    }, [data, dispatch]);
-
+        if (data && Object.keys(ordersSlice.entities).length === 0) {
+            dispatch(fetchOrders(data));
+        }
+    
+        const interval = setInterval(() => {
+            if (data && !ordersSlice ) {
+                dispatch(fetchOrders(data));
+            }
+        }, 60000); // Atualiza a cada 60 segundos
+    
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    }, [data, ordersSlice, dispatch]);
+    
     return (
         <>
             <CrudLayout
@@ -26,7 +35,7 @@ const PageOrder = () => {
                 refreshButton={
                     <Refresh
                         fetchItems={fetchOrders}
-                        lastUpdate={orders.lastUpdate}
+                        slice={ordersSlice}
                     />
                 }
                 tableChildren={<OrderKanban />}

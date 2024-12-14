@@ -1,58 +1,60 @@
-import { createSlice, createAsyncThunk, PayloadAction, Draft } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createEntityAdapter, EntityState } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
-import GetOrders from '@/app/api/order/route';
 
-export interface GenericSlice<T extends { id: string }> {
-    items: T[];
+// Estado genérico adicional
+export interface GenericState {
     loading: boolean;
     error: RequestError | null;
     lastUpdate: string;
 }
 
-interface GenericsProps<T> {
+export interface GenericsProps<T> {
     name: string;
     getItems: (session: Session) => Promise<T[]>;
 }
 
-export const fetchItems = createAsyncThunk(
-    'items/fetchItems',
-    async (session: Session, { rejectWithValue }) => {
-        try {
-            const orders = GetOrders(session);
-            return orders;  // Retorna os dados
-        } catch (error) {
-            return rejectWithValue(error);  // Caso de erro
-        }
-    }
-);
+// Configuração genérica do slice
+const createGenericSlice = <T extends { name: any; id: string }>({ name, getItems }: GenericsProps<T>) => {
+    const adapter = createEntityAdapter<T, string>({
+        // Assume IDs are stored in a field other than `t.id`
+        selectId: (t: T) => t.id,
+        // Keep the "all IDs" array sorted based on t name
+        sortComparer: (a, b) => a.name.localeCompare(b.name),
+    })
 
-
-const createGenericSlice = <T extends { id: string }>({ name, getItems }: GenericsProps<T>) => {
-    const initialState: GenericSlice<T> = {
-        items: [],
+    // Combina o estado inicial do adapter com estados adicionais
+    const initialState = adapter.getInitialState<GenericState>({
         loading: false,
         error: null,
         lastUpdate: FormatRefreshTime(new Date()),
-    };
+    });
 
+    // Criar o thunk assíncrono para buscar dados
+    const fetchItems = createAsyncThunk(`${name}/fetchItems`, async (session: Session, { rejectWithValue }) => {
+        try {
+            const items = await getItems(session);
+            return items;
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    });
+
+    // Criar o slice
     const slice = createSlice({
         name,
         initialState,
         reducers: {
-            addItem: (state: Draft<GenericSlice<T>>, action: PayloadAction<T>) => {
-                state.items.push(action.payload as Draft<T>);
-            },
-            updateItem: (state: Draft<GenericSlice<T>>, action: PayloadAction<T>) => {
-                const index = state.items.findIndex((item) => item.id === action.payload.id);
-                if (index !== -1) {
-                    state.items[index] = { ...state.items[index], ...action.payload };
-                }
-            },
-            removeItem: (state: Draft<GenericSlice<T>>, action: PayloadAction<string>) => {
-                state.items = state.items.filter((item) => item.id !== action.payload);
-            },
+            addItem: (state, action) => {
+                adapter.addOne(state, action.payload);
+            }, // Adiciona um item
+            updateItem: (state, action) => {
+                adapter.updateOne(state, action.payload);
+            }, // Atualiza um item
+            removeItem: (state, action) => {
+                adapter.removeOne(state, action.payload);
+            }, // Remove um item
         },
         extraReducers: (builder) => {
             builder
@@ -61,7 +63,7 @@ const createGenericSlice = <T extends { id: string }>({ name, getItems }: Generi
                 })
                 .addCase(fetchItems.fulfilled, (state, action) => {
                     state.loading = false;
-                    state.items = action.payload as unknown as Draft<T>[]; // Atualiza os itens
+                    adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })
                 .addCase(fetchItems.rejected, (state, action) => {
@@ -71,7 +73,13 @@ const createGenericSlice = <T extends { id: string }>({ name, getItems }: Generi
         },
     });
 
-    return { ...slice, fetchItems };
+    // Retornar o slice configurado
+    return {
+        reducer: slice.reducer,
+        actions: slice.actions,
+        fetchItems,
+        adapterSelectors: adapter.getSelectors((state: any) => state[name]), // Seletores do adapter
+    };
 };
 
 export default createGenericSlice;

@@ -4,6 +4,7 @@ import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
 import Order from '@/app/entities/order/order';
+import GetOrders from '@/app/api/order/route';
 
 // Configuração genérica do slice
 const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
@@ -72,7 +73,7 @@ const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
     };
 };
 
-const orderSlice = createOrdersSlice({ name: 'orders', getItems: async () => [] })
+const orderSlice = createOrdersSlice({ name: 'orders', getItems: GetOrders })
 export const { addOrder, removeOrder, updateOrder } = orderSlice.actions;
 export const { fetchItems: fetchOrders, adapterSelectors } = orderSlice;
 export default orderSlice.reducer;
