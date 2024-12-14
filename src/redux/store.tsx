@@ -4,13 +4,15 @@ import ordersReducer from './slices/orders';
 import clientsReducer from './slices/clients';
 import employeesReducer from './slices/employees';
 import productsReducer from './slices/products';
+import processRulesReducer from './slices/process-rule';
 
 export const store = configureStore({
     reducer: {
         orders: ordersReducer,
         clients: clientsReducer,
         employees: employeesReducer,
-        products: productsReducer
+        products: productsReducer,
+        processRules: processRulesReducer
     },
 });
 
