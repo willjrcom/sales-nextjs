@@ -4,7 +4,8 @@ import ordersReducer from './slices/orders';
 import clientsReducer from './slices/clients';
 import employeesReducer from './slices/employees';
 import productsReducer from './slices/products';
-import processRulesReducer from './slices/process-rule';
+import processRulesReducer from './slices/process-rules';
+import tablesReducer from './slices/tables';
 
 export const store = configureStore({
     reducer: {
@@ -12,7 +13,8 @@ export const store = configureStore({
         clients: clientsReducer,
         employees: employeesReducer,
         products: productsReducer,
-        processRules: processRulesReducer
+        processRules: processRulesReducer,
+        tables: tablesReducer
     },
 });
 
