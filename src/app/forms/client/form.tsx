@@ -6,17 +6,16 @@ import { ToIsoDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteClient from '@/app/api/client/delete/route';
-import { useClients } from '@/app/context/client/context';
 import NewClient from '@/app/api/client/new/route';
 import UpdateClient from '@/app/api/client/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
-    const context = useClients();
     const [client, setClient] = useState<Client>(item as Client || new Client())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
@@ -40,9 +39,9 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
             if (!isUpdate) {
                 newClient.id = response
-                context.addItem(newClient);
+                addClient(newClient);
             } else {
-                context.updateItem(newClient);
+                updateClient(newClient);
             }
             
             modalHandler.hideModal(modalName);
@@ -54,7 +53,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteClient(client.id, data)
-        context.removeItem(client.id)
+        removeClient(client.id)
         modalHandler.hideModal(modalName)
     }
 

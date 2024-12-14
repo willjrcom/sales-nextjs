@@ -38,7 +38,7 @@ const PageOrder = () => {
                         slice={ordersSlice}
                     />
                 }
-                tableChildren={<OrderKanban />}
+                tableChildren={<OrderKanban slice={ordersSlice}/>}
             />
         </>
     );

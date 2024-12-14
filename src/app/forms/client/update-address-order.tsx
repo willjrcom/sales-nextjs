@@ -3,7 +3,6 @@ import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ValidateClientForm } from '@/app/entities/client/client';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import { useClients } from '@/app/context/client/context';
 import UpdateClient from '@/app/api/client/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
@@ -11,6 +10,7 @@ import RequestError from '@/app/api/error';
 import AddressForm from '../address/form';
 import Address from '@/app/entities/address/address';
 import UpdateAddressOrderDelivery from '@/app/api/order-delivery/update/address/route';
+import { updateClient } from '@/redux/slices/clients';
 
 interface ClientAddressFormProps extends CreateFormsProps<Client> {
     deliveryOrderId?: string;
@@ -19,7 +19,6 @@ interface ClientAddressFormProps extends CreateFormsProps<Client> {
 const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) => {
     const modalName = 'edit-client-' + item?.id;
     const modalHandler = useModal();
-    const context = useClients();
     const [client, setClient] = useState<Client>(item as Client)
     const [address, setAddress] = useState<Address>(client.address)
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -40,7 +39,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
             await UpdateAddressOrderDelivery(deliveryOrderId, data)
             setError(null);
 
-            context.updateItem(client);
+            updateClient(client);
             modalHandler.hideModal(modalName);
         } catch (error) {
             setError(error as RequestError);

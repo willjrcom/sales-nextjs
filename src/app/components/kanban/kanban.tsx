@@ -8,10 +8,13 @@ import ReadyOrder from "@/app/api/order/status/ready/route";
 import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/route";
 import RequestError from "@/app/api/error";
-import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
+import { EntityState } from "@reduxjs/toolkit";
 
-function OrderKanban() {
+interface OrderKanbanProps {
+    slice: EntityState<Order, string>;
+}
+
+function OrderKanban({ slice }: OrderKanbanProps) {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
     const [finishedOrders, setFinishedOrders] = useState<Order[]>([]);
@@ -19,7 +22,7 @@ function OrderKanban() {
     const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
     const modalHandler = useModal();
-    const orders = useSelector((state: RootState) => state.orders);
+
     const { data } = useSession();
 
     useEffect(() => {
@@ -29,10 +32,10 @@ function OrderKanban() {
 
     // Atualiza as listas com base no contexto
     useEffect(() => {
-        setPendingOrders(Object.values(orders.entities).filter(order => order.status === "Pending"));
-        setReadyOrders(Object.values(orders.entities).filter(order => order.status === "Ready"));
-        setFinishedOrders(Object.values(orders.entities).filter(order => order.status === "Finished"));
-    }, [orders.entities]);
+        setPendingOrders(Object.values(slice.entities).filter(order => order.status === "Pending"));
+        setReadyOrders(Object.values(slice.entities).filter(order => order.status === "Ready"));
+        setFinishedOrders(Object.values(slice.entities).filter(order => order.status === "Finished"));
+    }, [slice.entities]);
 
     const handleDragStart = (event: { active: any }) => {
         setActiveId(event.active.id); // Atualiza o ID do item ativo

@@ -40,7 +40,6 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <Provider store={store}>
     <EmployeeProvider>
-      <ClientProvider>
         <CategoryProvider>
           <ProductProvider>
             <ProcessRuleProvider>
@@ -62,7 +61,6 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
             </ProcessRuleProvider>
           </ProductProvider>
         </CategoryProvider>
-      </ClientProvider>
     </EmployeeProvider>
     </Provider>
   )
