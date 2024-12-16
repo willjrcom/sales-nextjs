@@ -7,17 +7,16 @@ import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeletePlace from '@/app/api/place/delete/route';
-import { usePlaces } from '@/app/context/place/context';
 import NewPlace from '@/app/api/place/new/route';
 import UpdatePlace from '@/app/api/place/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import { addPlace, removePlace, updatePlace } from '@/redux/slices/places';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalName = isUpdate ? 'edit-place-' + item?.id : 'new-place'
     const modalHandler = useModal();
-    const context = usePlaces();
     const [place, setPlace] = useState<Place>(item || new Place());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
@@ -39,9 +38,9 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
             if (!isUpdate) {
                 place.id = response
-                context.addItem(place);
+                addPlace(place);
             } else {
-                context.updateItem(place);
+                updatePlace(place);
             }
 
             modalHandler.hideModal(modalName);
@@ -54,7 +53,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const onDelete = async () => {
         if (!data) return;
         DeletePlace(place.id, data);
-        context.removeItem(place.id)
+        removePlace(place)
         modalHandler.hideModal(modalName);
     }
 

@@ -1,24 +1,25 @@
-import { useCategories } from '@/app/context/category/context';
 import GroupItem from '@/app/entities/order/group-item';
 import Product from '@/app/entities/product/product';
 import React, { useEffect, useState } from 'react';
 import Carousel from '../../carousel/carousel';
 import AddComplementCard from './add-card-complement-item';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface ItemListProps {
     groupItem?: GroupItem | null;
 }
 
 const ComplementItemList = ({ groupItem }: ItemListProps) => {
-    const contextCategories = useCategories();
     const [complementItems, setComplementItems] = useState<Product[]>([]);
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
 
     useEffect(() => {
         try {
             if (!groupItem) return
 
             // Passo 1: Buscar a categoria atual do item
-            const category = contextCategories.findByID(groupItem.category_id);
+            const category = categoriesSlice.entities[groupItem.category_id];
             if (!category) {
                 return setComplementItems([]);
             }
@@ -31,7 +32,7 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
 
             // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
             const complementItems = complementCategories // groupItem.category?.product_category_to_complement
-                .map((internalCategory) => contextCategories.findByID(internalCategory.id)?.products) // Obter os produtos de cada categoria adicional
+                .map((internalCategory) => categoriesSlice.entities[internalCategory.id]?.products) // Obter os produtos de cada categoria adicional
                 .flat(); // "Flatten" para uma lista única de produtos
 
             if (!complementItems || complementItems.length === 0) {

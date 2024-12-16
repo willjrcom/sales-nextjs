@@ -16,12 +16,12 @@ export interface GenericsProps<T> {
 }
 
 // Configuração genérica do slice
-const createGenericSlice = <T extends { name: any; id: string }>({ name, getItems }: GenericsProps<T>) => {
+const createGenericSlice = <T extends { name?: any; id: string }>({ name, getItems }: GenericsProps<T>) => {
     const adapter = createEntityAdapter<T, string>({
         // Assume IDs are stored in a field other than `t.id`
         selectId: (t: T) => t.id,
         // Keep the "all IDs" array sorted based on t name
-        sortComparer: (a, b) => a.name.localeCompare(b.name),
+        //sortComparer: (a, b) => a.name.localeCompare(b.name),
     })
 
     // Combina o estado inicial do adapter com estados adicionais

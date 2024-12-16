@@ -7,15 +7,34 @@ import Refresh from "@/app/components/crud/refresh";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { TextField } from "@/app/components/modal/field";
-import { useState } from "react";
-import { useDeliveryDrivers } from "@/app/context/delivery-driver/context";
+import { useEffect, useState } from "react";
 import DeliveryDriverColumns from "@/app/entities/delivery-driver/table-columns";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { useSession } from "next-auth/react";
+import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
 
 const PageDeliveryDriver = () => {
-    const context = useDeliveryDrivers();
     const [nome, setNome] = useState<string>("");
+    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
+    const dispatch = useDispatch<AppDispatch>();
+    const { data } = useSession();
+
+    useEffect(() => {
+        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
+            dispatch(fetchDeliveryDrivers(data));
+        }
     
-    if (context.getLoading()) {
+        const interval = setInterval(() => {
+            if (data && !deliveryDriversSlice) {
+                dispatch(fetchDeliveryDrivers(data));
+            }
+        }, 60000); // Atualiza a cada 60 segundos
+    
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    }, [data, deliveryDriversSlice, dispatch]);
+    
+    if (deliveryDriversSlice.loading) {
         return (
             <h1>Carregando página...</h1>
         )
@@ -23,7 +42,7 @@ const PageDeliveryDriver = () => {
     
     return (
         <>
-        {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
+        {deliveryDriversSlice.error && <p className="mb-4 text-red-500">{deliveryDriversSlice.error?.message}</p>}
             <CrudLayout
                 title="Motoboys"
                 searchButtonChildren={
@@ -42,13 +61,14 @@ const PageDeliveryDriver = () => {
                 }
                 refreshButton={
                     <Refresh
-                        context={context}
+                    slice={deliveryDriversSlice}
+                    fetchItems={fetchDeliveryDrivers}
                     />
                 }
                 tableChildren={
                     <CrudTable 
                         columns={DeliveryDriverColumns()} 
-                        data={context.items.sort((a, b) => a.employee.name.localeCompare(b.employee.name))} />
+                        data={Object.values(deliveryDriversSlice.entities).sort((a, b) => a.employee.name.localeCompare(b.employee.name))} />
                 }
             />
         </>

@@ -7,7 +7,6 @@ import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteCategory from '@/app/api/category/delete/route';
-import { useCategories } from '@/app/context/category/context';
 import NewCategory from '@/app/api/category/new/route';
 import UpdateCategory from '@/app/api/category/update/route';
 import { useModal } from '@/app/context/modal/context';
@@ -17,6 +16,9 @@ import RemovableItensComponent from './removable-ingredients';
 import AdditionalCategorySelector from './additional-category';
 import ComplementCategorySelector from './complement-category';
 import { useRouter } from 'next/navigation';
+import { addCategory, fetchCategories, removeCategory, updateCategory } from '@/redux/slices/categories';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
 
 interface CategoryFormProps extends CreateFormsProps<Category> {
     setItem?: (item: Category) => void
@@ -24,7 +26,6 @@ interface CategoryFormProps extends CreateFormsProps<Category> {
 const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
-    const context = useCategories();
     const [category, setCategory] = useState<Category>(item || new Category());
     const [selectedType, setSelectedType] = useState<TypeCategory>("Normal");
     const { data } = useSession();
@@ -48,6 +49,23 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
         setType[selectedType]()
     }, [selectedType])
 
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const dispatch = useDispatch<AppDispatch>();
+
+    useEffect(() => {
+        if (data && Object.keys(categoriesSlice.entities).length === 0) {
+            dispatch(fetchCategories(data));
+        }
+    
+        const interval = setInterval(() => {
+            if (data && !categoriesSlice) {
+                dispatch(fetchCategories(data));
+            }
+        }, 60000); // Atualiza a cada 60 segundos
+    
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    }, [data, categoriesSlice, dispatch]);
+
     const handleInputChange = (field: keyof Category, value: any) => {
         setCategory(prev => ({ ...prev, [field]: value }));
     };
@@ -64,10 +82,10 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
             if (!isUpdate) {
                 category.id = response
-                context.addItem(category);
+                addCategory(category);
                 modalHandler.hideModal(modalName);
             } else {
-                context.updateItem(category);
+                updateCategory(category);
 
                 if (setItem) setItem(category)
             }
@@ -80,7 +98,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteCategory(category.id, data);
-        context.removeItem(category.id)
+        removeCategory(category)
 
         if (!isUpdate) {
             modalHandler.hideModal(modalName);
@@ -134,14 +152,14 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 <>
                     <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                         <AdditionalCategorySelector
-                            additionalCategories={context.items}
+                            additionalCategories={Object.values(categoriesSlice)}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                         <ComplementCategorySelector
-                            complementCategories={context.items}
+                            complementCategories={Object.values(categoriesSlice)}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />

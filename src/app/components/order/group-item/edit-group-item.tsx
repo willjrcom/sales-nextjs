@@ -1,4 +1,3 @@
-import { useCategories } from "@/app/context/category/context";
 import Carousel from "../../carousel/carousel";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
@@ -12,6 +11,8 @@ import ButtonIconText from "../../button/button-icon-text";
 import ComplementItemList from "./list-complement-item";
 import ComplementItemCard from "./complement-item";
 import Item from "@/app/entities/order/item";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export default function EditGroupItem() {
     return (
@@ -24,8 +25,8 @@ export default function EditGroupItem() {
 }
 
 const ListCartToAdd = () => {
-    const allCategories = useCategories().items
-    const [categories, setCategories] = useState<Category[]>(allCategories);
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const [categories, setCategories] = useState<Category[]>(Object.values(categoriesSlice.entities));
     const contextGroupItem = useGroupItem();
 
     useEffect(() => {
@@ -34,7 +35,7 @@ const ListCartToAdd = () => {
             return
         }
 
-        setCategories(allCategories);
+        setCategories(Object.values(categoriesSlice.entities));
     }, [contextGroupItem.groupItem?.category_id])
 
     return (

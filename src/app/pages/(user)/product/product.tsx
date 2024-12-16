@@ -3,19 +3,37 @@ import CrudLayout from "@/app/components/crud/layout";
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import { useProducts } from "@/app/context/product/context";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { SelectField } from "@/app/components/modal/field";
-import { useState } from "react";
-import { useCategories } from "@/app/context/category/context";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { useSession } from "next-auth/react";
+import { fetchProducts } from "@/redux/slices/products";
 
 const PageProducts = () => {
     const [categoryID, setCategoryID] = useState("");
-    const context = useProducts();
-    const contextCategory = useCategories();
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const productsSlice = useSelector((state: RootState) => state.products);
+    const dispatch = useDispatch<AppDispatch>();
+    const { data } = useSession();
 
-    if (context.getLoading()) {
+    useEffect(() => {
+        if (data && Object.keys(productsSlice.entities).length === 0) {
+            dispatch(fetchProducts(data));
+        }
+    
+        const interval = setInterval(() => {
+            if (data && !productsSlice) {
+                dispatch(fetchProducts(data));
+            }
+        }, 60000); // Atualiza a cada 60 segundos
+    
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    }, [data, productsSlice, dispatch]);
+
+    if (productsSlice.loading) {
         return (
             <h1>Carregando página...</h1>
         )
@@ -23,11 +41,11 @@ const PageProducts = () => {
 
     return (
         <>
-        {context.getError() && <p className="mb-4 text-red-500">{context.getError()?.message}</p>}
+        {productsSlice.error && <p className="mb-4 text-red-500">{productsSlice.error?.message}</p>}
             <CrudLayout title="Produtos"
                 searchButtonChildren={
                     <SelectField 
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={contextCategory.items} />
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} />
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
@@ -39,13 +57,14 @@ const PageProducts = () => {
                 }
                 refreshButton={
                     <Refresh 
-                        context={context}
+                    slice={productsSlice}
+                    fetchItems={fetchProducts}
                     />
                 }
                 tableChildren={
                     <CrudTable 
                         columns={ProductColumns()} 
-                        data={context.filterItems('category_id', categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
+                        data={Object.values(productsSlice.entities).filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
                     </CrudTable>
                 } 
                 />

@@ -4,20 +4,21 @@ import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
 import DeleteDeliveryDriver from '@/app/api/delivery-driver/delete/route';
-import { useDeliveryDrivers } from '@/app/context/delivery-driver/context';
 import NewDeliveryDriver from '@/app/api/delivery-driver/new/route';
 import UpdateDeliveryDriver from '@/app/api/delivery-driver/update/route';
 import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/api/error';
 import { SelectField } from '@/app/components/modal/field';
-import { useEmployees } from '@/app/context/employee/context';
 import Employee from '@/app/entities/employee/employee';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { addDeliveryDriver, removeDeliveryDriver, updateDeliveryDriver } from '@/redux/slices/delivery-drivers';
 
 const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>) => {
     const modalName = isUpdate ? 'edit-delivery-driver-' + item?.id : 'new-delivery-driver'
     const modalHandler = useModal();
-    const contextDeliveryDrivers = useDeliveryDrivers();
-    const contextEmployees = useEmployees();
+    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
+    const employeesSlice = useSelector((state: RootState) => state.employees);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -26,9 +27,9 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
 
     useEffect(() => {
         // remove repeted employees between deliveryDrivers and employees
-        const employeesFiltered = contextEmployees.items.filter(employee => !contextDeliveryDrivers.items.some(deliveryDriver => deliveryDriver.employee_id === employee.id))
+        const employeesFiltered = Object.values(employeesSlice.entities).filter(employee => !Object.values(deliveryDriversSlice.entities).some(deliveryDriver => deliveryDriver.employee_id === employee.id))
         setEmployees(employeesFiltered)
-    }, [contextDeliveryDrivers.items, contextEmployees.items]);;
+    }, [Object.values(deliveryDriversSlice.entities), Object.values(employeesSlice.entities)]);
 
     const submit = async () => {
         if (!data) return;
@@ -43,13 +44,13 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             setError(null);
 
             deliveryDriver.employee_id = selectedEmployeeId
-            deliveryDriver.employee = contextEmployees.items.filter(employee => employee.id === selectedEmployeeId)[0]
+            deliveryDriver.employee = Object.values(employeesSlice.entities).filter(employee => employee.id === selectedEmployeeId)[0]
 
             if (!isUpdate) {
                 deliveryDriver.id = response
-                contextDeliveryDrivers.addItem(deliveryDriver);
+                addDeliveryDriver(deliveryDriver);
             } else {
-                contextDeliveryDrivers.updateItem(deliveryDriver);
+                updateDeliveryDriver(deliveryDriver);
             }
 
             modalHandler.hideModal(modalName);
@@ -62,7 +63,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const onDelete = async () => {
         if (!data) return;
         DeleteDeliveryDriver(deliveryDriver.id, data)
-        contextDeliveryDrivers.removeItem(deliveryDriver.id)
+        removeDeliveryDriver(deliveryDriver.id)
         modalHandler.hideModal(modalName);
     }
     

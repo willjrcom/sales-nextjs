@@ -7,6 +7,8 @@ import productsReducer from './slices/products';
 import processRulesReducer from './slices/process-rules';
 import tablesReducer from './slices/tables';
 import placesReducer from './slices/places';
+import deliveryDriversReducer from './slices/delivery-drivers';
+import categoryReducer from './slices/categories';
 
 export const store = configureStore({
     reducer: {
@@ -16,7 +18,9 @@ export const store = configureStore({
         products: productsReducer,
         processRules: processRulesReducer,
         tables: tablesReducer,
-        places: placesReducer
+        places: placesReducer,
+        deliveryDrivers: deliveryDriversReducer,
+        categories: categoryReducer,
     },
 });
 

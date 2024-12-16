@@ -1,5 +1,4 @@
 import CategoryOrder from "@/app/components/order/category/category"
-import { useCategories } from "@/app/context/category/context"
 import GroupItem from "@/app/entities/order/group-item"
 import { useCallback, useEffect, useState } from "react"
 import EditGroupItem from "./group-item/edit-group-item"
@@ -15,6 +14,8 @@ import PickupCard from "./pickup-order"
 import TableCard from "./table-order"
 import StatusComponent from "../button/show-status"
 import ButtonIconTextFloat from "../button/button-float"
+import { useSelector } from "react-redux"
+import { RootState } from "@/redux/store"
 
 const OrderManager = () => {
     const context = useCurrentOrder();
@@ -45,9 +46,9 @@ interface CartProps {
 
 const CartAdded = ({ order }: CartProps) => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
-    const contextCategories = useCategories();
     const contextGroupItem = useGroupItem();
     const contextCurrentOrder = useCurrentOrder();
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
 
     useEffect(() => {
         if (!order) return
@@ -67,14 +68,14 @@ const CartAdded = ({ order }: CartProps) => {
             </div>
 
             <div className="overflow-y-auto overflow-x-auto h-[76vh]">
-            {Object.entries(groupedItems).map(([key, groups], index) => {
-                if (contextCategories.items.length === 0) return
-                const category = contextCategories.findByID(key)
-                if (!category) return
-                return (
-                    <CategoryOrder key={key} category={category} groups={groups} />
-                )
-            })}
+                {Object.entries(groupedItems).map(([key, groups], index) => {
+                    if (Object.values(categoriesSlice.entities).length === 0) return
+                    const category = categoriesSlice.entities[key]
+                    if (!category) return
+                    return (
+                        <CategoryOrder key={key} category={category} groups={groups} />
+                    )
+                })}
             </div>
         </div>
     )
@@ -115,13 +116,13 @@ const DataOrderCard = ({ order }: CartProps) => {
     const isAnyGroupsStaging = haveGroups && order?.groups?.some((group) => group.status == "Staging")
     const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging
     const subTotal = (order?.total_payable || 0) - (order?.delivery?.delivery_tax || 0)
-    
+
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
             {order?.status && <p><StatusComponent status={order?.status} /></p>}
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <br/>
+            <br />
             {/* Total do pedido */}
             <p><strong>Subtotal:</strong> R$ {subTotal.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
@@ -129,7 +130,7 @@ const DataOrderCard = ({ order }: CartProps) => {
             {/* <p>Desconto: R$ 5,00</p> */}
             <hr className="my-2" />
             <p><strong>Total:</strong> R$ {(order?.total_payable || 0).toFixed(2)}</p>
-            <br/>
+            <br />
             {isThrowButton && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
                 Lançar Pedido
             </button>}

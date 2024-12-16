@@ -7,17 +7,16 @@ import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteTable from '@/app/api/table/delete/route';
-import { useTables } from '@/app/context/table/context';
 import NewTable from '@/app/api/table/new/route';
 import UpdateTable from '@/app/api/table/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import { addTable, removeTable, updateTable } from '@/redux/slices/tables';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
     const modalHandler = useModal();
-    const context = useTables();
     const [table, setTable] = useState<Table>(item || new Table());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
@@ -39,9 +38,9 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
             if (!isUpdate) {
                 table.id = response
-                context.addItem(table);
+                addTable(table);
             } else {
-                context.updateItem(table);
+                updateTable(table);
             }
 
             modalHandler.hideModal(modalName);
@@ -53,7 +52,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteTable(table.id, data);
-        context.removeItem(table.id)
+        removeTable(table)
         modalHandler.hideModal(modalName);
     }
 

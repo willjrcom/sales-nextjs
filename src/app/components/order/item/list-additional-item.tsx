@@ -1,11 +1,12 @@
 import RequestError from '@/app/api/error';
 import DeleteAdditionalItem from '@/app/api/item/delete/additional/route';
 import NewAdditionalItem from '@/app/api/item/update/additional/route';
-import { useCategories } from '@/app/context/category/context';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';
+import { RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 interface ItemAdditional {
     name: string;
@@ -36,15 +37,15 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
 }
 
 const AdditionalItemList = ({ item }: ItemListProps) => {
-    const contextCategories = useCategories();
     const [itemList, setItemList] = useState<ItemAdditional[]>([]);
     const [error, setError] = useState<RequestError | null>(null);
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
     const { data } = useSession();
 
     useEffect(() => {
         try {
             // Passo 1: Buscar a categoria atual do item
-            const category = contextCategories.findByID(item.category_id);
+            const category = categoriesSlice.entities[item.category_id];
             if (!category) {
                 return setItemList([]); // Caso não encontre a categoria, retorna lista vazia
             }
@@ -57,7 +58,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
 
             // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
             const additionalItems = additionalCategories
-                .map((additionalCategory) => contextCategories.findByID(additionalCategory.id)?.products) // Obter os produtos de cada categoria adicional
+                .map((additionalCategory) => categoriesSlice.entities[additionalCategory.id]?.products) // Obter os produtos de cada categoria adicional
                 .flat(); // "Flatten" para uma lista única de produtos
 
             if (!additionalItems || additionalItems.length === 0) {
@@ -98,7 +99,9 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             return
         }
 
-        const category = contextCategories.findByID(itemAdditional.category_id)
+        const category = categoriesSlice.entities[itemAdditional.category_id]
+        if (!category) return setError(new RequestError("Categoria indisponivel"))
+            
         const quantity = category?.quantities.find(quantity => quantity.quantity === itemAdditional.quantity)
 
         if (!quantity) return setError(new RequestError("Quantidade indisponivel"))

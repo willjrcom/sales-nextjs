@@ -3,14 +3,15 @@ import NewItem, { NewItemProps } from "@/app/api/item/new/route";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
 import ErrorForms from "@/app/components/modal/error-forms"
 import { TextField } from "@/app/components/modal/field";
-import { useCategories } from "@/app/context/category/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import Product from "@/app/entities/product/product";
 import Quantity from "@/app/entities/quantity/quantity";
+import { RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 interface AddProductCardProps {
   product: Product;
@@ -86,12 +87,12 @@ interface QuantitySelectorProps {
 }
 
 const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }: QuantitySelectorProps) => {
-  const contextCategory = useCategories();
   const [quantities, setQuantities] = useState<Quantity[]>([]);
+  const categoriesSlice = useSelector((state: RootState) => state.categories);
 
   useEffect(() => {
-    if (!contextCategory.items) return;
-    const category = contextCategory.findByID(categoryID);
+    if (!Object.values(categoriesSlice.entities)) return;
+    const category = categoriesSlice.entities[categoryID];
     setQuantities(category?.quantities.sort((a, b) => a.quantity - b.quantity) || []);
   }, [categoryID])
 

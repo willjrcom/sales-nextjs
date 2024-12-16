@@ -6,18 +6,17 @@ import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
 import DeleteEmployee from '@/app/api/employee/delete/route';
-import { useEmployees } from '@/app/context/employee/context';
 import NewEmployee from '@/app/api/employee/new/route';
 import UpdateEmployee from '@/app/api/employee/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { ToIsoDate } from '@/app/utils/date';
+import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/employees';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
     const modalHandler = useModal();
-    const context = useEmployees();
     const [person, setPerson] = useState<Person>(item || new Employee());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
@@ -40,9 +39,9 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
 
             if (!isUpdate) {
                 employee.id = response
-                context.addItem(employee);
+                addEmployee(employee);
             } else {
-                context.updateItem(employee);
+                updateEmployee(employee);
             }
 
             modalHandler.hideModal(modalName);
@@ -56,7 +55,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
         if (!data) return;
         let employee = new Employee(person)
         DeleteEmployee(employee.id, data)
-        context.removeItem(employee.id)
+        removeEmployee(employee)
         modalHandler.hideModal(modalName);
     }
 

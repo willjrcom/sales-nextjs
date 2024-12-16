@@ -6,18 +6,15 @@ import Category, { ValidateCategoryForm } from '@/app/entities/category/category
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import DeleteCategory from '@/app/api/category/delete/route';
-import { useCategories } from '@/app/context/category/context';
-import NewCategory from '@/app/api/category/new/route';
 import UpdateCategory from '@/app/api/category/update/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
+import { updateCategory } from '@/redux/slices/categories';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
-    const context = useCategories();
     const [category, setCategory] = useState<Category>(item || new Category());
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
@@ -36,6 +33,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
         try {
             await UpdateCategory(category, data)
             setError(null);
+            updateCategory(category);
 
             modalHandler.hideModal(modalName);
 

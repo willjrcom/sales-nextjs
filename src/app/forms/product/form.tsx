@@ -8,19 +8,19 @@ import { useSession } from 'next-auth/react';
 import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/route';
-import { useProducts } from '@/app/context/product/context';
 import UpdateProduct from '@/app/api/product/update/route';
 import NewProduct from '@/app/api/product/new/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
-import { useCategories } from '@/app/context/category/context';
+import { addProduct, removeProduct, updateProduct } from '@/redux/slices/products';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
     const modalHandler = useModal();
-    const context = useProducts();
-    const contextCategories = useCategories();
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
     const [product, setProduct] = useState<Product>(item || new Product());
     const [categories, setCategories] = useState<Category[]>([]);
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
@@ -48,9 +48,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             if (!isUpdate) {
                 product.id = response
-                context.addItem(product);
+                addProduct(product);
             } else {
-                context.updateItem(product);
+                updateProduct(product);
             }
             modalHandler.hideModal(modalName);
             
@@ -62,7 +62,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        context.removeItem(product.id)
+        removeProduct(product)
         modalHandler.hideModal(modalName);
     }
 
@@ -71,16 +71,16 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             if (!data) return;
 
             try {
-                setCategories(contextCategories.items);
+                setCategories(Object.values(categoriesSlice.entities));
 
                 let records: Record<string, string>[] = [];
 
-                if (contextCategories.items.length === 0) {
+                if (Object.values(categoriesSlice.entities).length === 0) {
                     setRecordCategories([]);
                     return;
                 }
                 
-                for (const category of contextCategories.items) {
+                for (const category of Object.values(categoriesSlice.entities)) {
                     records.push({ id: category.id, name: category.name })
                 }
                 setRecordCategories(records);
@@ -91,7 +91,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         }
 
         LoadCategories();
-    }, [data, contextCategories]);
+    }, [data, categoriesSlice.entities]);
 
     useEffect(() => {
         const LoadSizes = async () => {
