@@ -10,30 +10,39 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { fetchProducts } from "@/redux/slices/products";
+import { fetchCategories } from "@/redux/slices/categories";
+import Product from "@/app/entities/product/product";
 
 const PageProducts = () => {
     const [categoryID, setCategoryID] = useState("");
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const productsSlice = useSelector((state: RootState) => state.products);
+    const [products, setProducts] = useState<Product[]>([]);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(productsSlice.entities).length === 0) {
-            dispatch(fetchProducts(data));
+        if (data && Object.keys(categoriesSlice.entities).length === 0) {
+            dispatch(fetchCategories(data));
         }
     
         const interval = setInterval(() => {
-            if (data && !productsSlice) {
-                dispatch(fetchProducts(data));
+            if (data && !categoriesSlice) {
+                dispatch(fetchCategories(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
     
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data, productsSlice, dispatch]);
+    }, [data, categoriesSlice, dispatch]);
 
-    if (productsSlice.loading) {
+    // products
+    useEffect(() => {
+        if(Object.keys(categoriesSlice.entities).length === 0) return;
+        const productsByCategories = Object.values(categoriesSlice.entities).map((category) => category.products || []).flat();
+        setProducts(productsByCategories)
+        setCategoryID(Object.values(categoriesSlice.entities)[0].id)
+    }, [categoriesSlice.entities]);
+
+    if (categoriesSlice.loading) {
         return (
             <h1>Carregando página...</h1>
         )
@@ -41,7 +50,7 @@ const PageProducts = () => {
 
     return (
         <>
-        {productsSlice.error && <p className="mb-4 text-red-500">{productsSlice.error?.message}</p>}
+        {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
             <CrudLayout title="Produtos"
                 searchButtonChildren={
                     <SelectField 
@@ -57,14 +66,14 @@ const PageProducts = () => {
                 }
                 refreshButton={
                     <Refresh 
-                    slice={productsSlice}
-                    fetchItems={fetchProducts}
+                    slice={categoriesSlice}
+                    fetchItems={fetchCategories}
                     />
                 }
                 tableChildren={
                     <CrudTable 
                         columns={ProductColumns()} 
-                        data={Object.values(productsSlice.entities).filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
+                        data={products.filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
                     </CrudTable>
                 } 
                 />
