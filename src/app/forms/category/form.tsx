@@ -84,7 +84,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 dispatch(addCategory(category));
                 modalHandler.hideModal(modalName);
             } else {
-                dispatch(updateCategory(category));
+                dispatch(updateCategory({id: category.id, changes: category}));
 
                 if (setItem) setItem(category)
             }
@@ -97,7 +97,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteCategory(category.id, data);
-        dispatch(removeCategory(category));
+        dispatch(removeCategory(category.id));
 
         if (!isUpdate) {
             modalHandler.hideModal(modalName);

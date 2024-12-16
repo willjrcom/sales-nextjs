@@ -43,7 +43,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
                 place.id = response
                 dispatch(addPlace(place));
             } else {
-                dispatch(updatePlace(place));
+                dispatch(updatePlace({id: place.id, changes: place}));
             }
 
             modalHandler.hideModal(modalName);
@@ -56,7 +56,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const onDelete = async () => {
         if (!data) return;
         DeletePlace(place.id, data);
-        dispatch(removePlace(place));
+        dispatch(removePlace(place.id));
         modalHandler.hideModal(modalName);
     }
 

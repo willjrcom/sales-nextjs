@@ -53,7 +53,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 processRule.id = response
                 dispatch(addProcessRule(processRule));
             } else {
-                dispatch(updateProcessRule(processRule));
+                dispatch(updateProcessRule({id: processRule.id, changes: processRule}));
             }
 
             modalHandler.hideModal(modalName);
@@ -66,7 +66,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProcessRule(processRule.id, data);
-        dispatch(removeProcessRule(processRule));
+        dispatch(removeProcessRule(processRule.id));
         modalHandler.hideModal(modalName);
     }
 

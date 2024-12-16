@@ -14,7 +14,6 @@ import RequestError from '@/app/api/error';
 import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import serialize from "serialize-javascript";
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
@@ -43,9 +42,9 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             
             if (!isUpdate) {
                 newClient.id = response
-                dispatch(addClient(serialize(newClient)));
+                dispatch(addClient({...newClient}));
             } else {
-                dispatch(updateClient(serialize(newClient)));
+                dispatch(updateClient({id: newClient.id, changes: newClient}));
             }
             
             modalHandler.hideModal(modalName);

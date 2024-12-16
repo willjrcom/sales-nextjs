@@ -39,7 +39,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
             await UpdateAddressOrderDelivery(deliveryOrderId, data)
             setError(null);
 
-            updateClient(client);
+            updateClient({id: client.id, changes: client});
             modalHandler.hideModal(modalName);
         } catch (error) {
             setError(error as RequestError);

@@ -51,7 +51,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
                 deliveryDriver.id = response
                 dispatch(addDeliveryDriver(deliveryDriver));
             } else {
-                dispatch(updateDeliveryDriver(deliveryDriver));
+                dispatch(updateDeliveryDriver({id: deliveryDriver.id, changes: deliveryDriver}));
             }
 
             modalHandler.hideModal(modalName);

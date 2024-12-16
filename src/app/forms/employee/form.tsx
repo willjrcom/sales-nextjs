@@ -44,7 +44,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
                 employee.id = response
                 dispatch(addEmployee(employee));
             } else {
-                dispatch(updateEmployee(employee));
+                dispatch(updateEmployee({id: employee.id, changes: employee}));
             }
 
             modalHandler.hideModal(modalName);
@@ -58,7 +58,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
         if (!data) return;
         let employee = new Employee(person);
         DeleteEmployee(employee.id, data);
-        dispatch(removeEmployee(employee));
+        dispatch(removeEmployee(employee.id));
         modalHandler.hideModal(modalName);
     }
 

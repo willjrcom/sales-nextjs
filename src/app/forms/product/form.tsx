@@ -51,7 +51,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 product.id = response
                 dispatch(addProduct(product));
             } else {
-                dispatch(updateProduct(product));
+                dispatch(updateProduct({id: product.id, changes: product}));
             }
             modalHandler.hideModal(modalName);
             
@@ -63,7 +63,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        dispatch(removeProduct(product));
+        dispatch(removeProduct(product.id));
         modalHandler.hideModal(modalName);
     }
 

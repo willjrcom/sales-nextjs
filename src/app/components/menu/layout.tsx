@@ -4,7 +4,8 @@ import { Provider } from 'react-redux';
 import { ModalProvider } from '@/app/context/modal/context';
 import { CurrentOrderProvider } from '@/app/context/current-order/context';
 import { GroupItemProvider } from '@/app/context/group-item/context';
-import { store } from '@/redux/store';
+import { RootState, store } from '@/redux/store';
+import { useRef } from 'react';
 
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
@@ -27,6 +28,11 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 }
 
 const ContextProviders = ({ children }: { children: React.ReactNode }) => {
+  const storeRef = useRef<RootState>();
+  if (!storeRef.current) {
+    storeRef.current = store.getState();
+  }
+
   return (
     <Provider store={store}>
       <CurrentOrderProvider>

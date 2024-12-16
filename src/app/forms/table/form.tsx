@@ -43,7 +43,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 table.id = response
                 dispatch(addTable(table));
             } else {
-                dispatch(updateTable(table));
+                dispatch(updateTable({id: table.id, changes: table}));
             }
 
             modalHandler.hideModal(modalName);
@@ -55,7 +55,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteTable(table.id, data);
-        dispatch(removeTable(table));
+        dispatch(removeTable(table.id));
         modalHandler.hideModal(modalName);
     }
 
