@@ -3,17 +3,37 @@
 import Access from '@/app/api/auth/access/route';
 import GetCompany from '@/app/api/company/route';
 import RequestError from '@/app/api/error';
+import { fetchCategories } from '@/redux/slices/categories';
+import { fetchClients } from '@/redux/slices/clients';
+import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
+import { fetchEmployees } from '@/redux/slices/employees';
+import { fetchOrders } from '@/redux/slices/orders';
+import { fetchPlaces } from '@/redux/slices/places';
+import { AppDispatch, persistor, store } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Provider, useDispatch } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
-export default function CompanySelection() {
+export default function Page() {
+    return (
+        <Provider store={store}>
+            <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+                <CompanySelection />
+            </PersistGate>
+        </Provider>
+    )
+}
+
+function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
 
         if (!schemaName) {
@@ -51,6 +71,14 @@ export default function CompanySelection() {
                     currentCompany: company,
                 },
             })
+
+            dispatch(fetchClients(data))
+            dispatch(fetchOrders(data))
+            dispatch(fetchCategories(data))
+            dispatch(fetchDeliveryDrivers(data))
+            dispatch(fetchEmployees(data))
+            dispatch(fetchPlaces(data))
+            
             router.push('/');
             setError(null);
         } catch (error) {
@@ -58,10 +86,6 @@ export default function CompanySelection() {
         }
     }
 
-    const newCompany = () => {
-        router.push('/pages/new-company');
-    }
-    
     if (!data?.user?.companies || data.user.companies.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -87,11 +111,10 @@ export default function CompanySelection() {
                         <h2 className="text-2xl font-bold">{company.trade_name}</h2>
                     </button>
                 ))}
-                <button
-                    className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition"
-                    onClick={newCompany}>
+                <Link href={"/pages/new-company"}
+                    className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition">
                     <h2 className="text-2xl font-bold">Nova empresa</h2>
-                </button>
+                </Link>
             </div>
             <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
         </div>

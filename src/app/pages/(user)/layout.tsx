@@ -14,10 +14,10 @@ export default function DashboardLayout({
     return (
         <ErrorBoundary errorComponent={PageError}>
             <Suspense fallback={<Loading />}>
-        <Menu>
-            {children}
-        </Menu>
-        </Suspense>
+                <Menu>
+                    {children}
+                </Menu>
+            </Suspense>
         </ErrorBoundary>
     );
 }

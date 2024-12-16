@@ -4,8 +4,9 @@ import { Provider } from 'react-redux';
 import { ModalProvider } from '@/app/context/modal/context';
 import { CurrentOrderProvider } from '@/app/context/current-order/context';
 import { GroupItemProvider } from '@/app/context/group-item/context';
-import { RootState, store } from '@/redux/store';
+import { persistor, RootState, store } from '@/redux/store';
 import { useRef } from 'react';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
@@ -35,13 +36,15 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Provider store={store}>
-      <CurrentOrderProvider>
-        <GroupItemProvider>
-          <ModalProvider>
-            {children}
-          </ModalProvider>
-        </GroupItemProvider>
-      </CurrentOrderProvider>
+      <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+        <CurrentOrderProvider>
+          <GroupItemProvider>
+            <ModalProvider>
+              {children}
+            </ModalProvider>
+          </GroupItemProvider>
+        </CurrentOrderProvider>
+      </PersistGate>
     </Provider>
   )
 }
