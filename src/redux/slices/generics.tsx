@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createEntityAdapter, EntityState } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createEntityAdapter, EntityState, PayloadAction, Update } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
@@ -46,13 +46,13 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
         name,
         initialState,
         reducers: {
-            addItem: (state, action) => {
+            addItem: (state, action: PayloadAction<T>) => {
                 adapter.addOne(state, action.payload);
             }, // Adiciona um item
-            updateItem: (state, action) => {
+            updateItem: (state, action: PayloadAction<PayloadAction<Update<T, string>>>) => {
                 adapter.updateOne(state, action.payload);
             }, // Atualiza um item
-            removeItem: (state, action) => {
+            removeItem: (state, action: PayloadAction<string>) => {
                 adapter.removeOne(state, action.payload);
             }, // Remove um item
         },

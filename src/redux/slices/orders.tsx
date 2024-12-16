@@ -1,5 +1,5 @@
 import { GenericsProps, GenericState } from './generics';
-import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Update } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
@@ -37,13 +37,13 @@ const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
         name,
         initialState,
         reducers: {
-            addOrder: (state, action) => {
+            addOrder: (state, action: PayloadAction<Order>) => {
                 adapter.addOne(state, action.payload);
             }, // Adiciona um item
-            removeOrder: (state, action) => {
+            updateOrder: (state, action: PayloadAction<Update<Order, string>>) => {
                 adapter.updateOne(state, action.payload);
             }, // Atualiza um item
-            updateOrder: (state, action) => {
+            removeOrder: (state, action: PayloadAction<string>) => {
                 adapter.removeOne(state, action.payload);
             }, // Remove um item
         },
