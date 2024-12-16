@@ -3,7 +3,6 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import ordersReducer from './slices/orders';
 import clientsReducer from './slices/clients';
 import employeesReducer from './slices/employees';
-import tablesReducer from './slices/tables';
 import placesReducer from './slices/places';
 import deliveryDriversReducer from './slices/delivery-drivers';
 import categoryReducer from './slices/categories';
@@ -14,14 +13,13 @@ import { persistReducer, persistStore } from 'redux-persist';
 const persistConfig = {
     key: 'root', // Nome da chave no armazenamento
     storage, // Tipo de armazenamento (LocalStorage neste caso)
-    whitelist: ['clients', 'employees', 'tables', 'places', 'deliveryDrivers', 'categories'], // Reducers que serão persistidos
+    whitelist: ['clients', 'employees', 'places', 'deliveryDrivers', 'categories'], // Reducers que serão persistidos
 };
 
 const rootReducer = combineReducers({
     orders: ordersReducer,
     clients: clientsReducer,
     employees: employeesReducer,
-    tables: tablesReducer,
     places: placesReducer,
     deliveryDrivers: deliveryDriversReducer,
     categories: categoryReducer,

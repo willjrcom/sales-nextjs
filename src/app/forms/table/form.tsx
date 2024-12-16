@@ -43,7 +43,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 table.id = response
                 dispatch(addTable(table));
             } else {
-                dispatch(updateTable({id: table.id, changes: table}));
+                dispatch(updateTable({ type: "UPDATE", payload: { id: table.id, changes: table } }));
             }
 
             modalHandler.hideModal(modalName);

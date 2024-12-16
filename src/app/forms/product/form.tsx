@@ -13,22 +13,37 @@ import NewProduct from '@/app/api/product/new/route';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
-import { addProduct, removeProduct, updateProduct } from '@/redux/slices/products';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
+import Size from '@/app/entities/size/size';
+import { updateCategory } from '@/redux/slices/categories';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
     const modalHandler = useModal();
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const dispatch = useDispatch<AppDispatch>();
     const [product, setProduct] = useState<Product>(item || new Product());
     const [categories, setCategories] = useState<Category[]>([]);
+    const [category, setCategory] = useState<Category>(new Category());
+    const [size, setSize] = useState<Size>(new Size());
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const dispatch = useDispatch<AppDispatch>();
+
+    useEffect(() => {
+        const category = categoriesSlice.entities[product.category_id];
+        if (!category) return
+        setCategory(category)
+    }, [product.category_id])
+
+    useEffect(() => {
+        const size = category.sizes.find(size => size.id === product.size_id);
+        if (!size) return
+        setSize(size)    
+    }, [product.size_id]);
 
     const handleInputChange = (field: keyof Product, value: any) => {
         setProduct(prev => ({ ...prev, [field]: value }));
@@ -36,7 +51,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     const submit = async () => {
         if (!data) return;
-
         const validationErrors = ValidateProductForm(product);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
@@ -44,14 +58,14 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
             setError(null);
 
-            product.category.name = recordCategories.filter(category => category.id === product.category_id)[0].name;
-            product.size.name = recordSizes.filter(size => size.id === product.size_id)[0].name;
+            product.category = category;
+            product.size = size;
 
             if (!isUpdate) {
                 product.id = response
-                dispatch(addProduct(product));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: [...category.products, product]} } }));
             } else {
-                dispatch(updateProduct({ type: "UPDATE", payload: { id: product.id, changes: product }}));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: category.products.map(p => p.id === product.id ? product : p)} } }));
             }
             modalHandler.hideModal(modalName);
             
@@ -63,7 +77,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        dispatch(removeProduct(product.id));
+        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: category.products.filter(p => p.id !== product.id)} } }));
         modalHandler.hideModal(modalName);
     }
 

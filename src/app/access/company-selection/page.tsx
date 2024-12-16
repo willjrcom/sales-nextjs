@@ -73,12 +73,11 @@ function CompanySelection() {
             })
 
             dispatch(fetchClients(data))
-            dispatch(fetchOrders(data))
             dispatch(fetchCategories(data))
             dispatch(fetchDeliveryDrivers(data))
             dispatch(fetchEmployees(data))
             dispatch(fetchPlaces(data))
-            
+
             router.push('/');
             setError(null);
         } catch (error) {
