@@ -13,6 +13,8 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { ToIsoDate } from '@/app/utils/date';
 import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/employees';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
@@ -20,6 +22,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const [person, setPerson] = useState<Person>(item || new Employee());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
     const submit = async () => {
@@ -39,9 +42,9 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
 
             if (!isUpdate) {
                 employee.id = response
-                addEmployee(employee);
+                dispatch(addEmployee(employee));
             } else {
-                updateEmployee(employee);
+                dispatch(updateEmployee(employee));
             }
 
             modalHandler.hideModal(modalName);
@@ -53,9 +56,9 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
 
     const onDelete = async () => {
         if (!data) return;
-        let employee = new Employee(person)
-        DeleteEmployee(employee.id, data)
-        removeEmployee(employee)
+        let employee = new Employee(person);
+        DeleteEmployee(employee.id, data);
+        dispatch(removeEmployee(employee));
         modalHandler.hideModal(modalName);
     }
 

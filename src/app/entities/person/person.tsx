@@ -18,7 +18,7 @@ export default class Person {
         this.cpf = cpf;
         this.birthday = birthday;
         this.contact = contact;
-        this.address = address;
+        this.address = Object.assign(new Address(), address);
         this.address.likeTax = likeTax
     }
 };

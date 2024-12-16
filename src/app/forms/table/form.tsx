@@ -13,6 +13,8 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { addTable, removeTable, updateTable } from '@/redux/slices/tables';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
@@ -21,6 +23,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const dispatch = useDispatch<AppDispatch>();
     
     const handleInputChange = (field: keyof Table, value: any) => {
         setTable(prev => ({ ...prev, [field]: value }));
@@ -38,9 +41,9 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
             if (!isUpdate) {
                 table.id = response
-                addTable(table);
+                dispatch(addTable(table));
             } else {
-                updateTable(table);
+                dispatch(updateTable(table));
             }
 
             modalHandler.hideModal(modalName);
@@ -52,7 +55,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteTable(table.id, data);
-        removeTable(table)
+        dispatch(removeTable(table));
         modalHandler.hideModal(modalName);
     }
 

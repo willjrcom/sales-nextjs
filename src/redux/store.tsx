@@ -9,6 +9,7 @@ import tablesReducer from './slices/tables';
 import placesReducer from './slices/places';
 import deliveryDriversReducer from './slices/delivery-drivers';
 import categoryReducer from './slices/categories';
+import deliveryOrdersReducer from './slices/delivery-orders';
 
 export const store = configureStore({
     reducer: {
@@ -21,6 +22,7 @@ export const store = configureStore({
         places: placesReducer,
         deliveryDrivers: deliveryDriversReducer,
         categories: categoryReducer,
+        deliveryOrders: deliveryOrdersReducer
     },
 });
 

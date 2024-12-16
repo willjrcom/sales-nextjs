@@ -10,8 +10,8 @@ import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/api/error';
 import { SelectField } from '@/app/components/modal/field';
 import Employee from '@/app/entities/employee/employee';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
 import { addDeliveryDriver, removeDeliveryDriver, updateDeliveryDriver } from '@/redux/slices/delivery-drivers';
 
 const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>) => {
@@ -19,6 +19,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const modalHandler = useModal();
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const employeesSlice = useSelector((state: RootState) => state.employees);
+    const dispatch = useDispatch<AppDispatch>();
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -29,7 +30,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
         // remove repeted employees between deliveryDrivers and employees
         const employeesFiltered = Object.values(employeesSlice.entities).filter(employee => !Object.values(deliveryDriversSlice.entities).some(deliveryDriver => deliveryDriver.employee_id === employee.id))
         setEmployees(employeesFiltered)
-    }, [Object.values(deliveryDriversSlice.entities), Object.values(employeesSlice.entities)]);
+    }, [deliveryDriversSlice.entities, employeesSlice.entities]);
 
     const submit = async () => {
         if (!data) return;
@@ -48,9 +49,9 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
 
             if (!isUpdate) {
                 deliveryDriver.id = response
-                addDeliveryDriver(deliveryDriver);
+                dispatch(addDeliveryDriver(deliveryDriver));
             } else {
-                updateDeliveryDriver(deliveryDriver);
+                dispatch(updateDeliveryDriver(deliveryDriver));
             }
 
             modalHandler.hideModal(modalName);
@@ -62,8 +63,8 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteDeliveryDriver(deliveryDriver.id, data)
-        removeDeliveryDriver(deliveryDriver.id)
+        DeleteDeliveryDriver(deliveryDriver.id, data);
+        dispatch(removeDeliveryDriver(deliveryDriver.id));
         modalHandler.hideModal(modalName);
     }
     

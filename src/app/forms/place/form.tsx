@@ -13,6 +13,8 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { addPlace, removePlace, updatePlace } from '@/redux/slices/places';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalName = isUpdate ? 'edit-place-' + item?.id : 'new-place'
@@ -21,6 +23,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const dispatch = useDispatch<AppDispatch>();
     
     const handleInputChange = (field: keyof Place, value: any) => {
         setPlace(prev => ({ ...prev, [field]: value }));
@@ -38,9 +41,9 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
             if (!isUpdate) {
                 place.id = response
-                addPlace(place);
+                dispatch(addPlace(place));
             } else {
-                updatePlace(place);
+                dispatch(updatePlace(place));
             }
 
             modalHandler.hideModal(modalName);
@@ -53,7 +56,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const onDelete = async () => {
         if (!data) return;
         DeletePlace(place.id, data);
-        removePlace(place)
+        dispatch(removePlace(place));
         modalHandler.hideModal(modalName);
     }
 

@@ -14,13 +14,14 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { addProduct, removeProduct, updateProduct } from '@/redux/slices/products';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
     const modalHandler = useModal();
     const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const dispatch = useDispatch<AppDispatch>();
     const [product, setProduct] = useState<Product>(item || new Product());
     const [categories, setCategories] = useState<Category[]>([]);
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
@@ -48,9 +49,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             if (!isUpdate) {
                 product.id = response
-                addProduct(product);
+                dispatch(addProduct(product));
             } else {
-                updateProduct(product);
+                dispatch(updateProduct(product));
             }
             modalHandler.hideModal(modalName);
             
@@ -62,7 +63,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        removeProduct(product)
+        dispatch(removeProduct(product));
         modalHandler.hideModal(modalName);
     }
 

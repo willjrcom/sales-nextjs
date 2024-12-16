@@ -31,6 +31,8 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
 
     useEffect(() => {
@@ -48,9 +50,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         setType[selectedType]()
     }, [selectedType])
-
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
@@ -82,10 +81,10 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
             if (!isUpdate) {
                 category.id = response
-                addCategory(category);
+                dispatch(addCategory(category));
                 modalHandler.hideModal(modalName);
             } else {
-                updateCategory(category);
+                dispatch(updateCategory(category));
 
                 if (setItem) setItem(category)
             }
@@ -98,7 +97,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteCategory(category.id, data);
-        removeCategory(category)
+        dispatch(removeCategory(category));
 
         if (!isUpdate) {
             modalHandler.hideModal(modalName);

@@ -9,7 +9,7 @@ interface AddressFormProps {
 
 const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
     const [address, setAddress] = useState<Address>(addressParent || new Address());
-    console.log(address)
+    
     const handleInputChange = (field: keyof Address, value: any) => {
         setAddress(prev => ({ ...prev, [field]: value }));
         setAddressParent(prev => ({ ...prev, [field]: value }));

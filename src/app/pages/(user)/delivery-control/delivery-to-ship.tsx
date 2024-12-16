@@ -1,25 +1,26 @@
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
-import { useDeliveryOrders } from "@/app/context/order-delivery/context";
 import Address from "@/app/entities/address/address";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
+import { RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaPaperPlane } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const DeliveryOrderToShip = () => {
-    const contextDeliveryOrder = useDeliveryOrders();
-    const [deliveryOrders, setDeliveryOrders] = useState<Order[]>(contextDeliveryOrder.items);
+    const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
+    const [deliveryOrders, setDeliveryOrders] = useState<Order[]>(Object.values(deliveryOrdersSlice.entities));
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [points, setPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const { data } = useSession();
 
     useEffect(() => {
-        setDeliveryOrders(contextDeliveryOrder.items);
-    }, [contextDeliveryOrder.items]);
+        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities));
+    }, [deliveryOrdersSlice.entities]);
     
     useEffect(() => {
         if (!data || !data?.user?.currentCompany?.address) return

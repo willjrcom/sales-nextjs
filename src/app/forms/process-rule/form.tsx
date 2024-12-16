@@ -14,8 +14,8 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import Category from '@/app/entities/category/category';
 import { addProcessRule, removeProcessRule, updateProcessRule } from '@/redux/slices/process-rules';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
@@ -23,6 +23,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const [processRule, setProcessRule] = useState<ProcessRule>(item || new ProcessRule());
     const [category, setCategory] = useState<Category>(new Category());
     const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const dispatch = useDispatch<AppDispatch>();
 
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
@@ -50,9 +51,9 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
             if (!isUpdate) {
                 processRule.id = response
-                addProcessRule(processRule);
+                dispatch(addProcessRule(processRule));
             } else {
-                updateProcessRule(processRule);
+                dispatch(updateProcessRule(processRule));
             }
 
             modalHandler.hideModal(modalName);
@@ -65,7 +66,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProcessRule(processRule.id, data);
-        removeProcessRule(processRule)
+        dispatch(removeProcessRule(processRule));
         modalHandler.hideModal(modalName);
     }
 

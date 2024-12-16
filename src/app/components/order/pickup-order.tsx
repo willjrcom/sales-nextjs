@@ -2,7 +2,7 @@ import { showStatus } from "@/app/utils/status";
 import ButtonIcon from "../button/button-icon";
 import Order from "@/app/entities/order/order";
 import StatusComponent from "../button/show-status";
-import PickupNameForm from "@/app/forms/pickup-order/update-address-order";
+import PickupNameForm from "@/app/forms/pickup-order/update-name-order";
 
 interface OrderProps {
     order: Order | null;

@@ -56,7 +56,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             if (!draggedOrder) return;
 
             const updatedOrder: Order = { ...draggedOrder, status };
-            console.log(status)
+            
             // Atualiza as listas de forma imutável
             setPendingOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
             setReadyOrders(prev => prev.filter(order => order.id !== draggedOrder.id));

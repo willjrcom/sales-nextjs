@@ -38,11 +38,11 @@ export default class Address {
     state: string = '';
     cep: string = '';
     delivery_tax: number = 0;
-    likeTax?: boolean = false
+    likeTax: boolean = false;
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
-    constructor(likeTax: boolean = false, id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, adress_type = '', coordinates?: Coordinates) {
+    constructor(id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, adress_type = '', likeTax: boolean = false, coordinates?: Coordinates) {
         this.id = id
         this.object_id = object_id
         this.street = street

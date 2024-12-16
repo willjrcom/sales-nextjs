@@ -12,6 +12,9 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import serialize from "serialize-javascript";
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
@@ -19,6 +22,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const [client, setClient] = useState<Client>(item as Client || new Client())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     
     const submit = async () => {
@@ -36,12 +40,12 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         try {
             const response = isUpdate ? await UpdateClient(newClient, data) : await NewClient(newClient, data)
             setError(null);
-
+            
             if (!isUpdate) {
                 newClient.id = response
-                addClient(newClient);
+                dispatch(addClient(serialize(newClient)));
             } else {
-                updateClient(newClient);
+                dispatch(updateClient(serialize(newClient)));
             }
             
             modalHandler.hideModal(modalName);
@@ -52,8 +56,8 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteClient(client.id, data)
-        removeClient(client.id)
+        DeleteClient(client.id, data);
+        dispatch(removeClient(client.id));
         modalHandler.hideModal(modalName)
     }
 
