@@ -53,7 +53,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 processRule.id = response
                 dispatch(addProcessRule(processRule));
             } else {
-                dispatch(updateProcessRule({id: processRule.id, changes: processRule}));
+                dispatch(updateProcessRule({ type: "UPDATE", payload: { id: processRule.id, changes: processRule }}));
             }
 
             modalHandler.hideModal(modalName);

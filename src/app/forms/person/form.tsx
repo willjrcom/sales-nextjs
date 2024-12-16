@@ -24,11 +24,11 @@ const PersonForm = ({ person, setPerson }: PersonProps) => {
     
     useEffect(() => {
         handleInputChange('address', address);
-    }, [address, handleInputChange]);
+    }, [address]);
 
     useEffect(() => {
         handleInputChange('contact', contact);
-    }, [contact, handleInputChange]);
+    }, [contact]);
 
     return (
         <>

@@ -26,7 +26,7 @@ const PageOrderEdit = () => {
 
     useEffect(() => {
         getOrder();
-    }, [data, getOrder]);
+    }, [data?.user.idToken]);
 
 
     if (!id || !order) {

@@ -21,11 +21,11 @@ const PageEditOrderControl = () => {
         } catch (error) {
             setError(error as RequestError);
         }
-    }, [data, id, context]);
+    }, [data?.user.idToken, id]);
 
     useEffect(() => {
         getOrder();
-    }, [data]);
+    }, [data?.user.idToken]);
 
 
     if (!id || !context.order) {

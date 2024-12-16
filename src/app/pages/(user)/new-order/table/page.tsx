@@ -34,7 +34,7 @@ const PageNewOrderTable = () => {
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data, placesSlice, dispatch]);
+    }, [data?.user.idToken]);
 
     useEffect(() => {
         if (!placeID) return;
@@ -46,7 +46,7 @@ const PageNewOrderTable = () => {
             filteredTables.push(table.table)
         }
         setTables(filteredTables);
-    }, [placeID, placesSlice.entities]);
+    }, [placeID]);
 
     const newOrder = async (tableID: string) => {
         event?.preventDefault();

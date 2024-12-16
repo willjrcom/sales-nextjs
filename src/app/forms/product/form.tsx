@@ -51,7 +51,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 product.id = response
                 dispatch(addProduct(product));
             } else {
-                dispatch(updateProduct({id: product.id, changes: product}));
+                dispatch(updateProduct({ type: "UPDATE", payload: { id: product.id, changes: product }}));
             }
             modalHandler.hideModal(modalName);
             
@@ -92,7 +92,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         }
 
         LoadCategories();
-    }, [data, categoriesSlice.entities]);
+    }, [data?.user.idToken, categoriesSlice.entities]);
 
     useEffect(() => {
         const LoadSizes = async () => {
@@ -122,7 +122,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         LoadSizes();
 
-    }, [categories, product.category_id, data])
+    }, [categories, product.category_id, data?.user.idToken])
 
     return (
         <>

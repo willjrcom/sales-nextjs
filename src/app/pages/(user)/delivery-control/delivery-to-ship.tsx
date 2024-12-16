@@ -29,7 +29,7 @@ const DeliveryOrderToShip = () => {
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
-    }, [data])
+    }, [data?.user.idToken])
 
     useEffect(() => {
         const newPoints: Point[] = [];

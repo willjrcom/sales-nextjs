@@ -31,7 +31,7 @@ const PageCategories = () => {
         }, 60000); // Atualiza a cada 60 segundos
     
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data, categoriesSlice, dispatch]);
+    }, [data?.user.idToken]);
 
     if (categoriesSlice.loading) {
         return (

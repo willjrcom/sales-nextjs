@@ -30,7 +30,7 @@ const OrderManager = () => {
 
     useEffect(() => {
         fetchOrder()
-    }, [context.order, fetchOrder])
+    }, [context.order?.id])
 
     return (
         <div className="flex h-full bg-gray-100">
@@ -54,7 +54,7 @@ const CartAdded = ({ order }: CartProps) => {
         if (!order) return
         const items = groupBy(order.groups, "category_id");
         setGroupedItems(items);
-    }, [order]);
+    }, [order?.groups]);
 
     return (
         <div className="bg-white w-full">

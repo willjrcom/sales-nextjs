@@ -39,7 +39,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
 
     useEffect(() => {
         fetchData();
-    }, [data?.user.idToken, fetchData]);
+    }, [data?.user.idToken]);
 
     const filterItems = (key: keyof T, value: string) => {
         if (!value) return items;

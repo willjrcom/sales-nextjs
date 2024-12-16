@@ -47,7 +47,7 @@ const Topbar = () => {
     } else {
       setCurrentOrder(false);
     }
-  }, [contextCurrentOrder.order]);
+  }, [contextCurrentOrder.order?.status]);
 
   return (
     <div className="flex justify-between pl-[65px] pr-4 w-full items-center h-[8vh] box-border bg-[#333] text-[#fff] pl-2"> {/* Ajustamos o padding left dinamicamente */}

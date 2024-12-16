@@ -32,7 +32,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         if (item && item.id !== quantity.id) {
             setQuantity(item); // Atualiza o estado apenas se o 'item' for realmente novo
         }
-    }, [item, quantity.id]); // Vai ser chamado apenas quando 'item' mudar
+    }, [item?.id, quantity.id]); // Vai ser chamado apenas quando 'item' mudar
     
 
     useEffect(() => {

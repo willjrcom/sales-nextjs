@@ -55,15 +55,15 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
             dispatch(fetchCategories(data));
         }
-    
+
         const interval = setInterval(() => {
             if (data && !categoriesSlice) {
                 dispatch(fetchCategories(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
-    
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data, categoriesSlice, dispatch]);
+    }, [data?.user.idToken]);
 
     const handleInputChange = (field: keyof Category, value: any) => {
         setCategory(prev => ({ ...prev, [field]: value }));
@@ -84,8 +84,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 dispatch(addCategory(category));
                 modalHandler.hideModal(modalName);
             } else {
-                dispatch(updateCategory({id: category.id, changes: category}));
-
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: category } }));
                 if (setItem) setItem(category)
             }
 
