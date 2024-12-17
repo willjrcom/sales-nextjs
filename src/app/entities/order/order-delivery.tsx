@@ -1,5 +1,6 @@
 import Address from "../address/address";
 import Client from "../client/client";
+import DeliveryDriver from "../delivery-driver/delivery-driver";
 import Employee from "../employee/employee";
 
 type StatusOrderDelivery = "Staging" | "Pending" | "Ready" | "Shipped" | "Delivered";
@@ -13,7 +14,7 @@ export default class OrderDelivery {
     address_id: string = "";
     address?: Address;
     driver_id?: string = "";
-    driver?: Employee;
+    driver?: DeliveryDriver;
     order_id: string = "";
     pending_at?: string = "";
     shipped_at?: string = "";

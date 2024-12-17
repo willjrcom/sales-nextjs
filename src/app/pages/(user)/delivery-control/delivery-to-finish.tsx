@@ -1,13 +1,15 @@
 import RequestError from "@/app/api/error";
-import ShipOrderDelivery from "@/app/api/order-delivery/update/ship/route";
+import FinishOrderDelivery from "@/app/api/order-delivery/update/ship/route";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Carousel from "@/app/components/carousel/carousel";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
+import { SelectField } from "@/app/components/modal/field";
 import { useModal } from "@/app/context/modal/context";
 import Address from "@/app/entities/address/address";
 import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
+import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
 import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
@@ -18,15 +20,28 @@ import { useEffect, useState } from "react";
 import { FaPaperPlane } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
-const DeliveryOrderToShip = () => {
+const DeliveryOrderToFinish = () => {
     const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
+    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
+    const [deliveryDrivers, setDeliveryDrivers] = useState<Employee[]>([]);
     const dispatch = useDispatch<AppDispatch>();
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [points, setPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
+    const [selectedDriverId, setSelectedDriverId] = useState<string>("");
     const { data } = useSession();
+
+    useEffect(() => {
+        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
+            dispatch(fetchDeliveryDrivers(data));
+        }
+    }, [data?.user.idToken]);
+
+    useEffect(() => {
+        setDeliveryDrivers(Object.values(deliveryDriversSlice.entities).map((deliveryDriver) => deliveryDriver.employee));
+    }, [deliveryDriversSlice.entities]);
 
     useEffect(() => {
         if (data && Object.keys(deliveryOrdersSlice.entities).length === 0) {
@@ -43,9 +58,15 @@ const DeliveryOrderToShip = () => {
     }, [data?.user.idToken]);
 
     useEffect(() => {
-        console.log(deliveryOrdersSlice.entities)
-        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending'));
-    }, [deliveryOrdersSlice.entities]);
+        const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped')
+
+        if (selectedDriverId === "") {
+            setDeliveryOrders(shippedOrders);
+            return;
+        }
+
+        setDeliveryOrders(shippedOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId));
+    }, [deliveryOrdersSlice.entities, selectedDriverId]);
 
     useEffect(() => {
         const deliveryIDs: string[] = []
@@ -80,7 +101,14 @@ const DeliveryOrderToShip = () => {
 
     return (
         <>
-            <div className="flex justify-end items-center">
+            <div className="flex justify-between items-center">
+                <SelectField
+                    friendlyName=""
+                    name="name"
+                    setSelectedValue={setSelectedDriverId}
+                    selectedValue={selectedDriverId}
+                    values={deliveryDrivers}
+                />
                 <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
             </div>
             <div className="flex flex-col md:flex-row gap-4 items-start">
@@ -105,23 +133,11 @@ interface ModalData {
 }
 
 const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
-    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const dispatch = useDispatch<AppDispatch>();
-    const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
-    const [deliveryDrivers, setDeliveryDrivers] = useState<DeliveryDriver[]>([]);
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
     const modalHandler = useModal();
 
-    useEffect(() => {
-        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
-            dispatch(fetchDeliveryDrivers(data));
-        }
-    }, [data?.user.idToken]);
-
-    useEffect(() => {
-        setDeliveryDrivers(Object.values(deliveryDriversSlice.entities));
-    }, [deliveryDriversSlice.entities]);
 
     const submit = () => {
         if (!data) return
@@ -131,16 +147,11 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
             return
         }
 
-        if (!selectedDriver) {
-            setError(new RequestError('Selecione um entregador'));
-            return
-        };
 
         setError(null);
 
         const deliveryOrderIds = Array.from(deliveryIDs);
         try {
-            ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
             setError(null);
             dispatch(fetchDeliveryOrders(data));
             modalHandler.hideModal("ship-delivery");
@@ -151,26 +162,8 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
 
     return (
         <>
-        <div className="items-center mb-4">
-            <Carousel items={deliveryDrivers}>
-                {(driver) => (
-                    <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${selectedDriver?.id === driver.id ? 'bg-blue-100' : 'bg-white'}`} onClick={() => setSelectedDriver(driver)}>
-                        <div className="text-center">
-                            <p className="text-gray-700">
-                                {driver.employee.name}
-                            </p>
-                            <p className="text-gray-700">
-                                Na rua
-                            </p>
-                        </div>
-                    </li>
-                )}
-            </Carousel>
-            </div>
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>
         </>
     )
 }
 
-export default DeliveryOrderToShip
+export default DeliveryOrderToFinish
