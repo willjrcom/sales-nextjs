@@ -4,6 +4,7 @@ import { useState } from "react";
 import "./style.css";
 import DeliveryOrderToShip from "./delivery-to-ship";
 import DeliveryOrderToFinish from "./delivery-to-finish";
+import DeliveryOrderFinished from "./delivery-finished";
 
 const PageDeliveryOrder = () => {
     const [activeTab, setActiveTab] = useState<'A enviar' | 'Na rua' | 'Finalizadas'>('A enviar');
@@ -15,7 +16,7 @@ const PageDeliveryOrder = () => {
             case 'Na rua':
                 return <DeliveryOrderToFinish />;
             case 'Finalizadas':
-                return <h1>Finalizadas</h1>;;
+                return <DeliveryOrderFinished />;
             default:
                 return null;
         }

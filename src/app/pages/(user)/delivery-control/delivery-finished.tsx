@@ -1,7 +1,5 @@
 import RequestError from "@/app/api/error";
-import FinishOrderDelivery from "@/app/api/order-delivery/update/ship/route";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import Carousel from "@/app/components/carousel/carousel";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
@@ -19,7 +17,7 @@ import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
-const DeliveryOrderToFinish = () => {
+const DeliveryOrderFinished = () => {
     const dispatch = useDispatch<AppDispatch>();
     const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
@@ -164,4 +162,4 @@ const FinishDelivery = ({ deliveryID }: ModalData) => {
     )
 }
 
-export default DeliveryOrderToFinish
+export default DeliveryOrderFinished
