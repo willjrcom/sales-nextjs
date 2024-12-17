@@ -5,43 +5,57 @@ interface BaseRow {
     id: string;
 }
 
+type RowSelectionType = "normal" | "checkbox" | "radio";
+
 interface DataProps<T extends BaseRow> {
     columns: ColumnDef<T>[];
     data: T[];
-    showCheckbox?: boolean; // Controla exibição dos checkboxes
+    rowSelectionType?: RowSelectionType; // "normal", "checkbox", "radio"
     selectedRows?: Set<string>; // Opcional
     setSelectedRows?: Dispatch<SetStateAction<Set<string>>>; // Opcional
+    selectedRow?: string | null; // Estado para seleção única (externo)
+    setSelectedRow?: Dispatch<SetStateAction<string>>; // Setter para seleção única
 }
 
 const CrudTable = <T extends BaseRow,>({
     columns,
     data,
-    showCheckbox = false,
+    rowSelectionType = "normal",
     selectedRows: externalSelectedRows,
     setSelectedRows: externalSetSelectedRows,
+    selectedRow: externalSelectedRow,
+    setSelectedRow: externalSetSelectedRow
 }: DataProps<T>) => {
     const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
+    const [internalSelectedRow, setInternalSelectedRow] = useState<string | null>(null);
 
     // Use o estado externo se disponível, caso contrário, use o interno
     const selectedRows = externalSelectedRows ?? internalSelectedRows;
     const setSelectedRows = externalSetSelectedRows ?? setInternalSelectedRows;
 
+    const selectedRow = externalSelectedRow ?? internalSelectedRow;
+    const setSelectedRow = externalSetSelectedRow ?? setInternalSelectedRow;
+
     const [pageSize, setPageSize] = useState(10); // Tamanho da página
     const [pageIndex, setPageIndex] = useState(0); // Página atual
 
     const toggleRowSelection = (rowId: string) => {
-        setSelectedRows(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(rowId)) {
-                newSet.delete(rowId);
-            } else {
-                newSet.add(rowId);
-            }
-            return newSet;
-        });
+        if (rowSelectionType === "checkbox") {
+            setSelectedRows(prev => {
+                const newSet = new Set(prev);
+                if (newSet.has(rowId)) {
+                    newSet.delete(rowId);
+                } else {
+                    newSet.add(rowId);
+                }
+                return newSet;
+            });
+        } else if (rowSelectionType === "radio") {
+            setSelectedRow(rowId);
+        }
     };
 
-    const isRowSelected = (rowId: string) => selectedRows.has(rowId);
+    const isRowSelected = (rowId: string) => selectedRows.has(rowId) || selectedRow === rowId;
 
     const toggleAllRowsSelection = () => {
         setSelectedRows(prev => {
@@ -56,7 +70,7 @@ const CrudTable = <T extends BaseRow,>({
         });
     };
 
-    const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length;
+    const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
     const table = useReactTable({
         columns,
@@ -77,8 +91,8 @@ const CrudTable = <T extends BaseRow,>({
         <div>
             <div className="overflow-y-auto h-[50vh]">
                 <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
-                    {tHead({ table, showCheckbox, toggleAllRowsSelection, isAllRowsSelected })}
-                    {tBody({ table, columns, toggleRowSelection, isRowSelected, showCheckbox })}
+                    {tHead({ table, rowSelectionType, toggleAllRowsSelection, isAllRowsSelected })}
+                    {tBody({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected })}
                 </table>
             </div>
             {Pagination({ table })}
@@ -88,17 +102,17 @@ const CrudTable = <T extends BaseRow,>({
 
 interface THeadProps<T extends BaseRow> {
     table: Table<T>;
-    showCheckbox: boolean;
+    rowSelectionType: RowSelectionType;
     toggleAllRowsSelection: () => void;
     isAllRowsSelected: () => boolean;
 }
 
-const tHead = <T extends BaseRow,>({ table, showCheckbox, toggleAllRowsSelection, isAllRowsSelected }: THeadProps<T>) => {
+const tHead = <T extends BaseRow,>({ table, rowSelectionType, toggleAllRowsSelection, isAllRowsSelected }: THeadProps<T>) => {
     return (
         <thead className="bg-gray-50">
             {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id}>
-                    {showCheckbox && (
+                    {rowSelectionType === "checkbox" && (
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <input
                                 type="checkbox"
@@ -107,6 +121,9 @@ const tHead = <T extends BaseRow,>({ table, showCheckbox, toggleAllRowsSelection
                                 onChange={toggleAllRowsSelection}
                             />
                         </th>
+                    )}
+                    {rowSelectionType === "radio" && (
+                        <th></th>
                     )}
                     {headerGroup.headers.map(column => (
                         <th
@@ -128,10 +145,10 @@ interface TBodyProps<T extends BaseRow> {
     columns: any[];
     toggleRowSelection: (rowId: string) => void;
     isRowSelected: (rowId: string) => boolean;
-    showCheckbox: boolean;
+    rowSelectionType: RowSelectionType;
 }
 
-const tBody = <T extends BaseRow,>({ table, columns, toggleRowSelection, isRowSelected, showCheckbox }: TBodyProps<T>) => {
+const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected }: TBodyProps<T>) => {
     if (table.getRowModel().rows.length === 0) {
         return noResults({ columns });
     }
@@ -140,7 +157,7 @@ const tBody = <T extends BaseRow,>({ table, columns, toggleRowSelection, isRowSe
         <tbody className="bg-white divide-y divide-gray-200">
             {table.getRowModel().rows.map(row => (
                 <tr key={row.original.id} className="hover:bg-gray-100">
-                    {showCheckbox && (
+                    {rowSelectionType === "checkbox" && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <input
                                 type="checkbox"
@@ -149,6 +166,11 @@ const tBody = <T extends BaseRow,>({ table, columns, toggleRowSelection, isRowSe
                                 onChange={() => toggleRowSelection(row.original.id)}
                             />
                         </td>
+                    )}
+                    {rowSelectionType === "radio" && (
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <input type="radio" className="form-radio" checked={isRowSelected(row.original.id)} onChange={() => toggleRowSelection(row.original.id)}/>
+                        </th>
                     )}
                     {row.getVisibleCells().map(cell => (
                         <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

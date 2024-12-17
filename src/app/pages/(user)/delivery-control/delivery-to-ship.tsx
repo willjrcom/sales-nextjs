@@ -43,7 +43,6 @@ const DeliveryOrderToShip = () => {
     }, [data?.user.idToken]);
 
     useEffect(() => {
-        console.log(deliveryOrdersSlice.entities)
         setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending'));
     }, [deliveryOrdersSlice.entities]);
 
@@ -86,7 +85,7 @@ const DeliveryOrderToShip = () => {
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} showCheckbox={true} selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
                 </div>
                 {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">

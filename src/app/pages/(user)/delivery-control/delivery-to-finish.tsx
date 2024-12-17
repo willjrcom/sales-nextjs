@@ -8,7 +8,6 @@ import Map, { Point } from "@/app/components/map/map";
 import { SelectField } from "@/app/components/modal/field";
 import { useModal } from "@/app/context/modal/context";
 import Address from "@/app/entities/address/address";
-import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
 import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
@@ -17,20 +16,20 @@ import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { FaPaperPlane } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
 const DeliveryOrderToFinish = () => {
+    const dispatch = useDispatch<AppDispatch>();
     const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
     const [deliveryDrivers, setDeliveryDrivers] = useState<Employee[]>([]);
-    const dispatch = useDispatch<AppDispatch>();
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [points, setPoints] = useState<Point[]>([]);
-    const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-    const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
-    const [selectedDriverId, setSelectedDriverId] = useState<string>("");
+    const [selectedRow, setSelectedRow] = useState<string>("");
+    const [selectedDeliveryID, setSelectedDeliveryID] = useState<string>("");
+    const [selectedDriverId, setSelectedDriverId] = useState<string>();
     const { data } = useSession();
 
     useEffect(() => {
@@ -60,7 +59,7 @@ const DeliveryOrderToFinish = () => {
     useEffect(() => {
         const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped')
 
-        if (selectedDriverId === "") {
+        if (!selectedDriverId) {
             setDeliveryOrders(shippedOrders);
             return;
         }
@@ -69,10 +68,11 @@ const DeliveryOrderToFinish = () => {
     }, [deliveryOrdersSlice.entities, selectedDriverId]);
 
     useEffect(() => {
-        const deliveryIDs: string[] = []
-        selectedRows.forEach((id) => deliveryIDs.push(deliveryOrdersSlice.entities[id].delivery?.id || ""));
-        setSelectedDeliveryIDs(deliveryIDs);
-    }, [selectedRows]);
+        const order = deliveryOrdersSlice.entities[selectedRow]
+        if (!order) return
+
+        setSelectedDeliveryID(order.delivery?.id || "");
+    }, [selectedRow]);
 
     useEffect(() => {
         if (!data || !data?.user?.currentCompany?.address) return
@@ -106,7 +106,7 @@ const DeliveryOrderToFinish = () => {
                     friendlyName=""
                     name="name"
                     setSelectedValue={setSelectedDriverId}
-                    selectedValue={selectedDriverId}
+                    selectedValue={selectedDriverId || ""}
                     values={deliveryDrivers}
                 />
                 <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
@@ -114,43 +114,40 @@ const DeliveryOrderToFinish = () => {
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} showCheckbox={true} selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={selectedRow} setSelectedRow={setSelectedRow} />
                 </div>
                 {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
                     <Map centerPoint={centerPoint} points={points} />
                 </div>
             </div>
-            {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaPaperPlane} title="Enviar entrega" position="bottom-right">
-                <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} />
+            {selectedRow && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
+                <FinishDelivery deliveryID={selectedDeliveryID} />
             </ButtonIconTextFloat>}
         </>
     )
 }
 
 interface ModalData {
-    deliveryIDs: string[];
+    deliveryID: string;
 }
 
-const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
+const FinishDelivery = ({ deliveryID }: ModalData) => {
     const dispatch = useDispatch<AppDispatch>();
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
     const modalHandler = useModal();
-
-
+    console.log(deliveryID)
     const submit = () => {
         if (!data) return
 
-        if (deliveryIDs.length === 0) {
-            setError(new RequestError('Selecione pelo menos uma entrega'));
+        if (deliveryID === "") {
+            setError(new RequestError('Selecione uma entrega'));
             return
         }
 
-
         setError(null);
 
-        const deliveryOrderIds = Array.from(deliveryIDs);
         try {
             setError(null);
             dispatch(fetchDeliveryOrders(data));

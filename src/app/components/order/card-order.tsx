@@ -103,7 +103,6 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     const totalRest = order.total_payable - order.total_paid;
 
     const renderOrderTypeDetails = () => {
-        console.log(order.delivery?.status)
         if (order.delivery) {
             return (
                 <div className="text-gray-700">
@@ -123,7 +122,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                     </p>
                     <p>
                         <strong>Entregador:</strong>{" "}
-                        {order.delivery.driver?.name || "Não atribuído"}
+                        {order.delivery.driver?.employee?.name || "Não atribuído"}
                     </p>
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>

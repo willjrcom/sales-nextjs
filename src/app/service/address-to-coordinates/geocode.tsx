@@ -18,11 +18,9 @@ const geocodeAddressOpenCage = async (address: string, apiKey: string): Promise<
             const { lat, lng } = result.geometry;
             return { lat, lng };
         } else {
-            console.error("Endereço não encontrado.");
             return null;
         }
     } catch (error) {
-        console.error("Erro ao geocodificar o endereço:", error);
         return null;
     }
 };

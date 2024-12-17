@@ -79,8 +79,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             setItemList(items);
 
         } catch (error) {
-            console.error("Erro ao buscar itens adicionais:", error);
-            setItemList([]); // Caso ocorra um erro, retorna lista vazia
+            setError(error as RequestError);
         }
     }, [item.id]);
 
