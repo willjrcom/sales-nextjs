@@ -3,12 +3,13 @@ import { Session } from "next-auth";
 
 interface ShipOrderProps {
     driver_id: string;
+    delivery_ids: string[];
 }
 
-const ShipOrderDelivery = async (delivery_id: string, driver_id: string, session: Session): Promise<string> => {
-    const body = { driver_id: driver_id } as ShipOrderProps
+const ShipOrderDelivery = async (deliveryOrderIds: string[], driverId: string, session: Session): Promise<string> => {
+    const body = { driver_id: driverId, delivery_ids: deliveryOrderIds } as ShipOrderProps
     const response = await RequestApi<ShipOrderProps, string>({
-        path: "/order-delivery/update/ship/" + delivery_id, 
+        path: "/order-delivery/update/ship", 
         method: "POST",
         body: body,
         headers: await AddIdToken(session),

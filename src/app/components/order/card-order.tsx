@@ -103,6 +103,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     const totalRest = order.total_payable - order.total_paid;
 
     const renderOrderTypeDetails = () => {
+        console.log(order.delivery?.status)
         if (order.delivery) {
             return (
                 <div className="text-gray-700">

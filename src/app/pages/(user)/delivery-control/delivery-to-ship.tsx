@@ -1,10 +1,15 @@
+import RequestError from "@/app/api/error";
+import ShipOrderDelivery from "@/app/api/order-delivery/update/ship/route";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
+import Carousel from "@/app/components/carousel/carousel";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
 import Address from "@/app/entities/address/address";
+import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
+import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
 import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
@@ -19,6 +24,7 @@ const DeliveryOrderToShip = () => {
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [points, setPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+    const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
     const { data } = useSession();
 
     useEffect(() => {
@@ -37,8 +43,14 @@ const DeliveryOrderToShip = () => {
 
     useEffect(() => {
         console.log(deliveryOrdersSlice.entities)
-        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities));
+        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending'));
     }, [deliveryOrdersSlice.entities]);
+
+    useEffect(() => {
+        const deliveryIDs: string[] = []
+        selectedRows.forEach((id) => deliveryIDs.push(deliveryOrdersSlice.entities[id].delivery?.id || ""));
+        setSelectedDeliveryIDs(deliveryIDs);
+    }, [selectedRows]);
 
     useEffect(() => {
         if (!data || !data?.user?.currentCompany?.address) return
@@ -80,9 +92,79 @@ const DeliveryOrderToShip = () => {
                     <Map centerPoint={centerPoint} points={points} />
                 </div>
             </div>
-            <ButtonIconTextFloat modalName="ship-delivery" icon={FaPaperPlane} title="Enviar entrega" position="bottom-right">
-                <h1>Enviar entrega(s)</h1>
-            </ButtonIconTextFloat>
+            {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaPaperPlane} title="Enviar entrega" position="bottom-right">
+                <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} />
+            </ButtonIconTextFloat>}
+        </>
+    )
+}
+
+interface ModalData {
+    deliveryIDs: string[];
+}
+
+const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
+    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
+    const dispatch = useDispatch<AppDispatch>();
+    const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
+    const [deliveryDrivers, setDeliveryDrivers] = useState<DeliveryDriver[]>([]);
+    const [error, setError] = useState<RequestError | null>(null);
+    const { data } = useSession();
+
+    useEffect(() => {
+        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
+            dispatch(fetchDeliveryDrivers(data));
+        }
+    }, [data?.user.idToken]);
+
+    useEffect(() => {
+        setDeliveryDrivers(Object.values(deliveryDriversSlice.entities));
+    }, [deliveryDriversSlice.entities]);
+
+    const submit = () => {
+        if (!data) return
+
+        if (deliveryIDs.length === 0) {
+            setError(new RequestError('Selecione pelo menos uma entrega'));
+            return
+        }
+
+        if (!selectedDriver) {
+            setError(new RequestError('Selecione um entregador'));
+            return
+        };
+
+        setError(null);
+
+        const deliveryOrderIds = Array.from(deliveryIDs);
+        try {
+            ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
+            setError(null);
+        } catch (error) {
+            setError(error as RequestError);
+        }
+    }
+
+    return (
+        <>
+        <div className="items-center mb-4">
+            <Carousel items={deliveryDrivers}>
+                {(driver) => (
+                    <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${selectedDriver?.id === driver.id ? 'bg-blue-100' : 'bg-white'}`} onClick={() => setSelectedDriver(driver)}>
+                        <div className="text-center">
+                            <p className="text-gray-700">
+                                {driver.employee.name}
+                            </p>
+                            <p className="text-gray-700">
+                                Na rua
+                            </p>
+                        </div>
+                    </li>
+                )}
+            </Carousel>
+            </div>
+            {error && <p className="text-red-500 mb-4">{error.message}</p>}
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>
         </>
     )
 }
