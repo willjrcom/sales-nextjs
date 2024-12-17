@@ -27,7 +27,6 @@ const PageEditOrderControl = () => {
         getOrder();
     }, [data?.user.idToken]);
 
-
     if (!id || !context.order) {
         return (
             <>

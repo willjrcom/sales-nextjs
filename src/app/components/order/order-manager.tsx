@@ -20,17 +20,10 @@ import { RootState } from "@/redux/store"
 const OrderManager = () => {
     const context = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(context.order);
-    const { data } = useSession();
-
-    const fetchOrder = useCallback(async () => {
-        if (!context.order || !data) return
-        const orderUpdated = await GetOrderByID(context.order.id, data);
-        setOrder(orderUpdated);
-    }, [context.order, data]);
 
     useEffect(() => {
-        fetchOrder()
-    }, [context.order?.id])
+        setOrder(context.order)
+    }, [context.order])
 
     return (
         <div className="flex h-full bg-gray-100">

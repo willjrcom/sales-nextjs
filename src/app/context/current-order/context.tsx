@@ -1,5 +1,5 @@
 import CurrentOrder from '@/app/entities/order/order';
-import React, { createContext, useContext, ReactNode, useState} from 'react';
+import React, { createContext, useContext, ReactNode, useState, useCallback} from 'react';
 import { useSession } from 'next-auth/react';
 import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
@@ -33,21 +33,25 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
-    const fetchData = async (id?: string) => {
-        if (!data?.user?.idToken || (!id && !order?.id)) return;
-
-        if (!id && order) id = order?.id;
+    const fetchData = useCallback(async (id?: string) => {
+        console.log(data, id, order?.id)
+        if (!data?.user.idToken) return;
+        
+        if (!id) {
+            id = order?.id;
+        }
 
         try {
-            const order = await GetOrderByID(id as string, data);
-            setOrder(order);
+            const orderFound = await GetOrderByID(id as string, data);
+            setOrder(orderFound);
             setError(null);
         } catch (error) {
             setError(error as RequestError);
         }
 
         setLoading(false);
-    };
+
+    }, [data?.user.idToken]);
 
     const getGroupByID = (id: string) => {
         return order?.groups.filter((order) => order.id === id);
