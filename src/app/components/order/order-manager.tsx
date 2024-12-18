@@ -49,12 +49,13 @@ const CartAdded = ({ order }: CartProps) => {
         setGroupedItems(items);
     }, [order?.groups]);
 
+    if (!order) return null
     return (
         <div className="bg-white w-full">
             <div className=" mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
-                    <ButtonIconTextFloat size="xl" position="bottom-right" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={contextCurrentOrder.fetchData}>
+                    <ButtonIconTextFloat size="xl" position="bottom-right" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
                         <EditGroupItem />
                     </ButtonIconTextFloat>
                 </div>

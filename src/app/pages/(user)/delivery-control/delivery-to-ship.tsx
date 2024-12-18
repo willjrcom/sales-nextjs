@@ -122,7 +122,7 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         setDeliveryDrivers(Object.values(deliveryDriversSlice.entities));
     }, [deliveryDriversSlice.entities]);
 
-    const submit = () => {
+    const submit = async () => {
         if (!data) return
 
         if (deliveryIDs.length === 0) {
@@ -139,7 +139,7 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
 
         const deliveryOrderIds = Array.from(deliveryIDs);
         try {
-            ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
+            await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
             setError(null);
             dispatch(fetchDeliveryOrders(data));
             modalHandler.hideModal("ship-delivery");

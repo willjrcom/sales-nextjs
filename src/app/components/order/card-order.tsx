@@ -42,6 +42,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     };
 
     useEffect(() => {
+        console.log("atualizou")
         setOrder(contextCurrentOrder.order);
     }, [contextCurrentOrder.order]);
 
@@ -189,7 +190,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
                         <StatusComponent status={order?.status} />
-                        <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + contextCurrentOrder.order?.id}>
+                        <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
                             <FaEdit />
                         </Link>
                     </div>
@@ -316,7 +317,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
                 {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" onCloseModal={() => setErrorPayment(null)}>
-                    <PaymentForm order={order} setOrderPaymentError={setErrorPayment} setOrderError={setError} />
+                    <PaymentForm setOrderPaymentError={setErrorPayment} setOrderError={setError} />
                 </ButtonIconText>}
 
                 {isOrderStatusFinished && <div>&nbsp;</div>}

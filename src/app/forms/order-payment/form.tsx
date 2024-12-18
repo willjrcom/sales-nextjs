@@ -9,23 +9,23 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { PaymentOrder, payMethodsWithId, ValidatePaymentForm } from '@/app/entities/order/order-payment';
-import Order from '@/app/entities/order/order';
 import PayOrder from '@/app/api/order/payment/route';
 import { useCurrentOrder } from '@/app/context/current-order/context';
+import Order from '@/app/entities/order/order';
 
 interface PaymentFormProps extends CreateFormsProps<PaymentOrder> {
-    order?: Order;
     setOrderPaymentError: (error: RequestError | null) => void;
     setOrderError: (error: RequestError | null) => void;
 }
 
-const PaymentForm = ({ item, isUpdate, order, setOrderPaymentError, setOrderError }: PaymentFormProps) => {
+const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: PaymentFormProps) => {
     const modalName = isUpdate ? 'edit-payment-' + item?.id : 'add-payment'
     const modalHandler = useModal();
     const [payment, setPayment] = useState<PaymentOrder>(item || new PaymentOrder());
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const { data } = useSession();
     
     const handleInputChange = (field: keyof PaymentOrder, value: any) => {

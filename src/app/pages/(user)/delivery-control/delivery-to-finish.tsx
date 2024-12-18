@@ -1,4 +1,5 @@
 import RequestError from "@/app/api/error";
+import DeliveryOrderDelivery from "@/app/api/order-delivery/update/delivery/route";
 import FinishOrderDelivery from "@/app/api/order-delivery/update/ship/route";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Carousel from "@/app/components/carousel/carousel";
@@ -28,7 +29,7 @@ const DeliveryOrderToFinish = () => {
     const [deliveryDrivers, setDeliveryDrivers] = useState<Employee[]>([]);
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [points, setPoints] = useState<Point[]>([]);
-    const [selectedRow, setSelectedRow] = useState<string>("");
+    const [orderID, setSelectedOrderID] = useState<string>("");
     const [selectedDeliveryID, setSelectedDeliveryID] = useState<string>("");
     const [selectedDriverId, setSelectedDriverId] = useState<string>();
     const { data } = useSession();
@@ -58,7 +59,7 @@ const DeliveryOrderToFinish = () => {
     }, [data?.user.idToken]);
 
     useEffect(() => {
-        const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped')
+        const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped' && order.status === 'Ready')
 
         if (!selectedDriverId) {
             setDeliveryOrders(shippedOrders);
@@ -69,11 +70,11 @@ const DeliveryOrderToFinish = () => {
     }, [deliveryOrdersSlice.entities, selectedDriverId]);
 
     useEffect(() => {
-        const order = deliveryOrdersSlice.entities[selectedRow]
+        const order = deliveryOrdersSlice.entities[orderID]
         if (!order) return
 
         setSelectedDeliveryID(order.delivery?.id || "");
-    }, [selectedRow]);
+    }, [orderID]);
 
     useEffect(() => {
         if (!data || !data?.user?.currentCompany?.address) return
@@ -115,16 +116,72 @@ const DeliveryOrderToFinish = () => {
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={selectedRow} setSelectedRow={setSelectedRow} />
+                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
                 </div>
                 {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
                     <Map centerPoint={centerPoint} points={points} />
                 </div>
             </div>
-            {selectedRow && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
-                <CardOrder orderId={selectedRow}/>
+            {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
+                <FinishDelivery deliveryID={selectedDeliveryID} orderID={orderID}/>
             </ButtonIconTextFloat>}
+        </>
+    )
+}
+
+interface ModalData {
+    deliveryID: string;
+    orderID: string;
+}
+
+const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const [error, setError] = useState<RequestError | null>(null);
+    const { data } = useSession();
+    const modalHandler = useModal();
+
+    const showOrder = (orderId: string, error?: RequestError | null) => {
+        const onClose = () => {
+            modalHandler.hideModal("show-order-" + orderId)
+        }
+        modalHandler.showModal(
+            "show-order-" + orderId,
+            "Ver Pedido",
+            <CardOrder orderId={orderId} errorRequest={error} />,
+            "xl",
+            onClose
+        );
+    };
+
+    const submit = async () => {
+        if (!data) return
+
+        if (!deliveryID) {
+            setError(new RequestError('Selecione uma entrega'));
+            return
+        }
+
+        setError(null);
+
+        try {
+            await DeliveryOrderDelivery(deliveryID, data);
+            setError(null);
+            dispatch(fetchDeliveryOrders(data));
+            modalHandler.hideModal("finish-delivery");
+            showOrder(orderID)
+        } catch (error) {
+            setError(error as RequestError);
+        }
+    }
+
+    return (
+        <>
+        <div className="items-center mb-4">
+                <p className="text-sm text-gray-600">Confirma que a entrega foi finalizada?</p>
+            </div>
+            {error && <p className="text-red-500 mb-4">{error.message}</p>}
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Confirmar entrega</button>
         </>
     )
 }

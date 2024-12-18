@@ -34,11 +34,11 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
     const fetchData = useCallback(async (id?: string) => {
-        console.log(data, id, order?.id)
         if (!data?.user.idToken) return;
-        
+        console.log(order, id)
         if (!id) {
             id = order?.id;
+            console.log("pegou o id: " + id)
         }
 
         try {
