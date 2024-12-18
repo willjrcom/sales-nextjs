@@ -9,6 +9,9 @@ import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/route";
 import RequestError from "@/app/api/error";
 import { EntityState } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { fetchOrders } from "@/redux/slices/orders";
 
 interface OrderKanbanProps {
     slice: EntityState<Order, string>;
@@ -22,6 +25,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
     const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
     const modalHandler = useModal();
+    const dispatch = useDispatch<AppDispatch>();
 
     const { data } = useSession();
 
@@ -77,6 +81,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             if (!orderId || !data) return;
             try {
                 await ReadyOrder(orderId, data);
+                dispatch(fetchOrders(data));
             } catch (error) { }
 
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
@@ -85,6 +90,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             try {
                 await FinishOrder(orderId, data);
                 moveOrder(readyOrders, "Finished");
+                dispatch(fetchOrders(data));
             } catch (error) {
                 handleDoubleClick(orderId, error as RequestError);
             }
