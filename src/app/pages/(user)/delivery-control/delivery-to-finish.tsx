@@ -6,6 +6,7 @@ import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
 import { SelectField } from "@/app/components/modal/field";
+import CardOrder from "@/app/components/order/card-order";
 import { useModal } from "@/app/context/modal/context";
 import Address from "@/app/entities/address/address";
 import Employee from "@/app/entities/employee/employee";
@@ -122,44 +123,8 @@ const DeliveryOrderToFinish = () => {
                 </div>
             </div>
             {selectedRow && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
-                <FinishDelivery deliveryID={selectedDeliveryID} />
+                <CardOrder orderId={selectedRow}/>
             </ButtonIconTextFloat>}
-        </>
-    )
-}
-
-interface ModalData {
-    deliveryID: string;
-}
-
-const FinishDelivery = ({ deliveryID }: ModalData) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const [error, setError] = useState<RequestError | null>(null);
-    const { data } = useSession();
-    const modalHandler = useModal();
-    const submit = () => {
-        if (!data) return
-
-        if (deliveryID === "") {
-            setError(new RequestError('Selecione uma entrega'));
-            return
-        }
-
-        setError(null);
-
-        try {
-            setError(null);
-            dispatch(fetchDeliveryOrders(data));
-            modalHandler.hideModal("ship-delivery");
-        } catch (error) {
-            setError(error as RequestError);
-        }
-    }
-
-    return (
-        <>
-        {error && <p className="mb-4 text-red-500">{error.message}</p>}
-        
         </>
     )
 }

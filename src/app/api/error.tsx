@@ -28,7 +28,8 @@ const errorTranslations: Record<string, string> = {
     "sql: no rows in result set": "Nenhum resultado encontrado",
     "order paid less than total": "O total pago deve ser maior que o total do pedido",
     "group item not staging": "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens.",
-    "total paid is invalid": "O total pago deve ser maior que 0"
+    "total paid is invalid": "O total pago deve ser maior que 0",
+    "order delivery must be delivered": "A entrega do pedido deve estar entregue",
 };
 
 

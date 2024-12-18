@@ -179,6 +179,9 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+            {error && error.message != errorPayment?.message && <p className="mb-4 text-red-500">{error.message}</p>}
+            {errorPayment && <p className="mb-4 text-red-500">{errorPayment.message}</p>}
+
             {/* Layout Responsivo */}
             <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 mb-6">
                 {/* Informações Básicas */}
@@ -187,7 +190,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                         <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
                         <StatusComponent status={order?.status} />
                         <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + contextCurrentOrder.order?.id}>
-                        <FaEdit/>
+                            <FaEdit />
                         </Link>
                     </div>
                     <p className="text-gray-700">
@@ -290,15 +293,15 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                         <Carousel items={order.payments}>
                             {(payment) => (
                                 <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                                <div className="text-center">
-                                    <p className="text-gray-700">
-                                        <strong>Método:</strong> {payment.method}
-                                    </p>
-                                    <p className="text-gray-700">
-                                        <strong>Valor:</strong> R$ {payment.total_paid.toFixed(2)}
-                                    </p>
-                                </div>
-                            </li>
+                                    <div className="text-center">
+                                        <p className="text-gray-700">
+                                            <strong>Método:</strong> {payment.method}
+                                        </p>
+                                        <p className="text-gray-700">
+                                            <strong>Valor:</strong> R$ {payment.total_paid.toFixed(2)}
+                                        </p>
+                                    </div>
+                                </li>
                             )}
                         </Carousel>
                     </ul>
@@ -307,7 +310,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                 )}
             </div>
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            {error && error.message != errorPayment?.message && <p className="mb-4 text-red-500">{error.message}</p>}
             {errorPayment && <p className="mb-4 text-red-500">{errorPayment.message}</p>}
 
             {/* Botões de Ação */}

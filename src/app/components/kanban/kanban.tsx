@@ -56,7 +56,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             if (!draggedOrder) return;
 
             const updatedOrder: Order = { ...draggedOrder, status };
-            
+
             // Atualiza as listas de forma imutável
             setPendingOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
             setReadyOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
@@ -73,11 +73,11 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         // Decide para qual lista mover com base no ID do droppable
         if (over.id === "Ready" && active.id.startsWith("Pending-")) {
             moveOrder(pendingOrders, "Ready");
-            
+
             if (!orderId || !data) return;
             try {
                 await ReadyOrder(orderId, data);
-            } catch (error) {}
+            } catch (error) { }
 
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
             if (!orderId || !data) return;
@@ -95,13 +95,12 @@ function OrderKanban({ slice }: OrderKanbanProps) {
 
     const handleDoubleClick = (orderId: string, error?: RequestError | null) => {
         const onClose = () => {
-            
             modalHandler.hideModal("show-order-" + orderId)
         }
         modalHandler.showModal(
             "show-order-" + orderId,
             "Ver Pedido",
-            <CardOrder orderId={orderId} errorRequest={error}/>,
+            <CardOrder orderId={orderId} errorRequest={error} />,
             "xl",
             onClose
         );

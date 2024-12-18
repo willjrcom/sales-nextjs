@@ -43,7 +43,7 @@ const DeliveryOrderToShip = () => {
     }, [data?.user.idToken]);
 
     useEffect(() => {
-        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending'));
+        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending' && order.status === 'Ready'));
     }, [deliveryOrdersSlice.entities]);
 
     useEffect(() => {

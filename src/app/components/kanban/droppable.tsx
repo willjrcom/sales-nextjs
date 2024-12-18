@@ -1,6 +1,7 @@
 import Order from "@/app/entities/order/order";
 import { useDroppable } from "@dnd-kit/core";
 import Draggable from "./draggable";
+import { FaLuggageCart, FaPaperPlane, FaUtensils } from "react-icons/fa";
 
 interface OrderProps {
     id: string;
@@ -40,13 +41,32 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
             <div className="mt-4 flex flex-col w-full">
                 {orders.map(order => (
                     <Draggable key={order.id} order={order}>
-                        <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200">
-                            Pedido {order.order_number}
+                        <div className="flex items-center justify-between h-[5vh] border-black">
+                            {/* Texto "Pedido X" */}
+                            <div className="ml-4 text-lg font-bold">Pedido {order.order_number}</div>
+
+                            {/* Elemento Verde à Direita */}
+                            {order.delivery && (
+                                <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
+                                    <FaPaperPlane className="w-6 h-6" />
+                                </div>
+                            )}
+                            {order.table && (
+                                <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
+                                    <FaUtensils className="w-6 h-6" />
+                                </div>
+                            )}
+                            {order.pickup && (
+                                <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
+                                    <FaLuggageCart className="w-6 h-6"/>
+                                </div>
+                            )}
                         </div>
                     </Draggable>
                 ))}
             </div>
         </div>
+
     );
 }
 

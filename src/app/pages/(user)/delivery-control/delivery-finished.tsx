@@ -4,6 +4,7 @@ import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
 import { SelectField } from "@/app/components/modal/field";
+import CardOrder from "@/app/components/order/card-order";
 import { useModal } from "@/app/context/modal/context";
 import Address from "@/app/entities/address/address";
 import Employee from "@/app/entities/employee/employee";
@@ -120,7 +121,7 @@ const DeliveryOrderFinished = () => {
                 </div>
             </div>
             {selectedRow && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
-                <FinishDelivery deliveryID={selectedDeliveryID} />
+                <CardOrder orderId={selectedRow} />
             </ButtonIconTextFloat>}
         </>
     )

@@ -4,6 +4,11 @@ import Address from "../address/address";
 
 const DeliveryOrderColumns = (): ColumnDef<Order>[] => [
   {
+    id: 'Comanda',
+    accessorKey: 'order_number',
+    header: 'Comanda',
+  },
+  {
     id: 'Cliente',
     accessorKey: 'name',
     header: 'Cliente',
