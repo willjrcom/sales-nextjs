@@ -18,8 +18,7 @@ export const CardOrderResume = () => {
     }, [contextCurrentOrder.order])
 
     return (
-        <div className="w-80 bg-gray-50 p-3 overflow-y-auto">
-            {/* Lançar Pedido */}
+        <div className="w-1/5 bg-gray-50 p-3 overflow-y-auto">
 
             <OrderPaymentsResume />
             {order?.delivery && <DeliveryCard />}
@@ -71,6 +70,8 @@ export const OrderPaymentsResume = () => {
             <hr className="my-2" />
             <p><strong>Total:</strong> R$ {(order?.total_payable || 0).toFixed(2)}</p>
             <br />
+
+            {/* Lançar Pedido */}
             {isThrowButton && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
                 Lançar Pedido
             </button>}

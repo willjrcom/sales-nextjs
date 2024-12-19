@@ -28,7 +28,7 @@ export const CartAdded = () => {
 
     if (!order) return null
     return (
-        <div className="bg-white w-full">
+        <div className="bg-white w-4/5">
             <div className=" mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
