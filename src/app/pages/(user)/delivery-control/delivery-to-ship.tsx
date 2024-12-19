@@ -34,13 +34,13 @@ const DeliveryOrderToShip = () => {
         }
 
         const interval = setInterval(() => {
-            if (data && !deliveryOrdersSlice) {
+            if (data) {
                 dispatch(fetchDeliveryOrders(data));
             }
-        }, 60000); // Atualiza a cada 60 segundos
+        }, 10000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
 
     useEffect(() => {
         setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending' && order.status === 'Ready'));
@@ -116,6 +116,14 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
             dispatch(fetchDeliveryDrivers(data));
         }
+
+        const interval = setInterval(() => {
+            if (data) {
+                dispatch(fetchDeliveryDrivers(data));
+            }
+        }, 30000); // Atualiza a cada 30 segundos
+
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.idToken]);
 
     useEffect(() => {

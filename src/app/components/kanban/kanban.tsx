@@ -30,6 +30,20 @@ function OrderKanban({ slice }: OrderKanbanProps) {
     const { data } = useSession();
 
     useEffect(() => {
+        if (data && Object.keys(slice.entities).length === 0) {
+            dispatch(fetchOrders(data));
+        }
+
+        const interval = setInterval(() => {
+            if (data) {
+                dispatch(fetchOrders(data));
+            }
+        }, 30000); // Atualiza a cada 30 segundos
+
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    }, [data?.user.idToken, dispatch]);
+
+    useEffect(() => {
         setPreventDrag(false); // Ativa a flag para prevenir o arrasto
         setLastClickTime(null);
     }, [preventDrag]);

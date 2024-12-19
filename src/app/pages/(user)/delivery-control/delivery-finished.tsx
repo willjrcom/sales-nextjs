@@ -26,12 +26,6 @@ const DeliveryOrderFinished = () => {
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
-            dispatch(fetchDeliveryDrivers(data));
-        }
-    }, [data?.user.idToken]);
-
-    useEffect(() => {
         setDeliveryDrivers(Object.values(deliveryDriversSlice.entities).map((deliveryDriver) => deliveryDriver.employee));
     }, [deliveryDriversSlice.entities]);
 
@@ -41,13 +35,13 @@ const DeliveryOrderFinished = () => {
         }
 
         const interval = setInterval(() => {
-            if (data && !deliveryOrdersSlice) {
+            if (data) {
                 dispatch(fetchDeliveryOrders(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
 
     useEffect(() => {
         const deliveredOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Delivered')

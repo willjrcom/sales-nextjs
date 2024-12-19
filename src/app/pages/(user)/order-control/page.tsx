@@ -20,13 +20,13 @@ const PageOrder = () => {
         }
     
         const interval = setInterval(() => {
-            if (data && !ordersSlice ) {
+            if (data) {
                 dispatch(fetchOrders(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
     
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
     
     return (
         <>

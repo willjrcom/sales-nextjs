@@ -57,13 +57,13 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
         }
 
         const interval = setInterval(() => {
-            if (data && !categoriesSlice) {
+            if (data) {
                 dispatch(fetchCategories(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
 
     const handleInputChange = (field: keyof Category, value: any) => {
         setCategory(prev => ({ ...prev, [field]: value }));

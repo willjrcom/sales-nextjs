@@ -26,13 +26,13 @@ const PageDeliveryDriver = () => {
         }
     
         const interval = setInterval(() => {
-            if (data && !deliveryDriversSlice) {
+            if (data) {
                 dispatch(fetchDeliveryDrivers(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
     
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
     
     if (deliveryDriversSlice.loading) {
         return (

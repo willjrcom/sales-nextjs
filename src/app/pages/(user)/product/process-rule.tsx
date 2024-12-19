@@ -27,13 +27,13 @@ export default function PageProcessRules() {
         }
 
         const interval = setInterval(() => {
-            if (data && !categoriesSlice) {
+            if (data) {
                 dispatch(fetchCategories(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
 
     useEffect(() => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;

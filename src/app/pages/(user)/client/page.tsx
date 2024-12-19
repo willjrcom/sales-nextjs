@@ -26,13 +26,13 @@ const PageClient = () => {
         }
     
         const interval = setInterval(() => {
-            if (data && !clientsSlice) {
+            if (data) {
                 dispatch(fetchClients(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
     
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
 
     return (
         <>
