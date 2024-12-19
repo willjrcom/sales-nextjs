@@ -57,7 +57,7 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
             {onSubmit && <button onClick={onSubmit} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 {buttonName}
             </button>}
-            {!onSubmit && <div className=""></div>}
+            {!onSubmit && <div></div>}
 
             {item.id !== '' && deleteItem &&
             <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onCloseModal} >

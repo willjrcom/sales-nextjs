@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { TextField, NumberField, HiddenField, TimeField } from '../../components/modal/field';
+import { TextField, NumberField, HiddenField, TimeField, SelectField } from '../../components/modal/field';
 import ProcessRule, { ValidateProcessRuleForm } from '@/app/entities/process-rule/process-rule';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -59,6 +59,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             modalHandler.hideModal(modalName);
 
         } catch (error) {
+            console.log(error)
             setError(error as RequestError);
         }
     }
@@ -80,7 +81,9 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
                 <TimeField friendlyName='Tempo experimental (mm:ss)' name='experimental_error' setValue={value => handleInputChange('experimental_error', value)} value={processRule.experimental_error} />
             </div>
-            <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />
+
+            {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
+            <SelectField friendlyName='Categoria' name='category' values={Object.values(categoriesSlice.entities)} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
