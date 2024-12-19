@@ -12,12 +12,12 @@ const PageEditOrderControl = () => {
     const { id } = useParams();
     const [error, setError] = useState<RequestError | null>(null)
     const { data } = useSession();
-    const context = useCurrentOrder();
+    const contextCurrentOrder = useCurrentOrder();
 
     const getOrder = useCallback(async () => {
         if (!id || !data) return;
         try {
-            context.fetchData(id as string);
+            contextCurrentOrder.fetchData(id as string);
             setError(null);
         } catch (error) {
             setError(error as RequestError);

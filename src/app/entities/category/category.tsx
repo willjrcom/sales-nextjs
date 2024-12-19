@@ -9,6 +9,7 @@ export default class Category {
     name: string = "";
     image_path: string = "";
     need_print: boolean = false;
+    use_process_rule: boolean = false;
     removable_ingredients: string[] = [];
     sizes: Size[] = [];
     products: Product[] = [];
@@ -19,11 +20,12 @@ export default class Category {
     product_category_to_additional: Category[] = [];
     product_category_to_complement: Category[] = [];
     
-    constructor(id = "", name = "", image_path = "", need_print = false, removable_ingredients: string[] = [], sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = [], is_additional = false, is_complement = false, product_category_to_additional: Category[] = [], product_category_to_complement: Category[] = []) {
+    constructor(id = "", name = "", image_path = "", need_print = false, use_process_rule = false, removable_ingredients: string[] = [], sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = [], is_additional = false, is_complement = false, product_category_to_additional: Category[] = [], product_category_to_complement: Category[] = []) {
         this.id = id;
         this.name = name;
         this.image_path = image_path;
         this.need_print = need_print;
+        use_process_rule = use_process_rule;
         this.sizes = sizes;
         this.removable_ingredients = removable_ingredients;
         this.products = products;

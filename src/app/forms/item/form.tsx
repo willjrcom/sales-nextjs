@@ -1,5 +1,6 @@
 import RequestError from "@/app/api/error";
 import NewItem, { NewItemProps } from "@/app/api/item/new/route";
+import GetProductByID from "@/app/api/product/[id]/route";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
 import ErrorForms from "@/app/components/modal/error-forms"
 import { TextField } from "@/app/components/modal/field";
@@ -17,16 +18,32 @@ interface AddProductCardProps {
   product: Product;
 }
 
-const AddProductCard = ({ product }: AddProductCardProps) => {
-  const modalName = 'add-item-' + product.id
+const AddProductCard = ({ product: item }: AddProductCardProps) => {
+  const modalName = 'add-item-' + item.id
   const modalHandler = useModal();
   const contextCurrentOrder = useCurrentOrder();
   const contextGroupItem = useGroupItem();
   const { data } = useSession();
+  const [product, setProduct] = useState<Product>(item || new Product());
   const [quantity, setQuantity] = useState<Quantity>(new Quantity());
   const [observation, setObservation] = useState('');
   const [error, setError] = useState<RequestError | null>(null);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [reloadProduct, setReloadProduct] = useState(false);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [data?.user.idToken, reloadProduct]);
+
+  const fetchProduct = async () => {
+    setReloadProduct(false);
+    if (reloadProduct && data) {
+      const productFound = await GetProductByID(item.id, data)
+      if (!productFound) return;
+
+      setProduct(productFound);
+    }
+  }
 
   const submit = async () => {
     if (!contextCurrentOrder.order || !quantity || !data) return;
@@ -50,6 +67,17 @@ const AddProductCard = ({ product }: AddProductCardProps) => {
     } catch (error) {
       setError(error as RequestError);
     }
+  }
+
+  useEffect(() => {
+
+    if (!product.size || !product.category) {
+      setReloadProduct(true);
+    }
+  }, [])
+
+  if (!product.size || !product.category) {
+    return null;
   }
 
   return (

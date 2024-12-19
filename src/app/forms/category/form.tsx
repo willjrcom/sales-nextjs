@@ -131,6 +131,12 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                     setValue={value => handleInputChange('need_print', value)}
                     value={category.need_print}
                 />
+                <CheckboxField
+                    friendlyName="Deseja produzir com processos?"
+                    name="use_process_rule"
+                    setValue={value => handleInputChange('use_process_rule', value)}
+                    value={category.use_process_rule}
+                />
             </div>
 
             {/* Bloco de Ingredientes Removíveis */}

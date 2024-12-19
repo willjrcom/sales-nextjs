@@ -6,7 +6,6 @@ import Category from "@/app/entities/category/category";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import Modal from "@/app/components/modal/modal";
 import ListSize from "../../../../forms/category/list-size";
 import ListQuantity from "../../../../forms/category/list-quantity";
 import CategoryForm from "@/app/forms/category/form";
@@ -41,15 +40,16 @@ const PageCategoryEdit = () => {
 
     return (
         <div className="flex items-center justify-between">
+            {error && <p className="text-red-500">{error.message}</p>}
             <div className=" w-[80vw]">
-            <CategoryForm isUpdate={true} item={category} setItem={setCategory} />
+                <CategoryForm isUpdate={true} item={category} setItem={setCategory} />
 
-            <hr className="my-4" />
+                <hr className="my-4" />
 
-            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <ListSize category={category} />
-                <ListQuantity category={category} />
-            </div>
+                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <ListSize category={category} />
+                    <ListQuantity category={category} />
+                </div>
             </div>
         </div>
     );

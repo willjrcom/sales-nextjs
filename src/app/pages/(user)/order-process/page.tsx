@@ -6,6 +6,7 @@ import ProcessRule from '@/app/entities/process-rule/process-rule';
 import { fetchCategories } from '@/redux/slices/categories';
 import { AppDispatch, RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -65,7 +66,7 @@ interface CardProcessRuleProps {
 
 const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
     return (
-        <div
+        <Link href={`/pages/order-process/process-rule/${processRule.id}`}
             key={processRule.id}
             className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col justify-between h-32"
         >
@@ -85,7 +86,7 @@ const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
                     0 em fila
                 </div>
             </div>
-        </div>
+        </Link>
     )
 }
 export default OrderProcess;
