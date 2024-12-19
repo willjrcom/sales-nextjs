@@ -28,17 +28,9 @@ const PageEditOrderControl = () => {
         getOrder();
     }, [data?.user.idToken]);
 
-    if (!id || !context.order) {
-        return (
-            <>
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <h1>Pedido não encontrado</h1>
-            </>
-        )
-    }
-
     return (
         <div className="flex h-full bg-gray-100">
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <CartAdded />
             <CardOrderResume />
         </div>

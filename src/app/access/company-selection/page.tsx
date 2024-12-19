@@ -20,7 +20,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 export default function Page() {
     return (
         <Provider store={store}>
-            <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+            <PersistGate persistor={persistor}>
                 <CompanySelection />
             </PersistGate>
         </Provider>

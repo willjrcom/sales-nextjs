@@ -15,9 +15,9 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         <Sidebar />
         <div className="flex-1 flex flex-col ml-[65px]">
           <Topbar />
-          <main className="p-4 h-[89vh] min-w-0 max-w-full flex justify-center">
+          <main className="p-4 h-[89vh] min-w-0 max-w-[94vw] flex justify-center">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto ">
-              <div className='min-w-[80vw] max-w-[90vw]'>
+              <div className='min-w-[80vw]'>
                 {children}
               </div>
             </div>
@@ -36,7 +36,7 @@ const ContextProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Provider store={store}>
-      <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+      <PersistGate persistor={persistor}>
         <CurrentOrderProvider>
           <GroupItemProvider>
             <ModalProvider>

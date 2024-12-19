@@ -1,5 +1,6 @@
 "use client";
 
+import Carousel from '@/app/components/carousel/carousel';
 import Category from '@/app/entities/category/category';
 import ProcessRule from '@/app/entities/process-rule/process-rule';
 import { fetchCategories } from '@/redux/slices/categories';
@@ -33,10 +34,10 @@ const OrderProcess = () => {
     }, [categoriesSlice.entities]);
 
     return (
-        <>
+        <div className='max-w-[85vw] flex-auto h-full'>
             <h1 className="text-2xl font-bold mb-4">Processos</h1>
             {categories?.map((category) => <CardCategory key={category.id} category={category} />)}
-        </>
+        </div>
     );
 };
 
@@ -46,14 +47,15 @@ interface CardCategoryProps {
 
 const CardCategory = ({ category }: CardCategoryProps) => {
     if (!category.process_rules) return null;
+    // <div key={category.id} className="p-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 
     return (
         <>
             <hr className="my-4" />
             <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
-            <div key={category.id} className="p-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {category.process_rules?.map((processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />)}
-            </div>
+            <Carousel items={category.process_rules}>
+            {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
+            </Carousel>
         </>
     )
 }
