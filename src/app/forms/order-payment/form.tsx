@@ -46,7 +46,7 @@ const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: Pa
             setOrderPaymentError(null);
             setOrderError(null);
 
-            contextCurrentOrder.fetchData();
+            contextCurrentOrder.fetchData(order.id);
 
             modalHandler.hideModal(modalName);
 

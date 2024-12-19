@@ -150,14 +150,14 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 <>
                     <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                         <AdditionalCategorySelector
-                            additionalCategories={Object.values(categoriesSlice)}
+                            additionalCategories={Object.values(categoriesSlice.entities)}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                         <ComplementCategorySelector
-                            complementCategories={Object.values(categoriesSlice)}
+                            complementCategories={Object.values(categoriesSlice.entities)}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />

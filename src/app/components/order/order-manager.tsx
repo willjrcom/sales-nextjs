@@ -1,11 +1,10 @@
 import CategoryOrder from "@/app/components/order/category/category"
 import GroupItem from "@/app/entities/order/group-item"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import EditGroupItem from "./group-item/edit-group-item"
 import { useCurrentOrder } from "@/app/context/current-order/context"
 import { useGroupItem } from "@/app/context/group-item/context"
 import Order from "@/app/entities/order/order"
-import GetOrderByID from "@/app/api/order/[id]/route"
 import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/route"
 import RequestError from "@/app/api/error"
@@ -18,30 +17,24 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 
 const OrderManager = () => {
-    const context = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(context.order);
-
-    useEffect(() => {
-        setOrder(context.order)
-    }, [context.order])
-
     return (
         <div className="flex h-full bg-gray-100">
-            <CartAdded order={order} />
-            <OrderOptions order={order} />
+            <CartAdded />
+            <OrderOptions />
         </div>
     )
 };
 
-interface CartProps {
-    order: Order | null;
-}
-
-const CartAdded = ({ order }: CartProps) => {
+const CartAdded = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
     const contextGroupItem = useGroupItem();
     const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
+
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order)
+    }, [contextCurrentOrder.order])
 
     useEffect(() => {
         if (!order) return
@@ -55,7 +48,11 @@ const CartAdded = ({ order }: CartProps) => {
             <div className=" mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
-                    <ButtonIconTextFloat size="xl" position="bottom-right" title="Novo grupo de itens" modalName="edit-group-item" onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
+                    <ButtonIconTextFloat size="xl"
+                        position="bottom-right"
+                        title="Novo grupo de itens" 
+                        modalName="edit-group-item" 
+                        onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
                         <EditGroupItem />
                     </ButtonIconTextFloat>
                 </div>
@@ -75,23 +72,35 @@ const CartAdded = ({ order }: CartProps) => {
     )
 }
 
-const OrderOptions = ({ order }: CartProps) => {
+const OrderOptions = () => {
+    const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order)
+    }, [contextCurrentOrder.order])
+
     return (
         <div className="w-80 bg-gray-50 p-3 overflow-y-auto">
             {/* Lançar Pedido */}
 
-            <DataOrderCard order={order} />
-            {order?.delivery && <DeliveryCard order={order} />}
-            {order?.pickup && <PickupCard order={order} />}
-            {order?.table && <TableCard order={order} />}
+            <DataOrderCard />
+            {order?.delivery && <DeliveryCard />}
+            {order?.pickup && <PickupCard />}
+            {order?.table && <TableCard />}
         </div>
     );
 };
 
-const DataOrderCard = ({ order }: CartProps) => {
+const DataOrderCard = () => {
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null)
     const contextCurrentOrder = useCurrentOrder();
+    const [error, setError] = useState<RequestError | null>(null)
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order)
+    }, [contextCurrentOrder.order])
 
     const onSubmit = async () => {
         if (!order || !data) return
@@ -99,7 +108,7 @@ const DataOrderCard = ({ order }: CartProps) => {
         try {
             await PendingOrder(order.id, data)
             setError(null)
-            contextCurrentOrder.fetchData();
+            contextCurrentOrder.fetchData(order.id);
         } catch (error) {
             setError(error as RequestError)
         }

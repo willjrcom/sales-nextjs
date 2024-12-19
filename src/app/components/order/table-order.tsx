@@ -1,12 +1,18 @@
 import ButtonIcon from "../button/button-icon";
 import Order from "@/app/entities/order/order";
 import StatusComponent from "../button/show-status";
+import { useEffect, useState } from "react";
+import { useCurrentOrder } from "@/app/context/current-order/context";
 
-interface OrderProps {
-    order: Order | null;
-}
+const TableCard = () => {
+    const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
 
-const TableCard = ({ order }: OrderProps) => {
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order)
+    }, [contextCurrentOrder.order])
+
+    if (!order || !order.table) return null
     const table = order?.table;
     
     return (

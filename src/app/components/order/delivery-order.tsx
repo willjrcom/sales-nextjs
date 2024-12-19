@@ -1,14 +1,19 @@
 import ClientAddressForm from "@/app/forms/client/update-address-order";
 import ButtonIcon from "../button/button-icon";
-import Order from "@/app/entities/order/order";
-import { showStatus } from "@/app/utils/status";
 import StatusComponent from "../button/show-status";
+import { useCurrentOrder } from "@/app/context/current-order/context";
+import { useEffect, useState } from "react";
+import Order from "@/app/entities/order/order";
 
-interface OrderProps {
-    order: Order | null;
-}
+const DeliveryCard = () => {
+    const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
 
-const DeliveryCard = ({ order }: OrderProps) => {
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order)
+    }, [contextCurrentOrder.order])
+
+    if (!order || !order.delivery) return null
     const delivery = order?.delivery;
     const client = delivery?.client;
     const address = client?.address;

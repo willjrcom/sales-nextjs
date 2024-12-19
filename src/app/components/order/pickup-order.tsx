@@ -1,15 +1,20 @@
-import { showStatus } from "@/app/utils/status";
 import ButtonIcon from "../button/button-icon";
 import Order from "@/app/entities/order/order";
 import StatusComponent from "../button/show-status";
 import PickupNameForm from "@/app/forms/pickup-order/update-name-order";
+import { useEffect, useState } from "react";
+import { useCurrentOrder } from "@/app/context/current-order/context";
 
-interface OrderProps {
-    order: Order | null;
-}
+const PickupCard = () => {
+    const contextCurrentOrder = useCurrentOrder();
+    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
 
-const PickupCard = ({ order }: OrderProps) => {
-    const pickup = order?.pickup;
+    useEffect(() => {
+        setOrder(contextCurrentOrder.order)
+    }, [contextCurrentOrder.order])
+
+    if (!order || !order.pickup) return null
+    const pickup = order.pickup;
 
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
