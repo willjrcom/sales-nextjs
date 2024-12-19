@@ -42,7 +42,6 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     };
 
     useEffect(() => {
-        console.log("atualizou")
         setOrder(contextCurrentOrder.order);
     }, [contextCurrentOrder.order]);
 

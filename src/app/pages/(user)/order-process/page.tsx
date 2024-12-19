@@ -30,7 +30,6 @@ const OrderProcess = () => {
 
     useEffect(() => {
         setCategories(Object.values(categoriesSlice.entities));
-        console.log(categoriesSlice.entities)
     }, [categoriesSlice.entities]);
 
     return (
@@ -47,7 +46,7 @@ interface CardCategoryProps {
 
 const CardCategory = ({ category }: CardCategoryProps) => {
     if (!category.process_rules) return null;
-    
+
     return (
         <>
             <hr className="my-4" />

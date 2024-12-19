@@ -73,7 +73,7 @@ export default function PageProcessRules() {
                 tableChildren={
                     <CrudTable
                         columns={ProcessRuleColumns()}
-                        data={processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
+                        data={processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.order - b.order)}>
                     </CrudTable>
                 }
             />

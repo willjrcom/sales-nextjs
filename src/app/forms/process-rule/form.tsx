@@ -33,7 +33,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         const category = categoriesSlice.entities[processRule.category_id];
         if (!category) return
         setCategory(category)
-    }, [item?.id])
+    }, [item?.id, processRule.category_id])
 
     const handleInputChange = (field: keyof ProcessRule, value: any) => {
         setProcessRule(prev => ({ ...prev, [field]: value }));
@@ -41,7 +41,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     const submit = async () => {
         if (!data) return;
-
+        
         const validationErrors = ValidateProcessRuleForm(processRule);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
@@ -53,13 +53,13 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 processRule.id = response
                 dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {process_rules: [...category.process_rules, processRule]} } }));
             } else {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {process_rules: category.process_rules.map(rule => rule.id === processRule.id ? processRule : rule)} } }));
+                const updatedProcessRules = category.process_rules.map(rule => rule.id === processRule.id ? processRule : rule)
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {process_rules: updatedProcessRules } } }));
             }
 
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            console.log(error)
             setError(error as RequestError);
         }
     }
@@ -83,7 +83,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             </div>
 
             {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
-            <SelectField friendlyName='Categoria' name='category' values={Object.values(categoriesSlice.entities)} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />
+            <SelectField friendlyName='Categoria' name='category' values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}

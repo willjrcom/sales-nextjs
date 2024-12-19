@@ -39,7 +39,6 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
         }
     };
 
-    console.log(additionalCategories)
     const filteredCategories = additionalCategories?.filter(cat => cat.is_additional)
 
     if (!filteredCategories.length) {

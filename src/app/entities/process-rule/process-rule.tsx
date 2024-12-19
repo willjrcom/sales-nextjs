@@ -26,8 +26,8 @@ const SchemaProcessRule = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     order: z.number().min(1, 'A primeira ordem deve ser 1'),
     description: z.string().optional(),
-    ideal_time: z.string(),
-    experimental_error: z.string(),
+    ideal_time: z.string().min(2, 'Tempo ideal inválido'),
+    experimental_error: z.string().min(2, 'Erro experimental inválido'),
     category_id: z.string().uuid("Categoria inválida"),
 });
 

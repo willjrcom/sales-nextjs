@@ -35,10 +35,9 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     
     const fetchData = useCallback(async (id?: string) => {
         if (!data?.user.idToken) return;
-        console.log(order, id)
+        
         if (!id) {
             id = order?.id;
-            console.log("pegou o id: " + id)
         }
 
         try {

@@ -30,6 +30,8 @@ const errorTranslations: Record<string, string> = {
     "group item not staging": "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens.",
     "total paid is invalid": "O total pago deve ser maior que 0",
     "order delivery must be delivered": "A entrega do pedido deve estar entregue",
+    "ideal time is required": "O tempo ideal é obrigatório",
+    "experimental error is required": "O erro experimental é obrigatório",
 };
 
 
