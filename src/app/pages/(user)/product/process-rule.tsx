@@ -54,7 +54,7 @@ export default function PageProcessRules() {
             <CrudLayout title="Processos"
                 searchButtonChildren={
                     <SelectField
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} />
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} />
                 }
                 filterButtonChildren={
                     <h1>Filtro</h1>
