@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/api/error";
-import OrderManager from "@/app/components/order/order-manager";
 import { useCurrentOrder } from "@/app/context/current-order/context";
+import { CartAdded } from "@/app/components/order/cart/cart-added";
+import { CardOrderResume } from "@/app/components/order/resume/resume";
 
 const PageEditOrderControl = () => {
     const { id } = useParams();
@@ -37,7 +38,10 @@ const PageEditOrderControl = () => {
     }
 
     return (
-        <OrderManager />
+        <div className="flex h-full bg-gray-100">
+            <CartAdded />
+            <CardOrderResume />
+        </div>
     );
 }
 export default PageEditOrderControl

@@ -2,7 +2,7 @@ import GroupItem from '@/app/entities/order/group-item';
 import Product from '@/app/entities/product/product';
 import React, { useEffect, useState } from 'react';
 import Carousel from '../../carousel/carousel';
-import AddComplementCard from './add-card-complement-item';
+import AddComplementCard from './add-complement-item';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import RequestError from '@/app/api/error';

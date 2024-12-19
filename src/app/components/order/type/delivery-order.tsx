@@ -1,6 +1,6 @@
 import ClientAddressForm from "@/app/forms/client/update-address-order";
-import ButtonIcon from "../button/button-icon";
-import StatusComponent from "../button/show-status";
+import ButtonIcon from "../../button/button-icon";
+import StatusComponent from "../../button/show-status";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { useEffect, useState } from "react";
 import Order from "@/app/entities/order/order";

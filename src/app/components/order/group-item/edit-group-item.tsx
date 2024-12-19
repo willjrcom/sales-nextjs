@@ -1,66 +1,26 @@
-import Carousel from "../../carousel/carousel";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
 import ItemCard from "../item/card-item";
 import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
-import Category from "@/app/entities/category/category";
 import GroupItemForm from "@/app/forms/group-item/form";
 import StatusComponent from "../../button/show-status";
-import ProductCard from "../product/card-product";
 import ButtonIconText from "../../button/button-icon-text";
 import ComplementItemList from "./list-complement-item";
 import ComplementItemCard from "./complement-item";
 import Item from "@/app/entities/order/item";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { CartToAdd } from "../cart/cart-to-add";
 
 export default function EditGroupItem() {
     return (
         <div className="flex h-[68vh]">
             {/* Componente à esquerda: ocupa 70% da tela */}
-            <ListCartToAdd />
-            <ListGroupItem />
+            <CartToAdd />
+            <ShowGroupItem />
         </div>
     );
 }
 
-const ListCartToAdd = () => {
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const [categories, setCategories] = useState<Category[]>(Object.values(categoriesSlice.entities));
-    const contextGroupItem = useGroupItem();
-
-    useEffect(() => {
-        if (contextGroupItem.groupItem?.category_id) {
-            setCategories(categories.filter((category) => category.id === contextGroupItem.groupItem?.category_id));
-            return
-        }
-
-        setCategories(Object.values(categoriesSlice.entities));
-    }, [contextGroupItem.groupItem?.category_id])
-
-    return (
-        <div className="max-w-[60vw] flex-auto p-4 bg-gray-100 space-y-3 mr-4 overflow-y-auto h-full">
-            <h1 className="text-2xl font-bold">Carrinho</h1>
-            <div>
-                {categories?.map((category) => {
-                    if (!category.products) return null;
-                    return (
-                        <div key={category.id} className="mb-6">
-                            <span className="text-lg font-semibold">{category.name}</span>
-                            <hr className="mb-2" />
-                            {/* Ajuste o tamanho do Carousel com responsividade */}
-                            <Carousel items={category.products}>
-                                {(product) => <ProductCard key={product.id} product={product} />}
-                            </Carousel>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-    );
-}
-
-const ListGroupItem = () => {
+const ShowGroupItem = () => {
     const contextGroupItem = useGroupItem();
     const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
     const [complementItem, setComplementItem] = useState<Item | null>();

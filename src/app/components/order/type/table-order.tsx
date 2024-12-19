@@ -1,6 +1,6 @@
-import ButtonIcon from "../button/button-icon";
+import ButtonIcon from "../../button/button-icon";
 import Order from "@/app/entities/order/order";
-import StatusComponent from "../button/show-status";
+import StatusComponent from "../../button/show-status";
 import { useEffect, useState } from "react";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 
