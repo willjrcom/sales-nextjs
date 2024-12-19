@@ -80,7 +80,7 @@ const Sidebar = () => {
       <div className={styles.sidebarContainer}>
         <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" />
         <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
-        <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/" />
+        <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
         <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
         <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
         <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
