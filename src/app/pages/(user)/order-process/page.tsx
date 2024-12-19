@@ -54,7 +54,7 @@ const CardCategory = ({ category }: CardCategoryProps) => {
         <>
             <hr className="my-4" />
             <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
-            <Carousel items={category.process_rules}>
+            <Carousel items={category.process_rules.sort((a, b) => a.order - b.order)}>
             {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
             </Carousel>
         </>
@@ -70,9 +70,10 @@ const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
             key={processRule.id}
             className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col justify-between h-32"
         >
-            <div>
+            <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold">{processRule.name}</h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 rounded-full bg-gray-300 px-4 py-1">
+                    {processRule.order}
                 </p>
             </div>
             <div className="flex items-center justify-between mt-4">

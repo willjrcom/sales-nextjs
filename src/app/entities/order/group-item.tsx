@@ -13,6 +13,8 @@ export default class GroupItem {
   total_price: number = 0;
   quantity: number = 0;
   need_print: boolean = false;
+  use_process_rule: boolean = false;
+  observation: string = "";
   category_id: string = "";
   category?: Category;
   complement_item_id?: string = "";
@@ -23,7 +25,7 @@ export default class GroupItem {
   ready_at?: string;
   canceled_at?: string;
 
-  constructor(id = "", items: Item[] = [], order_id = "", size = "", status: StatusGroupItem = "Staging", total_price = 0, quantity = 0, need_print = false, category_id = "", complement_item_id = "", start_at?: string, pending_at?: string, started_at?: string, ready_at?: string, canceled_at?: string) {
+  constructor(id = "", items: Item[] = [], order_id = "", size = "", status: StatusGroupItem = "Staging", total_price = 0, quantity = 0, need_print = false, use_process_rule = false, observation = "", category_id = "", complement_item_id = "", start_at?: string, pending_at?: string, started_at?: string, ready_at?: string, canceled_at?: string) {
     this.id = id;
     this.items = items;
     this.order_id = order_id;
@@ -32,6 +34,8 @@ export default class GroupItem {
     this.total_price = total_price;
     this.quantity = quantity;
     this.need_print = need_print;
+    this.use_process_rule = use_process_rule;
+    this.observation = observation;
     this.category_id = category_id;
     this.complement_item_id = complement_item_id;
     this.start_at = start_at;
