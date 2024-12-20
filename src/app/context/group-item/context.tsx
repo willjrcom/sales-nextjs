@@ -14,7 +14,6 @@ interface GroupItemContextProps<T> {
     addItem: (item: Item) => void;
     removeItem: (id: string) => void;
     updateGroupItem: (item: T) => void;
-    removeGroupItem: () => void;
     updateLastUpdate: () => void;
     getError: () => RequestError | null;
     getLoading: () => boolean;
@@ -66,10 +65,6 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
         setgroupItem(groupItem);
     }
 
-    const removeGroupItem = () => {
-        setgroupItem(null);
-    };
-
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
 
     const getError = () => error;
@@ -77,7 +72,7 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const getLastUpdate = () => lastUpdate;
 
     return (
-        <ContextGroupItem.Provider value={{ groupItem, fetchData, resetGroupItem, getItemByID, addItem, removeItem, updateGroupItem: updateGroupItem, removeGroupItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextGroupItem.Provider value={{ groupItem, fetchData, resetGroupItem, getItemByID, addItem, removeItem, updateGroupItem: updateGroupItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
             {children}
         </ContextGroupItem.Provider>
     );

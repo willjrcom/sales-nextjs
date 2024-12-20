@@ -54,7 +54,7 @@ const CardCategory = ({ category }: CardCategoryProps) => {
         <>
             <hr className="my-4" />
             <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
-            <Carousel items={category.process_rules.sort((a, b) => a.order - b.order)}>
+            <Carousel items={category.process_rules?.sort((a, b) => a.order - b.order)}>
             {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
             </Carousel>
         </>
