@@ -19,7 +19,7 @@ export const CartToAdd = () => {
             return
         }
 
-        setCategories(Object.values(categoriesSlice.entities));
+        setCategories(Object.values(categoriesSlice.entities).filter((category) => category.products && category.products.length > 0 && !category.is_additional && !category.is_complement));
     }, [contextGroupItem.groupItem?.category_id])
 
     return (
