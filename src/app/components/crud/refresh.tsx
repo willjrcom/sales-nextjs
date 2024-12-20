@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 interface RefreshProps{
     fetchItems?: (session: Session) => any;
     fetchItemsByID?: (params: { id: string; session: Session }) => any;
-    id: string;
+    id?: string;
     slice: GenericState;
 }
 
@@ -25,7 +25,7 @@ const Refresh = ({ fetchItems, fetchItemsByID, id, slice }: RefreshProps) => {
         try {
             if (fetchItems) {
                 dispatch(fetchItems(data));
-            } else if (fetchItemsByID) {
+            } else if (fetchItemsByID && id) {
                 dispatch(fetchItemsByID({id, session: data}));
 
             }

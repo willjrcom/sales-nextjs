@@ -80,6 +80,7 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
                         </div>
                     ))}
                     <div className="text-right">
+                        {orderProcess.id}<br/>
                         {groupItem.status}
                         <p className="text-gray-600 font-medium">Quantidade: <span className="font-bold">{groupItem?.quantity}</span></p>
                     </div>

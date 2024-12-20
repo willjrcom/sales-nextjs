@@ -64,7 +64,7 @@ const Component = () => {
             setOrderProcesses([]);
             return
         };
-
+        
         setOrderProcesses(Object.values(orderProcessesSlice.entities));
     }, [data?.user.idToken, orderProcessesSlice.entities]);
 
