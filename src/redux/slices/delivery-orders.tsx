@@ -54,6 +54,7 @@ const createDeliveryOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => 
                 })
                 .addCase(fetchDeliveryOrders.fulfilled, (state, action) => {
                     state.loading = false;
+                    state.error = null;
                     adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })

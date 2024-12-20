@@ -51,11 +51,11 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
         <div className="flex flex-col md:flex-row items-center border border-blue-400 rounded-lg p-4 shadow-lg">
             {/* Imagem */}
             <div className="w-full md:w-1/3">
-                <Image
+                {/* <Image
                     src={""}
                     alt={""}
                     className="rounded-lg w-full h-auto object-cover"
-                />
+                /> */}
             </div>
 
             {/* Conteúdo */}
@@ -80,6 +80,7 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
                         </div>
                     ))}
                     <div className="text-right">
+                        {groupItem.status}
                         <p className="text-gray-600 font-medium">Quantidade: <span className="font-bold">{groupItem?.quantity}</span></p>
                     </div>
                 </div>

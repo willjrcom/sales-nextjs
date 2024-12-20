@@ -53,6 +53,7 @@ const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderPr
                 })
                 .addCase(fetchOrderProcesses.fulfilled, (state, action) => {
                     state.loading = false;
+                    state.error = null;
                     adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })

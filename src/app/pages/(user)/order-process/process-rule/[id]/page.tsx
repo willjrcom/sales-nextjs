@@ -11,7 +11,6 @@ import CardOrderProcess from "./card";
 import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
 import { fetchOrderProcesses } from "@/redux/slices/order-processes";
 import CrudLayout from "@/app/components/crud/layout";
-import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";
 
@@ -26,7 +25,7 @@ const PageProcessRule = () => {
 const Component = () => {
     const { id } = useParams();
     const { data } = useSession();
-    const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>(id as string);
+    const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>("");
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const orderProcessesSlice = useSelector((state: RootState) => state.orderProcesses);
     const [processRule, setProcessRule] = useState<ProcessRule | null>(null);
@@ -35,22 +34,30 @@ const Component = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        if (data && Object.keys(orderProcessesSlice.entities).length === 0) {
-            dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
-        }
-
-        const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
-            }
-        }, 30000); // Atualiza a cada 60 segundos
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken, dispatch]);
+        setCurrentProcessRuleID(id as string);
+    }, [id]);
 
     useEffect(() => {
         if (!data) return;
         dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+
+        const interval = setInterval(() => {
+            if (data) {
+                console.log("dentro do interval: "+currentProcessRuleID)
+                dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+            }
+        }, 10000); // Atualiza a cada 60 segundos
+
+        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    }, [data?.user.idToken, dispatch, currentProcessRuleID]);
+
+    useEffect(() => {
+        if (!data) return;
+        dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+
+        const processRule = processRules.find((p) => p.id === currentProcessRuleID)
+        if (!processRule) return
+        setProcessRule(processRule)
     }, [currentProcessRuleID]
 )
     useEffect(() => {

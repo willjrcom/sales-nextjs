@@ -25,7 +25,7 @@ const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
     // Criar o thunk assíncrono para buscar dados
     const fetchOrders = createAsyncThunk(`${name}/fetch`, async (session: Session, { rejectWithValue }) => {
         try {
-            const items = await getItems(session);
+            const items = await getItems!(session);
             return items;
         } catch (error) {
             return rejectWithValue(error);
@@ -54,6 +54,7 @@ const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
                 })
                 .addCase(fetchOrders.fulfilled, (state, action) => {
                     state.loading = false;
+                    state.error = null;
                     adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })
