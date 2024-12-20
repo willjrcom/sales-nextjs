@@ -2,15 +2,21 @@ import RequestError from '@/app/api/error';
 import FinishOrderProcess from '@/app/api/order-process/finish/route';
 import StartOrderProcess from '@/app/api/order-process/start/route';
 import { OrderProcess } from '@/app/entities/order-process/order-process';
+import { updateCategory } from '@/redux/slices/categories';
+import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-processes';
+import { AppDispatch, RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 type CardProps = {
     orderProcess: OrderProcess;
 };
 
 const CardOrderProcess = ({ orderProcess }: CardProps) => {
+    const orderProcessesSlice = useSelector((state: RootState) => state.orderProcesses);
+    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
 
@@ -23,6 +29,7 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
         try {
             await StartOrderProcess(id, data)
             setError(null)
+            dispatch(updateOrderProcess({ type: "UPDATE", payload: { id, changes: { status: "Started" } } }))
         } catch (error) {
             setError(error as RequestError)
         }
@@ -34,6 +41,7 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
         try {
             await FinishOrderProcess(id, data)
             setError(null)
+            dispatch(removeOrderProcess(id))
         } catch (error) {
             setError(error as RequestError)
         }

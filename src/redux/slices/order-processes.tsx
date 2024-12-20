@@ -3,16 +3,15 @@ import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Upda
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
-import Order from '@/app/entities/order/order';
-import GetOrdersWithDelivery from '@/app/api/order/all/delivery/route';
+import { OrderProcess } from '@/app/entities/order-process/order-process';
+import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/route';
 
-// Configuração genérica do slice
-const createDeliveryOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
-    const adapter = createEntityAdapter<Order, string>({
+const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderProcess>) => {
+    const adapter = createEntityAdapter<OrderProcess, string>({
         // Assume IDs are stored in a field other than `t.id`
-        selectId: (t: Order) => t.id,
+        selectId: (t: OrderProcess) => t.id,
         // Keep the "all IDs" array sorted based on t order_number
-        sortComparer: (a, b) => a.order_number - b.order_number,
+        sortComparer: (a, b) => a.status === "Started" ? -1 : 1,
     })
 
     // Combina o estado inicial do adapter com estados adicionais
@@ -23,9 +22,9 @@ const createDeliveryOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => 
     });
 
     // Criar o thunk assíncrono para buscar dados
-    const fetchDeliveryOrders = createAsyncThunk(`${name}/fetch`, async (session: Session, { rejectWithValue }) => {
+    const fetchOrderProcesses = createAsyncThunk(`${name}/fetch`, async (payload: { id: string; session: Session }, { rejectWithValue }) => {
         try {
-            const items = await getItems!(session);
+            const items = await getItemsByID!(payload.id, payload.session);
             return items;
         } catch (error) {
             return rejectWithValue(error);
@@ -37,27 +36,27 @@ const createDeliveryOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => 
         name,
         initialState,
         reducers: {
-            addDeliveryOrder: (state, action: PayloadAction<Order>) => {
+            addOrderProcess: (state, action: PayloadAction<OrderProcess>) => {
                 adapter.addOne(state, action.payload);
             }, // Adiciona um item
-            updateDeliveryOrder: (state, action: PayloadAction<Update<Order, string>>) => {
+            updateOrderProcess: (state, action: PayloadAction<PayloadAction<Update<OrderProcess, string>>>) => {
                 adapter.updateOne(state, action.payload);
             }, // Atualiza um item
-            removeDeliveryOrder: (state, action: PayloadAction<string>) => {
+            removeOrderProcess: (state, action: PayloadAction<string>) => {
                 adapter.removeOne(state, action.payload);
             }, // Remove um item
         },
         extraReducers: (builder) => {
             builder
-                .addCase(fetchDeliveryOrders.pending, (state) => {
+                .addCase(fetchOrderProcesses.pending, (state) => {
                     state.loading = true;
                 })
-                .addCase(fetchDeliveryOrders.fulfilled, (state, action) => {
+                .addCase(fetchOrderProcesses.fulfilled, (state, action) => {
                     state.loading = false;
                     adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })
-                .addCase(fetchDeliveryOrders.rejected, (state, action) => {
+                .addCase(fetchOrderProcesses.rejected, (state, action) => {
                     state.loading = false;
                     state.error = action.payload as RequestError;
                 });
@@ -68,12 +67,12 @@ const createDeliveryOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => 
     return {
         reducer: slice.reducer,
         actions: slice.actions,
-        fetchItems: fetchDeliveryOrders,
+        fetchItems: fetchOrderProcesses,
         adapterSelectors: adapter.getSelectors((state: any) => state[name]), // Seletores do adapter
     };
 };
 
-const deliveryOrdersSlice = createDeliveryOrdersSlice({ name: 'delivery-orders', getItems: GetOrdersWithDelivery })
-export const { addDeliveryOrder, removeDeliveryOrder, updateDeliveryOrder } = deliveryOrdersSlice.actions;
-export const { fetchItems: fetchDeliveryOrders, adapterSelectors } = deliveryOrdersSlice;
-export default deliveryOrdersSlice.reducer;
+const orderProcessSlice = createOrderProcessesSlice({ name: 'delivery-orders', getItemsByID: GetProcessesByProcessRuleID })
+export const { addOrderProcess, removeOrderProcess, updateOrderProcess } = orderProcessSlice.actions;
+export const { fetchItems: fetchOrderProcesses, adapterSelectors } = orderProcessSlice;
+export default orderProcessSlice.reducer;

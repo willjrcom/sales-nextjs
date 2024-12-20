@@ -1,15 +1,19 @@
 "use client";
-import RequestError from "@/app/api/error";
-import GetProcessesByProcessRuleID from "@/app/api/order-process/by-process-rule/route";
+
 import { OrderProcess } from "@/app/entities/order-process/order-process";
 import ProcessRule from "@/app/entities/process-rule/process-rule";
-import { RootState } from "@/redux/store";
+import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import CardOrderProcess from "../card";
-import { CurrentProcessRuleProvider, useCurrentProcessRule } from "@/app/context/current-process-rule/context";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import CardOrderProcess from "./card";
+import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
+import { fetchOrderProcesses } from "@/redux/slices/order-processes";
+import CrudLayout from "@/app/components/crud/layout";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import Refresh from "@/app/components/crud/refresh";
+import { SelectField } from "@/app/components/modal/field";
 
 const PageProcessRule = () => {
     return (
@@ -22,35 +26,48 @@ const PageProcessRule = () => {
 const Component = () => {
     const { id } = useParams();
     const { data } = useSession();
+    const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>(id as string);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const orderProcessesSlice = useSelector((state: RootState) => state.orderProcesses);
     const [processRule, setProcessRule] = useState<ProcessRule | null>(null);
+    const [processRules, setProcessRules] = useState<ProcessRule[]>([]);
     const [orderProcesses, setOrderProcesses] = useState<OrderProcess[]>([]);
-    const contextCurrentProcessRule = useCurrentProcessRule();
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        contextCurrentProcessRule.fetchData(id as string)
-    
+        if (data && Object.keys(orderProcessesSlice.entities).length === 0) {
+            dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+        }
+
         const interval = setInterval(() => {
-            contextCurrentProcessRule.fetchData(id as string)
+            if (data) {
+                dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+            }
         }, 30000); // Atualiza a cada 60 segundos
-    
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken]);
+    }, [data?.user.idToken, dispatch]);
 
     useEffect(() => {
-        console.log(contextCurrentProcessRule.orderProcesses)
-        if (!contextCurrentProcessRule.orderProcesses) {
+        if (!data) return;
+        dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+    }, [currentProcessRuleID]
+)
+    useEffect(() => {
+        if (!Object.values(orderProcessesSlice.entities)) {
             setOrderProcesses([]);
             return
         };
 
-        setOrderProcesses(contextCurrentProcessRule.orderProcesses);
-    }, [data?.user.idToken, contextCurrentProcessRule.orderProcesses]);
+        setOrderProcesses(Object.values(orderProcessesSlice.entities));
+    }, [data?.user.idToken, orderProcessesSlice.entities]);
 
     useEffect(() => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
         const category = Object.values(categoriesSlice.entities).find((category) => category.process_rules.some((processRule) => processRule.id === id));
         if (!category) return;
+
+        setProcessRules(category.process_rules || []);
 
         const processRule = category?.process_rules.find((processRule) => processRule.id === id);
         if (!processRule) return;
@@ -61,11 +78,23 @@ const Component = () => {
     if (!processRule) return null;
 
     return (
-        <div className='max-w-[85vw] flex-auto h-full'>
-            <h1 className="text-2xl font-bold mb-4">{processRule?.name}</h1>
-            {contextCurrentProcessRule.getError() && <p className="mb-4 text-red-500">{contextCurrentProcessRule.getError()?.message}</p>}
-            {orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1).map((process) => <CardOrderProcess key={process.id} orderProcess={process} />)}
-        </div>
+        <>
+            {orderProcessesSlice.error && <p className="mb-4 text-red-500">{orderProcessesSlice.error?.message}</p>}
+            <CrudLayout title={processRule.name || "Carregando..."}
+            searchButtonChildren={
+                <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} />
+            }
+                refreshButton={
+                    <Refresh
+                        slice={categoriesSlice}
+                        fetchItemsByID={fetchOrderProcesses}
+                        id={currentProcessRuleID}
+                    />
+                }
+                tableChildren=
+                {orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1).map((process) => <CardOrderProcess key={process.id} orderProcess={process} />)}
+            />
+        </>
     );
 }
 

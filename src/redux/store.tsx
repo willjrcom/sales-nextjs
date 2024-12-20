@@ -7,6 +7,7 @@ import placesReducer from './slices/places';
 import deliveryDriversReducer from './slices/delivery-drivers';
 import categoryReducer from './slices/categories';
 import deliveryOrdersReducer from './slices/delivery-orders';
+import orderProcessesReducer from './slices/order-processes';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -23,7 +24,8 @@ const rootReducer = combineReducers({
     places: placesReducer,
     deliveryDrivers: deliveryDriversReducer,
     categories: categoryReducer,
-    deliveryOrders: deliveryOrdersReducer
+    deliveryOrders: deliveryOrdersReducer,
+    orderProcesses: orderProcessesReducer
 });
 
 // Aplica o persistReducer para o rootReducer

@@ -12,7 +12,8 @@ export interface GenericState {
 
 export interface GenericsProps<T> {
     name: string;
-    getItems: (session: Session) => Promise<T[]>;
+    getItems?: (session: Session) => Promise<T[]>;
+    getItemsByID?: (id: string, session: Session) => Promise<T[]>;
 }
 
 // Configuração genérica do slice
@@ -21,7 +22,7 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
         // Assume IDs are stored in a field other than `t.id`
         selectId: (t: T) => t.id,
         // Keep the "all IDs" array sorted based on t name
-        //sortComparer: (a, b) => a.name.localeCompare(b.name),
+        // sortComparer: (a, b) => a.name.localeCompare(b.name),
     })
 
     // Combina o estado inicial do adapter com estados adicionais
@@ -34,7 +35,7 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
     // Criar o thunk assíncrono para buscar dados
     const fetchItems = createAsyncThunk(`${name}/fetch`, async (session: Session, { rejectWithValue }) => {
         try {
-            const items = await getItems(session);
+            const items = await getItems!(session);
             return items;
         } catch (error) {
             return rejectWithValue(error);

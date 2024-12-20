@@ -7,23 +7,29 @@ import { useState } from "react";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { useDispatch } from "react-redux";
 
-interface RefreshProps<T> {
-    fetchItems?: (session: Session) => any; // Ajuste para refletir o tipo de ação válida
-    context?: ItemsContextProps<T>;
+interface RefreshProps{
+    fetchItems?: (session: Session) => any;
+    fetchItemsByID?: (params: { id: string; session: Session }) => any;
+    id: string;
     slice: GenericState;
 }
 
-const Refresh = <T extends { id: string }>({ fetchItems, slice }: RefreshProps<T>) => {
+const Refresh = ({ fetchItems, fetchItemsByID, id, slice }: RefreshProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
     const [isRefreshing, setRefreshing] = useState(false);
 
     const handleRefresh = async () => {
-        if (!data || !fetchItems || isRefreshing) return;
+        if (!data || (!fetchItems && !fetchItemsByID) || isRefreshing) return;
         setRefreshing(true);
         try {
-            dispatch(fetchItems(data));
+            if (fetchItems) {
+                dispatch(fetchItems(data));
+            } else if (fetchItemsByID) {
+                dispatch(fetchItemsByID({id, session: data}));
+
+            }
         } catch (error) {
             console.error("Erro ao atualizar os dados:", error);
         } finally {
