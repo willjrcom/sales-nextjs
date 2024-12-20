@@ -43,7 +43,6 @@ const Component = () => {
 
         const interval = setInterval(() => {
             if (data) {
-                console.log("dentro do interval: "+currentProcessRuleID)
                 dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
             }
         }, 10000); // Atualiza a cada 60 segundos
@@ -93,7 +92,7 @@ const Component = () => {
             }
                 refreshButton={
                     <Refresh
-                        slice={categoriesSlice}
+                        slice={orderProcessesSlice}
                         fetchItemsByID={fetchOrderProcesses}
                         id={currentProcessRuleID}
                     />

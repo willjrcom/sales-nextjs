@@ -1,4 +1,3 @@
-import { ItemsContextProps } from "@/app/context/props";
 import { GenericState } from "@/redux/slices/generics";
 import { AppDispatch } from "@/redux/store";
 import { Session } from "next-auth";
