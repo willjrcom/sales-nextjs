@@ -63,6 +63,7 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
                 })
                 .addCase(fetchItems.fulfilled, (state, action) => {
                     state.loading = false;
+                    state.error = null;
                     adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })

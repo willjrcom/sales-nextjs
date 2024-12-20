@@ -50,11 +50,12 @@ const CardCategory = ({ category }: CardCategoryProps) => {
     if (!category.process_rules) return null;
     // <div key={category.id} className="p-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 
+    const processRules = [...(category.process_rules || [])].sort((a, b) => a.order - b.order)
     return (
         <>
             <hr className="my-4" />
             <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
-            <Carousel items={category.process_rules?.sort((a, b) => a.order - b.order)}>
+            <Carousel items={processRules}>
             {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
             </Carousel>
         </>

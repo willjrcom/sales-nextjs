@@ -121,7 +121,8 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
   useEffect(() => {
     if (!Object.values(categoriesSlice.entities)) return;
     const category = categoriesSlice.entities[categoryID];
-    setQuantities(category?.quantities.sort((a, b) => a.quantity - b.quantity) || []);
+    if (!category || !category.quantities) return setQuantities([]);
+    setQuantities(category?.quantities.sort((a, b) => a.quantity - b.quantity));
   }, [categoryID])
 
   useEffect(() => {

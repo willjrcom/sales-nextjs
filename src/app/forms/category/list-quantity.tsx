@@ -25,11 +25,12 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(quantity.id))
     }
 
+    const quantities = [...(category?.quantities || [])].sort((a, b) => a.quantity - b.quantity)
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Quantidades</h2>
             <div className="flex items-center space-x-4">
-                <Carousel items={category?.quantities?.sort((a, b) => a.quantity - b.quantity) || []}>
+                <Carousel items={quantities}>
                     {(quantity) => (<div onClick={() => onEdit(quantity)}
                         key={quantity.id}
                         className="border p-2 rounded-md text-center bg-white ml-16 w-32"

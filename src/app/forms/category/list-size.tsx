@@ -25,11 +25,13 @@ const ListSize = ({ category }: ListSizeProps) => {
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(size.id))
     }
 
+    const sizes = [...(category?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name))
+
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
             <div className="flex items-center space-x-4">
-            <Carousel items={[...(category?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name))}>
+            <Carousel items={sizes}>
                     {(size) => (<div onClick={() => onEdit(size)}
                         key={size.id}
                         className="border p-2 rounded-md text-center bg-white ml-16 w-32"
