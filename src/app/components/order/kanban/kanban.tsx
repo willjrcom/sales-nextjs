@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Order, { StatusOrder } from "@/app/entities/order/order";
 import Droppable from "./droppable";
 import { useModal } from "@/app/context/modal/context";
-import CardOrder from "../order/card-order";
+import CardOrder from "../card-order";
 import ReadyOrder from "@/app/api/order/status/ready/route";
 import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/route";

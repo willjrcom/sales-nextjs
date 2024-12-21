@@ -2,7 +2,7 @@
 
 import CrudLayout from "@/app/components/crud/layout";
 import Refresh from "@/app/components/crud/refresh";
-import OrderKanban from "@/app/components/kanban/kanban";
+import OrderKanban from "@/app/components/order/kanban/kanban";
 import { fetchOrders } from "@/redux/slices/orders";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useSession } from "next-auth/react";
