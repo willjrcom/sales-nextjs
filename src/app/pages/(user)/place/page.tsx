@@ -1,7 +1,14 @@
 "use client";
 
-import React, { CSSProperties, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchPlaces } from "@/redux/slices/places";
+import { useSession } from "next-auth/react";
+import PlaceTable from "@/app/entities/place/place_table";
+import { SelectField } from "@/app/components/modal/field";
+import Place from "@/app/entities/place/place";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 
@@ -20,10 +27,31 @@ const DragAndDropGrid = () => {
     const [totalRows, setTotalRows] = useState(INITIAL_GRID_SIZE);
     const [totalCols, setTotalCols] = useState(INITIAL_GRID_SIZE);
     const [grid, setGrid] = useState(generateGrid(totalRows, totalCols));
-    const [droppedItems, setDroppedItems] = useState<{ id: string; x: number; y: number }[]>([
-        { id: "item-1", x: 0, y: 0 },
-        { id: "item-2", x: 1, y: 1 },
-    ]);
+    const placesSlice = useSelector((state: RootState) => state.places);
+    const [places, setPlaces] = useState<Place[]>(Object.values(placesSlice.entities));
+    const dispatch = useDispatch<AppDispatch>();
+    const { data } = useSession();
+    const [droppedTables, setDroppedTables] = useState<PlaceTable[]>([]);
+    const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
+
+    useEffect(() => {
+        if (data && Object.values(placesSlice.entities).length == 0) {
+            dispatch(fetchPlaces(data));
+        }
+    }, [data?.user.idToken, dispatch])
+
+    useEffect(() => {
+        if (Object.values(placesSlice.entities).length > 0) {
+            setPlaces(Object.values(placesSlice.entities));
+        }
+    }, [placesSlice.entities])
+
+    useEffect(() => {
+        const place = placesSlice.entities[placeSelectedID]
+        if (!place) return;
+
+        setDroppedTables(place.tables);
+    }, [placeSelectedID])
 
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
@@ -31,9 +59,9 @@ const DragAndDropGrid = () => {
         if (over) {
             const [x, y] = over.id.split("-").map(Number); // Pega as coordenadas da célula
             console.log(x, y)
-            setDroppedItems((prev) => [
-                ...prev.filter((item) => item.id !== active.id), // Remove o item se já foi solto antes
-                { id: active.id, x, y }, // Adiciona o item com as novas coordenadas
+            setDroppedTables((prev) => [
+                ...prev.filter((item) => item.table_id !== active.id), // Remove o item se já foi solto antes
+                { ...active.data.current, row: x, column: y }, // Adiciona o item com as novas coordenadas
             ]);
         }
     };
@@ -63,110 +91,113 @@ const DragAndDropGrid = () => {
     };
 
     return (
-        <DndContext onDragEnd={handleDragEnd}>
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: `repeat(${totalCols}, 80px) auto`,
-                    gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
-                    gap: "4px",
-                    position: "relative",
-                    backgroundColor: "#f4f4f4",
-                    padding: "20px",
-                }}
-            >
-                {/* Células da grade */}
-                {grid.map((cell) => (
-                    <DroppableCell key={`${cell.x}-${cell.y}`} id={`${cell.x}-${cell.y}`}>
-                        {droppedItems
-                            .filter((item) => item.x === cell.x && item.y === cell.y)
-                            .map((item) => (
-                                <DraggableItem key={item.id} id={item.id} label={item.id} />
-                            ))}
-                    </DroppableCell>
-                ))}
-
-                {/* Botões de controle */}
+        <>
+        <SelectField friendlyName="Local" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
+            <DndContext onDragEnd={handleDragEnd}>
                 <div
                     style={{
-                        gridColumn: `${totalCols + 1}`,
-                        gridRow: `1 / span ${totalRows}`,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                        justifyContent: "flex-start",
+                        display: "grid",
+                        gridTemplateColumns: `repeat(${totalCols}, 80px) auto`,
+                        gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
                         gap: "4px",
+                        position: "relative",
+                        backgroundColor: "#f4f4f4",
+                        padding: "20px",
                     }}
                 >
-                    <button
-                        onClick={removeColumn}
-                        disabled={totalCols <= 1}
-                        style={{
-                            backgroundColor: "#FFC107",
-                            border: "none",
-                            color: "black",
-                            padding: "10px 20px",
-                            cursor: totalCols > 1 ? "pointer" : "not-allowed",
-                            width: "60px",
-                        }}
-                    >
-                        -
-                    </button>
-                    <button
-                        onClick={addColumn}
-                        style={{
-                            backgroundColor: "#4CAF50",
-                            border: "none",
-                            color: "white",
-                            padding: "10px 20px",
-                            cursor: "pointer",
-                            width: "60px",
-                        }}
-                    >
-                        +
-                    </button>
-                </div>
+                    {/* Células da grade */}
+                    {grid.map((cell) => (
+                        <DroppableCell key={`${cell.x}-${cell.y}`} id={`${cell.x}-${cell.y}`}>
+                            {droppedTables
+                                .filter((item) => item.row === cell.x && item.column === cell.y)
+                                .map((item) => (
+                                    <DraggableItem key={item.table_id} id={item.table_id} label={item.table.name} />
+                                ))}
+                        </DroppableCell>
+                    ))}
 
-                <div
-                    style={{
-                        gridColumn: `1 / span ${totalCols}`,
-                        gridRow: `${totalRows + 1}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        gap: "4px",
-                    }}
-                >
-                    <button
-                        onClick={removeRow}
-                        disabled={totalRows <= 1}
+                    {/* Botões de controle */}
+                    <div
                         style={{
-                            backgroundColor: "#FFC107",
-                            border: "none",
-                            color: "black",
-                            padding: "10px 20px",
-                            cursor: totalRows > 1 ? "pointer" : "not-allowed",
-                            width: "60px",
+                            gridColumn: `${totalCols + 1}`,
+                            gridRow: `1 / span ${totalRows}`,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                            justifyContent: "flex-start",
+                            gap: "4px",
                         }}
                     >
-                        -
-                    </button>
-                    <button
-                        onClick={addRow}
+                        <button
+                            onClick={removeColumn}
+                            disabled={totalCols <= 1}
+                            style={{
+                                backgroundColor: "#FFC107",
+                                border: "none",
+                                color: "black",
+                                padding: "10px 20px",
+                                cursor: totalCols > 1 ? "pointer" : "not-allowed",
+                                width: "60px",
+                            }}
+                        >
+                            -
+                        </button>
+                        <button
+                            onClick={addColumn}
+                            style={{
+                                backgroundColor: "#4CAF50",
+                                border: "none",
+                                color: "white",
+                                padding: "10px 20px",
+                                cursor: "pointer",
+                                width: "60px",
+                            }}
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <div
                         style={{
-                            backgroundColor: "#4CAF50",
-                            border: "none",
-                            color: "white",
-                            padding: "10px 20px",
-                            cursor: "pointer",
-                            width: "60px",
+                            gridColumn: `1 / span ${totalCols}`,
+                            gridRow: `${totalRows + 1}`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                            gap: "4px",
                         }}
                     >
-                        +
-                    </button>
+                        <button
+                            onClick={removeRow}
+                            disabled={totalRows <= 1}
+                            style={{
+                                backgroundColor: "#FFC107",
+                                border: "none",
+                                color: "black",
+                                padding: "10px 20px",
+                                cursor: totalRows > 1 ? "pointer" : "not-allowed",
+                                width: "60px",
+                            }}
+                        >
+                            -
+                        </button>
+                        <button
+                            onClick={addRow}
+                            style={{
+                                backgroundColor: "#4CAF50",
+                                border: "none",
+                                color: "white",
+                                padding: "10px 20px",
+                                cursor: "pointer",
+                                width: "60px",
+                            }}
+                        >
+                            +
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </DndContext>
+            </DndContext>
+        </>
     );
 };
 
