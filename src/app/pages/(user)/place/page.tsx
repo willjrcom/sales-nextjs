@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import Place from "@/app/entities/place/place";
+import Table from "@/app/entities/table/table";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 
@@ -43,6 +44,10 @@ const DragAndDropGrid = () => {
     useEffect(() => {
         if (Object.values(placesSlice.entities).length > 0) {
             setPlaces(Object.values(placesSlice.entities));
+            
+            const firstPlace = Object.values(placesSlice.entities)[0];
+            if (!firstPlace) return
+            setPlaceSelectedID(firstPlace.id)
         }
     }, [placesSlice.entities])
 
@@ -53,18 +58,22 @@ const DragAndDropGrid = () => {
         setDroppedTables(place.tables);
     }, [placeSelectedID])
 
+    useEffect(() => {
+        console.log(droppedTables)
+    }, [droppedTables])
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
-
+    
         if (over) {
-            const [x, y] = over.id.split("-").map(Number); // Pega as coordenadas da célula
-            console.log(x, y)
+            const [x, y] = over.id.split("-").map(Number);
+    
             setDroppedTables((prev) => [
                 ...prev.filter((item) => item.table_id !== active.id), // Remove o item se já foi solto antes
-                { ...active.data.current, row: x, column: y }, // Adiciona o item com as novas coordenadas
+                { ...active.data.current, row: y, column: x }, // Adiciona o item com as novas coordenadas
             ]);
         }
     };
+    
 
     const addRow = () => {
         setGrid(generateGrid(totalRows + 1, totalCols));
@@ -109,9 +118,9 @@ const DragAndDropGrid = () => {
                     {grid.map((cell) => (
                         <DroppableCell key={`${cell.x}-${cell.y}`} id={`${cell.x}-${cell.y}`}>
                             {droppedTables
-                                .filter((item) => item.row === cell.x && item.column === cell.y)
+                                .filter((item) => item.column === cell.x && item.row === cell.y)
                                 .map((item) => (
-                                    <DraggableItem key={item.table_id} id={item.table_id} label={item.table.name} />
+                                    <DraggableItem key={`${item.table_id}-${item.row}-${item.column}`} id={item.table_id} table={item} />
                                 ))}
                         </DroppableCell>
                     ))}
@@ -201,9 +210,8 @@ const DragAndDropGrid = () => {
     );
 };
 
-// Componente Draggable (itens arrastáveis)
-const DraggableItem = ({ id, label }: { id: string; label: string }) => {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+const DraggableItem = ({ id, table }: { id: string; table: PlaceTable }) => {
+    const { attributes, listeners, setNodeRef, transform } = useDraggable({ id, data: table });
 
     const style = {
         transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
@@ -229,10 +237,11 @@ const DraggableItem = ({ id, label }: { id: string; label: string }) => {
                 justifyContent: "center",
             }}
         >
-            {label}
+            {table?.table.name || "Sem Nome"} {/* Renderiza um fallback se `table.name` for undefined */}
         </div>
     );
 };
+
 
 // Componente Droppable (células da mesa)
 const DroppableCell = ({ id, children }: { id: string; children?: React.ReactNode }) => {
