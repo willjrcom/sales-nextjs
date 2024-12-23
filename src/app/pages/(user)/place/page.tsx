@@ -4,14 +4,15 @@ import React, { CSSProperties, useEffect, useState } from "react";
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchPlaces } from "@/redux/slices/places";
+import { fetchPlaces, updatePlace } from "@/redux/slices/places";
 import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import Place from "@/app/entities/place/place";
-import Table from "@/app/entities/table/table";
+import RequestError from "@/app/api/error";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
+class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
 
 // Função para gerar a matriz
 const generateGrid = (rows: number, cols: number) => {
@@ -34,6 +35,7 @@ const DragAndDropGrid = () => {
     const { data } = useSession();
     const [droppedTables, setDroppedTables] = useState<PlaceTable[]>([]);
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
+    const [error, setError] = useState<RequestError | null>(null);
 
     useEffect(() => {
         if (data && Object.values(placesSlice.entities).length == 0) {
@@ -44,10 +46,10 @@ const DragAndDropGrid = () => {
     useEffect(() => {
         if (Object.values(placesSlice.entities).length > 0) {
             setPlaces(Object.values(placesSlice.entities));
-            
+
             const firstPlace = Object.values(placesSlice.entities)[0];
             if (!firstPlace) return
-            setPlaceSelectedID(firstPlace.id)
+            if (placeSelectedID === "") setPlaceSelectedID(firstPlace.id)
         }
     }, [placesSlice.entities])
 
@@ -56,24 +58,51 @@ const DragAndDropGrid = () => {
         if (!place) return;
 
         setDroppedTables(place.tables);
+        reloadGrid(place.tables);
     }, [placeSelectedID])
 
     useEffect(() => {
-        console.log(droppedTables)
-    }, [droppedTables])
+        if (error && error.message != "") {
+            setTimeout(() => {
+                setError(null);
+            }, 10000);
+        }
+    }, [error])
+
+    const reloadGrid = (tables: PlaceTable[]) => {
+        if (tables.length === 0) return;
+        const xyPositions = tables.map((table) => new GridItem(table.column, table.row ))
+        
+        // Encontrar o maior x (column) e maior y (row)
+        const { maxX, maxY } = xyPositions.reduce(
+            (acc, pos) => ({
+                maxX: Math.max(acc.maxX, pos.x),
+                maxY: Math.max(acc.maxY, pos.y),
+            }),
+            { maxX: 0, maxY: 0 } // Valores iniciais
+        );
+
+        setGrid(generateGrid(maxY < 5 ? 5 : maxY + 1, maxX < 5 ? 5 : maxX + 1));
+        setTotalRows(maxY < 5 ? 5 : maxY + 1);
+        setTotalCols(maxX < 5 ? 5 : maxX + 1);
+    }
+
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
-    
+
         if (over) {
             const [x, y] = over.id.split("-").map(Number);
-    
+
+            const tables = droppedTables.filter((item) => item.table_id !== active.id)
+            tables.push({ ...active.data.current, row: y, column: x });
+            dispatch(updatePlace({type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables } }}));
             setDroppedTables((prev) => [
                 ...prev.filter((item) => item.table_id !== active.id), // Remove o item se já foi solto antes
                 { ...active.data.current, row: y, column: x }, // Adiciona o item com as novas coordenadas
             ]);
         }
     };
-    
+
 
     const addRow = () => {
         setGrid(generateGrid(totalRows + 1, totalCols));
@@ -81,6 +110,13 @@ const DragAndDropGrid = () => {
     };
 
     const removeRow = () => {
+        const lastRowUsed = droppedTables.find((item) => item.row === totalRows - 1);
+
+        if (lastRowUsed) {
+            setError(new RequestError("Nao é possivel remover uma linha que existe em uma mesa"));
+            return;
+        }
+
         if (totalRows > 1) {
             setGrid(generateGrid(totalRows - 1, totalCols));
             setTotalRows((prev) => prev - 1);
@@ -93,6 +129,13 @@ const DragAndDropGrid = () => {
     };
 
     const removeColumn = () => {
+        const lastColumnUsed = droppedTables.find((item) => item.column === totalCols - 1);
+
+        if (lastColumnUsed) {
+            setError(new RequestError("Nao é possivel remover uma coluna que existe em uma mesa"));
+            return;
+        }
+
         if (totalCols > 1) {
             setGrid(generateGrid(totalRows, totalCols - 1));
             setTotalCols((prev) => prev - 1);
@@ -101,7 +144,8 @@ const DragAndDropGrid = () => {
 
     return (
         <>
-        <SelectField friendlyName="Local" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
+            <SelectField friendlyName="Local" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <DndContext onDragEnd={handleDragEnd}>
                 <div
                     style={{
@@ -237,7 +281,7 @@ const DraggableItem = ({ id, table }: { id: string; table: PlaceTable }) => {
                 justifyContent: "center",
             }}
         >
-            {table?.table.name || "Sem Nome"} {/* Renderiza um fallback se `table.name` for undefined */}
+            {table?.table.name || "Sem Nome"}
         </div>
     );
 };
