@@ -69,7 +69,7 @@ const DragAndDropGrid = () => {
         const place = placesSlice.entities[placeSelectedID]
         if (!place) return;
 
-        setDroppedTables(place.tables);
+        setDroppedTables(place.tables || []);
         reloadGrid(place.tables);
     }, [placeSelectedID])
 
@@ -82,7 +82,7 @@ const DragAndDropGrid = () => {
     }, [error])
 
     const reloadGrid = (tables: PlaceTable[]) => {
-        if (tables.length === 0) return;
+        if (!tables || tables.length === 0) return;
         const xyPositions = tables.map((table) => new GridItem(table.column, table.row))
 
         // Encontrar o maior x (column) e maior y (row)
@@ -111,7 +111,7 @@ const DragAndDropGrid = () => {
                 const placeTable = active.data.current as PlaceTable
                 const table = placeTable.table as Table
 
-                const newDroppedTables = droppedTables.filter((item) => item.table_id !== active.id)
+                const newDroppedTables = [...droppedTables || []].filter((item) => item.table_id !== active.id)
                 const newUnusedTables = [...unusedTables, { ...table }]
 
                 if (!data) return
@@ -139,7 +139,7 @@ const DragAndDropGrid = () => {
                 const placeTable = { table: table, table_id: table.id, column: x, row: y, place_id: placeSelectedID } as PlaceTable;
 
                 const newUnusedTables = unusedTables.filter((item) => item.id !== table.id)
-                const newDroppedTables = [...droppedTables, placeTable]
+                const newDroppedTables = [...droppedTables || [], placeTable]
 
                 if (!data) return
 
@@ -161,12 +161,12 @@ const DragAndDropGrid = () => {
             // From x-y to x-y
             if (active.id !== over.id) {
                 const [x, y] = over.id.split("-").map(Number);
-                const tables = droppedTables.filter((item) => item.table_id !== active.id)
+                const tables = [...droppedTables || []].filter((item) => item.table_id !== active.id)
 
                 const placeTable = { ...active.data.current, row: y, column: x } as PlaceTable;
                 tables.push(placeTable);
 
-                const newDroppedTables = [...droppedTables.filter((item) => item.table_id !== active.id), placeTable]
+                const newDroppedTables = [...[...droppedTables || []].filter((item) => item.table_id !== active.id), placeTable]
                 
                 if (!data) return
 
@@ -190,7 +190,7 @@ const DragAndDropGrid = () => {
     };
 
     const removeRow = () => {
-        const lastRowUsed = droppedTables.find((item) => item.row === totalRows - 1);
+        const lastRowUsed = [...droppedTables || []].find((item) => item.row === totalRows - 1);
 
         if (lastRowUsed) {
             setError(new RequestError("Nao é possivel remover uma linha que existe em uma mesa"));
@@ -209,7 +209,7 @@ const DragAndDropGrid = () => {
     };
 
     const removeColumn = () => {
-        const lastColumnUsed = droppedTables.find((item) => item.column === totalCols - 1);
+        const lastColumnUsed = [...droppedTables || []].find((item) => item.column === totalCols - 1);
 
         if (lastColumnUsed) {
             setError(new RequestError("Nao é possivel remover uma coluna que existe em uma mesa"));
@@ -233,10 +233,10 @@ const DragAndDropGrid = () => {
                             <h3 className="text-lg font-semibold mb-2">Mesas alocadas</h3>
                             <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
                         </div>
-                        <div
+                        <div className="min-h-[80vh]"
                             style={{
                                 display: "grid",
-                                gridTemplateColumns: `repeat(${totalCols}, 80px) auto`,
+                                gridTemplateColumns: `repeat(${totalCols}, 100px) auto`,
                                 gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
                                 gap: "4px",
                                 position: "relative",
@@ -247,8 +247,7 @@ const DragAndDropGrid = () => {
                             {/* Células da grade */}
                             {grid.map((cell) => (
                                 <DroppableCell key={`${cell.x}-${cell.y}`} id={`${cell.x}-${cell.y}`}>
-                                    {droppedTables
-                                        .filter((item) => item.column === cell.x && item.row === cell.y)
+                                    {droppedTables?.filter((item) => item.column === cell.x && item.row === cell.y)
                                         .map((item) => (
                                             <DraggablePlaceToTable key={`${item.table_id}-${item.row}-${item.column}`} id={item.table_id} table={item} />
                                         ))}
@@ -360,7 +359,7 @@ const DraggablePlaceToTable = ({ id, table }: { id: string; table: PlaceTable })
     const style = {
         transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
         transition: "transform 0.2s ease",
-        width: "60px",
+        width: "80px",
         height: "60px",
         zIndex: 1000,
     };
@@ -381,7 +380,7 @@ const DraggablePlaceToTable = ({ id, table }: { id: string; table: PlaceTable })
                 justifyContent: "center",
             }}
         >
-            {table?.table.name || "Sem Nome"}
+            <p className="text-sm">{table?.table.name || "Sem Nome"}</p>
         </div>
     );
 };
@@ -394,7 +393,7 @@ const DraggableUnusedTable = ({ id, table }: { id: string; table: Table }) => {
         transition: "transform 0.2s ease",
         width: "130px",
         height: "60px",
-        zIndex: 1000,
+        zIndex: 2000,
         backgroundColor: "lightblue",
         border: "1px solid #ccc",
         borderRadius: "4px",
@@ -406,7 +405,7 @@ const DraggableUnusedTable = ({ id, table }: { id: string; table: Table }) => {
 
     return (
         <div
-            className="mb-2"
+            className="mb-2 min-h-[60px]"
             ref={setNodeRef}
             {...listeners}
             {...attributes}
@@ -424,7 +423,7 @@ const DroppableCell = ({ id, children }: { id: string; children?: React.ReactNod
     const style: CSSProperties = {
         backgroundColor: isOver ? "#d1fadf" : "#f9f9f9",
         border: "1px dashed #ccc",
-        width: "80px",
+        width: "100px",
         height: "80px",
         display: "flex",
         alignItems: "center",
@@ -445,18 +444,17 @@ const DroppableColumn = ({ id, children }: { id: string; children?: React.ReactN
         backgroundColor: isOver ? "#d1fadf" : "#f9f9f9",
         border: "1px dashed #ccc",
         width: "40vh",
-        height: "60vh",
         display: "flex",
+        flexDirection: "column", // Garantir o alinhamento vertical
         alignItems: "center",
-        justifyContent: "center",
-        position: "relative", // Corrigido: agora TypeScript reconhece como válido
     };
 
     return (
-        <div ref={setNodeRef} style={style} className="flex flex-col items-center">
+        <div ref={setNodeRef} style={style} className="flex flex-col items-center p-2 min-h-[80vh]">
             {children}
         </div>
     );
 };
+
 
 export default DragAndDropGrid;
