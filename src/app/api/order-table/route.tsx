@@ -1,6 +1,6 @@
 import RequestApi, { AddIdToken } from "../request";
 import { Session } from "next-auth";
-import { OrderTable } from "@/app/entities/order/order-table";
+import OrderTable from "@/app/entities/order/order-table";
 
 const GetOrderTables = async (session: Session): Promise<OrderTable[]> => {
     const response = await RequestApi<null, OrderTable[]>({

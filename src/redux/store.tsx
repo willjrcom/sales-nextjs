@@ -1,13 +1,14 @@
 // redux/store.ts
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import ordersReducer from './slices/orders';
+import deliveryOrdersReducer from './slices/delivery-orders';
+import tableOrdersReducer from './slices/table-orders';
 import clientsReducer from './slices/clients';
 import employeesReducer from './slices/employees';
 import placesReducer from './slices/places';
 import unusedTablesReducer from './slices/unused-tables';
 import deliveryDriversReducer from './slices/delivery-drivers';
 import categoryReducer from './slices/categories';
-import deliveryOrdersReducer from './slices/delivery-orders';
 import orderProcessesReducer from './slices/order-processes';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
@@ -20,13 +21,14 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     orders: ordersReducer,
+    deliveryOrders: deliveryOrdersReducer,
+    tableOrders: tableOrdersReducer,
     clients: clientsReducer,
     employees: employeesReducer,
     places: placesReducer,
     unusedTables: unusedTablesReducer,
     deliveryDrivers: deliveryDriversReducer,
     categories: categoryReducer,
-    deliveryOrders: deliveryOrdersReducer,
     orderProcesses: orderProcessesReducer,
 });
 
