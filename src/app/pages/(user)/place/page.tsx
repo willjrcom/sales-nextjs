@@ -12,6 +12,8 @@ import Place from "@/app/entities/place/place";
 import RequestError from "@/app/api/error";
 import Table from "@/app/entities/table/table";
 import { addUnusedTable, fetchUnusedTables, removeUnusedTable, updateUnusedTable } from "@/redux/slices/unused-tables";
+import AddTableToPlace from "@/app/api/place/table/add/route";
+import RemoveTableFromPlace from "@/app/api/place/table/remove/route";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -96,7 +98,7 @@ const DragAndDropGrid = () => {
         setTotalCols(maxX < 5 ? 5 : maxX + 1);
     }
 
-    const handleDragEnd = (event: any) => {
+    const handleDragEnd = async (event: any) => {
         const { active, over } = event;
 
         if (over) {
@@ -119,6 +121,15 @@ const DragAndDropGrid = () => {
 
                 dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
                 dispatch(addUnusedTable(table));
+
+                if (!data) return
+
+                try {
+                    await RemoveTableFromPlace(table.id, data)
+                } catch (error) {
+                    setError(error as RequestError)
+                }
+                
                 return
             }
 
@@ -137,6 +148,15 @@ const DragAndDropGrid = () => {
 
                 dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
                 dispatch(removeUnusedTable(table.id));
+
+                if (!data) return
+
+                try {
+                    await AddTableToPlace(placeTable, data)
+                } catch (error) {
+                    setError(error as RequestError)
+                }
+
                 return
             }
 
@@ -145,12 +165,24 @@ const DragAndDropGrid = () => {
                 const [x, y] = over.id.split("-").map(Number);
 
                 const tables = droppedTables.filter((item) => item.table_id !== active.id)
+                const placeTable = { ...active.data.current, row: y, column: x } as PlaceTable;
+
                 tables.push({ ...active.data.current, row: y, column: x });
                 dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables } } }));
                 setDroppedTables((prev) => [
                     ...prev.filter((item) => item.table_id !== active.id), // Remove o item se já foi solto antes
-                    { ...active.data.current, row: y, column: x }, // Adiciona o item com as novas coordenadas
+                    placeTable, // Adiciona o item com as novas coordenadas
                 ]);
+
+                if (!data) return
+
+                try {
+                    await AddTableToPlace(placeTable, data)
+                } catch (error) {
+                    setError(error as RequestError)
+                }
+
+                return
             }
         }
     };
