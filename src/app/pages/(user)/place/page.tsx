@@ -167,7 +167,7 @@ const DragAndDropGrid = () => {
                 tables.push(placeTable);
 
                 const newDroppedTables = [...[...droppedTables || []].filter((item) => item.table_id !== active.id), placeTable]
-                
+
                 if (!data) return
 
                 try {
@@ -224,13 +224,12 @@ const DragAndDropGrid = () => {
 
     return (
         <>
-            <SelectField friendlyName="Local" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="flex justify-around mb-4">
                     <div className="mr-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold mb-2">Mesas alocadas</h3>
+                            <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
                             <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
                         </div>
                         <div className="min-h-[80vh]"
