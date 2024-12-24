@@ -4,6 +4,7 @@ import ordersReducer from './slices/orders';
 import clientsReducer from './slices/clients';
 import employeesReducer from './slices/employees';
 import placesReducer from './slices/places';
+import unusedTablesReducer from './slices/unused-tables';
 import deliveryDriversReducer from './slices/delivery-drivers';
 import categoryReducer from './slices/categories';
 import deliveryOrdersReducer from './slices/delivery-orders';
@@ -22,10 +23,11 @@ const rootReducer = combineReducers({
     clients: clientsReducer,
     employees: employeesReducer,
     places: placesReducer,
+    unusedTables: unusedTablesReducer,
     deliveryDrivers: deliveryDriversReducer,
     categories: categoryReducer,
     deliveryOrders: deliveryOrdersReducer,
-    orderProcesses: orderProcessesReducer
+    orderProcesses: orderProcessesReducer,
 });
 
 // Aplica o persistReducer para o rootReducer
