@@ -16,6 +16,14 @@ const translateError = (errorMessage: string): string => {
     if (errorTranslations[errorMessage]) {
         return errorTranslations[errorMessage];
     }
+
+    // Verificar correspondências parciais para mensagens dinâmicas
+    for (const [key, translation] of Object.entries(errorTranslations)) {
+        if (errorMessage.startsWith(key)) {
+            return translation;
+        }
+    }
+
     // Tradução genérica
     if (errorMessage.includes("not found")) return "Recurso não encontrado";
     if (errorMessage.includes("Invalid")) return "Entrada inválida";
@@ -32,6 +40,7 @@ const errorTranslations: Record<string, string> = {
     "order delivery must be delivered": "A entrega do pedido deve estar entregue",
     "ideal time is required": "O tempo ideal é obrigatório",
     "experimental error is required": "O erro experimental é obrigatório",
+    "place position already used by table:": "A posição ja está sendo utilizada por outra mesa",
 };
 
 

@@ -14,6 +14,7 @@ import Table from "@/app/entities/table/table";
 import { addUnusedTable, fetchUnusedTables, removeUnusedTable, updateUnusedTable } from "@/redux/slices/unused-tables";
 import AddTableToPlace from "@/app/api/place/table/add/route";
 import RemoveTableFromPlace from "@/app/api/place/table/remove/route";
+import Refresh from "@/app/components/crud/refresh";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -102,9 +103,6 @@ const DragAndDropGrid = () => {
         const { active, over } = event;
 
         if (over) {
-            console.log("over", over)
-            console.log("active", active)
-
             // From unused to yourself
             if (over.id === "unused-tables" && active.id.endsWith("-unused")) return
 
@@ -116,20 +114,20 @@ const DragAndDropGrid = () => {
                 const newDroppedTables = droppedTables.filter((item) => item.table_id !== active.id)
                 const newUnusedTables = [...unusedTables, { ...table }]
 
-                setDroppedTables(newDroppedTables);
-                setUnusedTables(newUnusedTables);
-
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
-                dispatch(addUnusedTable(table));
-
                 if (!data) return
 
                 try {
                     await RemoveTableFromPlace(table.id, data)
                 } catch (error) {
                     setError(error as RequestError)
+                    return
                 }
-                
+
+                setDroppedTables(newDroppedTables);
+                setUnusedTables(newUnusedTables);
+
+                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
+                dispatch(addUnusedTable(table));
                 return
             }
 
@@ -143,45 +141,44 @@ const DragAndDropGrid = () => {
                 const newUnusedTables = unusedTables.filter((item) => item.id !== table.id)
                 const newDroppedTables = [...droppedTables, placeTable]
 
-                setUnusedTables(newUnusedTables);
-                setDroppedTables(newDroppedTables);
-
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
-                dispatch(removeUnusedTable(table.id));
-
                 if (!data) return
 
                 try {
                     await AddTableToPlace(placeTable, data)
                 } catch (error) {
                     setError(error as RequestError)
+                    return
                 }
 
+                setUnusedTables(newUnusedTables);
+                setDroppedTables(newDroppedTables);
+
+                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
+                dispatch(removeUnusedTable(table.id));
                 return
             }
 
             // From x-y to x-y
             if (active.id !== over.id) {
                 const [x, y] = over.id.split("-").map(Number);
-
                 const tables = droppedTables.filter((item) => item.table_id !== active.id)
+
                 const placeTable = { ...active.data.current, row: y, column: x } as PlaceTable;
+                tables.push(placeTable);
 
-                tables.push({ ...active.data.current, row: y, column: x });
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables } } }));
-                setDroppedTables((prev) => [
-                    ...prev.filter((item) => item.table_id !== active.id), // Remove o item se já foi solto antes
-                    placeTable, // Adiciona o item com as novas coordenadas
-                ]);
-
+                const newDroppedTables = [...droppedTables.filter((item) => item.table_id !== active.id), placeTable]
+                
                 if (!data) return
 
                 try {
                     await AddTableToPlace(placeTable, data)
                 } catch (error) {
                     setError(error as RequestError)
+                    return
                 }
 
+                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables } } }));
+                setDroppedTables(newDroppedTables);
                 return
             }
         }
@@ -230,115 +227,127 @@ const DragAndDropGrid = () => {
             <SelectField friendlyName="Local" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <DndContext onDragEnd={handleDragEnd}>
-                <div className="flex justify-between items-center mb-4">
-                    <div
-                        style={{
-                            display: "grid",
-                            gridTemplateColumns: `repeat(${totalCols}, 80px) auto`,
-                            gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
-                            gap: "4px",
-                            position: "relative",
-                            backgroundColor: "#f4f4f4",
-                            padding: "20px",
-                        }}
-                    >
-                        {/* Células da grade */}
-                        {grid.map((cell) => (
-                            <DroppableCell key={`${cell.x}-${cell.y}`} id={`${cell.x}-${cell.y}`}>
-                                {droppedTables
-                                    .filter((item) => item.column === cell.x && item.row === cell.y)
-                                    .map((item) => (
-                                        <DraggablePlaceToTable key={`${item.table_id}-${item.row}-${item.column}`} id={item.table_id} table={item} />
-                                    ))}
-                            </DroppableCell>
-                        ))}
-
-                        {/* Botões de controle */}
-                        <div
-                            style={{
-                                gridColumn: `${totalCols + 1}`,
-                                gridRow: `1 / span ${totalRows}`,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "flex-start",
-                                justifyContent: "flex-start",
-                                gap: "4px",
-                            }}
-                        >
-                            <button
-                                onClick={removeColumn}
-                                disabled={totalCols <= 1}
-                                style={{
-                                    backgroundColor: "#FFC107",
-                                    border: "none",
-                                    color: "black",
-                                    padding: "10px 20px",
-                                    cursor: totalCols > 1 ? "pointer" : "not-allowed",
-                                    width: "60px",
-                                }}
-                            >
-                                -
-                            </button>
-                            <button
-                                onClick={addColumn}
-                                style={{
-                                    backgroundColor: "#4CAF50",
-                                    border: "none",
-                                    color: "white",
-                                    padding: "10px 20px",
-                                    cursor: "pointer",
-                                    width: "60px",
-                                }}
-                            >
-                                +
-                            </button>
+                <div className="flex justify-around mb-4">
+                    <div className="mr-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold mb-2">Mesas alocadas</h3>
+                            <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
                         </div>
-
                         <div
                             style={{
-                                gridColumn: `1 / span ${totalCols}`,
-                                gridRow: `${totalRows + 1}`,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "flex-end",
+                                display: "grid",
+                                gridTemplateColumns: `repeat(${totalCols}, 80px) auto`,
+                                gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
                                 gap: "4px",
+                                position: "relative",
+                                backgroundColor: "#f4f4f4",
+                                padding: "20px",
                             }}
                         >
-                            <button
-                                onClick={removeRow}
-                                disabled={totalRows <= 1}
+                            {/* Células da grade */}
+                            {grid.map((cell) => (
+                                <DroppableCell key={`${cell.x}-${cell.y}`} id={`${cell.x}-${cell.y}`}>
+                                    {droppedTables
+                                        .filter((item) => item.column === cell.x && item.row === cell.y)
+                                        .map((item) => (
+                                            <DraggablePlaceToTable key={`${item.table_id}-${item.row}-${item.column}`} id={item.table_id} table={item} />
+                                        ))}
+                                </DroppableCell>
+                            ))}
+
+                            {/* Botões de controle */}
+                            <div
                                 style={{
-                                    backgroundColor: "#FFC107",
-                                    border: "none",
-                                    color: "black",
-                                    padding: "10px 20px",
-                                    cursor: totalRows > 1 ? "pointer" : "not-allowed",
-                                    width: "60px",
+                                    gridColumn: `${totalCols + 1}`,
+                                    gridRow: `1 / span ${totalRows}`,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "flex-start",
+                                    justifyContent: "flex-start",
+                                    gap: "4px",
                                 }}
                             >
-                                -
-                            </button>
-                            <button
-                                onClick={addRow}
+                                <button
+                                    onClick={removeColumn}
+                                    disabled={totalCols <= 1}
+                                    style={{
+                                        backgroundColor: "#FFC107",
+                                        border: "none",
+                                        color: "black",
+                                        padding: "10px 20px",
+                                        cursor: totalCols > 1 ? "pointer" : "not-allowed",
+                                        width: "60px",
+                                    }}
+                                >
+                                    -
+                                </button>
+                                <button
+                                    onClick={addColumn}
+                                    style={{
+                                        backgroundColor: "#4CAF50",
+                                        border: "none",
+                                        color: "white",
+                                        padding: "10px 20px",
+                                        cursor: "pointer",
+                                        width: "60px",
+                                    }}
+                                >
+                                    +
+                                </button>
+                            </div>
+
+                            <div
                                 style={{
-                                    backgroundColor: "#4CAF50",
-                                    border: "none",
-                                    color: "white",
-                                    padding: "10px 20px",
-                                    cursor: "pointer",
-                                    width: "60px",
+                                    gridColumn: `1 / span ${totalCols}`,
+                                    gridRow: `${totalRows + 1}`,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "flex-end",
+                                    gap: "4px",
                                 }}
                             >
-                                +
-                            </button>
+                                <button
+                                    onClick={removeRow}
+                                    disabled={totalRows <= 1}
+                                    style={{
+                                        backgroundColor: "#FFC107",
+                                        border: "none",
+                                        color: "black",
+                                        padding: "10px 20px",
+                                        cursor: totalRows > 1 ? "pointer" : "not-allowed",
+                                        width: "60px",
+                                    }}
+                                >
+                                    -
+                                </button>
+                                <button
+                                    onClick={addRow}
+                                    style={{
+                                        backgroundColor: "#4CAF50",
+                                        border: "none",
+                                        color: "white",
+                                        padding: "10px 20px",
+                                        cursor: "pointer",
+                                        width: "60px",
+                                    }}
+                                >
+                                    +
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <DroppableColumn key="unused-tables" id="unused-tables">
-                        {unusedTables.map((item) => (
-                            <DraggableUnusedTable key={`${item.id}-unused`} id={`${item.id}-unused`} table={item} />
-                        ))}
-                    </DroppableColumn>
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold mb-2">Mesas não alocadas</h3>
+                            <Refresh slice={unusedTablesSlice} fetchItems={fetchUnusedTables} removeText={true} />
+                        </div>
+                        <DroppableColumn key="unused-tables" id="unused-tables">
+                            {unusedTables.map((item) => (
+                                <DraggableUnusedTable key={`${item.id}-unused`} id={`${item.id}-unused`} table={item} />
+                            ))}
+                        </DroppableColumn>
+                    </div>
                 </div>
             </DndContext>
         </>
@@ -435,7 +444,7 @@ const DroppableColumn = ({ id, children }: { id: string; children?: React.ReactN
     const style: CSSProperties = {
         backgroundColor: isOver ? "#d1fadf" : "#f9f9f9",
         border: "1px dashed #ccc",
-        width: "30vh",
+        width: "40vh",
         height: "60vh",
         display: "flex",
         alignItems: "center",

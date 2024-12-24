@@ -11,9 +11,10 @@ interface RefreshProps{
     fetchItemsByID?: (params: { id: string; session: Session }) => any;
     id?: string;
     slice: GenericState;
+    removeText?: boolean;
 }
 
-const Refresh = ({ fetchItems, fetchItemsByID, id, slice }: RefreshProps) => {
+const Refresh = ({ fetchItems, fetchItemsByID, id, slice, removeText }: RefreshProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
@@ -36,7 +37,7 @@ const Refresh = ({ fetchItems, fetchItemsByID, id, slice }: RefreshProps) => {
         }
     };
 
-    if (slice.loading) {
+    if (slice.loading && !removeText) {
         return (
             <div className="flex items-center gap-3">
                 <button disabled><HiOutlineRefresh /></button>
@@ -47,7 +48,7 @@ const Refresh = ({ fetchItems, fetchItemsByID, id, slice }: RefreshProps) => {
     return (
         <div className="flex items-center gap-3">
             <button onClick={handleRefresh}><HiOutlineRefresh /></button>
-            <label className="text-gray-800">Atualizado em {slice.lastUpdate}</label>
+            {!removeText && <label className="text-gray-800">Atualizado em {slice.lastUpdate}</label>}
         </div>
     );
 };
