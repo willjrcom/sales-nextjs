@@ -49,7 +49,6 @@ const PageNewOrderTable = () => {
     }, [placeID]);
 
     const newOrder = async (tableID: string) => {
-        event?.preventDefault();
         if (!data) return
         try {
             const response = await NewOrderTable(tableID, data)

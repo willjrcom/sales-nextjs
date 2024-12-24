@@ -14,6 +14,9 @@ import { useModal } from "@/app/context/modal/context";
 import CardOrder from "@/app/components/order/card-order";
 import OrderTable from "@/app/entities/order/order-table";
 import { fetchTableOrders } from "@/redux/slices/table-orders";
+import { FaPlus } from "react-icons/fa";
+import NewOrderTable from "@/app/api/order-table/new/route";
+import { useRouter } from "next/navigation";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -141,6 +144,10 @@ const DragAndDropGrid = () => {
 };
 
 const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) => {
+    const [error, setError] = useState<RequestError | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+    const { data } = useSession();
+    const router = useRouter();
     const modalHandler = useModal();
     const style = {
         width: "80px",
@@ -149,18 +156,46 @@ const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) 
     };
 
     const openModal = () => {
+        // New order
         if (!order) {
 
             const onClose = () => {
                 modalHandler.hideModal("new-table")
             }
-            modalHandler.showModal("new-table", "Nova mesa", <h1>Digite o nome da nova mesa</h1>, "md", onClose);
+
+            const newOrder = async (tableID: string) => {
+                if (!data) return
+                try {
+                    const response = await NewOrderTable(tableID, data)
+                    router.push('/pages/order-control/' + response.order_id)
+                    dispatch(fetchTableOrders(data));
+                    setError(null);
+                    onClose()
+                } catch (error) {
+                    setError(error as RequestError);
+                }
+            }
+
+            const button = () => (
+                <>
+                    {error && <p className="mb-4 text-red-500">{error.message}</p>}
+                    <p className="mb-4"><strong>Mesa:</strong> {table.table.name}</p>
+                    <p className="mb-4">Deseja iniciar um novo pedido?</p>
+                    <button onClick={() => newOrder(table.table_id)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+                        <FaPlus />
+                        <span>Iniciar</span>
+                    </button>
+                </>
+            )
+
+            modalHandler.showModal("new-table", "Nova mesa", button(), "md", onClose);
             return
         }
 
         const onClose = () => {
             modalHandler.hideModal("edit-table-" + order.order_id)
         }
+
         modalHandler.showModal("edit-table-" + order.order_id, "Editar mesa", <CardOrder orderId={order.order_id} />, "xl", onClose);
     }
 

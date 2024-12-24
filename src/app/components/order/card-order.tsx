@@ -217,7 +217,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
             {/* Itens do Pedido */}
             <div className="mb-6">
                 <h3 className="text-xl font-bold mb-2 text-gray-800">Itens do Pedido</h3>
-                {order.groups.length > 0 ? (
+                {order.groups?.length > 0 ? (
                     <ul className="space-y-4">
                         {order.groups
                             .sort((a, b) => a.category_id.localeCompare(b.category_id))
