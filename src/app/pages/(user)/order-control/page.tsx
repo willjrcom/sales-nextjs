@@ -3,7 +3,7 @@
 import CrudLayout from "@/app/components/crud/layout";
 import Refresh from "@/app/components/crud/refresh";
 import OrderKanban from "@/app/components/order/kanban/kanban";
-import OrderItemList from "@/app/components/order/kanban/order-item-list";
+import CardOrderListItem from "@/app/components/order/kanban/card-list-orders";
 import { useModal } from "@/app/context/modal/context";
 import { fetchOrders } from "@/redux/slices/orders";
 import { RootState, AppDispatch } from "@/redux/store";
@@ -33,14 +33,14 @@ const PageOrder = () => {
 
     const stagingOrders = Object.values(ordersSlice.entities).map((order) => order.status === "Staging"? order : null).filter((order) => order !== null);
 
+    
     const openStagingOrders = () => {
         if (stagingOrders.length === 0) return;
 
         const onClose = () => {
             modalHandler.hideModal("show-staging-orders")
         }
-        const list = stagingOrders.map((order) => <OrderItemList key={order.id} order={order}/>);
-        modalHandler.showModal("show-staging-orders", "Pedidos em aberto", list, "sm", onClose);
+        modalHandler.showModal("show-staging-orders", "Pedidos em aberto", <CardOrderListItem orders={stagingOrders} /> , "sm", onClose);
     }
     return (
         <>

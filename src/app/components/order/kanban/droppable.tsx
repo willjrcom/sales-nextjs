@@ -1,7 +1,6 @@
 import Order from "@/app/entities/order/order";
 import { useDroppable } from "@dnd-kit/core";
 import Draggable from "./draggable";
-import { FaLuggageCart, FaPaperPlane, FaUtensils } from "react-icons/fa";
 import OrderItemList from "./order-item-list";
 
 interface OrderProps {

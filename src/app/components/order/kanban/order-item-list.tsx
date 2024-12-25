@@ -1,5 +1,5 @@
 import Order from "@/app/entities/order/order";
-import { FaLuggageCart, FaPaperPlane, FaUtensils } from "react-icons/fa";
+import { FaLuggageCart, FaMotorcycle, FaUtensils } from "react-icons/fa";
 import CardOrder from "../card-order";
 import { useModal } from "@/app/context/modal/context";
 import RequestError from "@/app/api/error";
@@ -26,14 +26,14 @@ const OrderItemList = ({ order, error }: OrderItemListProps) => {
     };
     
     return (
-        <div className="flex items-center justify-between h-[5vh] border-black" onClick={OpenOrder}>
+        <div className="flex items-center justify-between h-[5vh] border-black border rounded" onClick={OpenOrder}>
             {/* Texto "Pedido X" */}
             <div className="ml-4 text-lg font-bold">Pedido {order.order_number}</div>
 
             {/* Elemento Verde à Direita */}
             {order.delivery && (
                 <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
-                    <FaPaperPlane className="w-6 h-6" />
+                    <FaMotorcycle className="w-6 h-6" />
                 </div>
             )}
             {order.table && (

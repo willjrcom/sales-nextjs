@@ -44,7 +44,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                 newClient.id = response
                 dispatch(addClient({...newClient}));
             } else {
-                dispatch(updateClient({id: newClient.id, changes: newClient}));
+                dispatch(updateClient({ type: "UPDATE", payload: {id: newClient.id, changes: newClient}}));
             }
             
             modalHandler.hideModal(modalName);

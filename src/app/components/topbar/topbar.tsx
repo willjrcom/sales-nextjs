@@ -33,7 +33,7 @@ const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => 
 
 const TopbarItemAlert: React.FC<TopbarItemIconProps> = ({ label, icon: Icon, href }) => (
   <Link href={href} className="self-center">
-    <div className="inline-flex items-center text-red-500"><Icon/>&nbsp;{label}</div>
+    <div className="inline-flex items-center rounded px-4 py-1 bg-red-500"><Icon/>&nbsp;{label}</div>
   </Link>
 );
 
