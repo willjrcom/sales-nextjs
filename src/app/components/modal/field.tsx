@@ -8,6 +8,7 @@ interface TextFieldProps {
     value: string;
     setValue: (value: string) => void;
     pattern?: string;
+    optional?: boolean;
 }
 
 interface NumberFieldProps {
@@ -17,6 +18,7 @@ interface NumberFieldProps {
     disabled?: boolean
     value?: number
     setValue: Dispatch<SetStateAction<number>>
+    optional?: boolean;
 }
 
 interface DateFieldProps {
@@ -25,6 +27,7 @@ interface DateFieldProps {
     disabled?: boolean;
     value?: string | null | undefined; // Permitir undefined além de Date e null
     setValue: Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
+    optional?: boolean;
 }
 
 interface DateTimeFieldProps {
@@ -33,6 +36,7 @@ interface DateTimeFieldProps {
     disabled?: boolean;
     value: string | null | undefined; // Permite null para valores não definidos
     setValue: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+    optional?: boolean;
 }
 
 interface TimeFieldProps {
@@ -41,6 +45,7 @@ interface TimeFieldProps {
     disabled?: boolean;
     value?: string | null | undefined; // Permitir undefined além de string e null
     setValue: Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
+    optional?: boolean;
 }
 
 interface CheckboxFieldProps {
@@ -49,6 +54,7 @@ interface CheckboxFieldProps {
     disabled?: boolean
     value?: boolean
     setValue: Dispatch<SetStateAction<boolean>>
+    optional?: boolean;
 }
 
 interface RadioFieldProps {
@@ -58,12 +64,14 @@ interface RadioFieldProps {
     values: Record<string, string>[];
     selectedValue: string;
     setSelectedValue: Dispatch<SetStateAction<string>>;
+    optional?: boolean;
 }
 
 interface HiddenFieldProps {
     name: string
     value?: string
     setValue: Dispatch<SetStateAction<string>>
+    optional?: boolean;
 }
 
 interface SelectFieldProps {
@@ -73,16 +81,17 @@ interface SelectFieldProps {
     values: { id: string; name: string }[];
     selectedValue: string;
     setSelectedValue: (value: string) => void;
+    optional?: boolean;
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
-const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern }: TextFieldProps) => {
+const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern, optional}: TextFieldProps) => {
     return (
         <div className="mb-4">
             {friendlyName && (
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
-                    {friendlyName}
+                    {friendlyName} {optional && <span className="text-red-500">*</span>}
                 </label>
             )}
 
@@ -100,11 +109,11 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
     );
 };
 
-const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue }: NumberFieldProps) => {
+const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue, optional}: NumberFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
-                {friendlyName}
+                {friendlyName} {optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -120,11 +129,11 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
     )
 }
 
-const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldProps) => {
+const DateField = ({ friendlyName, name, disabled, setValue, value, optional}: DateFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName}
+                {friendlyName} {optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -139,7 +148,7 @@ const DateField = ({ friendlyName, name, disabled, setValue, value }: DateFieldP
     );
 };
 
-const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTimeFieldProps) => {
+const DateTimeField = ({ friendlyName, name, disabled, setValue, value, optional}: DateTimeFieldProps) => {
     const formatDateTime = (date: string | null | undefined): string => {
         const newDate = date ? new Date(date) : null;
         // Verifica se o valor é um objeto Date válido
@@ -151,7 +160,7 @@ const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTi
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName}
+                {friendlyName} {optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -166,11 +175,11 @@ const DateTimeField = ({ friendlyName, name, disabled, setValue, value }: DateTi
     );
 };
 
-const TimeField = ({ friendlyName, name, disabled, setValue, value }: TimeFieldProps) => {
+const TimeField = ({ friendlyName, name, disabled, setValue, value, optional}: TimeFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName}
+                {friendlyName} {optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -185,11 +194,11 @@ const TimeField = ({ friendlyName, name, disabled, setValue, value }: TimeFieldP
     );
 };
 
-const CheckboxField = ({ friendlyName, name, disabled, value, setValue }: CheckboxFieldProps) => {
+const CheckboxField = ({ friendlyName, name, disabled, value, setValue, optional}: CheckboxFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName}
+                {friendlyName} {optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -203,10 +212,10 @@ const CheckboxField = ({ friendlyName, name, disabled, value, setValue }: Checkb
     );
 };
 
-const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue }: RadioFieldProps) => (
+const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue, optional }: RadioFieldProps) => (
     <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-            {friendlyName}
+            {friendlyName} {optional && <span className="text-red-500">*</span>}
         </label>
         {values.length === 0 && <p className="text-gray-600">Nenhuma opção disponível</p>}
         {values.map((valueObj) => (
@@ -238,10 +247,10 @@ const HiddenField = ({ name, value, setValue }: HiddenFieldProps) => {
     )
 }
 
-const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue }: SelectFieldProps) => (
+const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue, optional }: SelectFieldProps) => (
     <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-            {friendlyName}
+            {friendlyName} {optional && <span className="text-red-500">*</span>}
         </label>
         {values.length === 0 && <p className="text-gray-600">Nenhuma opção disponível</p>}
         {values.length > 0 &&
