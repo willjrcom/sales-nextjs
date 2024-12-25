@@ -81,7 +81,7 @@ const DeliveryOrderFinished = () => {
                 <h3 className="text-lg font-semibold mb-2">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
-            {orderID && <ButtonIconTextFloat modalName="show-delivery" icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders(data))}>
+            {orderID && <ButtonIconTextFloat modalName={"show-order-"+orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders(data))}>
                 <CardOrder orderId={orderID} />
             </ButtonIconTextFloat>}
         </>

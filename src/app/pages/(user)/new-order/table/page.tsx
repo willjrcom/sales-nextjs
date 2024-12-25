@@ -42,8 +42,8 @@ const PageNewOrderTable = () => {
         if (!selectedPlace) return
 
         const filteredTables: Table[] = [];
-        for (const table of selectedPlace.tables) {
-            filteredTables.push(table.table)
+        for (const placeTable of selectedPlace.tables) {
+            filteredTables.push(placeTable.table)
         }
         setTables(filteredTables);
     }, [placeID]);

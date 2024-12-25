@@ -70,7 +70,7 @@ const Component = () => {
 
     useEffect(() => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
-        const category = Object.values(categoriesSlice.entities).find((category) => category.process_rules.some((processRule) => processRule.id === id));
+        const category = Object.values(categoriesSlice.entities).find((category) => category.process_rules?.some((processRule) => processRule.id === id));
         if (!category) return;
 
         setProcessRules(category.process_rules || []);

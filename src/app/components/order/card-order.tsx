@@ -15,6 +15,10 @@ import { useModal } from "@/app/context/modal/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import Link from "next/link";
 import Carousel from "../carousel/carousel";
+import CloseTable from "@/app/api/order-table/status/finish/route";
+import { fetchTableOrders } from "@/redux/slices/table-orders";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -26,6 +30,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const [error, setError] = useState<RequestError | null>(null);
     const [errorPayment, setErrorPayment] = useState<RequestError | null>(errorRequest || null);
+    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -136,6 +141,19 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
             );
         }
         if (order.table) {
+            const finishTable = async () => {
+                if (!order.table?.id || !data) return
+
+                try {
+                    await CloseTable(order.table?.id, data);
+                    setError(null);
+                    dispatch(fetchTableOrders(data));
+                    fetchOrder();
+                } catch (error) {
+                    setError(error as RequestError);
+                }
+            }
+
             return (
                 <div className="mb-4">
                     <div className="flex justify-between items-center mb-4">
@@ -150,6 +168,8 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                             <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>
                             <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>
                         </ul>
+                        {!order.table.closed_at && <button onClick={finishTable}
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Fechar Mesa</button>}
                     </div>
                 </div>
             );

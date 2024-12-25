@@ -3,7 +3,6 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchPlaces } from "@/redux/slices/places";
 import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
@@ -62,7 +61,6 @@ const DragAndDropGrid = () => {
 
     useEffect(() => {
         setTableOrders(Object.values(tableOrdersSlice.entities));
-        console.log(Object.values(tableOrdersSlice.entities))
     }, [tableOrdersSlice.entities])
 
     useEffect(() => {
@@ -114,7 +112,7 @@ const DragAndDropGrid = () => {
                 <div>
                     <div className="flex items-center justify-between">
                         <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
-                        <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
+                        <Refresh slice={tableOrdersSlice} fetchItems={fetchTableOrders} />
                     </div>
                     <div
                         style={{
@@ -132,7 +130,7 @@ const DragAndDropGrid = () => {
                             <Cell key={`${cell.x}-${cell.y}`}>
                                 {droppedTables?.filter((item) => item.column === cell.x && item.row === cell.y)
                                     .map((item) => (
-                                        <TableItem key={`${item.table_id}-${item.row}-${item.column}`} table={item} order={tableOrders?.find((order) => order.table_id === item.table_id)} />
+                                        <TableItem key={`${item.table_id}-${item.row}-${item.column}`} placeTable={item} order={tableOrders?.find((order) => order.table_id === item.table_id && order.status !== "Closed")} />
                                     ))}
                             </Cell>
                         ))}
@@ -143,7 +141,7 @@ const DragAndDropGrid = () => {
     );
 };
 
-const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) => {
+const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: OrderTable }) => {
     const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
@@ -179,9 +177,9 @@ const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) 
             const button = () => (
                 <>
                     {error && <p className="mb-4 text-red-500">{error.message}</p>}
-                    <p className="mb-4"><strong>Mesa:</strong> {table.table.name}</p>
+                    <p className="mb-4"><strong>Mesa:</strong> {placeTable.table.name}</p>
                     <p className="mb-4">Deseja iniciar um novo pedido?</p>
-                    <button onClick={() => newOrder(table.table_id)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+                    <button onClick={() => newOrder(placeTable.table_id)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                         <FaPlus />
                         <span>Iniciar</span>
                     </button>
@@ -193,10 +191,10 @@ const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) 
         }
 
         const onClose = () => {
-            modalHandler.hideModal("edit-table-" + order.order_id)
+            modalHandler.hideModal("show-order-" + order.order_id)
         }
 
-        modalHandler.showModal("edit-table-" + order.order_id, "Editar mesa", <CardOrder orderId={order.order_id} />, "xl", onClose);
+        modalHandler.showModal("show-order-" + order.order_id, "Editar mesa", <CardOrder orderId={order.order_id} />, "xl", onClose);
     }
 
     return (
@@ -204,7 +202,7 @@ const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) 
             onClick={openModal}
             style={{
                 ...style,
-                backgroundColor: order ? "lightgreen" : "lightblue",
+                backgroundColor: (order && order.status !== "Closed") ? "lightgreen" : "lightblue",
                 border: "1px solid #ccc",
                 borderRadius: "4px",
                 cursor: "grab",
@@ -213,7 +211,7 @@ const TableItem = ({ table, order }: { table: PlaceTable, order?: OrderTable }) 
                 justifyContent: "center",
             }}
         >
-            <p className="text-sm">{table?.table.name || "Sem Nome"}</p>
+            <p className="text-sm">{placeTable?.table.name || "Sem Nome"}</p>
         </div>
     );
 };
@@ -227,7 +225,7 @@ const Cell = ({ children }: { children?: React.ReactNode }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        position: "relative", // Corrigido: agora TypeScript reconhece como válido
+        position: "relative",
     };
 
     return (
