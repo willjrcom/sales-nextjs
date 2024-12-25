@@ -12,6 +12,7 @@ import { EntityState } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { fetchOrders } from "@/redux/slices/orders";
+import DroppableFinish from "./droppable-finish";
 
 interface OrderKanbanProps {
     slice: EntityState<Order, string>;
@@ -20,7 +21,6 @@ interface OrderKanbanProps {
 function OrderKanban({ slice }: OrderKanbanProps) {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
-    const [finishedOrders, setFinishedOrders] = useState<Order[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
     const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
@@ -52,7 +52,6 @@ function OrderKanban({ slice }: OrderKanbanProps) {
     useEffect(() => {
         setPendingOrders(Object.values(slice.entities).filter(order => order.status === "Pending"));
         setReadyOrders(Object.values(slice.entities).filter(order => order.status === "Ready"));
-        setFinishedOrders(Object.values(slice.entities).filter(order => order.status === "Finished"));
     }, [slice.entities]);
 
     const handleDragStart = (event: { active: any }) => {
@@ -78,11 +77,9 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             // Atualiza as listas de forma imutável
             setPendingOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
             setReadyOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
-            setFinishedOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
 
             if (over.id === "Pending") setPendingOrders(prev => [...prev, updatedOrder]);
             if (over.id === "Ready") setReadyOrders(prev => [...prev, updatedOrder]);
-            if (over.id === "Finished") setFinishedOrders(prev => [...prev, updatedOrder]);
         };
 
         const indexId = activeId?.indexOf("-");
@@ -106,14 +103,11 @@ function OrderKanban({ slice }: OrderKanbanProps) {
                 moveOrder(readyOrders, "Finished");
                 dispatch(fetchOrders(data));
             } catch (error) {
-                handleDoubleClick(orderId, error as RequestError);
+                OpenOrder(orderId, error as RequestError);
             }
         }
     };
-
-    const isDoubleClick = (now: number) => lastClickTime && now - lastClickTime < 300;
-
-    const handleDoubleClick = (orderId: string, error?: RequestError | null) => {
+    const OpenOrder = (orderId: string, error: RequestError) => {
         const onClose = () => {
             modalHandler.hideModal("show-order-" + orderId)
         }
@@ -130,19 +124,6 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         useSensor(MouseSensor, {
             activationConstraint: {
                 distance: preventDrag ? Infinity : 5,
-            },
-            onActivation: () => {
-                const now = Date.now();
-                if (isDoubleClick(now)) {
-                    setLastClickTime(null);
-                    setPreventDrag(true);
-                    const indexId = activeId?.indexOf("-");
-                    const orderId = activeId?.substring(indexId ? indexId + 1 : 0);
-                    if (!orderId) return;
-                    handleDoubleClick(orderId);
-                } else {
-                    setLastClickTime(now);
-                }
             },
         })
     );
@@ -171,14 +152,13 @@ function OrderKanban({ slice }: OrderKanbanProps) {
                 </Droppable>
 
                 {/* Finalizados */}
-                <Droppable
+                <DroppableFinish
                     id="Finished"
-                    orders={finishedOrders}
                     activeId={activeId}
                     canReceive={() => activeId?.startsWith("Ready-") || activeId?.startsWith("Finished-") || false}
                 >
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Finalizados</h2>
-                </Droppable>
+                </DroppableFinish>
             </div>
         </DndContext>
     );
