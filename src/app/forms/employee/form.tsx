@@ -44,7 +44,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
                 employee.id = response
                 dispatch(addEmployee(employee));
             } else {
-                dispatch(updateEmployee({id: employee.id, changes: employee}));
+                dispatch(updateEmployee({ type: "UPDATE", payload: { id: employee.id, changes: employee } }));
             }
 
             modalHandler.hideModal(modalName);
