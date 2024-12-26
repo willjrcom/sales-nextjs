@@ -229,7 +229,7 @@ const DragAndDropGrid = () => {
                 <div className="flex justify-around mb-4">
                     <div className="mr-4">
                         <div className="flex items-center justify-between">
-                            <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
+                            <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} optional/>
                             <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
                         </div>
                         <div className="min-h-[80vh]"

@@ -41,7 +41,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
 
     return (
         <>
-            <TextField name='name' friendlyName='Nome' placeholder='Digite o nome' setValue={setName} value={name} />
+            <TextField name='name' friendlyName='Nome' placeholder='Digite o nome' setValue={setName} value={name} optional/>
             {error && <p className='text-red-500'>{error.message}</p>}
             <ButtonsModal
                 item={item!}

@@ -104,6 +104,7 @@ const DeliveryOrderToFinish = () => {
                     setSelectedValue={setSelectedDriverId}
                     selectedValue={selectedDriverId || ""}
                     values={deliveryDrivers}
+                    optional
                 />
                 <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
             </div>

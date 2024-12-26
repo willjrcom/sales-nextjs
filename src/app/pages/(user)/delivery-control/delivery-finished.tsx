@@ -6,7 +6,6 @@ import CardOrder from "@/app/components/order/card-order";
 import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
-import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
 import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
@@ -68,6 +67,7 @@ const DeliveryOrderFinished = () => {
                     setSelectedValue={setSelectedDriverId}
                     selectedValue={selectedDriverId || ""}
                     values={deliveryDrivers}
+                    optional
                 />
                 <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
             </div>

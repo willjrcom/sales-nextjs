@@ -46,7 +46,7 @@ const PageDeliveryDriver = () => {
             <CrudLayout
                 title="Motoboys"
                 searchButtonChildren={
-                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} />
+                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} optional/>
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-delivery-driver" icon={FaFilter}>

@@ -54,7 +54,7 @@ const PageProducts = () => {
             <CrudLayout title="Produtos"
                 searchButtonChildren={
                     <SelectField 
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} />
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} optional/>
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>

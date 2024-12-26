@@ -88,7 +88,7 @@ const Component = () => {
             {orderProcessesSlice.error && <p className="mb-4 text-red-500">{orderProcessesSlice.error?.message}</p>}
             <CrudLayout title={processRule.name || "Carregando..."}
             searchButtonChildren={
-                <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} />
+                <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional/>
             }
                 refreshButton={
                     <Refresh

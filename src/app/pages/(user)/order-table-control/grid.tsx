@@ -111,7 +111,8 @@ const DragAndDropGrid = () => {
             <div className="flex justify-center">
                 <div>
                     <div className="flex items-center justify-between">
-                        <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} />
+                        <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} 
+                        optional/>
                         <Refresh slice={tableOrdersSlice} fetchItems={fetchTableOrders} />
                     </div>
                     <div

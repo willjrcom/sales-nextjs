@@ -39,7 +39,7 @@ const PageClient = () => {
             {clientsSlice.error && <p className="mb-4 text-red-500">{clientsSlice.error?.message}</p>}
             <CrudLayout title="Clientes"
                 searchButtonChildren={
-                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} />
+                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional/>
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
