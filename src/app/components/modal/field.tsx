@@ -91,7 +91,7 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
         <div className="mb-4">
             {friendlyName && (
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
-                    {friendlyName} {optional && <span className="text-red-500">*</span>}
+                    {friendlyName} {!optional && <span className="text-red-500">*</span>}
                 </label>
             )}
 
@@ -113,7 +113,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
-                {friendlyName} {optional && <span className="text-red-500">*</span>}
+                {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -133,7 +133,7 @@ const DateField = ({ friendlyName, name, disabled, setValue, value, optional}: D
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName} {optional && <span className="text-red-500">*</span>}
+                {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -160,7 +160,7 @@ const DateTimeField = ({ friendlyName, name, disabled, setValue, value, optional
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName} {optional && <span className="text-red-500">*</span>}
+                {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -179,7 +179,7 @@ const TimeField = ({ friendlyName, name, disabled, setValue, value, optional}: T
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName} {optional && <span className="text-red-500">*</span>}
+                {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -198,7 +198,7 @@ const CheckboxField = ({ friendlyName, name, disabled, value, setValue, optional
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-                {friendlyName} {optional && <span className="text-red-500">*</span>}
+                {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
             <input
@@ -215,7 +215,7 @@ const CheckboxField = ({ friendlyName, name, disabled, value, setValue, optional
 const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue, optional }: RadioFieldProps) => (
     <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-            {friendlyName} {optional && <span className="text-red-500">*</span>}
+            {friendlyName} {!optional && <span className="text-red-500">*</span>}
         </label>
         {values.length === 0 && <p className="text-gray-600">Nenhuma opção disponível</p>}
         {values.map((valueObj) => (
@@ -250,7 +250,7 @@ const HiddenField = ({ name, value, setValue }: HiddenFieldProps) => {
 const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue, optional }: SelectFieldProps) => (
     <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-            {friendlyName} {optional && <span className="text-red-500">*</span>}
+            {friendlyName} {!optional && <span className="text-red-500">*</span>}
         </label>
         {values.length === 0 && <p className="text-gray-600">Nenhuma opção disponível</p>}
         {values.length > 0 &&

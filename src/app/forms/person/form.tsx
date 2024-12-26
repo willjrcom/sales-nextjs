@@ -34,11 +34,11 @@ const PersonForm = ({ person, setPerson }: PersonProps) => {
         <>
             <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={person.name}/>
 
-            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email}/>
+            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional/>
 
-            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf}/>
+            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional/>
 
-            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} />
+            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional/>
 
             <ContactForm contactParent={contact} setContactParent={setContact} />
             <AddressForm addressParent={person.address} setAddressParent={setAddress} />

@@ -124,18 +124,21 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                     name="image_path"
                     setValue={value => handleInputChange('image_path', value)}
                     value={category.image_path}
+                    optional
                 />
                 <CheckboxField
                     friendlyName="Deseja imprimir no pedido?"
                     name="need_print"
                     setValue={value => handleInputChange('need_print', value)}
                     value={category.need_print}
+                    optional
                 />
                 <CheckboxField
                     friendlyName="Deseja produzir com processos?"
                     name="use_process_rule"
                     setValue={value => handleInputChange('use_process_rule', value)}
                     value={category.use_process_rule}
+                    optional
                 />
             </div>
 

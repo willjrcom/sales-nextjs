@@ -86,7 +86,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       <p className="text-sm">{product.description}</p>
       <p className="text-lg font-bold">Tamanho {product.size.name}</p>
       <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
-      <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} />
+      <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional/>
       <hr className="my-4" />
 
       {/* Valor unitario */}

@@ -43,7 +43,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
                 place.id = response
                 dispatch(addPlace(place));
             } else {
-                dispatch(updatePlace({id: place.id, changes: place}));
+                dispatch(updatePlace({ type: "UPDATE", payload: {id: place.id, changes: place}}));
             }
 
             modalHandler.hideModal(modalName);
@@ -63,7 +63,9 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     return (
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={place.name}/>
-            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={place.image_path}/>
+                
+            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={place.image_path} optional/>
+
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
