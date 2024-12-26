@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import { FaLuggageCart, FaPaperPlane, FaUtensils } from "react-icons/fa";
+import { FaLuggageCart, FaMotorcycle, FaUtensils } from "react-icons/fa";
 
 
 const PageNewOrder = () => {
@@ -10,7 +10,7 @@ const PageNewOrder = () => {
 
   const options = [
     { id: "mesa", label: "Mesa", icon: <FaUtensils className="w-24 h-24 mb-4" />, route: "/pages/new-order/table" },
-    { id: "entrega", label: "Entrega", icon: <FaPaperPlane className="w-24 h-24 mb-4" />, route: "/pages/new-order/delivery" },
+    { id: "entrega", label: "Entrega", icon: <FaMotorcycle className="w-24 h-24 mb-4" />, route: "/pages/new-order/delivery" },
     { id: "balcao", label: "Balcão/Retirada", icon: <FaLuggageCart className="w-24 h-24 mb-4" />, route: "/pages/new-order/pickup" },
   ];
 

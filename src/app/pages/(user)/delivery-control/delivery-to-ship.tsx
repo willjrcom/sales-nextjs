@@ -15,7 +15,7 @@ import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { FaPaperPlane } from "react-icons/fa";
+import { FaMotorcycle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
 const DeliveryOrderToShip = () => {
@@ -92,7 +92,7 @@ const DeliveryOrderToShip = () => {
                     <Map centerPoint={centerPoint} points={points} />
                 </div>
             </div>
-            {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaPaperPlane} title="Enviar entrega" position="bottom-right">
+            {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaMotorcycle} title="Enviar entrega" position="bottom-right">
                 <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} />
             </ButtonIconTextFloat>}
         </>
