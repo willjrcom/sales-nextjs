@@ -206,7 +206,7 @@ const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: Orde
                 backgroundColor: (order && order.status !== "Closed") ? "lightgreen" : "lightblue",
                 border: "1px solid #ccc",
                 borderRadius: "4px",
-                cursor: "grab",
+                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

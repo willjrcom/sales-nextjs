@@ -1,10 +1,14 @@
 import { useModal } from "@/app/context/modal/context";
-import { User } from "@/app/entities/user/user";
+import Person from "@/app/entities/person/person";
 import PersonForm from "@/app/forms/person/form";
 import React from "react";
 
+interface UserSession {
+    person: Person;
+}
+
 type EmployeeUserProfileProps = {
-    user?: User | null;
+    user: UserSession;
     photoUrl?: string;
 };
 
@@ -16,7 +20,7 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
         const onClose = () => {
             modalHandler.hideModal("show-user")
         }
-
+        
         modalHandler.showModal(
             "show-user",
             "Dados Pessoais",
@@ -25,16 +29,16 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
                     {photoUrl ? (
                         <img
                             src={photoUrl}
-                            alt={`${user?.person.name}'s profile`}
+                            alt={`${user.person.name}'s profile`}
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <span className="text-lg font-bold text-gray-600">{getInitial(user?.person.name)}</span>
+                        <span className="text-lg font-bold text-gray-600">{getInitial(user.person.name)}</span>
                     )}
                 </div>
-                <p className="mt-2 text-lg font-bold">{user?.person.name}</p>
+                <p className="mt-2 text-lg font-bold">{user.person.name}</p>
                 <hr className="my-4" />
-                <PersonForm person={user?.person!} setPerson={() => {}} />
+                <PersonForm person={user.person} setPerson={() => {}} />
             </>,
             "sm", onClose
         )
@@ -42,17 +46,17 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
     return (
         <div className="relative">
             <div onClick={OpenModal}
-                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md"
-                title={user?.person.name}
+                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md cursor-pointer"
+                title={user.person.name}
             >
                 {photoUrl ? (
                     <img
                         src={photoUrl}
-                        alt={`${user?.person.name}'s profile`}
+                        alt={`${user.person.name}'s profile`}
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <span className="text-lg font-bold text-gray-600">{getInitial(user?.person.name)}</span>
+                    <span className="text-lg font-bold text-gray-600">{getInitial(user.person.name)}</span>
                 )}
             </div>
         </div>

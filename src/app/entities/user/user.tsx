@@ -1,12 +1,11 @@
 import Company from "../company/company";
 import Person from "../person/person";
 
-export class User {
-    person: Person = new Person();
+export class User extends Person {
     companies: Company [] = [];
 
     constructor(person: Person = new Person(), companies = []) {
-        this.person = person;
+        super(person.id, person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
         this.companies = companies;
     }
 };

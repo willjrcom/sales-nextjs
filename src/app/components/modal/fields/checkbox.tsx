@@ -17,6 +17,7 @@ const CheckboxField = ({ friendlyName, name, disabled, value, setValue, optional
             </label>
 
             <input
+            className="cursor-pointer"
                 id={name}
                 type="checkbox"
                 disabled={disabled}

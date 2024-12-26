@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import styles from './topbar.module.css';
 import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
 import { FaExclamationCircle } from 'react-icons/fa';
@@ -65,7 +64,7 @@ const Topbar = () => {
         <TopbarItem label="Turno" href="/pages/shift" color='green'/>
         <div>&nbsp;</div>
         <TopbarItemIcon icon={IoIosNotifications} href="/" />
-        <EmployeeUserProfile user={data?.user} />
+        {data?.user && <EmployeeUserProfile user={data?.user} />}
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PersonForm from '../person/form';
 import Person from '@/app/entities/person/person';
 import Employee, { ValidateEmployeeForm } from '@/app/entities/employee/employee';
@@ -15,22 +15,33 @@ import { ToIsoDate } from '@/app/utils/date';
 import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/employees';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
+import { HiddenField } from '@/app/components/modal/field';
+import { User } from '@/app/entities/user/user';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
     const modalHandler = useModal();
-    const [person, setPerson] = useState<Person>(item || new Employee());
+    const [employee, setEmployee] = useState<Employee>(item || new Employee());
+    const [person, setPerson] = useState<Person>(item?.user || new Person());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
+    useEffect(() => {
+        setEmployee(prev => ({ ...prev, user: person as User }));
+    }, [person]);
+
+    const handleInputChange = (field: keyof Employee, value: any) => {
+        setEmployee(prev => ({ ...prev, [field]: value }));
+    };
+
     const submit = async () => {
         if (!data) return;
-        let employee = new Employee(person)
+        let employee = new Employee(person.id);
 
-        if (employee.birthday) {
-            employee.birthday = ToIsoDate(employee.birthday)
+        if (employee.user.birthday) {
+            employee.user.birthday = ToIsoDate(employee.user.birthday)
         }
 
         const validationErrors = ValidateEmployeeForm(employee);
@@ -56,7 +67,6 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
 
     const onDelete = async () => {
         if (!data) return;
-        let employee = new Employee(person);
         DeleteEmployee(employee.id, data);
         dispatch(removeEmployee(employee.id));
         modalHandler.hideModal(modalName);
@@ -66,6 +76,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
         <>
             {error && <p className='text-red-500'>{error.message}</p>}
             <PersonForm person={person} setPerson={setPerson} />
+            <HiddenField name='user_id' setValue={value => handleInputChange('user_id', value)} value={employee.user_id} />
             <ErrorForms errors={errors} />
             <ButtonsModal item={person} name="Funcionário" onSubmit={submit} deleteItem={onDelete} />
         </>

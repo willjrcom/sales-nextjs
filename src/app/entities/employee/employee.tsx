@@ -1,14 +1,14 @@
 import { z } from "zod";
-import Person, { ValidatePersonForm } from "../person/person";
+import { ValidatePersonForm } from "../person/person";
 import { User } from "../user/user";
 
-export default class Employee extends Person {
+export default class Employee {
+    id: string = '';
     user_id: string = '';
     user: User = new User();
 
-    constructor(person: Person = new Person(), user_id: string = '', user: User = new User()) {
-        // Call the super constructor with the name and age from the Person object
-        super(person.id, person.name, person.email, person.cpf, person.birthday, person.contact, person.address, false);
+    constructor(id: string = '', user_id: string = '', user: User = new User()) {
+        this.id = id;
         this.user_id = user_id;
         this.user = user;
     }
@@ -17,8 +17,8 @@ export default class Employee extends Person {
 const SchemaEmployee = z.object({
 });
 
-export const ValidateEmployeeForm = (client: Employee) => {
-    const errors = ValidatePersonForm(client);
+export const ValidateEmployeeForm = (employee: Employee) => {
+    const errors = ValidatePersonForm(employee.user);
     const validatedFields = SchemaEmployee.safeParse({
     });
 

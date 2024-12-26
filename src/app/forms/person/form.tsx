@@ -12,8 +12,8 @@ interface PersonProps {
 }
 
 const PersonForm = ({ person, setPerson }: PersonProps) => {
-    const [contact, setContact] = useState<Contact>(person.contact)
-    const [address, setAddress] = useState<Address>(person.address)
+    const [contact, setContact] = useState<Contact>(person.contact || new Contact())
+    const [address, setAddress] = useState<Address>(person.address || new Address())
 
     const handleInputChange = useCallback((field: keyof Person, value: any) => {
         setPerson(prev => ({

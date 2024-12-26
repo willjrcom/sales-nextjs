@@ -40,6 +40,8 @@ const PageEmployee = () => {
         )
     }
     
+    const filteredEmployees = Object.values(employeesSlice.entities).filter(employee => employee.user.name.includes(nome)).sort((a, b) => a.user.name.localeCompare(b.user.name));
+
     return (
         <>
         {employeesSlice.error && <p className="mb-4 text-red-500">{employeesSlice.error?.message}</p>}
@@ -68,7 +70,7 @@ const PageEmployee = () => {
                 tableChildren={
                     <CrudTable 
                         columns={EmployeeColumns()} 
-                        data={Object.values(employeesSlice.entities).filter(employee => employee.name.includes(nome)).sort((a, b) => a.name.localeCompare(b.name))} />
+                        data={filteredEmployees} />
                 }
             />
         </>
