@@ -5,6 +5,8 @@ import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { useCurrentOrder } from '@/app/context/current-order/context';
+import EmployeeUserProfile from '../profile/profile';
+import { useSession } from 'next-auth/react';
 
 interface TopbarItemProps {
   label: string;
@@ -40,6 +42,7 @@ const TopbarItemAlert: React.FC<TopbarItemIconProps> = ({ label, icon: Icon, hre
 const Topbar = () => {
   const contextCurrentOrder = useCurrentOrder();
   const [showCurrentOrder, setCurrentOrder] = useState(false);
+  const { data } = useSession();
 
   useEffect(() => {
     if (contextCurrentOrder.order?.status === "Staging") {
@@ -62,6 +65,7 @@ const Topbar = () => {
         <TopbarItem label="Turno" href="/pages/shift" color='green'/>
         <div>&nbsp;</div>
         <TopbarItemIcon icon={IoIosNotifications} href="/" />
+        <EmployeeUserProfile />
       </div>
     </div>
   )
