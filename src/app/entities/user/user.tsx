@@ -1,11 +1,12 @@
 import Company from "../company/company";
+import Person from "../person/person";
 
 export class User {
-    email: string = '';
+    person: Person = new Person();
     companies: Company [] = [];
 
-    constructor(email = "", companies = []) {
-        this.email = email;
+    constructor(person: Person = new Person(), companies = []) {
+        this.person = person;
         this.companies = companies;
     }
 };

@@ -65,7 +65,7 @@ const Topbar = () => {
         <TopbarItem label="Turno" href="/pages/shift" color='green'/>
         <div>&nbsp;</div>
         <TopbarItemIcon icon={IoIosNotifications} href="/" />
-        <EmployeeUserProfile />
+        <EmployeeUserProfile user={data?.user} />
       </div>
     </div>
   )
