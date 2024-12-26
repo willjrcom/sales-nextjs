@@ -1,7 +1,7 @@
 import Company from "../company/company";
 import Person from "../person/person";
 
-export class User extends Person {
+export default class User extends Person {
     companies: Company [] = [];
 
     constructor(person: Person = new Person(), companies = []) {

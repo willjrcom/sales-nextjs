@@ -16,7 +16,7 @@ import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/empl
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import { HiddenField } from '@/app/components/modal/field';
-import { User } from '@/app/entities/user/user';
+import User from '@/app/entities/user/user';
 
 const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'

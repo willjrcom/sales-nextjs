@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ValidatePersonForm } from "../person/person";
-import { User } from "../user/user";
+import User from "../user/user";
 
 export default class Employee {
     id: string = '';
