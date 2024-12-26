@@ -90,7 +90,9 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     return (
         <>
             <TextField friendlyName='Quantidade' name='quantity' setValue={setQuantityValue} value={quantityValue}/>
+
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id}/>
+                
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}

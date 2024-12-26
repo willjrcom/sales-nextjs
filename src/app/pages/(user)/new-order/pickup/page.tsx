@@ -35,6 +35,7 @@ const PageNewOrderPickup = () => {
                         placeholder="Digite o nome do pedido" 
                         setValue={setOrderName} 
                         value={orderName} 
+                        optional
                     />
                 </div>
                 {error && <p className="mb-4 text-red-500">{error.message}</p>}

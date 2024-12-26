@@ -46,7 +46,7 @@ const PageEmployee = () => {
             <CrudLayout
                 title="Funcionários"
                 searchButtonChildren={
-                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do funcionário" setValue={setNome} value={nome} />
+                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do funcionário" setValue={setNome} value={nome} optional />
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-employee" icon={FaFilter}>

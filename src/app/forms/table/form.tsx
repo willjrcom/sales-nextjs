@@ -62,7 +62,9 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     return (
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name}/>
+
             <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_available', value)} value={table.is_available}/>
+                
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name}/>
 
             {error && <p className='mb-4 text-red-500'>{error.message}</p>}

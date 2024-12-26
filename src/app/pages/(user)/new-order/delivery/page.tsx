@@ -41,6 +41,7 @@ const PageNewOrderDelivery = () => {
                         placeholder="Digite o contato do cliente"
                         setValue={setContact}
                         value={contact}
+                        optional
                     />
                 </div>
                 <button

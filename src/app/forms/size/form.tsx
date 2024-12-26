@@ -72,8 +72,11 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     return (
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name}/>
+
             <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active}/>
+
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id}/>
+                
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}

@@ -141,14 +141,23 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     return (
         <>
             <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code}/>
+
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name}/>
-            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description}/>
+
+            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description} optional/>
+
             <NumberField friendlyName='Preço' name='price' setValue={value => handleInputChange('price', value)} value={product.price}/>
-            <NumberField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost}/>
-            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={product.image_path}/>
+
+            <NumberField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost} optional/>
+
+            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={product.image_path} optional/>
+
             <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available}/>
+
             <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories}/>
+
             <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes}/>
+                
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id}/>
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
