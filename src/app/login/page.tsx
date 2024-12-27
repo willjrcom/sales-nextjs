@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { TextField } from '../components/modal/field';
+import PasswordField from '../components/modal/fields/password';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -46,40 +48,25 @@ const LoginForm = () => {
           <p>Conecte-se a sua conta.</p>
         </div>
       </div>
+
       <div className="w-1/2 flex items-center justify-center bg-white">
         <div className="w-full max-w-md px-8 py-10">
           <h2 className="text-2xl mb-6">Conecte-se</h2>
           {error && <p className="mb-4 text-red-500">{error}</p>}
           <div className="flex flex-col">
-            <label htmlFor="email" className="mb-2 text-gray-700">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mb-4 p-3 border border-gray-300 rounded"
-              required
-            />
-            <label htmlFor="password" className="mb-2 text-gray-700">Senha</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mb-4 p-3 border border-gray-300 rounded"
-              required
-            />
+            <TextField friendlyName='Email' name='email' placeholder='Digite seu email' setValue={setEmail} value={email} />
+
+            <PasswordField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
+
             <div className="flex items-center mb-4">
               <input type="checkbox" id="remember" name="remember" className="mr-2" />
               <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
             </div>
+
             <button onClick={handleSubmit} className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Conectar</button>
+
             <div className="flex justify-between mt-4 text-yellow-500">
-              <a href="#" className="hover:underline">Esqueceu a senha?</a>
+              <Link href="/login/forget-password" className="hover:underline">Esqueceu a senha?</Link>
               <Link href="/login/sign-up" className="hover:underline">Novo usuário</Link>
             </div>
           </div>
