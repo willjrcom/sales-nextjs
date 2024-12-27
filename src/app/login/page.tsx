@@ -2,6 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -79,7 +80,7 @@ const LoginForm = () => {
             <button onClick={handleSubmit} className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Conectar</button>
             <div className="flex justify-between mt-4 text-yellow-500">
               <a href="#" className="hover:underline">Esqueceu a senha?</a>
-              <a href="#" className="hover:underline">Alterar senha</a>
+              <Link href="/login/sign-up" className="hover:underline">Novo usuário</Link>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useModal } from "@/app/context/modal/context";
 import Person from "@/app/entities/person/person";
-import PersonForm from "@/app/forms/person/form";
+import UserForm from "@/app/forms/user/form";
 import React from "react";
 
 interface UserSession {
@@ -38,7 +38,7 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
                 </div>
                 <p className="mt-2 text-lg font-bold">{user.person.name}</p>
                 <hr className="my-4" />
-                <PersonForm person={user.person} setPerson={() => {}} />
+                <UserForm item={user.person} />
             </>,
             "sm", onClose
         )

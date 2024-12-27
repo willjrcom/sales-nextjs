@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 export default class Contact {
-    id: string = '';
+    id?: string;
     ddd: string = '';
     number: string = '';
     type: ContactType = ContactType.Client;
-    object_id: string = '';
+    object_id?: string = '';
 
-    constructor(id = '', ddd = '', number = '', type = ContactType.Client, object_id = '') { 
+    constructor(id?: string, ddd = '', number = '', type = ContactType.Client, object_id = '') { 
         this.id = id; 
         this.ddd = ddd; 
         this.number = number; 
@@ -22,6 +22,6 @@ export enum ContactType {
 }
 
 export const SchemaContact = z.object({
-    ddd: z.string().min(2, 'DDD inválido').max(2, 'DDD inválido'),
-    number: z.string().min(8, 'Número inválido').max(9, 'Número inválido'),
+    ddd: z.string().length(2, 'Celular: DDD inválido, precisa ter 2 caracteres'),
+    number: z.string().min(8, 'Celular: Número min inválido').max(9, 'Celular: Número max inválido'),
 });

@@ -1,13 +1,16 @@
-import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi from "../../request";
 import User from "@/app/entities/user/user";
 
-const NewUser = async (user: User, session: Session): Promise<string> => {
-    const response = await RequestApi<User,string>({
+interface UserWithPassword extends User {
+    password: string
+}
+const NewUser = async (user: User, password: string): Promise<string> => {
+    const userWithPassword = {...user, password: password} as UserWithPassword
+    
+    const response = await RequestApi<UserWithPassword,string>({
         path: "/user/new", 
         method: "POST",
-        body: user,
-        headers: await AddIdToken(session),
+        body: userWithPassword,
     });
     return response.data
 };

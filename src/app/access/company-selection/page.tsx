@@ -7,7 +7,6 @@ import { fetchCategories } from '@/redux/slices/categories';
 import { fetchClients } from '@/redux/slices/clients';
 import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
 import { fetchEmployees } from '@/redux/slices/employees';
-import { fetchOrders } from '@/redux/slices/orders';
 import { fetchPlaces } from '@/redux/slices/places';
 import { AppDispatch, persistor, store } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';

@@ -27,8 +27,8 @@ function translateToPortuguese(type: string): string {
 }
 
 export default class Address {
-    id: string = '';
-    object_id: string = '';
+    id?: string;
+    object_id?: string = '';
     street: string = '';
     number: string = '';
     complement: string = '';
@@ -42,7 +42,7 @@ export default class Address {
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
-    constructor(id = '', object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, adress_type = '', likeTax: boolean = false, coordinates?: Coordinates) {
+    constructor(id?: string, object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, adress_type = '', likeTax: boolean = false, coordinates?: Coordinates) {
         this.id = id
         this.object_id = object_id
         this.street = street
@@ -106,7 +106,7 @@ export class Coordinates {
 export const SchemaAddress = z.object({
     cep: z.string().min(8, 'Cep inválido').max(9, 'Cep inválido'),
     street: z.string().min(3, 'Rua precisa ter pelo menos 3 caracteres').max(100, 'Rua precisa ter no máximo 100 caracteres'),
-    number: z.string().min(1, 'Número inválido').max(10, 'Número inválido'),
+    number: z.string().min(1, 'Endereço: Número minimo 1 caracter'),
     complement: z.string().max(100, 'Complemento precisa ter no máximo 100 caracteres'),
     reference: z.string().max(100, 'Referência precisa ter no máximo 100 caracteres'),
     neighborhood: z.string().min(3, 'Bairro precisa ter pelo menos 3 caracteres').max(100, 'Bairro precisa ter no máximo 100 caracteres'),
@@ -115,7 +115,6 @@ export const SchemaAddress = z.object({
     delivery_tax: z.number().min(0, 'Taxa de entrega inválida'),
     object_id: z.string().optional(),
 });
-
 
 export const ValidateAddressForm = (address: Address) => {
     const validatedFields = SchemaAddress.safeParse({
