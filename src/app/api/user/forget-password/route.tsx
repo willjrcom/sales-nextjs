@@ -7,7 +7,7 @@ const ForgetUserPassword = async (email: string): Promise<string> => {
     const body = {email: email} as ForgetUserPasswordProps
     const response = await RequestApi<ForgetUserPasswordProps,string>({
         path: "/user/forget-password", 
-        method: "PATCH",
+        method: "POST",
         body: body,
     });
     return response.data
