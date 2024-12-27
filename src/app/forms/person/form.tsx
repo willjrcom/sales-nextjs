@@ -7,11 +7,12 @@ import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
 
 interface PersonProps {
-    person: Person
-    setPerson: React.Dispatch<React.SetStateAction<Person>>
+    person: Person;
+    setPerson: React.Dispatch<React.SetStateAction<Person>>;
+    isEmployee?: boolean;
 }
 
-const PersonForm = ({ person, setPerson }: PersonProps) => {
+const PersonForm = ({ person, setPerson, isEmployee }: PersonProps) => {
     const [contact, setContact] = useState<Contact>(person.contact || new Contact())
     const [address, setAddress] = useState<Address>(person.address || new Address())
 
@@ -34,11 +35,11 @@ const PersonForm = ({ person, setPerson }: PersonProps) => {
         <>
             <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={person.name}/>
 
-            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional/>
+            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional={!isEmployee}/>
 
-            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional/>
+            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee}/>
 
-            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional/>
+            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee}/>
 
             <ContactForm contactParent={contact} setContactParent={setContact} />
             <AddressForm addressParent={person.address} setAddressParent={setAddress} />

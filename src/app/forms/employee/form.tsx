@@ -75,7 +75,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     return (
         <>
             {error && <p className='text-red-500'>{error.message}</p>}
-            <PersonForm person={person} setPerson={setPerson} />
+            <PersonForm person={person} setPerson={setPerson} isEmployee />
             <HiddenField name='user_id' setValue={value => handleInputChange('user_id', value)} value={employee.user_id} />
             <ErrorForms errors={errors} />
             <ButtonsModal item={person} name="Funcionário" onSubmit={submit} deleteItem={onDelete} />

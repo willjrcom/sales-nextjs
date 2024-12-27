@@ -3,6 +3,7 @@
 import RequestError from '@/app/api/error';
 import NewUser from '@/app/api/user/new/route';
 import ErrorForms from '@/app/components/modal/error-forms';
+import { TextField } from '@/app/components/modal/field';
 import { useModal } from '@/app/context/modal/context';
 import Person, { ValidatePersonForm } from '@/app/entities/person/person';
 import User, { ValidateUserForm } from '@/app/entities/user/user';
@@ -69,29 +70,9 @@ const RegisterForm = () => {
                     <div className="flex flex-col">
                         {error && <p className="mb-4 text-red-500">{error.message}</p>}
                         <ErrorForms errors={errors} />
-                        <PersonForm person={user} setPerson={setUser} />
-                        <label htmlFor="password" className="mb-2 text-gray-700">Senha</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Senha"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="mb-4 p-3 border border-gray-300 rounded"
-                            required
-                        />
-                        <label htmlFor="confirmPassword" className="mb-2 text-gray-700">Confirmar Senha</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            placeholder="Confirmar Senha"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="mb-4 p-3 border border-gray-300 rounded"
-                            required
-                        />
+                        <PersonForm person={user} setPerson={setUser} isEmployee />
+                        <TextField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
+                        <TextField friendlyName='Confirmar Senha' name='confirmPassword' placeholder='Confirme sua senha' setValue={setConfirmPassword} value={confirmPassword} />
                         {error && <p className="mb-4 text-red-500">{error.message}</p>}
                         <ErrorForms errors={errors} />
                     </div>
