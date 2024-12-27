@@ -21,7 +21,7 @@ const authOptions: NextAuthOptions = {
 
                     const response = await Login({ email, password });
 
-                    if (response?.access_token && response?.companies) {
+                    if (response?.access_token) {
                         return {
                             id: response.access_token,
                             person: response.person,
