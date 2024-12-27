@@ -13,6 +13,7 @@ import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { FaPlus } from 'react-icons/fa';
 import { Provider, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -90,6 +91,15 @@ function CompanySelection() {
                 <h2 className="text-2xl font-bold">Não existem empresas disponíveis.</h2>
                 <p className="text-lg">Por favor, entre em contato com a empresa responsável pela sua conta.</p>
                 <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
+
+                <Link href={"/pages/new-company"}>
+                    <div className={`fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max`}
+                        style={{ zIndex: 1000 }}
+                    >
+                        <FaPlus className="text-sm" />
+                        <span>Nova empresa</span>
+                    </div>
+                </Link>
             </div>
         );
     }
@@ -109,11 +119,16 @@ function CompanySelection() {
                         <h2 className="text-2xl font-bold">{company.trade_name}</h2>
                     </button>
                 ))}
-                <Link href={"/pages/new-company"}
-                    className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition">
-                    <h2 className="text-2xl font-bold">Nova empresa</h2>
+                <Link href={"/pages/new-company"}>
+                    <div className={`fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max`}
+                        style={{ zIndex: 1000 }}
+                    >
+                        <FaPlus className="text-sm" />
+                        <span>Nova empresa</span>
+                    </div>
                 </Link>
             </div>
+
             <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
         </div>
     );
