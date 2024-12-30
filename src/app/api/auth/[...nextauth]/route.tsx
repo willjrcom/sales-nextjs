@@ -50,6 +50,8 @@ const authOptions: NextAuthOptions = {
             if (trigger === "update" && session.user.idToken) {
                 token.idToken = session.user.idToken;
                 token.currentCompany = session.user.currentCompany;
+            } else if (trigger === "update" && session.user.person) {
+                token.person = session.user.person;
             }
 
             if (user) {

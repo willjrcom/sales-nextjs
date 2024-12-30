@@ -36,7 +36,6 @@ const UserForm = ({ item, isUpdate }: CreateFormsProps<Person>) => {
             await update({
                 ...data,
                 user: {
-                    ...data.user,
                     person: user
                 },
             })
