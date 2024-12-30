@@ -1,25 +1,25 @@
 import RequestError from '@/app/api/error';
 import FinishOrderProcess from '@/app/api/order-process/finish/route';
 import StartOrderProcess from '@/app/api/order-process/start/route';
+import { useModal } from '@/app/context/modal/context';
 import { OrderProcess } from '@/app/entities/order-process/order-process';
-import { updateCategory } from '@/redux/slices/categories';
+import Item from '@/app/entities/order/item';
 import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-processes';
-import { AppDispatch, RootState } from '@/redux/store';
+import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 type CardProps = {
     orderProcess: OrderProcess;
 };
 
 const CardOrderProcess = ({ orderProcess }: CardProps) => {
-    const orderProcessesSlice = useSelector((state: RootState) => state.orderProcesses);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
-
+    const modalHandler = useModal();
+    
     const groupItem = orderProcess.group_item;
     if (!groupItem) return;
 
@@ -47,24 +47,37 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
         }
     }
 
-    return (
-        <div className="flex flex-col md:flex-row items-center border border-blue-400 rounded-lg p-4 shadow-lg">
-            {/* Imagem */}
-            <div className="w-full md:w-1/3">
-                {/* <Image
-                    src={""}
-                    alt={""}
-                    className="rounded-lg w-full h-auto object-cover"
-                /> */}
-            </div>
+    const openMoreInfo = (item: Item) => {
+        const onClose = () => {
+            modalHandler.hideModal("show-process-detail-" + item.id)
+        }
 
-            {/* Conteúdo */}
-            <div className="flex flex-col justify-between w-full md:w-2/3 px-4">
-                <div className="flex justify-between items-start">
+        modalHandler.showModal("show-process-detail-" + item.id, item.name, 
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                    <p className="text-lg font-bold">{item.name}</p>
+                    <p className="text-sm text-gray-600">Quantidade: {item.quantity}</p>
+                </div>
+                {item.item_to_additional?.map((additional, index) => (
+                    <div key={index} className="flex flex-col gap-2">
+                        <p className="text-md font-bold">{additional.name}</p>
+                        <p className="text-sm text-gray-600">Quantidade: {additional.quantity}</p>
+                    </div>
+                ))}
+            </div>,
+            'lg',
+            onClose
+        )
+    }
+
+    return (
+        <div className="flex flex-col md:flex-row items-center border border-blue-400 rounded-lg p-4 shadow-lg mt-4">
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            <div className="flex  justify-between w-full px-4">
+                <div className='w-2/3'>
                     {groupItem?.items?.map((item) => (
-                        <div key={item.id}>
-                            <h2 className="text-xl font-bold text-gray-800">{ }</h2>
-                            <p className="text-md">{item.name}</p>
+                        <div key={item.id} className='border p-2 mt-1 cursor-pointer' onClick={() => openMoreInfo(item)}>
+                            <p className="text-md">{item.quantity} x {item.name}</p>
 
                             <div className="mt-4 flex flex-wrap gap-2">
                                 {item.item_to_additional?.map((additional, index) => (
@@ -73,31 +86,30 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
                                         className={`px-2 py-1 text-sm rounded-lg ${additional.quantity > 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                                             }`}
                                     >
-                                        {additional.name}
+                                        {additional.quantity} x {additional.name}
                                     </span>
                                 ))}
                             </div>
                         </div>
                     ))}
-                    <div className="text-right">
-                        {orderProcess.id}<br/>
-                        {groupItem.status}
-                        <p className="text-gray-600 font-medium">Quantidade: <span className="font-bold">{groupItem?.quantity}</span></p>
-                    </div>
                 </div>
+                <div className='w-1/3 text-right'>
+                    <p className="text-gray-600 font-medium">Quantidade total: <span className="font-bold">{groupItem?.quantity}</span></p>
 
-                {groupItem?.observation && <p className="mt-4 text-sm text-gray-700">
-                    <span className="font-semibold text-red-600">OBS:</span> {groupItem?.observation}
-                </p>}
+                    {groupItem?.observation && <p className="mt-4 text-sm text-gray-700">
+                        <span className="font-semibold text-red-600">OBS:</span> {groupItem?.observation}
+                    </p>}
 
-                <div className='flex justify-end'>
-                    {orderProcess.status === "Pending" && <button onClick={() => startProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 max-w-[10vw]">
-                        Iniciar
-                    </button>}
-                    {orderProcess.status === "Started" &&
-                        <button onClick={() => finishProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 max-w-[10vw]">
-                            Finalizar
+                    {/* Controles de iniciação e conclusão */}
+                    <div className='flex justify-end'>
+                        {orderProcess.status === "Pending" && <button onClick={() => startProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 max-w-[10vw]">
+                            Iniciar
                         </button>}
+                        {orderProcess.status === "Started" &&
+                            <button onClick={() => finishProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 max-w-[10vw]">
+                                Finalizar
+                            </button>}
+                    </div>
                 </div>
             </div>
         </div>
