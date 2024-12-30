@@ -1,7 +1,6 @@
 export default class Item {
     id: string = "";
     name: string = "";
-    description: string = "";
     observation: string = "";
     price: number = 0;
     total_price: number = 0;
@@ -10,12 +9,12 @@ export default class Item {
     group_item_id: string = "";
     category_id: string = "";
     item_to_additional?: Item[] = [];
+    removed_items?: string[] = [];
     product_id: string = "";
 
-    constructor(id: string = "", name: string = "", price: number = 0, quantity: number = 0, size: string = "", product_id: string = "", group_item_id: string = "", category_id: string = "", observation: string = "", description: string = "", item_to_additional?: Item[]) {
+    constructor(id: string = "", name: string = "", price: number = 0, quantity: number = 0, size: string = "", product_id: string = "", group_item_id: string = "", category_id: string = "", observation: string = "", item_to_additional?: Item[], removed_items?: string[]) {
         this.id = id;
         this.name = name;
-        this.description = description;
         this.observation = observation;
         this.price = price;
         this.total_price = price * quantity;
@@ -25,5 +24,6 @@ export default class Item {
         this.category_id = category_id;
         this.product_id = product_id;
         this.item_to_additional = item_to_additional;
+        this.removed_items = removed_items
     }
 };

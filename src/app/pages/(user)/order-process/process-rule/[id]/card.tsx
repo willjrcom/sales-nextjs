@@ -9,6 +9,8 @@ import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import AdditionalItem from './additional-item';
+import RemovedItem from './removed-item';
 
 type CardProps = {
     orderProcess: OrderProcess;
@@ -80,16 +82,15 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
                             <p className="text-md">{item.quantity} x {item.name}</p>
 
                             <div className="mt-4 flex flex-wrap gap-2">
-                                {item.item_to_additional?.map((additional, index) => (
-                                    <span
-                                        key={index}
-                                        className={`px-2 py-1 text-sm rounded-lg ${additional.quantity > 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                                            }`}
-                                    >
-                                        {additional.quantity} x {additional.name}
-                                    </span>
+                                {item.item_to_additional?.map((additional) => (
+                                    <AdditionalItem key={additional.id} item={additional} />
                                 ))}
                             </div>
+                            <div className=''>
+                                {item.removed_items?.map((removedItem) => (
+                                    <RemovedItem key={removedItem} item={removedItem} />
+                                ))}
+                                </div>
                         </div>
                     ))}
                 </div>
