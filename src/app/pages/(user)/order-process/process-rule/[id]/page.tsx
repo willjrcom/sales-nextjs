@@ -4,7 +4,7 @@ import { OrderProcess } from "@/app/entities/order-process/order-process";
 import ProcessRule from "@/app/entities/process-rule/process-rule";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CardOrderProcess from "./card";
@@ -32,6 +32,11 @@ const Component = () => {
     const [processRules, setProcessRules] = useState<ProcessRule[]>([]);
     const [orderProcesses, setOrderProcesses] = useState<OrderProcess[]>([]);
     const dispatch = useDispatch<AppDispatch>();
+    const router = useRouter();
+
+    const updateParam = (newId: string) => {
+        router.replace(`/pages/order-process/process-rule/${newId}`);
+      };
 
     useEffect(() => {
         setCurrentProcessRuleID(id as string);
@@ -57,6 +62,7 @@ const Component = () => {
         const processRule = processRules.find((p) => p.id === currentProcessRuleID)
         if (!processRule) return
         setProcessRule(processRule)
+        updateParam(processRule.id)
     }, [currentProcessRuleID]
 )
     useEffect(() => {
