@@ -1,72 +1,54 @@
-'use client';
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconType } from 'react-icons';
 import { FaUserTie, FaCog, FaPlus, FaSignOutAlt, FaRedo } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
-import styles from './sidebar.module.css';
 import { signOut, useSession } from 'next-auth/react';
-import Address from '@/app/entities/address/address';
+import Company from '@/app/entities/company/company';
 
-interface SidebarLinkItemProps {
-  icon: IconType;
-  label: string;
-  href: string;
-}
-
-interface SidebarItemProps {
-  icon: IconType;
-  label: string;
+interface ItemProps {
+  href?: string;
+  className?: string;
+  children: React.ReactNode;
   onClick?: () => Promise<void>;
 }
 
-const SidebarLinkItem: React.FC<SidebarLinkItemProps> = ({ icon: Icon, label, href }) => {
-  return (
-    <Link href={href} className={styles.menuItem}>
-      <Icon className={styles.icon} />
-      <span className={styles.label}>{label}</span>
-    </Link>
-  )
+interface SidebarLinkItemProps {
+  href?: string;
+  icon: IconType;
+  label: string;
+  className?: string;
+  onClick?: () => Promise<void>;
 }
 
-const SidebarItemCompany: React.FC<SidebarItemProps> = ({ icon: Icon, label }) => {
-  const { data } = useSession();
+const SidebarLinkItem = ({ icon: Icon, label, href, className, onClick }: SidebarLinkItemProps) => {
+  return (
+    <Item href={href} className={className} onClick={onClick}>
+      {/* Define um tamanho fixo e remove transformações no hover */}
+      <Icon style={{ fontSize: '1.5rem', transition: 'none' }} className="text-2xl mr-2.5 flex-shrink-0" />
+      <span className="text-left inline-block whitespace-nowrap overflow-hidden group-hover:block hidden transition-all duration-300 group-hover:max-w-xs">
+        {label}
+      </span>
+    </Item>
+  );
+};
 
-  const showData = () => {
-    if (!data?.user.currentCompany) return null;
 
-    const company = data?.user.currentCompany;
-    const address = Object.assign(new Address(), company.address);
-    
+const Item = ({ href, className, children, onClick }: ItemProps) => {
+  if (!href) {
     return (
-      <div>
-          <span>{address.toString()}</span>
-        <span>{company.contacts.join(', ')}</span>
+      <div className={className + ` w-full p-2.5 flex items-center transition-colors duration-300 text-white no-underline hover:bg-gray-700 focus:bg-gray-700 cursor-pointer`} onClick={onClick}>
+        {children}
       </div>
     )
   }
-  return (
-    <div className={styles.menuItemCompany}>
-      <Icon className={styles.icon} />
-      <div className='grid'>
-        <span className={styles.label}>{label}</span>
-        <div className={styles.description}>
-          {data?.user.currentCompany && showData()}
-        </div>
-      </div>
-    </div>
-  )
-}
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, onClick }) => {
   return (
-    <button className={styles.menuItem} onClick={onClick}>
-      <Icon className={styles.icon} />
-      <span className={styles.label}>{label}</span>
-    </button>
+    <Link href={href} className={className + ` w-full p-2.5 flex items-center transition-colors duration-300 text-white no-underline hover:bg-gray-700 focus:bg-gray-700`}>
+      {children}
+    </Link>
   )
 }
 
@@ -75,20 +57,28 @@ const Sidebar = () => {
     await signOut({ callbackUrl: '/login', redirect: true });
   }
 
+  const { data } = useSession();
+  const [company, setCompany] = useState<Company>(new Company());
+
+  useEffect(() => {
+    if (!data?.user.currentCompany) return;
+
+    const companyFound = data?.user.currentCompany as Company;
+    setCompany(companyFound);
+  }, [data?.user]);
+
   return (
-    <div className={styles.sidebar}>
-      <div className={styles.sidebarContainer}>
-        <SidebarItemCompany icon={MdOutlineHomeWork} label="Loja" />
-        <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
-        <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
-        <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
-        <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
-        <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
-        <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
-        <SidebarLinkItem icon={FaCog} label="Configurações" href="/" />
-        <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection"/>
-        <SidebarItem icon={FaSignOutAlt} label="Sair" onClick={() => signOutToLogin()}/>
-      </div>
+  <div className="w-16 h-screen bg-gray-800 text-white flex flex-col items-center transition-all duration-300 text-left fixed z-10 group hover:w-52 overflow-hidden">
+      <SidebarLinkItem className='h-[8vh]' icon={MdOutlineHomeWork} label={company.trade_name} />
+      <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
+      <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
+      <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
+      <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
+      <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
+      <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
+      <SidebarLinkItem icon={FaCog} label="Configurações" href="/" />
+      <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
+      <SidebarLinkItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin} />
     </div>
   );
 };
