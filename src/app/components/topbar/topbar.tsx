@@ -52,7 +52,7 @@ const Topbar = () => {
   }, [contextCurrentOrder.order?.status]);
 
   return (
-    <div className="flex justify-between pl-[65px] pr-4 w-full items-center h-[8vh] box-border bg-[#333] text-[#fff] pl-2"> {/* Ajustamos o padding left dinamicamente */}
+    <div className="flex justify-between pl-[65px] pr-4 w-full items-center h-[8vh] box-border bg-gray-800 text-white pl-2">
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />
