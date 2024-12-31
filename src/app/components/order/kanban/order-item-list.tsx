@@ -15,6 +15,7 @@ const OrderItemList = ({ order, error }: OrderItemListProps) => {
     const OpenOrder = () => {
         const onClose = () => {
             modalHandler.hideModal("show-order-" + order.id)
+            modalHandler.hideModal("show-staging-orders")
         }
         modalHandler.showModal(
             "show-order-" + order.id,

@@ -139,6 +139,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         <div>
             <br className="my-4" />
             <h4 className="text-2md font-bold">Itens adicionais</h4>
+            <hr className='my-4' />
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {itemList?.map((item) => (

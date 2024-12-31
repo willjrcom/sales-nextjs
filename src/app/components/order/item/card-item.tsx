@@ -6,6 +6,7 @@ import ButtonDelete from '../../button/button-delete';
 import DeleteItemModal from './delete-item-modal';
 import { useGroupItem } from '@/app/context/group-item/context';
 import AdditionalItemCard from './additional-item';
+import RemovedItemCard from './removed-item';
 
 interface CardProps {
     item: Item;
@@ -52,6 +53,11 @@ const ItemCard = ({ item }: CardProps) => {
             {isHovered && (
                 item.item_to_additional?.map((additionalItem, index) => (
                     <AdditionalItemCard key={index} item={additionalItem} />
+                ))
+            )}
+            {isHovered && (
+                item.removed_items?.map((item, index) => (
+                    <RemovedItemCard key={index} item={item} />
                 ))
             )}
         </div>

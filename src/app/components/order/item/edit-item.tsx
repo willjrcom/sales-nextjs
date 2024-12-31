@@ -3,6 +3,7 @@ import React from 'react';
 import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../button/button-delete';
 import AdditionalItemList from './list-additional-item';
+import RemovedItemList from './list-removed-item';
 
 interface EditItemProps {
     item: Item;
@@ -24,7 +25,8 @@ const EditItem = ({ item }: EditItemProps) => {
             </div>
             {item.observation && <p className="text-sm text-gray-600">{item.observation}</p>}
             <AdditionalItemList item={item} />
-
+            <RemovedItemList item={item} />
+            
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total</p>
