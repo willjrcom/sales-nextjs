@@ -13,6 +13,7 @@ interface ItemListProps {
 
 const RemovedItemList = ({ item }: ItemListProps) => {
     const [removableItems, setRemovableItems] = useState<string[]>([]);
+    const [removedItems, setRemovedItems] = useState<string[]>(item.removed_items || []);
     const [error, setError] = useState<RequestError | null>(null);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const { data } = useSession();
@@ -30,31 +31,31 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         } catch (error) {
             setError(error as RequestError);
         }
-    }, [item.id]);
+    }, [item.category_id, categoriesSlice]);
 
     const addRemovedItem = async (name: string) => {
         if (!data) return;
-        
+
         try {
             await AddRemovedItem(item.id, name, data);
-            item.removed_items?.push(name);
+            setRemovedItems((prev) => [...prev, name]); // Adiciona o item ao estado local
             setError(null);
         } catch (error) {
             setError(error as RequestError);
         }
-    }
+    };
 
     const removeRemovedItem = async (name: string) => {
         if (!data) return;
 
         try {
             await RemoveRemovedItem(item.id, name, data);
-            item.removed_items?.splice(item.removed_items.indexOf(name), 1);
+            setRemovedItems((prev) => prev.filter((item) => item !== name)); // Remove o item do estado local
             setError(null);
         } catch (error) {
             setError(error as RequestError);
         }
-    }
+    };
 
     return (
         <div>
@@ -64,7 +65,7 @@ const RemovedItemList = ({ item }: ItemListProps) => {
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {removableItems?.map((removableItem) => {
-                    const isRemoved = item.removed_items?.includes(removableItem)
+                    const isRemoved = removedItems.includes(removableItem);
                     const disabledClass = isRemoved ? "bg-gray-300" : "";
 
                     return (
@@ -74,22 +75,24 @@ const RemovedItemList = ({ item }: ItemListProps) => {
                                 {removableItem}
                             </div>
                             <div className="flex items-center space-x-2">
-                                {isRemoved &&
+                                {isRemoved ? (
                                     <button
                                         onClick={() => removeRemovedItem(removableItem)}
                                         className="bg-green-500 text-white px-3 py-1 rounded"
                                     >
                                         Adicionar
-                                    </button>}
-                                {!isRemoved && <button
-                                    onClick={() => addRemovedItem(removableItem)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded"
-                                >
-                                    Remover
-                                </button>}
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => addRemovedItem(removableItem)}
+                                        className="bg-red-500 text-white px-3 py-1 rounded"
+                                    >
+                                        Remover
+                                    </button>
+                                )}
                             </div>
                         </div>
-                    )
+                    );
                 })}
             </div>
         </div>
