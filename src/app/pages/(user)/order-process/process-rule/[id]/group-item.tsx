@@ -10,13 +10,13 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import ItemProcessOrder from './item';
 import GroupItem from '@/app/entities/order/group-item';
-import GroupItemDetails from './group-item-details';
+import OrderProcessDetails from './order-process-details';
 
-type CardProps = {
+interface GroupItemOrderProcessProps {
     orderProcess: OrderProcess;
 };
 
-const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
+const GroupItemOrderProcess = ({ orderProcess }: GroupItemOrderProcessProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
@@ -24,7 +24,7 @@ const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
 
     const groupItem = orderProcess.group_item;
     if (!groupItem) return;
-
+    console.log(groupItem)
     const startProcess = async (id: string) => {
         if (!data) return
 
@@ -55,7 +55,7 @@ const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
         }
 
         modalHandler.showModal("group-item-details-" + groupItem.id, "# " + groupItem.id,
-            <GroupItemDetails groupItem={groupItem} />,
+            <OrderProcessDetails orderProcess={orderProcess} />,
             'lg',
             onClose
         )

@@ -37,4 +37,16 @@ const ToUtcDatetime = (dateString?: string) => {
     return formattedDate;
 }
 
-export { ToIsoDate, ToUtcDate, ToUtcDatetime };
+const ToUtcTimeWithSeconds = (dateString?: string) => {
+    if (!dateString) return "--/--/-- --:--"
+
+    const date = new Date(dateString);
+    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+
+    // Formata a data corretamente
+    const formattedDate = formatUTC(zonedDate, "HH:mm:ss", { timeZone: "UTC" });
+
+    return formattedDate;
+}
+
+export { ToIsoDate, ToUtcDate, ToUtcDatetime, ToUtcTimeWithSeconds };

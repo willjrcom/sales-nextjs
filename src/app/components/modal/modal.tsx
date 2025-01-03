@@ -10,6 +10,8 @@ interface ModalProps {
     children: React.ReactNode;
 }
 
+
+
 const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children }: ModalProps) => {
     if (!show) return null;
 
@@ -35,7 +37,7 @@ const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children 
                     <div className="p-1">
                         {/* Cabeçalho do Modal */}
                         <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-bold">{title}</h2>
+                            <h2 className="text-md font-bold">{title}</h2>
                             {onClose && (
                                 <button
                                     onClick={onClose}
