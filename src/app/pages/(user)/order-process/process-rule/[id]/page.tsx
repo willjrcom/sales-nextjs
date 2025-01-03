@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import CardOrderProcess from "./card";
+import GroupItemOrderProcess from "./group-item";
 import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
 import { fetchOrderProcesses } from "@/redux/slices/order-processes";
 import CrudLayout from "@/app/components/crud/layout";
@@ -36,7 +36,7 @@ const Component = () => {
 
     const updateParam = (newId: string) => {
         router.replace(`/pages/order-process/process-rule/${newId}`);
-      };
+    };
 
     useEffect(() => {
         setCurrentProcessRuleID(id as string);
@@ -63,14 +63,14 @@ const Component = () => {
         if (!processRule) return
         setProcessRule(processRule)
         updateParam(processRule.id)
-    }, [currentProcessRuleID]
-)
+    }, [currentProcessRuleID])
+    
     useEffect(() => {
         if (!Object.values(orderProcessesSlice.entities)) {
             setOrderProcesses([]);
             return
         };
-        
+
         setOrderProcesses(Object.values(orderProcessesSlice.entities));
     }, [data?.user.idToken, orderProcessesSlice.entities]);
 
@@ -93,9 +93,9 @@ const Component = () => {
         <>
             {orderProcessesSlice.error && <p className="mb-4 text-red-500">{orderProcessesSlice.error?.message}</p>}
             <CrudLayout title={processRule.name || "Carregando..."}
-            searchButtonChildren={
-                <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional/>
-            }
+                searchButtonChildren={
+                    <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional />
+                }
                 refreshButton={
                     <Refresh
                         slice={orderProcessesSlice}
@@ -104,7 +104,7 @@ const Component = () => {
                     />
                 }
                 tableChildren=
-                {orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1).map((process) => <CardOrderProcess key={process.id} orderProcess={process} />)}
+                {orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1).map((process) => <GroupItemOrderProcess key={process.id} orderProcess={process} />)}
             />
         </>
     );

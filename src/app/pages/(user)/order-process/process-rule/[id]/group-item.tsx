@@ -11,17 +11,22 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import AdditionalItem from './additional-item';
 import RemovedItem from './removed-item';
+import ItemDetails from './item-details';
+import ItemProcessOrder from './item';
+import GroupItem from '@/app/entities/order/group-item';
+import GroupItemDetails from './group-item-details';
 
 type CardProps = {
     orderProcess: OrderProcess;
 };
 
-const CardOrderProcess = ({ orderProcess }: CardProps) => {
+const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
     const modalHandler = useModal();
-    
+
+    console.log(orderProcess)
     const groupItem = orderProcess.group_item;
     if (!groupItem) return;
 
@@ -49,24 +54,13 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
         }
     }
 
-    const openMoreInfo = (item: Item) => {
+    const openGroupItemDetails = (groupItem: GroupItem) => {
         const onClose = () => {
-            modalHandler.hideModal("show-process-detail-" + item.id)
+            modalHandler.hideModal("group-item-details-" + groupItem.id)
         }
 
-        modalHandler.showModal("show-process-detail-" + item.id, item.name, 
-            <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                    <p className="text-lg font-bold">{item.name}</p>
-                    <p className="text-sm text-gray-600">Quantidade: {item.quantity}</p>
-                </div>
-                {item.item_to_additional?.map((additional, index) => (
-                    <div key={index} className="flex flex-col gap-2">
-                        <p className="text-md font-bold">{additional.name}</p>
-                        <p className="text-sm text-gray-600">Quantidade: {additional.quantity}</p>
-                    </div>
-                ))}
-            </div>,
+        modalHandler.showModal("group-item-details-" + groupItem.id, "# " + groupItem.id,
+            <GroupItemDetails groupItem={groupItem} />,
             'lg',
             onClose
         )
@@ -77,22 +71,7 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <div className="flex  justify-between w-full px-4">
                 <div className='w-2/3'>
-                    {groupItem?.items?.map((item) => (
-                        <div key={item.id} className='border p-2 mt-1 cursor-pointer' onClick={() => openMoreInfo(item)}>
-                            <p className="text-md">{item.quantity} x {item.name}</p>
-
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                {item.item_to_additional?.map((additional) => (
-                                    <AdditionalItem key={additional.id} item={additional} />
-                                ))}
-                            </div>
-                            <div className=''>
-                                {item.removed_items?.map((removedItem) => (
-                                    <RemovedItem key={removedItem} item={removedItem} />
-                                ))}
-                                </div>
-                        </div>
-                    ))}
+                    {groupItem?.items?.map((item) => <ItemProcessOrder item={item} key={item.id} />)}
                 </div>
                 <div className='w-1/3 text-right'>
                     <p className="text-gray-600 font-medium">Quantidade total: <span className="font-bold">{groupItem?.quantity}</span></p>
@@ -103,6 +82,10 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
 
                     {/* Controles de iniciação e conclusão */}
                     <div className='flex justify-end'>
+                        <button className="mt-4 mr-4 px-6 py-2 text-yellow-500 underline max-w-[10vw]"
+                            onClick={() => openGroupItemDetails(groupItem)}>
+                            Ver mais
+                        </button>
                         {orderProcess.status === "Pending" && <button onClick={() => startProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 max-w-[10vw]">
                             Iniciar
                         </button>}
@@ -111,10 +94,16 @@ const CardOrderProcess = ({ orderProcess }: CardProps) => {
                                 Finalizar
                             </button>}
                     </div>
+
+                    {orderProcess.status === "Started" && 
+                        <p className="mt-4 text-sm text-gray-700">
+                            Duração: {orderProcess.duration_formatted}
+                        </p>
+                    }
                 </div>
             </div>
         </div>
     );
 };
 
-export default CardOrderProcess;
+export default GroupItemOrderProcess;
