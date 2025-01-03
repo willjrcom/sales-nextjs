@@ -10,11 +10,11 @@ interface CategorySelectorProps {
 
 const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, setSelectedCategory }: CategorySelectorProps) => {
     // Garantir que selectedCategories seja sempre um array
-    const [selectedCategories, setSelectedCategories] = useState<Category[]>(selectedCategory.product_category_to_additional || []);
+    const [selectedCategories, setSelectedCategories] = useState<Category[]>(selectedCategory.additional_categories || []);
 
     useEffect(() => {
-        // Sincronizar selectedCategories com product_category_to_additional quando selectedCategory mudar
-        setSelectedCategories(selectedCategory.product_category_to_additional || []);
+        // Sincronizar selectedCategories com additional_categories quando selectedCategory mudar
+        setSelectedCategories(selectedCategory.additional_categories || []);
     }, [selectedCategory]);
 
     const handleCategorySelection = (category: Category) => {
@@ -23,18 +23,18 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
         if (isSelected) {
             // Remover categoria selecionada
             setSelectedCategories(prev => prev.filter(cat => cat.id !== category.id));
-            // Remover da lista de categories.product_category_to_additional
+            // Remover da lista de categories.additional_categories
             setSelectedCategory(prev => ({
                 ...prev,
-                product_category_to_additional: prev.product_category_to_additional.filter(cat => cat.id !== category.id)
+                additional_categories: prev.additional_categories.filter(cat => cat.id !== category.id)
             }));
         } else {
             // Adicionar categoria
             setSelectedCategories(prev => [...(prev || []), category]);  // Garantir que prev é um array
-            // Adicionar à lista de categories.product_category_to_additional
+            // Adicionar à lista de categories.additional_categories
             setSelectedCategory(prev => ({
                 ...prev,
-                product_category_to_additional: [...(prev.product_category_to_additional || []), category] // Garantir que prev é um array
+                additional_categories: [...(prev.additional_categories || []), category] // Garantir que prev é um array
             }));
         }
     };

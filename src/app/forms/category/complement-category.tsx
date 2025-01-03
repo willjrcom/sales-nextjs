@@ -9,7 +9,7 @@ interface CategorySelectorProps {
 }
 
 const ComplementCategorySelector = ({ complementCategories, selectedCategory, setSelectedCategory }: CategorySelectorProps) => {
-    const [selectedCategories, setSelectedCategories] = useState<Category[]>(selectedCategory.product_category_to_complement);
+    const [selectedCategories, setSelectedCategories] = useState<Category[]>(selectedCategory.complement_categories);
 
     const handleCategorySelection = (category: Category) => {
         const isSelected = selectedCategories?.some(cat => cat.id === category.id);
@@ -17,18 +17,18 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
         if (isSelected) {
             // Remover categoria selecionada
             setSelectedCategories(prev => prev.filter(cat => cat.id !== category.id));
-            // Remover da lista de categories.product_category_to_complement
+            // Remover da lista de categories.complement_categories
             setSelectedCategory(prev => ({
                 ...prev,
-                product_category_to_complement: prev.product_category_to_complement.filter(cat => cat.id !== category.id)
+                complement_categories: prev.complement_categories.filter(cat => cat.id !== category.id)
             }));
         } else {
             // Adicionar categoria
             setSelectedCategories(prev => [...(prev || []), category]);  // Garantir que prev é um array
-            // Adicionar à lista de categories.product_category_to_complement
+            // Adicionar à lista de categories.complement_categories
             setSelectedCategory(prev => ({
                 ...prev,
-                product_category_to_complement: [...(prev.product_category_to_complement || []), category] // Garantir que prev é um array
+                complement_categories: [...(prev.complement_categories || []), category] // Garantir que prev é um array
             }));
         }
     };

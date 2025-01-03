@@ -1,6 +1,6 @@
 "use client";
 
-import { OrderProcess } from "@/app/entities/order-process/order-process";
+import OrderProcess from "@/app/entities/order-process/order-process";
 import ProcessRule from "@/app/entities/process-rule/process-rule";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";

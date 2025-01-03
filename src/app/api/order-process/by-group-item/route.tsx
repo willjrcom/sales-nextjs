@@ -1,4 +1,4 @@
-import { OrderProcess } from "@/app/entities/order-process/order-process";
+import OrderProcess  from "@/app/entities/order-process/order-process";
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 

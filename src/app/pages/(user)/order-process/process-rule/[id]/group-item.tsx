@@ -2,16 +2,12 @@ import RequestError from '@/app/api/error';
 import FinishOrderProcess from '@/app/api/order-process/finish/route';
 import StartOrderProcess from '@/app/api/order-process/start/route';
 import { useModal } from '@/app/context/modal/context';
-import { OrderProcess } from '@/app/entities/order-process/order-process';
-import Item from '@/app/entities/order/item';
+import OrderProcess from '@/app/entities/order-process/order-process';
 import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-processes';
 import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import AdditionalItem from './additional-item';
-import RemovedItem from './removed-item';
-import ItemDetails from './item-details';
 import ItemProcessOrder from './item';
 import GroupItem from '@/app/entities/order/group-item';
 import GroupItemDetails from './group-item-details';
@@ -26,7 +22,6 @@ const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
     const [error, setError] = useState<RequestError | null>(null)
     const modalHandler = useModal();
 
-    console.log(orderProcess)
     const groupItem = orderProcess.group_item;
     if (!groupItem) return;
 
@@ -71,7 +66,7 @@ const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <div className="flex  justify-between w-full px-4">
                 <div className='w-2/3'>
-                    {groupItem?.items?.map((item) => <ItemProcessOrder item={item} key={item.id} />)}
+                    {groupItem?.items?.map((item) => <ItemProcessOrder item={item} key={item.id} product={orderProcess.products.find(product => product.id === item.product_id)} />)}
                 </div>
                 <div className='w-1/3 text-right'>
                     <p className="text-gray-600 font-medium">Quantidade total: <span className="font-bold">{groupItem?.quantity}</span></p>
@@ -97,7 +92,9 @@ const GroupItemOrderProcess = ({ orderProcess }: CardProps) => {
 
                     {orderProcess.status === "Started" && 
                         <p className="mt-4 text-sm text-gray-700">
-                            Duração: {orderProcess.duration_formatted}
+                            Duração: {orderProcess.queue?.duration_formatted}
+                            <br/>
+                            Tempo padrão: {orderProcess.process_rule?.ideal_time}
                         </p>
                     }
                 </div>

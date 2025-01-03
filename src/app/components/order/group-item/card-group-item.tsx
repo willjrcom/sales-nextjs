@@ -58,9 +58,9 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
               <p className="font-bold">{item.quantity} x {item.name}</p>
             </div>
             <p className="text-sm font-semibold">R$ {item.price.toFixed(2)}</p>
-            {item.item_to_additional && (
+            {item.additional_items && (
               <ul className="mt-2 pl-4 list-disc text-sm text-gray-600">
-                {item.item_to_additional.map((add) => (
+                {item.additional_items.map((add) => (
                   <li key={add.id}>
                     {add.name} - R$ {add.price.toFixed(2)}
                   </li>

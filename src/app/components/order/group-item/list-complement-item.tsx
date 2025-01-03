@@ -27,13 +27,13 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
             }
 
             // Passo 2: Buscar as categorias adicionais relacionadas à categoria do item
-            const complementCategories = category.product_category_to_complement;
+            const complementCategories = category.complement_categories;
             if (!complementCategories || complementCategories.length === 0) {
                 return setComplementItems([]);
             }
 
             // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
-            const complementItems = complementCategories // groupItem.category?.product_category_to_complement
+            const complementItems = complementCategories // groupItem.category?.complement_categories
                 .map((internalCategory) => categoriesSlice.entities[internalCategory.id]?.products) // Obter os produtos de cada categoria adicional
                 .flat(); // "Flatten" para uma lista única de produtos
 

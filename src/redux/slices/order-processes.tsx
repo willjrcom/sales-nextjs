@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Upda
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
-import { OrderProcess } from '@/app/entities/order-process/order-process';
+import OrderProcess from '@/app/entities/order-process/order-process';
 import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/route';
 
 const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderProcess>) => {

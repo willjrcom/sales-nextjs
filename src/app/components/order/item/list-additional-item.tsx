@@ -51,7 +51,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             }
 
             // Passo 2: Buscar as categorias adicionais relacionadas à categoria do item
-            const additionalCategories = category.product_category_to_additional;
+            const additionalCategories = category.additional_categories;
             if (!additionalCategories || additionalCategories.length === 0) {
                 return setItemList([]); // Se não houver categorias adicionais, retorna lista vazia
             }
@@ -69,7 +69,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             const validItems = additionalItems.filter(item => item != null && item !== undefined);
 
             // Passo 5: Converter os produtos válidos para itens
-            const items = convertProductToItem(validItems, item.item_to_additional || []);
+            const items = convertProductToItem(validItems, item.additional_items || []);
             // Passo 6: Verificar se após conversão existem itens válidos
             if (!items || items.length === 0) {
                 return setItemList([]); // Se não houver itens válidos após a conversão, retorna lista vazia
