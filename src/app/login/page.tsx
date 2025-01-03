@@ -4,7 +4,7 @@ import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
 
@@ -13,6 +13,15 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
+  if (!isMounted) {
+    return null; // Evita renderizar HTML até o componente estar pronto
+  }
 
   const handleSubmit = async () => {
     setError(''); // Reset error state before attempting sign-in

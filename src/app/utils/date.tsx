@@ -38,7 +38,7 @@ const ToUtcDatetime = (dateString?: string) => {
 }
 
 const ToUtcTimeWithSeconds = (dateString?: string) => {
-    if (!dateString) return "--/--/-- --:--"
+    if (!dateString) return "--:--:--"
 
     const date = new Date(dateString);
     const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
@@ -49,4 +49,24 @@ const ToUtcTimeWithSeconds = (dateString?: string) => {
     return formattedDate;
 }
 
-export { ToIsoDate, ToUtcDate, ToUtcDatetime, ToUtcTimeWithSeconds };
+const ToUtcMinutesSeconds = (dateString?: string) => {
+    if (!dateString) return "--:--"
+
+    const date = new Date(dateString);
+    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+
+    // Formata a data corretamente
+    const formattedDate = formatUTC(zonedDate, "mm:ss", { timeZone: "UTC" });
+
+    return formattedDate;
+}
+
+function ConvertDurationToDate(durationNanoseconds: string | Number): Date {
+    const durationMilliseconds = Number(durationNanoseconds) / 1e6; // Converte nanosegundos para milissegundos
+    const baseDate = new Date(0); // Base "zero" (1970-01-01T00:00:00.000Z)
+    return new Date(baseDate.getTime() + durationMilliseconds); // Soma os milissegundos ao tempo base
+}
+
+
+
+export { ToIsoDate, ToUtcDate, ToUtcDatetime, ToUtcTimeWithSeconds, ToUtcMinutesSeconds, ConvertDurationToDate };

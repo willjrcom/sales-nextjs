@@ -5,12 +5,12 @@ import { useModal } from "@/app/context/modal/context";
 import ItemDetails from "./item-details";
 import Product from "@/app/entities/product/product";
 
-interface ItemProcessOrderProps {
+interface ItemOrderProcessProps {
     item: Item;
     product?: Product;
 }
 
-const ItemProcessOrder = ({ item, product }: ItemProcessOrderProps) => {
+const ItemOrderProcess = ({ item, product }: ItemOrderProcessProps) => {
     const modalHandler = useModal();
 
     const openItemDetails = () => {
@@ -46,4 +46,4 @@ const ItemProcessOrder = ({ item, product }: ItemProcessOrderProps) => {
     )
 }
 
-export default ItemProcessOrder
+export default ItemOrderProcess

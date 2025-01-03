@@ -8,15 +8,16 @@ import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import ItemProcessOrder from './item';
+import ItemOrderProcess from './item';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
+import { ToUtcTimeWithSeconds } from '@/app/utils/date';
 
-interface GroupItemOrderProcessProps {
+interface OrderProcessCardProps {
     orderProcess: OrderProcess;
 };
 
-const GroupItemOrderProcess = ({ orderProcess }: GroupItemOrderProcessProps) => {
+const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null)
@@ -61,12 +62,16 @@ const GroupItemOrderProcess = ({ orderProcess }: GroupItemOrderProcessProps) => 
         )
     }
 
+    const now = new Date();
+    const startAt = new Date(orderProcess.started_at ? orderProcess.started_at : now);
+    const duration = new Date(now.getTime() - startAt.getTime());
+    
     return (
         <div className="flex flex-col md:flex-row items-center border border-blue-400 rounded-lg p-4 shadow-lg mt-4">
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <div className="flex  justify-between w-full px-4">
                 <div className='w-2/3'>
-                    {groupItem?.items?.map((item) => <ItemProcessOrder item={item} key={item.id} product={orderProcess.products.find(product => product.id === item.product_id)} />)}
+                    {groupItem?.items?.map((item) => <ItemOrderProcess item={item} key={item.id} product={orderProcess.products.find(product => product.id === item.product_id)} />)}
                 </div>
                 <div className='w-1/3 text-right'>
                     <p className="text-gray-600 font-medium">Quantidade total: <span className="font-bold">{groupItem?.quantity}</span></p>
@@ -92,9 +97,7 @@ const GroupItemOrderProcess = ({ orderProcess }: GroupItemOrderProcessProps) => 
 
                     {orderProcess.status === "Started" && 
                         <p className="mt-4 text-sm text-gray-700">
-                            Duração: {orderProcess.queue?.duration_formatted}
-                            <br/>
-                            Tempo padrão: {orderProcess.process_rule?.ideal_time}
+                            Duração: {ToUtcTimeWithSeconds(duration.toISOString())}
                         </p>
                     }
                 </div>
@@ -103,4 +106,4 @@ const GroupItemOrderProcess = ({ orderProcess }: GroupItemOrderProcessProps) => 
     );
 };
 
-export default GroupItemOrderProcess;
+export default OrderProcessCard;

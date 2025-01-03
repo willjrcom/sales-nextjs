@@ -7,12 +7,13 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import GroupItemOrderProcess from "./group-item";
 import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
 import { fetchOrderProcesses } from "@/redux/slices/order-processes";
 import CrudLayout from "@/app/components/crud/layout";
 import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";
+import OrderProcessCard from "./order-process";
+import { ConvertDurationToDate } from "@/app/utils/date";
 
 const PageProcessRule = () => {
     return (
@@ -64,7 +65,7 @@ const Component = () => {
         setProcessRule(processRule)
         updateParam(processRule.id)
     }, [currentProcessRuleID])
-    
+
     useEffect(() => {
         if (!Object.values(orderProcessesSlice.entities)) {
             setOrderProcesses([]);
@@ -89,6 +90,16 @@ const Component = () => {
 
     if (!processRule) return null;
 
+    const body = (
+        <>
+        <p>Tempo ideal de produção: {processRule.ideal_time}</p>
+            {
+                orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1)
+                    .map((process) => <OrderProcessCard key={process.id} orderProcess={process} />)
+            }
+        </>
+    )
+
     return (
         <>
             {orderProcessesSlice.error && <p className="mb-4 text-red-500">{orderProcessesSlice.error?.message}</p>}
@@ -103,8 +114,7 @@ const Component = () => {
                         id={currentProcessRuleID}
                     />
                 }
-                tableChildren=
-                {orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1).map((process) => <GroupItemOrderProcess key={process.id} orderProcess={process} />)}
+                tableChildren={body}
             />
         </>
     );
