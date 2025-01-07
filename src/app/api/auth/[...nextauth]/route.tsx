@@ -3,8 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import Login from "../login/route";
 import Company from "@/app/entities/company/company";
 import { NextAuthOptions } from "next-auth";
-import RequestError from "../../error";
-import Person from "@/app/entities/person/person";
+import UserBackend from "@/app/entities/user/user";
 
 const authOptions: NextAuthOptions = {
     providers: [
@@ -20,12 +19,12 @@ const authOptions: NextAuthOptions = {
                 try {
 
                     const response = await Login({ email, password });
-
+                    
                     if (response?.access_token) {
                         return {
                             id: response.access_token,
-                            person: response.person,
-                            companies: response.companies,
+                            user: response.user,
+                            companies: response.user.companies,
                             email: email,
                         };
                     }
@@ -50,14 +49,14 @@ const authOptions: NextAuthOptions = {
             if (trigger === "update" && session.user.idToken) {
                 token.idToken = session.user.idToken;
                 token.currentCompany = session.user.currentCompany;
-            } else if (trigger === "update" && session.user.person) {
-                token.person = session.user.person;
+            } else if (trigger === "update" && session.user.user) {
+                token.user = session.user.user;
             }
 
             if (user) {
                 token.email = user.email;
                 token.sub = user.id;
-                token.person = user.person;
+                token.user = user.user;
                 token.companies = user.companies;
             }
 
@@ -69,7 +68,7 @@ const authOptions: NextAuthOptions = {
             session.user = session.user || {};
             if (token.sub) session.user.id = token.sub;
             if (token.idToken) session.user.idToken = token.idToken;
-            if (token.person) session.user.person = token.person;
+            if (token.user) session.user.user = token.user;
             if (token.companies) session.user.companies = token.companies;
             if (token.currentCompany) session.user.currentCompany = token.currentCompany;
         
@@ -96,7 +95,7 @@ const authOptions: NextAuthOptions = {
 declare module "next-auth/jwt" {
     interface JWT {
         id: string;
-        person: Person;
+        user: UserBackend;
         idToken?: string;
         companies: Company[];
         currentCompany?: Company;
@@ -109,8 +108,7 @@ declare module "next-auth" {
     }
 
     interface User {
-        id: string;
-        person: Person;
+        user: UserBackend;
         idToken?: string;
         companies: Company[];
         currentCompany?: Company;

@@ -1,5 +1,6 @@
 import Person from "@/app/entities/person/person";
 import RequestApi from "../../request";
+import User from "@/app/entities/user/user";
 
 interface LoginProps {
     email: string;
@@ -7,9 +8,8 @@ interface LoginProps {
 }
 
 interface LoginResponse {
-    person: Person;
+    user: User;
     access_token: string;
-    companies: [];
 }
 
 const Login = async (credencials: LoginProps): Promise<LoginResponse> => {
