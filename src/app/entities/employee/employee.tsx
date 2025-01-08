@@ -2,15 +2,14 @@ import { z } from "zod";
 import { ValidatePersonForm } from "../person/person";
 import User from "../user/user";
 
-export default class Employee {
+export default class Employee extends User {
     id: string = '';
     user_id: string = '';
-    user: User = new User();
 
     constructor(id: string = '', user_id: string = '', user: User = new User()) {
+        super();
         this.id = id;
         this.user_id = user_id;
-        this.user = user;
     }
 };
 
@@ -18,7 +17,7 @@ const SchemaEmployee = z.object({
 });
 
 export const ValidateEmployeeForm = (employee: Employee) => {
-    const errors = ValidatePersonForm(employee.user);
+    const errors = ValidatePersonForm(employee);
     const validatedFields = SchemaEmployee.safeParse({
     });
 

@@ -22,7 +22,7 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
     const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
     const modalHandler = useModal();
     const [employee, setEmployee] = useState<Employee>(item || new Employee());
-    const [person, setPerson] = useState<Person>(item?.user || new Person());
+    const [person, setPerson] = useState<Person>(item || new Person());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
@@ -40,8 +40,8 @@ const EmployeeForm = ({ item, isUpdate }: CreateFormsProps<Employee>) => {
         if (!data) return;
         let employee = new Employee(person.id);
 
-        if (employee.user.birthday) {
-            employee.user.birthday = ToIsoDate(employee.user.birthday)
+        if (employee.birthday) {
+            employee.birthday = ToIsoDate(employee.birthday)
         }
 
         const validationErrors = ValidateEmployeeForm(employee);

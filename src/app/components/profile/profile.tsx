@@ -1,14 +1,10 @@
 import { useModal } from "@/app/context/modal/context";
-import Person from "@/app/entities/person/person";
+import User from "@/app/entities/user/user";
 import UserForm from "@/app/forms/user/form";
 import React from "react";
 
-interface UserSession {
-    person: Person;
-}
-
 type EmployeeUserProfileProps = {
-    user: UserSession;
+    user: User;
     photoUrl?: string;
 };
 
@@ -29,16 +25,16 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
                     {photoUrl ? (
                         <img
                             src={photoUrl}
-                            alt={`${user.person.name}'s profile`}
+                            alt={`${user.name}'s profile`}
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <span className="text-lg font-bold text-gray-600">{getInitial(user.person.name)}</span>
+                        <span className="text-lg font-bold text-gray-600">{getInitial(user.name)}</span>
                     )}
                 </div>
-                <p className="mt-2 text-lg font-bold">{user.person.name}</p>
+                <p className="mt-2 text-lg font-bold">{user.name}</p>
                 <hr className="my-4" />
-                <UserForm item={user.person} />
+                <UserForm item={user} />
             </>,
             "sm", onClose
         )
@@ -47,16 +43,16 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
         <div className="relative">
             <div onClick={OpenModal}
                 className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md cursor-pointer"
-                title={user.person.name}
+                title={user.name}
             >
                 {photoUrl ? (
                     <img
                         src={photoUrl}
-                        alt={`${user.person.name}'s profile`}
+                        alt={`${user.name}'s profile`}
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <span className="text-lg font-bold text-gray-600">{getInitial(user.person.name)}</span>
+                    <span className="text-lg font-bold text-gray-600">{getInitial(user.name)}</span>
                 )}
             </div>
         </div>

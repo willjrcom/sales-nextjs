@@ -25,7 +25,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
     const groupItem = orderProcess.group_item;
     if (!groupItem) return;
-    console.log(groupItem)
+    
     const startProcess = async (id: string) => {
         if (!data) return
 

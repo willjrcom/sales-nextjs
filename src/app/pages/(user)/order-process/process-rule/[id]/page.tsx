@@ -13,7 +13,6 @@ import CrudLayout from "@/app/components/crud/layout";
 import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";
 import OrderProcessCard from "./order-process";
-import { ConvertDurationToDate } from "@/app/utils/date";
 
 const PageProcessRule = () => {
     return (
@@ -92,7 +91,7 @@ const Component = () => {
 
     const body = (
         <>
-        <p>Tempo ideal de produção: {processRule.ideal_time}</p>
+            <p>Tempo ideal de produção: {processRule.ideal_time}</p>
             {
                 orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1)
                     .map((process) => <OrderProcessCard key={process.id} orderProcess={process} />)

@@ -127,7 +127,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                     </p>
                     <p>
                         <strong>Entregador:</strong>{" "}
-                        {order.delivery.driver?.employee?.user.name || "Não atribuído"}
+                        {order.delivery.driver?.employee?.name || "Não atribuído"}
                     </p>
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>

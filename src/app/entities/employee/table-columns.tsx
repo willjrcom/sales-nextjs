@@ -9,15 +9,15 @@ import Address from "../address/address";
 const EmployeeColumns = (): ColumnDef<Employee>[] => [
   {
     id: 'Nome',
-    accessorKey: 'user.name',
+    accessorKey: 'name',
     header: 'Nome',
   },
   {
     id: 'Contato',
     header: 'Contato',
     accessorFn: row => {
-      if (row.user.contact as Contact) {
-        const contact = row.user.contact as Contact
+      if (row.contact as Contact) {
+        const contact = row.contact as Contact
         if (contact.ddd || contact.number) {
           return "(" + contact.ddd + ") " + contact.number
         }
@@ -27,15 +27,15 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
   },
   {
     id: 'Cpf',
-    accessorKey: 'user.cpf',
+    accessorKey: 'cpf',
     header: 'Cpf',
   },
   {
     id: 'Endereço',
     header: 'Endereço',
     accessorFn: row => {
-      if (row.user.address as Address) {
-        return row.user.address.street + ", " + row.user.address.number
+      if (row.address as Address) {
+        return row.address.street + ", " + row.address.number
       }
     },
   },
@@ -46,7 +46,7 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     cell: ({ row }) => {
       return (
         <ButtonIcon modalName={"edit-employee-" + row.original.id }
-          title={"Editar " + row.original.user.name}>
+          title={"Editar " + row.original.name}>
           <EmployeeForm
             item={row.original}
             isUpdate={true}/>
