@@ -11,10 +11,21 @@ import Item from "@/app/entities/order/item";
 import { CartToAdd } from "../cart/cart-to-add";
 
 export default function EditGroupItem() {
+    const contextGroupItem = useGroupItem();
+    if (!contextGroupItem.groupItem || contextGroupItem.groupItem?.status === "Staging") {
+        console.log("Staging")
+        return (
+            <div className="flex h-[68vh]">
+                {/* Componente à esquerda: ocupa 70% da tela */}
+                <CartToAdd />
+                <ShowGroupItem />
+            </div>
+        );
+    }
+
+    console.log(contextGroupItem.groupItem?.status)
     return (
         <div className="flex h-[68vh]">
-            {/* Componente à esquerda: ocupa 70% da tela */}
-            <CartToAdd />
             <ShowGroupItem />
         </div>
     );

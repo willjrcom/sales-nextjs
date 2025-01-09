@@ -5,8 +5,6 @@ import EditItem from './edit-item';
 import ButtonDelete from '../../button/button-delete';
 import DeleteItemModal from './delete-item-modal';
 import { useGroupItem } from '@/app/context/group-item/context';
-import AdditionalItemCard from './additional-item';
-import RemovedItemCard from './removed-item';
 
 interface CardProps {
     item: Item;
@@ -30,7 +28,7 @@ const ItemCard = ({ item }: CardProps) => {
 
     return (
         <div
-            className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg"
+            className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -43,12 +41,12 @@ const ItemCard = ({ item }: CardProps) => {
                     <div className="text-sm font-bold">R$ {totalPrice.toFixed(2)}</div>
 
                     {/* Count additionals */}
-                    {item.additional_items?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-sm font-bold rounded-full">
+                    {(item.additional_items?.length || 0 > 0) && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-sm font-bold rounded-full">
                         {item.additional_items?.reduce((total, item) => total + item.quantity, 0)}
                     </div>}
 
                     {/* Count removed */}
-                    {item.additional_items?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-red-500 text-white text-sm font-bold rounded-full">
+                    {(item.removed_items?.length || 0 > 0) && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-red-500 text-white text-sm font-bold rounded-full">
                         {item.removed_items?.reduce((total) => total + 1, 0)}
                     </div>}
 

@@ -30,21 +30,23 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
             product_id: product.id,
             name: product.name,
             quantity: itemAdded?.quantity || 0,
-            additional_item_id: itemAdded?.id,
+            additional_item_id: itemAdded?.id || "",
             category_id: product.category_id,
             price: product.price,
         }
         return item
     })
 
-    return items
+    return items.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
-    const [additionalItems, setAdditionalItems] = useState<ItemAdditional[]>([]);
+    const [additionalItemsToAdd, setAdditionalItems] = useState<ItemAdditional[]>([]);
     const [error, setError] = useState<RequestError | null>(null);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const contextGroupItem = useGroupItem();
     const { data } = useSession();
+    const isStaging = contextGroupItem.groupItem?.status === "Staging";
 
     useEffect(() => {
         try {
@@ -61,24 +63,22 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             }
 
             // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
-            const additionalItemsFound = additionalCategories
+            const productsFound = additionalCategories
                 .map((additionalCategory) => categoriesSlice.entities[additionalCategory.id]?.products) // Obter os produtos de cada categoria adicional
-                .flat(); // "Flatten" para uma lista única de produtos
+                .flat().filter(item => item != null && item !== undefined); // "Flatten" para uma lista única de produtos
 
-            if (!additionalItemsFound || additionalItemsFound.length === 0) {
+            if (!productsFound || productsFound.length === 0) {
                 return setAdditionalItems([]); // Se não houver produtos, retorna lista vazia
             }
 
-            // Passo 4: Filtrar qualquer produto inválido antes de converter
-            const validItems = additionalItemsFound.filter(item => item != null && item !== undefined);
-
             // Passo 5: Converter os produtos válidos para itens
-            const items = convertProductToItem(validItems, item.additional_items || []);
+            const items = convertProductToItem(productsFound, item.additional_items || []);
             // Passo 6: Verificar se após conversão existem itens válidos
             if (!items || items.length === 0) {
                 return setAdditionalItems([]); // Se não houver itens válidos após a conversão, retorna lista vazia
             }
 
+            console.log(items)
             // Atualiza o estado com os itens convertidos
             setAdditionalItems(items);
 
@@ -87,82 +87,122 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         }
     }, [item.id]);
 
-    const onChange = async (itemAdditional: ItemAdditional) => {
+    const updateAdditionalItem = async (clickedItem: ItemAdditional) => {
         if (!data) return
 
-        if (itemAdditional.quantity === 0) {
-            if (!itemAdditional.additional_item_id) return setError(new RequestError("Item indisponivel"))
+        const categoryFound = categoriesSlice.entities[clickedItem.category_id]
+        if (!categoryFound) return setError(new RequestError("Categoria indisponivel"))
 
-            try {
-                await DeleteAdditionalItem(itemAdditional.additional_item_id, data)
-                setError(null)
-            } catch (error) {
-                setError(error as RequestError)
-            }
-            return
-        }
-
-        const category = categoriesSlice.entities[itemAdditional.category_id]
-        if (!category) return setError(new RequestError("Categoria indisponivel"))
-
-        const quantity = category?.quantities.find(quantity => quantity.quantity === itemAdditional.quantity)
-
-        if (!quantity) return setError(new RequestError("Quantidade indisponivel"))
+        const quantityFound = categoryFound?.quantities.find(quantity => quantity.quantity === clickedItem.quantity)
+        if (!quantityFound) return setError(new RequestError("Quantidade indisponivel"))
 
         try {
-            await NewAdditionalItem(item.id, { product_id: itemAdditional.product_id, quantity_id: quantity?.id }, data)
+            clickedItem.additional_item_id = await NewAdditionalItem(item.id, { product_id: clickedItem.product_id, quantity_id: quantityFound?.id }, data)
             setError(null)
         } catch (error) {
             setError(error as RequestError)
         }
+
+        // Update additional items to add
+        const newAdditionalItemsToAdd = additionalItemsToAdd?.filter(item => item.product_id !== clickedItem.product_id) || [];
+        newAdditionalItemsToAdd.push({ ...clickedItem, additional_item_id: clickedItem.additional_item_id });
+
+        setAdditionalItems(newAdditionalItemsToAdd.sort((a, b) => a.name.localeCompare(b.name)));
     }
 
     const handleIncrement = (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 5) return
+        if (clickedItem.quantity === 5) return setError(new RequestError("Maximo de 5 itens adicionais"))
 
         clickedItem.quantity += 1
-        const additionalItem = additionalItems?.find(item => item.product_id === clickedItem.product_id)
-        if (!additionalItem) return
+
+        updateAdditionalItem(clickedItem)
+
+        // Update additional item from Item
+        const newAdditionalItems = item.additional_items?.filter(item => item.product_id !== clickedItem.product_id) || [];
+        newAdditionalItems.push({ ...clickedItem, id: clickedItem.additional_item_id } as Item);
 
         setItem((prev) => ({
             ...prev,
-            total_price: prev.total_price + additionalItem.price
+            total_price: prev.total_price + clickedItem.price,
+            additional_items: newAdditionalItems
         }))
-
-        onChange(clickedItem)
-        setAdditionalItems((prev) =>
-            prev.map((item) =>
-                item.product_id === clickedItem.product_id ? { ...item, quantity: item.quantity } : item
-            )
-        );
     };
 
-    const handleDecrement = (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 0) return
+    const handleDecrement = async (clickedItem: ItemAdditional) => {
+        if (clickedItem.quantity === 0 || !data) return setError(new RequestError("Minimo de 5 itens adicionais"))
 
         clickedItem.quantity -= 1
-        const additionalItem = additionalItems?.find(item => item.product_id === clickedItem.product_id)
-        if (!additionalItem) return
+
+        // Update quantity
+        if (clickedItem.quantity !== 0) {
+            updateAdditionalItem(clickedItem)
+
+            // Update additional item from Item
+            const newAdditionalItems = item.additional_items?.filter(item => item.product_id !== clickedItem.product_id) || [];
+
+            setItem((prev) => ({
+                ...prev,
+                total_price: prev.total_price - clickedItem.price,
+                additional_items: newAdditionalItems
+            }))
+
+            return
+        }
+
+        if (!clickedItem.additional_item_id) return setError(new RequestError("Item indisponivel"))
+
+        // Delete additional item
+        try {
+            await DeleteAdditionalItem(clickedItem.additional_item_id, data)
+            setError(null)
+        } catch (error) {
+            setError(error as RequestError)
+        }
+
+        // Update additional item from Item
+        const newAdditionalItems = item.additional_items?.filter(item => item.product_id !== clickedItem.product_id) || [];
 
         setItem((prev) => ({
             ...prev,
-            total_price: prev.total_price - additionalItem.price
+            total_price: prev.total_price - clickedItem.price,
+            additional_items: newAdditionalItems
         }))
-
-        onChange(clickedItem)
-        setAdditionalItems((prev) =>
-            prev.map((item) =>
-                item.product_id === clickedItem.product_id && item.quantity > 0
-                    ? { ...item, quantity: item.quantity }
-                    : item
-            )
-        );
     };
 
-    if (!additionalItems || additionalItems.length === 0) {
+    if (!additionalItemsToAdd || additionalItemsToAdd.length === 0) {
         return null;
     }
 
+    const AdditionalItemCard = ({ item }: { item: ItemAdditional }) => {
+        let name = item.name;
+
+        if (isStaging) {
+            name += "- R$" + item.price.toFixed(2)
+        }
+        return (
+            <div key={item.product_id} className="flex items-center space-x-4">
+                <div className="flex-1">{name} </div>
+                <div className="flex items-center space-x-2">
+                    {isStaging &&
+                        <button
+                            onClick={() => handleDecrement(item)}
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                        >
+                            -
+                        </button>}
+                    <span>{item.quantity}</span>
+
+                    {isStaging &&
+                        <button
+                            onClick={() => handleIncrement(item)}
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                        >
+                            +
+                        </button>}
+                </div>
+            </div>
+        );
+    }
     return (
         <div>
             <br className="my-4" />
@@ -170,26 +210,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             <hr className='my-4' />
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
-                {additionalItems?.map((item) => (
-                    <div key={item.product_id} className="flex items-center space-x-4">
-                        <div className="flex-1">{item.name}</div>
-                        <div className="flex items-center space-x-2">
-                            <button
-                                onClick={() => handleDecrement(item)}
-                                className="bg-red-500 text-white px-3 py-1 rounded"
-                            >
-                                -
-                            </button>
-                            <span>{item.quantity}</span>
-                            <button
-                                onClick={() => handleIncrement(item)}
-                                className="bg-green-500 text-white px-3 py-1 rounded"
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}
             </div>
         </div>
     );

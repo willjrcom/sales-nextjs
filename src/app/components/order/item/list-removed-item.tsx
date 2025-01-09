@@ -1,6 +1,7 @@
 import RequestError from '@/app/api/error';
 import AddRemovedItem from '@/app/api/item/update/removed-item/add/route';
 import RemoveRemovedItem from '@/app/api/item/update/removed-item/remove/route';
+import { useGroupItem } from '@/app/context/group-item/context';
 import Item from '@/app/entities/order/item';
 import { RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
@@ -16,7 +17,9 @@ const RemovedItemList = ({ item }: ItemListProps) => {
     const [removedItems, setRemovedItems] = useState<string[]>(item.removed_items || []);
     const [error, setError] = useState<RequestError | null>(null);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const contextGroupItem = useGroupItem();
     const { data } = useSession();
+    const isStaging = contextGroupItem.groupItem?.status === "Staging";
 
     useEffect(() => {
         try {
@@ -61,6 +64,36 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         return null;
     }
 
+    const RemovedItemCard = ({ item }: { item: string }) => {
+        const isRemoved = removedItems.includes(item);
+        const disabledClass = isRemoved ? "bg-red-300" : "";
+
+        return (
+            <div key={item} 
+            className={disabledClass + ` flex items-center space-x-4 p-2 rounded`}>
+                <div className="flex-1">
+                    {item}
+                </div>
+                {isStaging && <div className="flex items-center space-x-2">
+                    {isRemoved ? (
+                        <button
+                            onClick={() => removeRemovedItem(item)}
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                        >
+                            Adicionar
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => addRemovedItem(item)}
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                        >
+                            Remover
+                        </button>
+                    )}
+                </div>}
+            </div>
+        );
+    }
     return (
         <div>
             <br className="my-4" />
@@ -68,36 +101,7 @@ const RemovedItemList = ({ item }: ItemListProps) => {
             <hr className='my-4' />
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
-                {removableItems?.map((removableItem) => {
-                    const isRemoved = removedItems.includes(removableItem);
-                    const disabledClass = isRemoved ? "bg-gray-300" : "";
-
-                    return (
-                        <div key={removableItem} 
-                        className={disabledClass + ` flex items-center space-x-4 p-2 rounded`}>
-                            <div className="flex-1">
-                                {removableItem}
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                {isRemoved ? (
-                                    <button
-                                        onClick={() => removeRemovedItem(removableItem)}
-                                        className="bg-green-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Adicionar
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => addRemovedItem(removableItem)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Remover
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
+                {removableItems?.map((removableItem) => <RemovedItemCard key={removableItem} item={removableItem} />)}
             </div>
         </div>
     );

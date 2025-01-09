@@ -4,15 +4,20 @@ import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../button/button-delete';
 import AdditionalItemList from './list-additional-item';
 import RemovedItemList from './list-removed-item';
+import { useGroupItem } from '@/app/context/group-item/context';
 
 interface EditItemProps {
     item: Item;
 }
 
 const EditItem = ({ item }: EditItemProps) => {
+    const contextGroupItem = useGroupItem();
+    const isStaging = contextGroupItem.groupItem?.status === "Staging"
     const [itemState, setItemState] = React.useState<Item>(item);
 
     if (!itemState) return
+
+    const totalAdditionals = itemState.additional_items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0
 
     return (
         <div
@@ -23,13 +28,21 @@ const EditItem = ({ item }: EditItemProps) => {
                 <div className="text-sm font-medium">
                     {itemState.quantity} x {itemState.name}
                 </div>
-                <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name}><DeleteItemModal item={itemState} /></ButtonDelete>
+                {isStaging && <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name}><DeleteItemModal item={itemState} /></ButtonDelete>}
             </div>
             {itemState.observation && <p className="text-sm text-gray-600">{itemState.observation}</p>}
             <AdditionalItemList item={itemState} setItem={setItemState} />
             <RemovedItemList item={itemState} />
             
             <hr className="my-4" />
+            <div className="flex justify-between items-center">
+                <p className="text-md">Produto</p>
+                <p className="text-lg font-bold">R$ {itemState.price.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between items-center">
+                <p className="text-md">Adicionais</p>
+                <p className="text-lg font-bold">R$ {totalAdditionals.toFixed(2)}</p>
+            </div>
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total</p>
                 <p className="text-lg font-bold">R$ {itemState.total_price.toFixed(2)}</p>
