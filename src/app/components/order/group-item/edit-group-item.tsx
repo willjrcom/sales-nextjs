@@ -36,6 +36,7 @@ const ShowGroupItem = () => {
     }, [contextGroupItem.groupItem]);
 
     const containItems = groupItem?.items && groupItem?.items.length > 0
+    const isGroupItemStaging = groupItem?.status === "Staging"
 
     return (
         <div className="bg-gray-100 p-3 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[30vw]">
@@ -51,12 +52,12 @@ const ShowGroupItem = () => {
 
             {/* Adicionar complemento */}
             {containItems && <p className="text-lg font-semibold">Complemento</p>}
-            {containItems && !complementItem && <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
+            {containItems && !complementItem && isGroupItemStaging && <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
                 <ComplementItemList groupItem={groupItem} />
             </ButtonIconText>}
 
             {containItems && complementItem && 
-                <ComplementItemCard item={groupItem} />
+                <ComplementItemCard groupItem={groupItem} />
             }
 
             <div className="flex justify-between items-center">

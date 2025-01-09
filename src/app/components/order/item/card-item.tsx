@@ -26,6 +26,8 @@ const ItemCard = ({ item }: CardProps) => {
     let totalPrice = item.quantity * item.price;
 
     totalPrice += item.additional_items?.reduce((total, item) => total + (item.quantity * item.price), 0) || 0;
+    const isGroupItemStaging = contextGroupItem.groupItem?.status === "Staging"
+
     return (
         <div
             className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg"
@@ -39,18 +41,27 @@ const ItemCard = ({ item }: CardProps) => {
                         {item.quantity} x {item.name}
                     </div>
                     <div className="text-sm font-bold">R$ {totalPrice.toFixed(2)}</div>
+
+                    {/* Count additionals */}
                     {item.additional_items?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-sm font-bold rounded-full">
                         {item.additional_items?.reduce((total, item) => total + item.quantity, 0)}
                     </div>}
+
+                    {/* Count removed */}
+                    {item.additional_items?.length && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-red-500 text-white text-sm font-bold rounded-full">
+                        {item.removed_items?.reduce((total) => total + 1, 0)}
+                    </div>}
+
                 </div>
                 &nbsp;
-                <div className='bg-red-100 p-1 rounded-full'>
-                    <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
-                </div>
+                {isGroupItemStaging &&
+                    <div className='bg-red-100 p-1 rounded-full'>
+                        <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
+                    </div>}
             </div>
 
             {/* Hover para detalhes */}
-            {isHovered && (
+            {/* {isHovered && (
                 item.additional_items?.map((additionalItem, index) => (
                     <AdditionalItemCard key={index} item={additionalItem} />
                 ))
@@ -59,7 +70,7 @@ const ItemCard = ({ item }: CardProps) => {
                 item.removed_items?.map((item, index) => (
                     <RemovedItemCard key={index} item={item} />
                 ))
-            )}
+            )} */}
         </div>
     );
 };

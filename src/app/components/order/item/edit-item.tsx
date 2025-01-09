@@ -10,7 +10,9 @@ interface EditItemProps {
 }
 
 const EditItem = ({ item }: EditItemProps) => {
-    if (!item) return
+    const [itemState, setItemState] = React.useState<Item>(item);
+
+    if (!itemState) return
 
     return (
         <div
@@ -19,18 +21,18 @@ const EditItem = ({ item }: EditItemProps) => {
             {/* Estado padrão */}
             <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">
-                    {item.quantity} x {item.name}
+                    {itemState.quantity} x {itemState.name}
                 </div>
-                <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
+                <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name}><DeleteItemModal item={itemState} /></ButtonDelete>
             </div>
-            {item.observation && <p className="text-sm text-gray-600">{item.observation}</p>}
-            <AdditionalItemList item={item} />
-            <RemovedItemList item={item} />
+            {itemState.observation && <p className="text-sm text-gray-600">{itemState.observation}</p>}
+            <AdditionalItemList item={itemState} setItem={setItemState} />
+            <RemovedItemList item={itemState} />
             
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total</p>
-                <p className="text-lg font-bold">R$ {item.price.toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {itemState.total_price.toFixed(2)}</p>
             </div>
         </div>
     );
