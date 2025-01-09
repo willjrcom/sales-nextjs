@@ -31,31 +31,38 @@ const ItemCard = ({ item }: CardProps) => {
             className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)} // Ação de clique no div principal
         >
             {/* Estado padrão */}
             <div className="flex justify-between items-center">
-                <div className="flex justify-between items-center space-x-4" onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}>
+                <div className="flex justify-between items-center space-x-4 w-full">
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>
                     <div className="text-sm font-bold">R$ {totalPrice.toFixed(2)}</div>
 
                     {/* Count additionals */}
-                    {(item.additional_items?.length || 0 > 0) && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-sm font-bold rounded-full">
-                        {item.additional_items?.reduce((total, item) => total + item.quantity, 0)}
-                    </div>}
+                    {(item.additional_items?.length || 0 > 0) && (
+                        <div className="ml-4 flex items-center justify-center w-6 h-6 bg-green-500 text-white text-sm font-bold rounded-full">
+                            {item.additional_items?.reduce((total, item) => total + item.quantity, 0)}
+                        </div>
+                    )}
 
                     {/* Count removed */}
-                    {(item.removed_items?.length || 0 > 0) && <div className="ml-4 flex items-center justify-center w-6 h-6 bg-red-500 text-white text-sm font-bold rounded-full">
-                        {item.removed_items?.reduce((total) => total + 1, 0)}
-                    </div>}
-
+                    {(item.removed_items?.length || 0 > 0) && (
+                        <div className="ml-4 flex items-center justify-center w-6 h-6 bg-red-500 text-white text-sm font-bold rounded-full">
+                            {item.removed_items?.reduce((total) => total + 1, 0)}
+                        </div>
+                    )}
                 </div>
                 &nbsp;
-                {isGroupItemStaging &&
-                    <div className='bg-red-100 p-1 rounded-full'>
-                        <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}><DeleteItemModal item={item} /></ButtonDelete>
-                    </div>}
+                {isGroupItemStaging && (
+                    <div className="bg-red-100 p-1 rounded-full">
+                        <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}>
+                            <DeleteItemModal item={item} />
+                        </ButtonDelete>
+                    </div>
+                )}
             </div>
 
             {/* Hover para detalhes */}
@@ -71,6 +78,7 @@ const ItemCard = ({ item }: CardProps) => {
             )} */}
         </div>
     );
+
 };
 
 export default ItemCard;

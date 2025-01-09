@@ -169,10 +169,6 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         }))
     };
 
-    if (!additionalItemsToAdd || additionalItemsToAdd.length === 0) {
-        return null;
-    }
-
     const AdditionalItemCard = ({ item }: { item: ItemAdditional }) => {
         let name = item.name;
 
@@ -211,6 +207,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}
+                {additionalItemsToAdd.length === 0 && <p className="text-gray-500">Nenhum item disponível</p>}
             </div>
         </div>
     );

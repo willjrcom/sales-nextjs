@@ -60,10 +60,6 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         }
     };
 
-    if (!removableItems || removableItems.length === 0) {
-        return null;
-    }
-
     const RemovedItemCard = ({ item }: { item: string }) => {
         const isRemoved = removedItems.includes(item);
         const disabledClass = isRemoved ? "bg-red-300" : "";
@@ -102,6 +98,7 @@ const RemovedItemList = ({ item }: ItemListProps) => {
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {removableItems?.map((removableItem) => <RemovedItemCard key={removableItem} item={removableItem} />)}
+                {(!removableItems || removableItems?.length === 0) && <p className="text-gray-500">Nenhum item disponível</p>}
             </div>
         </div>
     );

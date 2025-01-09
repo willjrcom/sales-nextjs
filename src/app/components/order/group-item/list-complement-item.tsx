@@ -56,8 +56,8 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
         <div>
             <br className="my-4" />
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
-            <h4 className="text-2md font-bold">Itens adicionais</h4>
             <div className="space-y-4">
+                {complementItems.length === 0 && <p className="text-gray-500">Nenhum produto disponível</p>}
                 <Carousel items={complementItems}>
                     {(product) => <AddComplementCard key={product.id} groupItem={groupItem} product={product} />}
                 </Carousel>
