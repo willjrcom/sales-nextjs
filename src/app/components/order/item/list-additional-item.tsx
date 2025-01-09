@@ -37,7 +37,7 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
 }
 
 const AdditionalItemList = ({ item }: ItemListProps) => {
-    const [itemList, setItemList] = useState<ItemAdditional[]>([]);
+    const [additionalItems, setItemList] = useState<ItemAdditional[]>([]);
     const [error, setError] = useState<RequestError | null>(null);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const { data } = useSession();
@@ -57,16 +57,16 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             }
 
             // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
-            const additionalItems = additionalCategories
+            const additionalItemsFound = additionalCategories
                 .map((additionalCategory) => categoriesSlice.entities[additionalCategory.id]?.products) // Obter os produtos de cada categoria adicional
                 .flat(); // "Flatten" para uma lista única de produtos
 
-            if (!additionalItems || additionalItems.length === 0) {
+            if (!additionalItemsFound || additionalItemsFound.length === 0) {
                 return setItemList([]); // Se não houver produtos, retorna lista vazia
             }
-
+            
             // Passo 4: Filtrar qualquer produto inválido antes de converter
-            const validItems = additionalItems.filter(item => item != null && item !== undefined);
+            const validItems = additionalItemsFound.filter(item => item != null && item !== undefined);
 
             // Passo 5: Converter os produtos válidos para itens
             const items = convertProductToItem(validItems, item.additional_items || []);
@@ -124,6 +124,8 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
     };
 
     const handleDecrement = (itemAdditional: ItemAdditional) => {
+        if (itemAdditional.quantity === 0) return
+        
         itemAdditional.quantity -= 1
         onChange(itemAdditional)
         setItemList((prev) =>
@@ -135,6 +137,10 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
         );
     };
 
+    if (!additionalItems || additionalItems.length === 0) {
+        return null;
+    }
+    
     return (
         <div>
             <br className="my-4" />
@@ -142,7 +148,7 @@ const AdditionalItemList = ({ item }: ItemListProps) => {
             <hr className='my-4' />
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
-                {itemList?.map((item) => (
+                {additionalItems?.map((item) => (
                     <div key={item.product_id} className="flex items-center space-x-4">
                         <div className="flex-1">{item.name}</div>
                         <div className="flex items-center space-x-2">

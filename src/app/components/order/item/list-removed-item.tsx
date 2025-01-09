@@ -57,6 +57,10 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         }
     };
 
+    if (!removableItems || removableItems.length === 0) {
+        return null;
+    }
+
     return (
         <div>
             <br className="my-4" />
