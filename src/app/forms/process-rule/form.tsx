@@ -41,7 +41,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     const submit = async () => {
         if (!data) return;
-        
+
         const validationErrors = ValidateProcessRuleForm(processRule);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
@@ -51,10 +51,10 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
             if (!isUpdate) {
                 processRule.id = response
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {process_rules: [...category.process_rules, processRule]} } }));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: [...category.process_rules, processRule] } } }));
             } else {
                 const updatedProcessRules = category.process_rules.map(rule => rule.id === processRule.id ? processRule : rule)
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {process_rules: updatedProcessRules } } }));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: updatedProcessRules } } }));
             }
 
             modalHandler.hideModal(modalName);
@@ -67,7 +67,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProcessRule(processRule.id, data);
-        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {process_rules: category.process_rules.filter(rule => rule.id !== processRule.id)} } }));
+        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: category.process_rules.filter(rule => rule.id !== processRule.id) } } }));
         modalHandler.hideModal(modalName);
     }
 
@@ -75,21 +75,18 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={processRule.name} />
 
-            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={processRule.description} optional/>
+            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={processRule.description} optional />
 
             <NumberField friendlyName='Ordem' name='order' setValue={value => handleInputChange('order', value)} value={processRule.order} />
 
-            <TextField friendlyName='Caminho da imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={processRule.image_path || ""} optional/>
+            <TextField friendlyName='Caminho da imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={processRule.image_path || ""} optional />
 
-            <div className='flex justify-around'>
-                <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
-                <TimeField friendlyName='Tempo experimental (mm:ss)' name='experimental_error' setValue={value => handleInputChange('experimental_error', value)} value={processRule.experimental_error} />
-            </div>
+            <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
 
             {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
 
             <SelectField friendlyName='Categoria' name='category' values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />
-                
+
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}

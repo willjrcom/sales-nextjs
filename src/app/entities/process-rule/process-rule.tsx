@@ -7,19 +7,17 @@ export default class ProcessRule {
     description: string = "";
     image_path?: string = "";
     ideal_time: string = "";
-    experimental_error: string = "";
     category_id: string = "";
     total_order_process_late: number = 0;
     total_order_process: number = 0;
 
-    constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = "", experimental_error = "", category_id = "") {
+    constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = "", category_id = "") {
         this.id = id;
         this.name = name;
         this.order = order;
         this.description = description;
         this.image_path = image_path;
         this.ideal_time = ideal_time;
-        this.experimental_error = experimental_error;
         this.category_id = category_id;
     }
 }
@@ -29,7 +27,6 @@ const SchemaProcessRule = z.object({
     order: z.number().min(1, 'A primeira ordem deve ser 1'),
     description: z.string().optional(),
     ideal_time: z.string().min(2, 'Tempo ideal inválido'),
-    experimental_error: z.string().min(2, 'Erro experimental inválido'),
     category_id: z.string().uuid("Categoria inválida"),
 });
 
@@ -39,7 +36,6 @@ export const ValidateProcessRuleForm = (category: ProcessRule) => {
         order: category.order,
         description: category.description,
         ideal_time: category.ideal_time,
-        experimental_error: category.experimental_error,
         category_id: category.category_id
     });
 
