@@ -2,8 +2,10 @@ import { z } from "zod";
 import Person, { ValidatePersonForm } from "../person/person";
 
 export default class Client extends Person {
-    constructor(person: Person = new Person()) {
-        super(person.id, person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
+    id: string = '';
+    constructor(id: string = '', person: Person = new Person()) {
+        super(person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
+        this.id = id;
     }
 };
 

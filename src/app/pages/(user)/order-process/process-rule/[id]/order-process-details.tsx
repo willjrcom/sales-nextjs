@@ -12,7 +12,7 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
     const queue = orderProcess.queue;
     const leftAt = queue?.left_at ? queue?.left_at : new Date().toISOString();
     const epochLeftAt = new Date(leftAt).getTime()
-    const epochjoinedAt = new Date(queue?.joined_at!).getTime()
+    const epochjoinedAt = new Date(queue?.joined_at ?? new Date()).getTime()
     const queueTotalTime = new Date(epochLeftAt - epochjoinedAt);
     const modalHandler = useModal();
 

@@ -10,9 +10,10 @@ interface PersonProps {
     person: Person;
     setPerson: React.Dispatch<React.SetStateAction<Person>>;
     isEmployee?: boolean;
+    isHidden?: boolean;
 }
 
-const PersonForm = ({ person, setPerson, isEmployee }: PersonProps) => {
+const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) => {
     const [contact, setContact] = useState<Contact>(person.contact || new Contact())
     const [address, setAddress] = useState<Address>(person.address || new Address())
 
@@ -22,7 +23,7 @@ const PersonForm = ({ person, setPerson, isEmployee }: PersonProps) => {
             [field]: value
         }));
     }, [setPerson]);
-    
+
     useEffect(() => {
         handleInputChange('address', address);
     }, [address]);
@@ -33,18 +34,16 @@ const PersonForm = ({ person, setPerson, isEmployee }: PersonProps) => {
 
     return (
         <>
-            <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={person.name}/>
+            <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={person.name} disabled={isHidden} />
 
-            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional={!isEmployee}/>
+            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional={!isEmployee} disabled={isHidden} />
 
-            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee}/>
+            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee} disabled={isHidden} />
 
-            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee}/>
+            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee} disabled={isHidden} />
 
             <ContactForm contactParent={contact} setContactParent={setContact} />
             <AddressForm addressParent={person.address} setAddressParent={setAddress} />
-
-            <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={person.id}/>
         </>
     );
 }

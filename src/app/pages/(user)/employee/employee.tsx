@@ -56,9 +56,9 @@ const PageEmployee = () => {
                     </ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <ButtonIconTextFloat modalName="new-employee" position="bottom-right"
+                    <ButtonIconTextFloat modalName="new-employee" position="bottom-right" size="xl"
                         title="Novo funcionario">
-                        <EmployeeForm/>
+                        <EmployeeForm />
                     </ButtonIconTextFloat>
                 }
                 refreshButton={

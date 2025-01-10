@@ -52,18 +52,15 @@ const Component = () => {
             }
         }, 10000); // Atualiza a cada 60 segundos
 
+        const processRule = processRules.find((p) => p.id === currentProcessRuleID)
+        if (processRule) {
+            setProcessRule(processRule)
+            updateParam(processRule.id)
+        }
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.idToken, dispatch, currentProcessRuleID]);
 
-    useEffect(() => {
-        if (!data) return;
-        dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
-
-        const processRule = processRules.find((p) => p.id === currentProcessRuleID)
-        if (!processRule) return
-        setProcessRule(processRule)
-        updateParam(processRule.id)
-    }, [currentProcessRuleID])
 
     useEffect(() => {
         if (!Object.values(orderProcessesSlice.entities)) {
@@ -79,7 +76,7 @@ const Component = () => {
         const category = Object.values(categoriesSlice.entities).find((category) => category.process_rules?.some((processRule) => processRule.id === id));
         if (!category) return;
 
-        setProcessRules(category.process_rules.sort((a, b) => a.order - b.order) || []);
+        setProcessRules(category.process_rules?.sort((a, b) => a.order - b.order) || []);
 
         const processRule = category?.process_rules.find((processRule) => processRule.id === id);
         if (!processRule) return;

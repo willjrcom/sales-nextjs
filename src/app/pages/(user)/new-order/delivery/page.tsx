@@ -67,7 +67,6 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
     const { data } = useSession();
 
     const newOrder = async (client: Client) => {
-        event?.preventDefault();
         if (!data) return;
         try {
             const response = await NewOrderDelivery(client.id, data);

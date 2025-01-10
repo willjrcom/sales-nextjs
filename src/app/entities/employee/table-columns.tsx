@@ -49,7 +49,8 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
           title={"Editar " + row.original.name}>
           <EmployeeForm
             item={row.original}
-            isUpdate={true}/>
+            isUpdate={true}
+            isDisabledPerson />
         </ButtonIcon>
       )
     },

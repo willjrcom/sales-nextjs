@@ -2,11 +2,15 @@ import Employee from "@/app/entities/employee/employee";
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 
-const NewEmployee = async (employee: Employee, session: Session): Promise<string> => {
-    const response = await RequestApi<Employee, string>({
+interface NewEmployeeProps {
+    user_id: string;
+}
+const NewEmployee = async (user_id: string, session: Session): Promise<string> => {
+    const body = {user_id};
+    const response = await RequestApi<NewEmployeeProps, string>({
         path: "/employee/new", 
         method: "POST",
-        body: employee,
+        body: body,
         headers: await AddIdToken(session),
     });
     return response.data

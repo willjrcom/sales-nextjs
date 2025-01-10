@@ -3,7 +3,6 @@ import Address, { SchemaAddress } from "../address/address";
 import Contact, { SchemaContact } from "../contact/contact";
 
 export default class Person {
-    id: string = "";
     name: string = "";
     email: string = "";
     cpf: string = "";
@@ -11,8 +10,7 @@ export default class Person {
     contact: Contact = new Contact();
     address: Address = new Address();
 
-    constructor(id: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), likeTax: boolean = false) {
-        this.id = id;
+    constructor(name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), likeTax: boolean = false) {
         this.name = name;
         this.email = email;
         this.cpf = cpf;

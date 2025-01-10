@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -49,6 +49,7 @@
     "@types/redux-persist": "^4.3.1",
     "@types/serialize-javascript": "^5.0.4",
     "@types/uuid": "^9.0.8",
+    "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
