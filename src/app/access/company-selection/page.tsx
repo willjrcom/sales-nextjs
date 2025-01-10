@@ -3,6 +3,8 @@
 import Access from '@/app/api/auth/access/route';
 import GetCompany from '@/app/api/company/route';
 import RequestError from '@/app/api/error';
+import { ModalProvider, useModal } from '@/app/context/modal/context';
+import CompanyForm from '@/app/forms/company/form';
 import { fetchCategories } from '@/redux/slices/categories';
 import { fetchClients } from '@/redux/slices/clients';
 import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
@@ -21,7 +23,9 @@ export default function Page() {
     return (
         <Provider store={store}>
             <PersistGate persistor={persistor}>
-                <CompanySelection />
+                <ModalProvider>
+                    <CompanySelection />
+                </ModalProvider>
             </PersistGate>
         </Provider>
     )
@@ -32,6 +36,7 @@ function CompanySelection() {
     const { data, update } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
+    const modalHandler = useModal();
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
@@ -85,6 +90,14 @@ function CompanySelection() {
         }
     }
 
+    const newCompany = () => {
+        const onClose = () => {
+            modalHandler.hideModal("new-company")
+        }
+
+        modalHandler.showModal("new-company", "Nova empresa", <CompanyForm />, "md", onClose)
+    }
+    
     if (!data?.user?.companies || data.user.companies.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -119,14 +132,14 @@ function CompanySelection() {
                         <h2 className="text-2xl font-bold">{company.trade_name}</h2>
                     </button>
                 ))}
-                <Link href={"/pages/new-company"}>
+                <button onClick={newCompany}>
                     <div className={`fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max`}
                         style={{ zIndex: 1000 }}
                     >
                         <FaPlus className="text-sm" />
                         <span>Nova empresa</span>
                     </div>
-                </Link>
+                </button>
             </div>
 
             <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>

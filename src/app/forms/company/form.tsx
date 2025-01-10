@@ -78,6 +78,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <TextField friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
             <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
             
+            <hr className="my-4" />
             <FormArray
                 title='Contatos'
                 singleItemName='Contato'
@@ -86,6 +87,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 onRemove={handleRemoveContact}
                 onChange={handleContactChange}
             />
+            
+            <hr className="my-4" />
             
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
