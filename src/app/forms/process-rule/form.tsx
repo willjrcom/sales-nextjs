@@ -84,8 +84,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
 
             {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
-
-            <SelectField friendlyName='Categoria' name='category' values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />
+            {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
