@@ -61,28 +61,34 @@ const Component = () => {
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.idToken, dispatch, currentProcessRuleID]);
 
-
     useEffect(() => {
-        if (!Object.values(orderProcessesSlice.entities)) {
+        const entities = Object.values(orderProcessesSlice.entities);
+        if (entities.length === 0) {
             setOrderProcesses([]);
-            return
-        };
-
-        setOrderProcesses(Object.values(orderProcessesSlice.entities));
+            return;
+        }
+    
+        setOrderProcesses([...entities]); 
     }, [data?.user.idToken, orderProcessesSlice.entities]);
+    
 
     useEffect(() => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
-        const category = Object.values(categoriesSlice.entities).find((category) => category.process_rules?.some((processRule) => processRule.id === id));
+
+        const category = Object.values(categoriesSlice.entities).find((category) =>
+            category.process_rules?.some((processRule) => processRule.id === id)
+        );
         if (!category) return;
 
-        setProcessRules(category.process_rules?.sort((a, b) => a.order - b.order) || []);
+        const processRules = category.process_rules ? [...category.process_rules] : []; // Cria uma cópia
+        setProcessRules(processRules.sort((a, b) => a.order - b.order)); // Ordena a cópia
 
-        const processRule = category?.process_rules.find((processRule) => processRule.id === id);
+        const processRule = processRules.find((processRule) => processRule.id === id);
         if (!processRule) return;
 
-        setProcessRule(processRule);
+        setProcessRule({ ...processRule }); // Cria uma cópia para evitar referência direta
     }, [categoriesSlice.entities, id]);
+
 
     if (!processRule) return null;
 

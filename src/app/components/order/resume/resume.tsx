@@ -51,8 +51,8 @@ export const OrderPaymentsResume = () => {
     }
 
     const isStatusStagingOrPendingOrReady = order?.status == "Staging" || order?.status == "Pending" || order?.status == "Ready"
-    const haveGroups = order && order?.groups?.length > 0
-    const isAnyGroupsStaging = haveGroups && order?.groups?.some((group) => group.status == "Staging")
+    const haveGroups = order && order?.group_items?.length > 0
+    const isAnyGroupsStaging = haveGroups && order?.group_items?.some((group) => group.status == "Staging")
     const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging
     const subTotal = (order?.total_payable || 0) - (order?.delivery?.delivery_tax || 0)
 

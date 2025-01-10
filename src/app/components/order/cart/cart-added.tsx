@@ -22,9 +22,9 @@ export const CartAdded = () => {
 
     useEffect(() => {
         if (!order) return
-        const items = groupBy(order.groups, "category_id");
+        const items = groupBy(order.group_items, "category_id");
         setGroupedItems(items);
-    }, [order?.groups]);
+    }, [order?.group_items]);
 
     if (!order) return null
     return (
@@ -43,12 +43,12 @@ export const CartAdded = () => {
             </div>
 
             <div className="overflow-y-auto overflow-x-auto h-[76vh]">
-                {Object.entries(groupedItems).map(([key, groups], index) => {
+                {Object.entries(groupedItems).map(([key, groupItems], index) => {
                     if (Object.values(categoriesSlice.entities).length === 0) return
                     const category = categoriesSlice.entities[key]
                     if (!category) return
                     return (
-                        <CategoryOrder key={key} category={category} groups={groups} />
+                        <CategoryOrder key={key} category={category} groupItems={groupItems} />
                     )
                 })}
             </div>

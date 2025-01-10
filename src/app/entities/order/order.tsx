@@ -11,7 +11,7 @@ export default class Order {
     id: string = "";
     order_number: number = 0;
     status: StatusOrder = "Staging";
-    groups: GroupItem[] = [];
+    group_items: GroupItem[] = [];
     payments?: PaymentOrder[] = [];
     total_payable: number = 0;
     total_paid: number = 0;
@@ -29,11 +29,11 @@ export default class Order {
     canceled_at?: Date;
     archived_at?: Date;
 
-    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", groups: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", pending_at?: Date, finished_at?: Date, canceled_at?: Date, archived_at?: Date) {
+    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", group_items: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", pending_at?: Date, finished_at?: Date, canceled_at?: Date, archived_at?: Date) {
         this.id = id;
         this.order_number = order_number;
         this.status = status;
-        this.groups = groups;
+        this.group_items = group_items;
         this.payments = payments;
         this.total_payable = total_payable;
         this.total_paid = total_paid;

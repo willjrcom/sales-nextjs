@@ -5,16 +5,16 @@ import Carousel from "../../carousel/carousel";
 
 interface CategoryOrderProps {
     category: Category;
-    groups: GroupItem[];
+    groupItems: GroupItem[];
 }
 
-const CategoryOrder = ({ groups, category }: CategoryOrderProps) => {
+const CategoryOrder = ({ groupItems, category }: CategoryOrderProps) => {
     return (
         <div className="mb-6 bg-gray-100 p-4">
             {/* Título da categoria com botão de edição */}
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">{category.name}</h2>
-                <p className="text-right mt-2">Subtotal: R$ {groups?.reduce((total, group) => total + group.total_price, 0).toFixed(2)}</p>
+                <p className="text-right mt-2">Subtotal: R$ {groupItems?.reduce((total, group) => total + group.total_price, 0).toFixed(2)}</p>
             </div>
             <hr />
             <br />
@@ -22,7 +22,7 @@ const CategoryOrder = ({ groups, category }: CategoryOrderProps) => {
             {/* Container para grupos com scroll horizontal */}
             <div className="overflow-x-auto">
                 <div className=" space-x-4">
-                    <Carousel items={groups}>
+                    <Carousel items={groupItems}>
                         {(group) => (
                             <GroupItemCard key={group.id} groupItem={group} />
                         )}
