@@ -85,7 +85,7 @@ const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
                     </span>
                 </div>
                 <div className="bg-yellow-400 text-white font-medium text-sm px-4 py-1 rounded-full">
-                    {processRule.total_order_process || 0} em fila
+                    {processRule.total_order_queue || 0} em fila
                 </div>
             </div>
         </Link>

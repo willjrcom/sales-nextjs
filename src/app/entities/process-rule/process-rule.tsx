@@ -9,7 +9,7 @@ export default class ProcessRule {
     ideal_time: string = "";
     category_id: string = "";
     total_order_process_late: number = 0;
-    total_order_process: number = 0;
+    total_order_queue: number = 0;
 
     constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = "", category_id = "") {
         this.id = id;
