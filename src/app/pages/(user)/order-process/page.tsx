@@ -1,38 +1,38 @@
 "use client";
 
+import GetCategoriesWithOrderProcess from '@/app/api/category/all/with-order-process/route';
 import Carousel from '@/app/components/carousel/carousel';
 import Category from '@/app/entities/category/category';
 import ProcessRule from '@/app/entities/process-rule/process-rule';
 import { fetchCategories } from '@/redux/slices/categories';
-import { AppDispatch, RootState } from '@/redux/store';
+import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const OrderProcess = () => {
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const [categories, setCategories] = useState<Category[]>(Object.values(categoriesSlice.entities));
+    const [categories, setCategories] = useState<Category[]>([]);
     const { data } = useSession();
     const dispatch = useDispatch<AppDispatch>();
 
+    const fetch = async () => {
+        if (!data) return;
+        const categoriesFound = await GetCategoriesWithOrderProcess(data);
+        setCategories(categoriesFound);
+    }
+
     useEffect(() => {
-        if (data && Object.keys(categoriesSlice.entities).length === 0) {
-            dispatch(fetchCategories(data));
+        if (categories.length === 0) {
+            fetch()
         }
 
         const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchCategories(data));
-            }
+            fetch()
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.idToken, dispatch]);
-
-    useEffect(() => {
-        setCategories(Object.values(categoriesSlice.entities));
-    }, [categoriesSlice.entities]);
 
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
@@ -81,11 +81,11 @@ const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 bg-red-600 rounded-full"></span>
                     <span className="text-red-600 font-semibold text-sm">
-                        0 Atrasados
+                        {processRule.total_order_process_late || 0} Atrasados
                     </span>
                 </div>
                 <div className="bg-yellow-400 text-white font-medium text-sm px-4 py-1 rounded-full">
-                    0 em fila
+                    {processRule.total_order_process || 0} em fila
                 </div>
             </div>
         </Link>

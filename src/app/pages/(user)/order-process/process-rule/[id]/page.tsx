@@ -79,7 +79,7 @@ const Component = () => {
         const category = Object.values(categoriesSlice.entities).find((category) => category.process_rules?.some((processRule) => processRule.id === id));
         if (!category) return;
 
-        setProcessRules(category.process_rules || []);
+        setProcessRules(category.process_rules.sort((a, b) => a.order - b.order) || []);
 
         const processRule = category?.process_rules.find((processRule) => processRule.id === id);
         if (!processRule) return;
