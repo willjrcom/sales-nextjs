@@ -10,6 +10,7 @@ import unusedTablesReducer from './slices/unused-tables';
 import deliveryDriversReducer from './slices/delivery-drivers';
 import categoryReducer from './slices/categories';
 import orderProcessesReducer from './slices/order-processes';
+import usersReducer from './slices/users';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
     deliveryDrivers: deliveryDriversReducer,
     categories: categoryReducer,
     orderProcesses: orderProcessesReducer,
+    users: usersReducer,
 });
 
 // Aplica o persistReducer para o rootReducer
