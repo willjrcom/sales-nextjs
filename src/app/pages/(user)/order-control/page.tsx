@@ -35,20 +35,21 @@ const PageOrder = () => {
 
     
     const openStagingOrders = () => {
-        if (stagingOrders.length === 0) return;
-
         const onClose = () => {
             modalHandler.hideModal("show-staging-orders")
         }
         modalHandler.showModal("show-staging-orders", "Pedidos em aberto", <CardOrderListItem orders={stagingOrders} /> , "sm", onClose);
     }
+
+    const classOrderStaging = stagingOrders.length > 0 ? "text-white bg-red-400 hover:bg-red-500" : "bg-gray-200 hover:bg-gray-300";
+
     return (
         <>
             <CrudLayout
                 title="Pedidos"
                 searchButtonChildren={
                     <div className="w-1/6">
-                        <button className="px-4 py-2 bg-red-400 text-white rounded hover:bg-red-500"
+                        <button className={"px-4 py-2 rounded " + classOrderStaging}
                         onClick={openStagingOrders}>
                             {stagingOrders.length} pedidos em aberto
                         </button>

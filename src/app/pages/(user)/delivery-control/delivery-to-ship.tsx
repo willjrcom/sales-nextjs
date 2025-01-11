@@ -1,3 +1,4 @@
+import GetCompany from "@/app/api/company/route";
 import RequestError from "@/app/api/error";
 import ShipOrderDelivery from "@/app/api/order-delivery/update/ship/route";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
@@ -19,17 +20,19 @@ import { FaMotorcycle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
 const DeliveryOrderToShip = () => {
-    const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
-    const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
+    const ordersSlice = useSelector((state: RootState) => state.deliveryOrders);
+    const [orders, setOrders] = useState<Order[]>([]);
     const dispatch = useDispatch<AppDispatch>();
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [points, setPoints] = useState<Point[]>([]);
+    const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
+    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(deliveryOrdersSlice.entities).length === 0) {
+        if (data && Object.keys(ordersSlice.entities).length === 0) {
             dispatch(fetchDeliveryOrders(data));
         }
 
@@ -43,53 +46,95 @@ const DeliveryOrderToShip = () => {
     }, [data?.user.idToken, dispatch]);
 
     useEffect(() => {
-        setDeliveryOrders(Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Pending' && order.status === 'Ready'));
-    }, [deliveryOrdersSlice.entities]);
+        setOrders(Object.values(ordersSlice.entities).filter((order) => order.delivery?.status === 'Pending' && order.status === 'Ready'));
+    }, [ordersSlice.entities]);
 
     useEffect(() => {
-        const deliveryIDs: string[] = []
-        selectedRows.forEach((id) => deliveryIDs.push(deliveryOrdersSlice.entities[id].delivery?.id || ""));
-        setSelectedDeliveryIDs(deliveryIDs);
     }, [selectedRows]);
 
-    useEffect(() => {
-        if (!data || !data?.user?.currentCompany?.address) return
-        const company = data?.user?.currentCompany;
-        const coordinates = company.address.coordinates
+    const getCenterPoint = async () => {
+        if (!data) return
+
+        const company = await GetCompany(data);
+        if (!company) return setError(new RequestError("Nenhuma empresa encontrada"));
+
+        const address = company.address;
+        if (!company.address) return setError(new RequestError("Nenhuma endereço encontrada"));
+
+        const coordinates = address.coordinates;
+        if (!coordinates) return setError(new RequestError("Nenhuma coordenada encontrada"));
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
+    }
+    
+    useEffect(() => {
+        getCenterPoint();
     }, [data?.user.idToken])
 
     useEffect(() => {
         const newPoints: Point[] = [];
-        for (let deliveryOrder of deliveryOrders) {
-            const address = Object.assign(new Address(), deliveryOrder.delivery?.address);
+        const deliveryIDs: string[] = []
+        const newSelectedPoints: Point[] = [];
+        
+        for (let order of orders) {
+            const address = Object.assign(new Address(), order.delivery?.address);
             if (!address) continue;
 
             const coordinates = address.coordinates
             if (!coordinates) continue;
 
-            const point = { id: deliveryOrder.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
+            const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
             newPoints.push(point);
         }
 
+        // Set deliveryIDs
+        selectedRows.forEach((id) => deliveryIDs.push(ordersSlice.entities[id].delivery?.id || ""));
+        setSelectedDeliveryIDs(deliveryIDs);
+
+        // Set Selected points
+        selectedRows.forEach((id) => {
+            const order = ordersSlice.entities[id];
+            if (!order) return;
+
+            const address = Object.assign(new Address(), order.delivery?.address);
+            if (!address) return;
+
+            const coordinates = address.coordinates
+            if (!coordinates) return;
+
+            const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
+            newSelectedPoints.push(point);
+        });
+
+        setSelectedPoints(newSelectedPoints);
+
+        // Remove os pontos presentes em selectedPoints do newPoints
+        newSelectedPoints.forEach((selectedPoint) => {
+            const index = newPoints.findIndex((point) => point.id === selectedPoint.id);
+            if (index !== -1) {
+                newPoints.splice(index, 1); // Remove o ponto correspondente
+            }
+        });
+
         setPoints(newPoints);
-    }, [deliveryOrders])
+
+    }, [orders, selectedRows]);
 
     return (
         <>
+            {error && <p className="text-red-500">{error.message}</p>}
             <div className="flex justify-end items-center">
-                <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
+                <Refresh slice={ordersSlice} fetchItems={fetchDeliveryOrders} />
             </div>
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+                    <CrudTable columns={DeliveryOrderColumns()} data={orders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
                 </div>
                 {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <Map centerPoint={centerPoint} points={points} />
+                    <Map key={centerPoint?.id} centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>
             {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaMotorcycle} title="Enviar entrega" position="bottom-right">
@@ -158,21 +203,21 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
 
     return (
         <>
-        <div className="items-center mb-4">
-            <Carousel items={deliveryDrivers}>
-                {(driver) => (
-                    <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${selectedDriver?.id === driver.id ? 'bg-blue-100' : 'bg-white'}`} onClick={() => setSelectedDriver(driver)}>
-                        <div className="text-center">
-                            <p className="text-gray-700">
-                                {driver.employee.name}
-                            </p>
-                            <p className="text-gray-700">
-                                Na rua
-                            </p>
-                        </div>
-                    </li>
-                )}
-            </Carousel>
+            <div className="items-center mb-4">
+                <Carousel items={deliveryDrivers}>
+                    {(driver) => (
+                        <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${selectedDriver?.id === driver.id ? 'bg-blue-100' : 'bg-white'}`} onClick={() => setSelectedDriver(driver)}>
+                            <div className="text-center">
+                                <p className="text-gray-700">
+                                    {driver.employee.name}
+                                </p>
+                                <p className="text-gray-700">
+                                    Na rua
+                                </p>
+                            </div>
+                        </li>
+                    )}
+                </Carousel>
             </div>
             {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>
