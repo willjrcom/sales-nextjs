@@ -1,4 +1,3 @@
-import Category from "@/app/entities/company/company";
 import RequestApi, { AddIdToken } from "../../request";
 import { Session } from "next-auth";
 
@@ -6,7 +5,7 @@ interface RemoveUserToCompanyProps {
     email: string
 }
 
-const RemoveUserToCompany = async (email: string, session: Session): Promise<string> => {
+const RemoveUserFromCompany = async (email: string, session: Session): Promise<string> => {
     const body = {email: email} as RemoveUserToCompanyProps
     const response = await RequestApi<RemoveUserToCompanyProps, string>({
         path: "/company/remove/user", 
@@ -18,4 +17,4 @@ const RemoveUserToCompany = async (email: string, session: Session): Promise<str
     return response.data
 };
 
-export default RemoveUserToCompany
+export default RemoveUserFromCompany

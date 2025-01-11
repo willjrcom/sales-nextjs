@@ -1,6 +1,6 @@
 'use client';
 
-import UserForm from "@/app/forms/user/form";
+import UserForm from "@/app/forms/user/form-profile";
 import CrudLayout from "@/app/components/crud/layout";
 import CrudTable from "@/app/components/crud/table";
 import UserColumns from "@/app/entities/user/table-columns";
@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import User from "@/app/entities/user/user";
 import Company from "@/app/entities/company/company";
 import { fetchUsers } from "@/redux/slices/users";
+import UserFormRelation from "@/app/forms/user/form-relation";
 
 const PageUser = () => {
     const [nome, setNome] = useState<string>("");
@@ -60,9 +61,9 @@ const PageUser = () => {
                     </ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <ButtonIconTextFloat modalName="new-user" position="bottom-right" size="xl"
+                    <ButtonIconTextFloat modalName="edit-user" position="bottom-right" size="xl"
                         title="Novo usuário">
-                        <UserForm />
+                        <UserFormRelation />
                     </ButtonIconTextFloat>
                 }
                 refreshButton={

@@ -14,11 +14,13 @@ import RequestError from '@/app/api/error';
 import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
+import Person from '@/app/entities/person/person';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
     const [client, setClient] = useState<Client>(item as Client || new Client())
+    const [person, setPerson] = useState<Person>(client as Person);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
@@ -27,7 +29,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const submit = async () => {
         if (!data) return;
         
-        const newClient = new Client(client)
+        const newClient = { ...client, ...person };
         
         if (newClient.birthday) {
             newClient.birthday = ToIsoDate(newClient.birthday)
@@ -55,14 +57,20 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteClient(client.id, data);
-        dispatch(removeClient(client.id));
-        modalHandler.hideModal(modalName)
+
+        try {
+            await DeleteClient(client.id, data);
+            setError(null);
+            dispatch(removeClient(client.id));
+            modalHandler.hideModal(modalName)
+        } catch (error) {
+            setError(error as RequestError);
+        }
     }
 
     return (
         <>
-            <PersonForm person={client} setPerson={setClient} />
+            <PersonForm person={person} setPerson={setPerson} />
             {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal

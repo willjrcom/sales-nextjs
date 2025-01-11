@@ -1,8 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import User  from "./user";
 import ButtonIcon from "@/app/components/button/button-icon";
-import UserForm from "@/app/forms/user/form";
+import UserForm from "@/app/forms/user/form-profile";
 import Contact from "../contact/contact";
+import UserFormRelation from "@/app/forms/user/form-relation";
 
 
 const UserColumns = (): ColumnDef<User>[] => [
@@ -42,7 +43,7 @@ const UserColumns = (): ColumnDef<User>[] => [
       return (
         <ButtonIcon modalName={"edit-user-" + row.original.id }
           title={"Editar " + row.original.name}>
-          <UserForm
+          <UserFormRelation
             item={row.original}
             isUpdate={true} />
         </ButtonIcon>
