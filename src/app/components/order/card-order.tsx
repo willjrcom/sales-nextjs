@@ -256,7 +256,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                                             </RoundComponent>
                                         </div>
                                     </div>
-                                    {group.items.map((item) => (
+                                    {group.items?.map((item) => (
                                         <div key={item.id} className="text-gray-700 ml-4">
                                             <p className="font-semibold">
                                                 {item.quantity} x {item.name}

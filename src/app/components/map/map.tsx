@@ -63,7 +63,7 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
                     .bindPopup(point.label);
             });
 
-            selectedPoints.forEach((point) => {
+            selectedPoints?.forEach((point) => {
                 L.marker([point.lat, point.lng], {
                     icon: L.icon({
                         iconUrl: "/location-map-selected.png",

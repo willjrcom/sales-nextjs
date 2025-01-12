@@ -74,7 +74,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
     return (
         <>
-            <TextField friendlyName="Nome da empresa" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
+            <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
             <TextField friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
             <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
             
