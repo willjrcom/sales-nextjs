@@ -1,5 +1,3 @@
-"use client";
-
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 import L from "leaflet";
@@ -20,12 +18,13 @@ export interface MapProps {
 const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null); // Ref para o container do mapa
     const mapRef = useRef<L.Map | null>(null); // Ref para a instância do mapa
+    const markersRef = useRef<L.LayerGroup>(L.layerGroup()); // Ref para agrupar marcadores (inicia como uma instância de LayerGroup)
 
     useEffect(() => {
-        if (mapContainerRef.current && centerPoint && !mapRef.current) {
-            // Inicializa o mapa se ainda não foi criado
+        if (mapContainerRef.current && !mapRef.current) {
+            // Inicializa o mapa apenas uma vez
             mapRef.current = L.map(mapContainerRef.current).setView(
-                [centerPoint.lat, centerPoint.lng],
+                [centerPoint?.lat || 0, centerPoint?.lng || 0],
                 13
             );
 
@@ -37,17 +36,44 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
                 }
             ).addTo(mapRef.current);
 
+            // Adiciona o grupo de marcadores ao mapa
+            markersRef.current.addTo(mapRef.current);
+        }
+
+        return () => {
+            // Remove o mapa ao desmontar o componente
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+        };
+    }, []); // Este efeito roda apenas uma vez
+
+    useEffect(() => {
+        if (mapRef.current && centerPoint) {
+            // Centraliza o mapa no ponto central apenas quando `centerPoint` muda
+            mapRef.current.setView([centerPoint.lat, centerPoint.lng], 13);
+        }
+    }, [centerPoint]);
+
+    useEffect(() => {
+        if (markersRef.current) {
+            // Remove marcadores anteriores
+            markersRef.current.clearLayers();
+
             // Adiciona marcador do ponto central
-            L.marker([centerPoint.lat, centerPoint.lng], {
-                icon: L.icon({
-                    iconUrl: "/location-house.png",
-                    iconSize: [40, 40],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                }),
-            })
-                .addTo(mapRef.current)
-                .bindPopup(centerPoint.label);
+            if (centerPoint) {
+                L.marker([centerPoint.lat, centerPoint.lng], {
+                    icon: L.icon({
+                        iconUrl: "/location-house.png",
+                        iconSize: [40, 40],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                    }),
+                })
+                    .addTo(markersRef.current)
+                    .bindPopup(centerPoint.label);
+            }
 
             // Adiciona os outros pontos como marcadores
             points.forEach((point) => {
@@ -59,10 +85,11 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
                         popupAnchor: [1, -34],
                     }),
                 })
-                    .addTo(mapRef.current!)
+                    .addTo(markersRef.current)
                     .bindPopup(point.label);
             });
 
+            // Adiciona os pontos selecionados
             selectedPoints?.forEach((point) => {
                 L.marker([point.lat, point.lng], {
                     icon: L.icon({
@@ -72,22 +99,14 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
                         popupAnchor: [1, -34],
                     }),
                 })
-                    .addTo(mapRef.current!)
+                    .addTo(markersRef.current)
                     .bindPopup(point.label);
             });
         }
-
-        return () => {
-            // Limpa o mapa ao desmontar o componente
-            if (mapRef.current) {
-                mapRef.current.remove();
-                mapRef.current = null;
-            }
-        };
-    }, [centerPoint, points]); // Reexecuta o efeito ao mudar `centerPoint` ou `points`
+    }, [points, selectedPoints, centerPoint]); // Reexecuta ao mudar `points`, `selectedPoints` ou `centerPoint`
 
     if (!centerPoint) {
-        return <div>Carregando...</div>;
+        return <div>Carregando ponto central...</div>;
     }
 
     return (

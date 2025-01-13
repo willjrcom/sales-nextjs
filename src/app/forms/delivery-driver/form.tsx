@@ -70,8 +70,9 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     return (
         <>
             {error && <p className='text-red-500'>{error.message}</p>}
-            <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={employees} />
-            <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} deleteItem={onDelete} />
+            {!isUpdate && <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={employees} />}
+            {isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" deleteItem={onDelete} />}
+            {!isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} />}
         </>
     );
 };

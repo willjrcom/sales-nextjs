@@ -67,7 +67,7 @@ const DeliveryOrderToShip = () => {
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
     }
-    
+
     useEffect(() => {
         getCenterPoint();
     }, [data?.user.idToken])
@@ -76,7 +76,7 @@ const DeliveryOrderToShip = () => {
         const newPoints: Point[] = [];
         const deliveryIDs: string[] = []
         const newSelectedPoints: Point[] = [];
-        
+
         for (let order of orders) {
             const address = Object.assign(new Address(), order.delivery?.address);
             if (!address) continue;
@@ -85,38 +85,17 @@ const DeliveryOrderToShip = () => {
             if (!coordinates) continue;
 
             const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
-            newPoints.push(point);
+
+            if (selectedRows.has(order.id)) {
+                newSelectedPoints.push(point);
+                deliveryIDs.push(order.delivery?.id || "");
+            } else {
+                newPoints.push(point);
+            }
         }
 
-        // Set deliveryIDs
-        selectedRows.forEach((id) => deliveryIDs.push(ordersSlice.entities[id].delivery?.id || ""));
         setSelectedDeliveryIDs(deliveryIDs);
-
-        // Set Selected points
-        selectedRows.forEach((id) => {
-            const order = ordersSlice.entities[id];
-            if (!order) return;
-
-            const address = Object.assign(new Address(), order.delivery?.address);
-            if (!address) return;
-
-            const coordinates = address.coordinates
-            if (!coordinates) return;
-
-            const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
-            newSelectedPoints.push(point);
-        });
-
         setSelectedPoints(newSelectedPoints);
-
-        // Remove os pontos presentes em selectedPoints do newPoints
-        newSelectedPoints.forEach((selectedPoint) => {
-            const index = newPoints.findIndex((point) => point.id === selectedPoint.id);
-            if (index !== -1) {
-                newPoints.splice(index, 1); // Remove o ponto correspondente
-            }
-        });
-
         setPoints(newPoints);
 
     }, [orders, selectedRows]);
@@ -201,22 +180,27 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         }
     }
 
+    console.log(deliveryDrivers)
     return (
         <>
             <div className="items-center mb-4">
                 <Carousel items={deliveryDrivers}>
-                    {(driver) => (
-                        <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${selectedDriver?.id === driver.id ? 'bg-blue-100' : 'bg-white'}`} onClick={() => setSelectedDriver(driver)}>
-                            <div className="text-center">
-                                <p className="text-gray-700">
-                                    {driver.employee.name}
-                                </p>
-                                <p className="text-gray-700">
-                                    Na rua
-                                </p>
-                            </div>
-                        </li>
-                    )}
+                    {(driver) => {
+                        const isSelected = selectedDriver?.id === driver.id
+
+                        return (
+                            <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${isSelected ? 'bg-blue-100' : 'bg-white'}`}
+                                onClick={() => setSelectedDriver(driver)}>
+                                <div className="text-center">
+                                    <p className="text-gray-700">
+                                        {driver.employee.name}
+                                    </p>
+                                    {isSelected && <p className="text-gray-500 text-right">Selecionado</p>}
+                                    {!isSelected && <p className="text-gray-500">&nbsp;</p>}
+                                </div>
+                            </li>
+                        )
+                    }}
                 </Carousel>
             </div>
             {error && <p className="text-red-500 mb-4">{error.message}</p>}

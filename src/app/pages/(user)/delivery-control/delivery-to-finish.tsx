@@ -1,8 +1,6 @@
 import RequestError from "@/app/api/error";
 import DeliveryOrderDelivery from "@/app/api/order-delivery/update/delivery/route";
-import FinishOrderDelivery from "@/app/api/order-delivery/update/ship/route";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import Carousel from "@/app/components/carousel/carousel";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import Map, { Point } from "@/app/components/map/map";
@@ -13,7 +11,6 @@ import Address from "@/app/entities/address/address";
 import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
-import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
 import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
@@ -28,6 +25,7 @@ const DeliveryOrderToFinish = () => {
     const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
     const [deliveryDrivers, setDeliveryDrivers] = useState<Employee[]>([]);
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
+    const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [points, setPoints] = useState<Point[]>([]);
     const [orderID, setSelectedOrderID] = useState<string>("");
     const [selectedDeliveryID, setSelectedDeliveryID] = useState<string>("");
@@ -81,19 +79,28 @@ const DeliveryOrderToFinish = () => {
 
     useEffect(() => {
         const newPoints: Point[] = [];
-        for (let deliveryOrder of deliveryOrders) {
-            const address = Object.assign(new Address(), deliveryOrder.delivery?.address);
+        const newSelectedPoints: Point[] = [];
+
+        for (let order of deliveryOrders) {
+            const address = Object.assign(new Address(), order.delivery?.address);
             if (!address) continue;
 
             const coordinates = address.coordinates
             if (!coordinates) continue;
 
-            const point = { id: deliveryOrder.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
-            newPoints.push(point);
+            const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
+
+
+            if (orderID === order.id) {
+                newSelectedPoints.push(point);
+            } else {
+                newPoints.push(point);
+            }
         }
 
+        setSelectedPoints(newSelectedPoints);
         setPoints(newPoints);
-    }, [deliveryOrders])
+    }, [deliveryOrders, orderID]);
 
     return (
         <>
@@ -115,7 +122,7 @@ const DeliveryOrderToFinish = () => {
                 </div>
                 {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <Map centerPoint={centerPoint} points={points} />
+                    <Map centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>
             {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
