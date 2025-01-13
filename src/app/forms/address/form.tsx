@@ -4,6 +4,7 @@ import Address, { addressStatesWithId, AddressTypesWithId } from '@/app/entities
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/route';
+import { FaSearch } from 'react-icons/fa';
 
 interface AddressFormProps {
     addressParent: Address;
@@ -38,7 +39,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
         try {
             const addressFound = await GetAddressByCEP(address.cep)
 
-            if (addressFound.cep === address.cep) {
+            if (addressFound.cep.replace("-", "") === address.cep.replace("-", "")) {
                 const newAddress = Object.assign({}, 
                     { ...address, 
                         street: addressFound.logradouro, 
@@ -62,7 +63,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
         <div className="flex items-center space-x-4">
             <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional/>
             <button className='flex items-center space-x-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'
-            onClick={getAddress}>Buscar</button>
+            onClick={getAddress}><FaSearch />&nbsp;Buscar</button>
         </div>
 
         <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} />
