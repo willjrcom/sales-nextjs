@@ -35,8 +35,8 @@ const AddressColumns = (): ColumnDef<Address>[] => [
   },
   {
     id: 'Estado',
-    accessorKey: 'state',
-    header: 'state',
+    accessorKey: 'uf',
+    header: 'uf',
   },
   {
     id: 'Cep',

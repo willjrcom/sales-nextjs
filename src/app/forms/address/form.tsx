@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { HiddenField, NumberField, SelectField, TextField } from '../../components/modal/field';
-import Address, { addressStatesWithId, AddressTypesWithId } from '@/app/entities/address/address';
+import Address, { addressUFsWithId, AddressTypesWithId } from '@/app/entities/address/address';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/route';
@@ -16,7 +16,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
     const { data } = useSession();
 
     useEffect(() => {
-        if (address.state) return;
+        if (address.uf) return;
 
         const company = data?.user.currentCompany;
         if (!company) return;
@@ -24,7 +24,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
         const companyAddress = company.address;
         if (!companyAddress) return;
 
-        handleInputChange('state', companyAddress.state);
+        handleInputChange('uf', companyAddress.uf);
     }, [data?.user.currentCompany]);
 
     const handleInputChange = (field: keyof Address, value: any) => {
@@ -45,7 +45,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
                         street: addressFound.logradouro, 
                         neighborhood: addressFound.bairro, 
                         city: addressFound.localidade, 
-                        state: addressFound.uf }
+                        uf: addressFound.uf }
                     ) as Address;
                 setAddress(newAddress);
                 setAddressParent(newAddress);
@@ -78,7 +78,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
 
         <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city}/>
 
-        <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('state', value)} selectedValue={address.state} values={addressStatesWithId}/>
+        <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId}/>
         
         <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId}/>
 

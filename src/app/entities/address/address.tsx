@@ -14,14 +14,14 @@ export const AddressTypesWithId: { id: string; name: string }[] = Array.from(add
     name: translateToPortuguese(type),
 }));
 
-export const addressStates = [
+export const addressUFs = [
     'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
     'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ]
 
-export const  addressStatesWithId: { id: string; name: string }[] = Array.from(addressStates, (state) => ({
-    id: state,
-    name: state,
+export const  addressUFsWithId: { id: string; name: string }[] = Array.from(addressUFs, (uf) => ({
+    id: uf,
+    name: uf,
 }));
 
 function translateToPortuguese(type: string): string {
@@ -45,14 +45,14 @@ export default class Address {
     reference: string = '';
     neighborhood: string = '';
     city: string = '';
-    state: string = '';
+    uf: string = '';
     cep: string = '';
     delivery_tax: number = 0;
     likeTax: boolean = false;
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
-    constructor(id?: string, object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', state = '', cep = '', delivery_tax = 0, adress_type = '', likeTax: boolean = false, coordinates?: Coordinates) {
+    constructor(id?: string, object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', uf = '', cep = '', delivery_tax = 0, adress_type = '', likeTax: boolean = false, coordinates?: Coordinates) {
         this.id = id
         this.object_id = object_id
         this.street = street
@@ -61,7 +61,7 @@ export default class Address {
         this.reference = reference
         this.neighborhood = neighborhood
         this.city = city
-        this.state = state
+        this.uf = uf
         this.cep = cep
         this.delivery_tax = delivery_tax
         this.likeTax = likeTax
@@ -95,7 +95,7 @@ export default class Address {
             this.number,
             this.neighborhood,
             this.city,
-            this.state,
+            this.uf,
         ];
 
         // Filtra os campos que são null, undefined ou strings vazias
@@ -121,7 +121,7 @@ export const SchemaAddress = z.object({
     reference: z.string().max(100, 'Referência precisa ter no máximo 100 caracteres'),
     neighborhood: z.string().min(3, 'Bairro precisa ter pelo menos 3 caracteres').max(100, 'Bairro precisa ter no máximo 100 caracteres'),
     city: z.string().min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres'),
-    state: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
+    uf: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
     delivery_tax: z.number().min(0, 'Taxa de entrega inválida'),
     object_id: z.string().optional(),
 });
@@ -135,7 +135,7 @@ export const ValidateAddressForm = (address: Address) => {
         reference: address.reference,
         neighborhood: address.neighborhood,
         city: address.city,
-        state: address.state,
+        uf: address.uf,
         delivery_tax: address.delivery_tax,
         object_id: address.object_id
     });
