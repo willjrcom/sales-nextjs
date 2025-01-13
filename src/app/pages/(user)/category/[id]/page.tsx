@@ -47,6 +47,7 @@ const PageCategoryEdit = () => {
                 <hr className="my-4" />
 
                 <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h2 className="text-lg font-semibold mb-4">Cadastros relacionados</h2>
                     <ListSize category={category} />
                     <ListQuantity category={category} />
                 </div>

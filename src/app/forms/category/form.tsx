@@ -106,9 +106,10 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     }
 
     const isUpdated = JSON.stringify(category) !== JSON.stringify(item)
+    const classIsUpdate = isUpdate ? "w-[80vw]" : "";
 
     return (
-        <div className="w-[80vw]">
+        <div className={classIsUpdate}>
             {/* Bloco de Dados Básicos */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-md font-medium mb-4">Dados Básicos</h2>
@@ -140,59 +141,56 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                     value={category.use_process_rule}
                     optional
                 />
-            </div>
 
-            {/* Bloco de Ingredientes Removíveis */}
-            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <RemovableItensComponent item={category} setItem={setCategory} />
-            </div>
-
-            {/* Bloco de Tipo de Categoria */}
-            {!isUpdate && (
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
-                </div>
-            )}
-
-            {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
-            {selectedType === "Normal" && (
-                <>
-                    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
+                {selectedType === "Normal" && (
+                    <>
+                        <hr className="my-4" />
                         <AdditionalCategorySelector
                             additionalCategories={Object.values(categoriesSlice.entities)}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />
-                    </div>
-                    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+
+                        <hr className="my-4" />
                         <ComplementCategorySelector
                             complementCategories={Object.values(categoriesSlice.entities)}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />
-                    </div>
-                </>
-            )}
+                    </>
+                )}
 
-            {/* Campo Oculto para ID */}
-            <HiddenField
-                name="id"
-                setValue={value => handleInputChange('id', value)}
-                value={category.id}
-            />
 
-            {/* Exibição de Erros */}
-            {error && <p className="mb-4 text-red-500 text-center">{error.message}</p>}
-            <ErrorForms errors={errors} />
+                {/* Bloco de Ingredientes Removíveis */}
+                <hr className="my-4" />
+                <RemovableItensComponent item={category} setItem={setCategory} />
 
-            <hr className="my-6" />
+                {/* Bloco de Tipo de Categoria */}
+                {!isUpdate && (
+                    <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
+                )}
 
-            {/* Botões para Atualizar ou Excluir */}
-            {isUpdated ? (
-                <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />
-            ) : (
-                <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />
-            )}
+                {/* Campo Oculto para ID */}
+                <HiddenField
+                    name="id"
+                    setValue={value => handleInputChange('id', value)}
+                    value={category.id}
+                />
+
+                {/* Exibição de Erros */}
+                {error && <p className="mb-4 text-red-500 text-center">{error.message}</p>}
+                <ErrorForms errors={errors} />
+
+                <hr className="my-6" />
+
+                {/* Botões para Atualizar ou Excluir */}
+                {isUpdated ? (
+                    <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />
+                ) : (
+                    <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />
+                )}
+            </div>
         </div>
     );
 };

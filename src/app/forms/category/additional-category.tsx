@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Category from "@/app/entities/category/category";
 import Carousel from "@/app/components/carousel/carousel";
+import Image from "next/image";
 
 interface CategorySelectorProps {
     additionalCategories: Category[];
@@ -39,11 +40,7 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
         }
     };
 
-    const filteredCategories = additionalCategories?.filter(cat => cat.is_additional)
-
-    if (!filteredCategories.length) {
-        return null;
-    }
+    const filteredCategories = additionalCategories?.filter(cat => cat.is_additional) || [];
 
     return (
         <div>
@@ -55,11 +52,12 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
                         className={`border p-3 rounded-lg cursor-pointer ${selectedCategories?.some(cat => cat.id === category.id) ? 'bg-blue-100' : 'bg-white'}`}
                         onClick={() => handleCategorySelection(category)}
                     >
-                        <img src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />
+                        {category.image_path && <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />}
                         <h3 className="text-md font-bold text-center">{category.name}</h3>
                     </div>
                     )}
                 </Carousel>
+                {filteredCategories.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria adicional encontrada.</p>}
         </div>
     );
 };

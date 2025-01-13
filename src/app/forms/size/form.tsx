@@ -39,7 +39,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
+            const response = isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
             setError(null);
 
             if (isUpdate) {
@@ -48,6 +48,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
                     category.sizes[index] = size;
                 }
             } else {
+                size.id = response;
                 category.sizes.push(size);
             }
 

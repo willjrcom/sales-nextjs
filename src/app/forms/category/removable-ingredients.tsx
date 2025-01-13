@@ -26,10 +26,7 @@ const RemovableItensComponent = ({ item, setItem }: CategoryFormProps) => {
 
     const handleRemovableIngredientsChange = (index: number, value: string) => {
         setItem(prev => {
-            const updatedRemovableIngredients = Array.isArray(prev.removable_ingredients) 
-                ? [...prev.removable_ingredients] 
-                : [];
-
+            const updatedRemovableIngredients = [...prev.removable_ingredients];
             updatedRemovableIngredients[index] = value;
             return { ...prev, removable_ingredients: updatedRemovableIngredients };
         });

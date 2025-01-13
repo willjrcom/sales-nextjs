@@ -31,13 +31,14 @@ const ListSize = ({ category }: ListSizeProps) => {
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
             <div className="flex items-center space-x-4">
-            <Carousel items={sizes}>
-                    {(size) => (<div onClick={() => onEdit(size)}
-                        key={size.id}
-                        className="border p-2 rounded-md text-center bg-white ml-16 w-32"
-                    >
-                        {size.name}
-                    </div>
+                <Carousel items={sizes}>
+                    {(size) => (
+                        <div onClick={() => onEdit(size)}
+                            key={size.id}
+                            className="border p-2 rounded-md text-center bg-white ml-16 w-32 cursor-pointer"
+                        >
+                            {size.name}
+                        </div>
                     )}
                 </Carousel>
                 <ButtonIconText modalName="new-size" title="Tamanho">

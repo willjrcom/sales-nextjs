@@ -31,12 +31,13 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
             <h2 className="text-xl font-bold mb-4">Quantidades</h2>
             <div className="flex items-center space-x-4">
                 <Carousel items={quantities}>
-                    {(quantity) => (<div onClick={() => onEdit(quantity)}
-                        key={quantity.id}
-                        className="border p-2 rounded-md text-center bg-white ml-16 w-32"
-                    >
-                        {quantity.quantity}
-                    </div>)}
+                    {(quantity) => (
+                        <div onClick={() => onEdit(quantity)}
+                            key={quantity.id}
+                            className="border p-2 rounded-md text-center bg-white ml-16 w-32 cursor-pointer"
+                        >
+                            {quantity.quantity}
+                        </div>)}
 
                 </Carousel>
                 <ButtonIconText modalName="new-quantity" title="Quantidade">

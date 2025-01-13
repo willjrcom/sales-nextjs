@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Category from "@/app/entities/category/category";
 import Carousel from "@/app/components/carousel/carousel";
+import Image from "next/image";
 
 interface CategorySelectorProps {
     complementCategories: Category[];
@@ -35,10 +36,6 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
 
     const filteredCategories = complementCategories.filter(cat => cat.is_complement)
 
-    if (!filteredCategories.length) {
-        return null;
-    }
-
     return (
         <div>
             <h4 className="text-md font-medium mb-4">Categorias complemento</h4>
@@ -49,11 +46,12 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
                         className={`border p-3 rounded-lg cursor-pointer ${selectedCategories?.some(cat => cat.id === category.id) ? 'bg-blue-100' : 'bg-white'}`}
                         onClick={() => handleCategorySelection(category)}
                     >
-                        <img src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />
+                        {category.image_path && <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />}
                         <h3 className="text-md font-bold text-center">{category.name}</h3>
                     </div>
                     )}
                 </Carousel>
+                {filteredCategories?.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria complemento encontrada.</p>}
         </div>
     );
 };

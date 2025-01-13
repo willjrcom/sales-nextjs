@@ -13,6 +13,7 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import Category from '@/app/entities/category/category';
+import NumericField from '@/app/components/modal/fields/numeric';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
     category?: Category
@@ -21,28 +22,11 @@ interface QuantityFormProps extends CreateFormsProps<Quantity> {
 const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity'
     const modalHandler = useModal();
-    const [quantity, setQuantity] = useState<Quantity>(new Quantity());
-    const [quantityValue, setQuantityValue] = useState("0");
+    const [quantity, setQuantity] = useState<Quantity>(item || new Quantity());
     
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    
-    useEffect(() => {
-        if (item && item.id !== quantity.id) {
-            setQuantity(item); // Atualiza o estado apenas se o 'item' for realmente novo
-        }
-    }, [item?.id, quantity.id]); // Vai ser chamado apenas quando 'item' mudar
-    
-
-    useEffect(() => {
-        let num = Number(quantityValue);
-        if (quantityValue.includes(',')) {
-            num = Number(quantityValue.replace(',', '.'));
-        }
-
-        handleInputChange('quantity', Number(num));
-    }, [quantityValue]);
 
     const handleInputChange = (field: keyof Quantity, value: any) => {
         setQuantity(prev => ({ ...prev, [field]: value }));
@@ -57,7 +41,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
+            const response = isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
             setError(null);
 
             if (isUpdate) {
@@ -66,6 +50,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
                     category.quantities[index] = quantity;
                 }
             } else {
+                quantity.id = response;
                 category.quantities.push(quantity);
             }
 
@@ -89,7 +74,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
     return (
         <>
-            <TextField friendlyName='Quantidade' name='quantity' setValue={setQuantityValue} value={quantityValue}/>
+            <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity}/>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id}/>
                 
