@@ -39,19 +39,26 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
     return (
         <div>
             <h4 className="text-md font-medium mb-4">Categorias complemento</h4>
-                <Carousel items={filteredCategories}>
-                    {(category) => (
-                    <div
-                        key={category.id}
-                        className={`border p-3 rounded-lg cursor-pointer ${selectedCategories?.some(cat => cat.id === category.id) ? 'bg-blue-100' : 'bg-white'}`}
-                        onClick={() => handleCategorySelection(category)}
-                    >
-                        {category.image_path && <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />}
-                        <h3 className="text-md font-bold text-center">{category.name}</h3>
-                    </div>
-                    )}
-                </Carousel>
-                {filteredCategories?.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria complemento encontrada.</p>}
+            <Carousel items={filteredCategories}>
+                {(category) => {
+                    const isSelected = selectedCategories?.some(cat => cat.id === category.id);
+
+                    return (
+                        <div
+                            key={category.id}
+                            className={`border p-3 rounded-lg cursor-pointer ${isSelected ? 'bg-blue-100' : 'bg-white'}`}
+                            onClick={() => handleCategorySelection(category)}
+                        >
+                            {category.image_path && <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />}
+                            <h3 className="text-md font-bold text-center">{category.name}</h3>
+
+                            {isSelected && <p className="text-sm text-blue-600 text-right">Adicionado</p>}
+                            {!isSelected && <p className="text-sm text-gray-500 text-right">&nbsp;</p>}
+                        </div>
+                    )
+                }}
+            </Carousel>
+            {filteredCategories?.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria complemento encontrada.</p>}
         </div>
     );
 };
