@@ -14,6 +14,16 @@ export const AddressTypesWithId: { id: string; name: string }[] = Array.from(add
     name: translateToPortuguese(type),
 }));
 
+export const addressStates = [
+    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
+    'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+]
+
+export const  addressStatesWithId: { id: string; name: string }[] = Array.from(addressStates, (state) => ({
+    id: state,
+    name: state,
+}));
+
 function translateToPortuguese(type: string): string {
     const translations: Record<string, string> = {
         house: 'Casa',
@@ -87,10 +97,10 @@ export default class Address {
             this.city,
             this.state,
         ];
-    
+
         // Filtra os campos que são null, undefined ou strings vazias
         return parts.filter(Boolean).join(", ");
-    }    
+    }
 }
 
 export class Coordinates {
@@ -133,6 +143,6 @@ export const ValidateAddressForm = (address: Address) => {
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return validatedFields.error.flatten().fieldErrors;
-    } 
+    }
     return {}
 };

@@ -2,14 +2,14 @@ import { Session } from "next-auth"
 import RequestError, { translateError } from "./error"
 
 interface RequestApiProps<T> {
-    path: string
-    body?: T
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
-    headers?: any
+    path: string;
+    body?: T;
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    headers?: any;
 }
 
 interface Response<T> {
-    data: T
+    data: T;
 }
 
 const jsonHeaders = {
@@ -48,7 +48,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
             ...headers,
         },
     });
-
+    
     if (!res.ok && res.status === 500) {
         const body = await res.json();
         const error = new RequestError();
@@ -65,5 +65,32 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
     return {...parsedBody} as Response<TR>;
 };
 
+const RequestExternalApi = async <T, TR>({ path, body, method, headers }: RequestApiProps<T>): Promise<TR> => {
+    const res = await fetch(path, {
+        method,
+        body: body ? JSON.stringify(body) : undefined,
+        headers: {
+            ...jsonHeaders,
+            ...headers,
+        },
+    });
+    
+    if (!res.ok && res.status === 500) {
+        const body = await res.json();
+        const error = new RequestError();
+        error.message = body.message || "Erro desconhecido";
+
+        error.message = translateError(error.message)
+
+        error.status = res.status;
+        error.path = path;
+        throw error;
+    }
+
+    const parsedBody = (await res.json()) as TR;
+    return {...parsedBody};
+};
+
+
 export default RequestApi
-export { AddIdToken, AddAccessToken }
+export { AddIdToken, AddAccessToken, RequestExternalApi }

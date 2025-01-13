@@ -23,7 +23,7 @@ const SelectField = ({ friendlyName, name, disabled, values, selectedValue, setS
                 onChange={(e) => setSelectedValue(e.target.value)}
                 className="form-select block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm cursor-pointer"
             >
-                <option value="" disabled>Selecione uma opção</option>
+                <option value="">Selecione um {friendlyName}</option>
                 {values.map((valueObj) => (
                     <option key={valueObj.id} value={valueObj.id}>{valueObj.name}</option>
                 ))}

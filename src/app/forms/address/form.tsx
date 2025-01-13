@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HiddenField, NumberField, SelectField, TextField } from '../../components/modal/field';
-import Address, { AddressTypesWithId } from '@/app/entities/address/address';
+import Address, { addressStatesWithId, AddressTypesWithId } from '@/app/entities/address/address';
 import PatternField from '@/app/components/modal/fields/pattern';
+import { useSession } from 'next-auth/react';
+import GetAddressByCEP from '@/app/api/busca-cep/route';
 
 interface AddressFormProps {
     addressParent: Address;
@@ -10,18 +12,58 @@ interface AddressFormProps {
 
 const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
     const [address, setAddress] = useState<Address>(addressParent || new Address());
-    
+    const { data } = useSession();
+
+    useEffect(() => {
+        if (address.state) return;
+
+        const company = data?.user.currentCompany;
+        if (!company) return;
+
+        const companyAddress = company.address;
+        if (!companyAddress) return;
+
+        handleInputChange('state', companyAddress.state);
+    }, [data?.user.currentCompany]);
+
     const handleInputChange = (field: keyof Address, value: any) => {
         const newAddress = Object.assign({}, { ...address, [field]: value }) as Address; 
         setAddress(newAddress);
         setAddressParent(newAddress);
     };
 
+    const getAddress = async () => {
+        if (!data) return;
+        
+        try {
+            const addressFound = await GetAddressByCEP(address.cep)
+
+            if (addressFound.cep === address.cep) {
+                const newAddress = Object.assign({}, 
+                    { ...address, 
+                        street: addressFound.logradouro, 
+                        neighborhood: addressFound.bairro, 
+                        city: addressFound.localidade, 
+                        state: addressFound.uf }
+                    ) as Address;
+                setAddress(newAddress);
+                setAddressParent(newAddress);
+
+            }
+        } catch(error) {}
+    }
+
     return (
         <>
         <br/>
         <h2 className='text-xl'>Endereço</h2>
         <hr className="my-4" />
+
+        <div className="flex items-center space-x-4">
+            <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional/>
+            <button className='flex items-center space-x-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'
+            onClick={getAddress}>Buscar</button>
+        </div>
 
         <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} />
 
@@ -35,11 +77,9 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
 
         <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city}/>
 
-        <TextField name="state" friendlyName="Estado" placeholder="Digite o estado" setValue={value => handleInputChange('state', value)} value={address.state}/>
+        <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('state', value)} selectedValue={address.state} values={addressStatesWithId}/>
         
         <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId}/>
-
-        <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional/>
 
         {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={value => handleInputChange('delivery_tax', value)} value={address.delivery_tax}/>}
         

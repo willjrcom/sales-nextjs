@@ -180,7 +180,6 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         }
     }
 
-    console.log(deliveryDrivers)
     return (
         <>
             <div className="items-center mb-4">

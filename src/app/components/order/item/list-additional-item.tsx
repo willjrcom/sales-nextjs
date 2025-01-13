@@ -78,7 +78,6 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
                 return setAdditionalItems([]); // Se não houver itens válidos após a conversão, retorna lista vazia
             }
 
-            console.log(items)
             // Atualiza o estado com os itens convertidos
             setAdditionalItems(items);
 
