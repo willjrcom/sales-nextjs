@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 
 export interface Point {
@@ -10,23 +10,23 @@ export interface Point {
 }
 
 export interface MapProps {
+    mapId: string; // Identificador único para cada mapa
     centerPoint?: Point | null;
     points: Point[];
     selectedPoints: Point[];
 }
 
-const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
+const Map = ({ mapId, centerPoint, points, selectedPoints }: MapProps) => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null); // Ref para o container do mapa
     const mapRef = useRef<L.Map | null>(null); // Ref para a instância do mapa
-    const markersRef = useRef<L.LayerGroup>(L.layerGroup()); // Ref para agrupar marcadores (inicia como uma instância de LayerGroup)
+    const markersRef = useRef<L.LayerGroup>(L.layerGroup()); // Ref para agrupar marcadores
 
     useEffect(() => {
         if (mapContainerRef.current && !mapRef.current) {
-            // Inicializa o mapa apenas uma vez
-            mapRef.current = L.map(mapContainerRef.current).setView(
-                [centerPoint?.lat || 0, centerPoint?.lng || 0],
-                13
-            );
+            // Cria uma nova instância de mapa
+            const mapInstance = L.map(mapContainerRef.current, {
+                attributionControl: false,
+            }).setView([centerPoint?.lat || 0, centerPoint?.lng || 0], 13);
 
             // Adiciona o fundo do mapa
             L.tileLayer(
@@ -34,31 +34,27 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
                 {
                     attribution: '&copy; <a href="https://www.carto.com/">CARTO</a> contributors',
                 }
-            ).addTo(mapRef.current);
+            ).addTo(mapInstance);
 
             // Adiciona o grupo de marcadores ao mapa
-            markersRef.current.addTo(mapRef.current);
+            markersRef.current.addTo(mapInstance);
+
+            // Atualiza o mapa na ref
+            mapRef.current = mapInstance;
         }
 
         return () => {
-            // Remove o mapa ao desmontar o componente
+            // Limpa a instância do mapa quando o componente for desmontado
             if (mapRef.current) {
-                mapRef.current.remove();
-                mapRef.current = null;
+                mapRef.current.remove(); // Remove o mapa
+                mapRef.current = null; // Reseta a instância
             }
         };
-    }, []); // Este efeito roda apenas uma vez
+    }, [centerPoint]); // Esse efeito depende de centerPoint
 
     useEffect(() => {
-        if (mapRef.current && centerPoint) {
-            // Centraliza o mapa no ponto central apenas quando `centerPoint` muda
-            mapRef.current.setView([centerPoint.lat, centerPoint.lng], 13);
-        }
-    }, [centerPoint]);
-
-    useEffect(() => {
-        if (markersRef.current) {
-            // Remove marcadores anteriores
+        if (mapRef.current) {
+            // Limpa marcadores anteriores
             markersRef.current.clearLayers();
 
             // Adiciona marcador do ponto central
@@ -103,7 +99,7 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
                     .bindPopup(point.label);
             });
         }
-    }, [points, selectedPoints, centerPoint]); // Reexecuta ao mudar `points`, `selectedPoints` ou `centerPoint`
+    }, [points, selectedPoints, centerPoint]); // Reexecuta ao mudar `points`, `selectedPoints`, ou `centerPoint`
 
     if (!centerPoint) {
         return <div>Carregando ponto central...</div>;
@@ -112,6 +108,7 @@ const Map = ({ centerPoint, points, selectedPoints }: MapProps) => {
     return (
         <div
             ref={mapContainerRef}
+            id={mapId} // O id garante que o contêiner do mapa seja único para cada instância
             style={{ height: "58vh", width: "100%" }}
         />
     );
