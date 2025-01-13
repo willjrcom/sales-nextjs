@@ -10,6 +10,7 @@ import { HiddenField, TextField } from '@/app/components/modal/field';
 import Access from '@/app/api/auth/access/route';
 import { useRouter } from 'next/navigation';
 import FormArray from '../../components/modal/form-array';
+import PatternField from '@/app/components/modal/fields/pattern';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const [company, setCompany] = useState<Company>(item || new Company());
@@ -75,7 +76,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     return (
         <>
             <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
-            <TextField friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
+            <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
             <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
             
             <hr className="my-4" />
