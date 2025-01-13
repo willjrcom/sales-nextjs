@@ -8,6 +8,10 @@ import StatusComponent from "../../button/show-status"
 import DeliveryCard from "../type/delivery-order"
 import PickupCard from "../type/pickup-order"
 import TableCard from "../type/table-order"
+import PriceField from "../../modal/fields/price"
+import UpdateChangeOrderDelivery from "@/app/api/order-delivery/update/change/route"
+import { SelectField } from "../../modal/field"
+import { payMethodsWithId } from "@/app/entities/order/order-payment"
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
@@ -33,9 +37,13 @@ export const OrderPaymentsResume = () => {
     const contextCurrentOrder = useCurrentOrder();
     const [error, setError] = useState<RequestError | null>(null)
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+    const [change, setChange] = useState<number>(order?.delivery?.change || 0);
+    const [paymentMethod, setPaymentMethod] = useState<string>(order?.delivery?.payment_method || "");
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
+        setChange(contextCurrentOrder.order?.delivery?.change || 0)
+        setPaymentMethod(contextCurrentOrder.order?.delivery?.payment_method || "")
     }, [contextCurrentOrder.order])
 
     const onSubmit = async () => {
@@ -43,6 +51,18 @@ export const OrderPaymentsResume = () => {
 
         try {
             await PendingOrder(order.id, data)
+            setError(null)
+            contextCurrentOrder.fetchData(order.id);
+        } catch (error) {
+            setError(error as RequestError)
+        }
+    }
+
+    const updateChange = async () => {
+        if (!order || !order.delivery || !data) return
+
+        try {
+            await UpdateChangeOrderDelivery(order.delivery.id, change, paymentMethod, data)
             setError(null)
             contextCurrentOrder.fetchData(order.id);
         } catch (error) {
@@ -63,6 +83,19 @@ export const OrderPaymentsResume = () => {
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <br />
             {/* Total do pedido */}
+            {order?.delivery &&
+                <div>
+                    <hr className="my-2" />
+                    <PriceField friendlyName="Troco" name="change" value={change} setValue={setChange} optional />
+                    <SelectField friendlyName="Forma de pagamento" name="payment_method" values={payMethodsWithId} selectedValue={paymentMethod} setSelectedValue={setPaymentMethod} optional />
+
+                    {(change !== order.delivery.change || paymentMethod !== order.delivery.payment_method) &&
+                        <button className="ml-4 text-red-500" onClick={updateChange}>Alterar troco</button>
+                    }
+                </div>
+            }
+
+            <hr className="my-2" />
             <p><strong>Subtotal:</strong> R$ {subTotal.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
 

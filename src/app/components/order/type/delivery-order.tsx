@@ -26,12 +26,13 @@ const DeliveryCard = () => {
                 </ButtonIcon>
             </div>
 
-            <p>{client?.name}</p>
             {delivery?.status && <p><StatusComponent status={delivery?.status} /></p>}
-            <p>Endereço: {address?.street}, {address?.number}</p>
-            <p>Bairro: {address?.neighborhood}</p>
-            <p>Cidade: {address?.city}</p>
-            <p>Cep: {address?.cep}</p>
+            <br />
+            <p>{client?.name}</p>
+            <p><strong>Endereço:</strong> {address?.street}, {address?.number}</p>
+            <p><strong>Bairro:</strong> {address?.neighborhood}</p>
+            <p><strong>Cidade:</strong> {address?.city}</p>
+            <p><strong>Cep:</strong> {address?.cep}</p>
         </div>
     )
 }
