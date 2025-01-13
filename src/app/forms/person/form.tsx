@@ -5,6 +5,7 @@ import ContactForm from "../contact/form";
 import { useCallback, useEffect, useState } from "react";
 import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
+import PatternField from "@/app/components/modal/fields/pattern";
 
 interface PersonProps {
     person: Person;
@@ -38,7 +39,7 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
 
             <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional={!isEmployee} disabled={isHidden} />
 
-            <TextField name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee} disabled={isHidden} />
+            <PatternField patternName="cpf" name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee} disabled={isHidden} />
 
             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee} disabled={isHidden} />
 

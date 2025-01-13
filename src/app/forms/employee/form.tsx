@@ -20,6 +20,8 @@ import User from '@/app/entities/user/user';
 import NewUser from '@/app/api/user/new/route';
 import SearchUser from '@/app/api/user/search/route';
 import { FaCheck } from 'react-icons/fa';
+import PatternField from '@/app/components/modal/fields/pattern';
+import PriceField from '@/app/components/modal/fields/price';
 
 interface EmployeeFormProps extends CreateFormsProps<Employee> {
     isDisabledPerson?: boolean;
@@ -131,10 +133,10 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
                 {/* Coluna da Esquerda: Buscar por CPF */}
                 {!isUpdate && <div className="flex justify-center items-center shadow-md h-[80vh] min-w-[20vw]">
                     <div className="w-full block rounded-md p-8">
-                        <TextField
+                        <PatternField
                             name="cpf"
                             friendlyName="Buscar por CPF"
-                            placeholder="Digite o CPF"
+                            patternName='cpf'
                             setValue={setCpfToSearch}
                             value={cpfToSearch}
                         />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { HiddenField, NumberField, SelectField, TextField } from '../../components/modal/field';
 import Address, { AddressTypesWithId } from '@/app/entities/address/address';
+import PatternField from '@/app/components/modal/fields/pattern';
 
 interface AddressFormProps {
     addressParent: Address;
@@ -38,7 +39,7 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
         
         <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId}/>
 
-        <TextField name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional/>
+        <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional/>
 
         {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={value => handleInputChange('delivery_tax', value)} value={address.delivery_tax}/>}
         

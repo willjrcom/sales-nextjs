@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { TextField } from '../../components/modal/field';
 import Contact from '@/app/entities/contact/contact';
+import PatternField from '@/app/components/modal/fields/pattern';
 
 interface ContactFormProps {
     contactParent: Contact;
@@ -19,8 +20,9 @@ const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
     return (
         <div className="flex space-x-4">
             <div className="w-1/3">
-                <TextField
-                    name="ddd"
+                <PatternField
+                    patternName='ddd-phone'
+                    name="ddd-phone"
                     friendlyName="DDD"
                     placeholder="(xx)"
                     setValue={value => handleInputChange('ddd', value)}  // Atualizando o estado no componente pai
@@ -28,8 +30,9 @@ const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
                 />
             </div>
             <div className="w-2/3">
-                <TextField
-                    name="number"
+                <PatternField
+                    patternName='number-phone'
+                    name="number-phone"
                     friendlyName="Contato"
                     placeholder="x xxxx-xxxx"
                     setValue={value => handleInputChange('number', value)}  // Atualizando o estado no componente pai
