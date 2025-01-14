@@ -11,7 +11,7 @@ import { ToIsoDate } from '@/app/utils/date';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const RegisterForm = () => {
     const [password, setPassword] = useState('');
@@ -20,7 +20,15 @@ const RegisterForm = () => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
 
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null; // Evita renderizar HTML até o componente estar pronto
+    }
     const submit = async () => {
         setError(null);
 
@@ -57,7 +65,13 @@ const RegisterForm = () => {
     return (
         <div className="flex h-screen">
             <div className="w-1/2 bg-yellow-500 relative">
-                <Image src="/img_login.jpg" alt="Register" fill style={{ objectFit: 'cover' }} />
+                <Image
+                    src="/img_login.jpg"
+                    alt="Register"
+                    fill={true}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                />
+
                 <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
                     <h2 className="text-2xl mb-2">GazalTech</h2>
                     <p>Crie sua conta agora mesmo.</p>
