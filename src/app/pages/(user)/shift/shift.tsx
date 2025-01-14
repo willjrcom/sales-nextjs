@@ -18,10 +18,10 @@ import { FaShoppingCart, FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangl
 
 interface ChangeCardProps {
     openedAt: string;
+    fetchShift: () => void;
 }
 
-const ChangeCard = ({ openedAt }: ChangeCardProps) => {
-
+const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
     const [endChange, setEndChange] = useState<number>(0);
     const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
@@ -34,8 +34,8 @@ const ChangeCard = ({ openedAt }: ChangeCardProps) => {
         try {
             await CloseShift(endChange, data)
             setError(null);
+            fetchShift();
             modalHandler.hideModal("close-shift")
-            router.refresh()
         } catch (error) {
             setError(error as RequestError);
         }
@@ -52,9 +52,10 @@ const ChangeCard = ({ openedAt }: ChangeCardProps) => {
 
 interface ShiftProps {
     shift?: Shift | null;
+    fetchShift: () => void;
 }
 
-const ShiftCard = ({ shift }: ShiftProps) => {
+const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
     const { data } = useSession();
     const [user, setUser] = useState<User>(new User());
     const [startChange, setStartChange] = useState<number>(shift?.start_change || 0);
@@ -74,7 +75,7 @@ const ShiftCard = ({ shift }: ShiftProps) => {
         try {
             await OpenShift(startChange, data)
             setError(null);
-            
+            fetchShift();
         } catch (error) {
             setError(error as RequestError);
         }
@@ -85,7 +86,7 @@ const ShiftCard = ({ shift }: ShiftProps) => {
             modalHandler.hideModal("close-shift")
         }
 
-        modalHandler.showModal("close-shift", "Fechar turno", <ChangeCard openedAt={shift.opened_at} />, "md", onClose)
+        modalHandler.showModal("close-shift", "Fechar turno", <ChangeCard openedAt={shift.opened_at} fetchShift={fetchShift} />, "md", onClose)
     }
 
     if (!shift) {
@@ -226,6 +227,17 @@ const TopSales = () => {
     )
 }
 
+const ShiftResume = ({ shift }: ShiftProps) => {
+    return (
+        <div className="bg-white p-4 shadow-md rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Resumo do Turno</h3>
+            <div className="w-full bg-gray-200 rounded-lg h-64 mb-4">
+                <div className="flex items-center justify-center h-full">[Gráfico de Vendas]</div>
+            </div>
+        </div>
+    )
+}
+
 const ShiftDashboard = () => {
     const [shift, setShift] = useState<Shift | null>();
     const [error, setError] = useState<RequestError | null>();
@@ -236,7 +248,6 @@ const ShiftDashboard = () => {
 
         try {
             const currentShift = await GetCurrentShift(data);
-            console.log(currentShift)
             setError(null);
             setShift(currentShift);
 
@@ -256,36 +267,39 @@ const ShiftDashboard = () => {
 
     return (
         <div className="p-8 bg-gray-100 h-[80vh] overflow-y-auto">
-            <ShiftCard shift={shift} />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                <SalesCard
-                    title="Pedidos Cancelados"
-                    value={totalCanceledOrders.toString()}
-                    icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
-                />
-                <SalesCard
-                    title="Vendas Hoje"
-                    value={"R$ " + totalSales.toFixed(2)}
-                    icon={<FaMoneyBillWave size={30} className="text-gray-800" />}
-                />
-                <SalesCard
-                    title="Total de Pedidos"
-                    value={totalOrders.toString()}
-                    icon={<FaShoppingCart size={30} className="text-gray-800" />}
-                />
-                <SalesCard
-                    title="Pedidos Finalizados"
-                    value={totalFinishedOrders.toString()}
-                    icon={<FaClipboardCheck size={30} className="text-gray-800" />}
-                />
-            </div>
-            <div className="mt-6">
-                {/* <TopSales /> */}
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                {/* <ReviewCard /> */}
-                <SalesSummary />
-            </div>
+            <ShiftCard shift={shift} fetchShift={fetchCurrentShift} />
+            {shift &&
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                    <SalesCard
+                        title="Pedidos Cancelados"
+                        value={totalCanceledOrders.toString()}
+                        icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
+                    />
+                    <SalesCard
+                        title="Vendas Hoje"
+                        value={"R$ " + totalSales.toFixed(2)}
+                        icon={<FaMoneyBillWave size={30} className="text-gray-800" />}
+                    />
+                    <SalesCard
+                        title="Total de Pedidos"
+                        value={totalOrders.toString()}
+                        icon={<FaShoppingCart size={30} className="text-gray-800" />}
+                    />
+                    <SalesCard
+                        title="Pedidos Finalizados"
+                        value={totalFinishedOrders.toString()}
+                        icon={<FaClipboardCheck size={30} className="text-gray-800" />}
+                    />
+                </div>
+            }
+
+            {shift &&
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                    <ShiftResume shift={shift} fetchShift={fetchCurrentShift} />
+                    <SalesSummary />
+                </div>
+            }
+
         </div>
     )
 }
