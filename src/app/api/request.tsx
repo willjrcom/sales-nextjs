@@ -47,6 +47,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
             ...jsonHeaders,
             ...headers,
         },
+        signal: AbortSignal.timeout(5000)
     });
     
     if (!res.ok && res.status === 500) {
@@ -69,10 +70,9 @@ const RequestExternalApi = async <T, TR>({ path, body, method, headers }: Reques
     const res = await fetch(path, {
         method,
         body: body ? JSON.stringify(body) : undefined,
-        headers: {
-            ...jsonHeaders,
-            ...headers,
-        },
+        headers: headers,
+        signal: AbortSignal.timeout(5000),
+        credentials: 'omit'
     });
     
     if (!res.ok && res.status === 500) {

@@ -1,5 +1,4 @@
 import { RequestExternalApi } from "../request";
-import Address from "@/app/entities/address/address";
 
 interface AddressViaCep {
     cep: string;
