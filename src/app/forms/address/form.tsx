@@ -34,8 +34,6 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
     };
 
     const getAddress = async () => {
-        if (!data) return;
-        
         try {
             const addressFound = await GetAddressByCEP(address.cep)
 
