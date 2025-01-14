@@ -20,7 +20,7 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <Link href={'/pages/category/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
+        <Link href={'/pages/product/category/' + row.original.id} className="flex items-center space-x-2 p-2 rounded-md w-max">
             <FaEdit />
         </Link>
       )

@@ -26,6 +26,7 @@ const ListSize = ({ category }: ListSizeProps) => {
     }
 
     const sizes = [...(category?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name))
+    const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
         <div className="mb-8">
@@ -41,9 +42,11 @@ const ListSize = ({ category }: ListSizeProps) => {
                         </div>
                     )}
                 </Carousel>
-                <ButtonIconText modalName="new-size" title="Tamanho">
-                    <SizeForm category={category} />
-                </ButtonIconText>
+                {isDefaultCategory &&
+                    <ButtonIconText modalName="new-size" title="Tamanho">
+                        <SizeForm category={category} />
+                    </ButtonIconText>
+                }
             </div>
         </div>
     )

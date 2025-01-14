@@ -15,21 +15,26 @@ const PageNewOrder = () => {
   ];
 
   return (
-    <div className="flex gap-4 min-w-[80vw]">
-      {options.map((option) => (
-        <Link href={option.route} 
-        key={option.id}
-        className={`w-1/3 h-[80vh] rounded overflow-hidden shadow-lg flex flex-col items-center justify-center shadow-md cursor-pointer transition duration-300 ${selectedOption === option.id
-            ? "border-4 border-purple-500"
-            : "hover:border-4 hover:border-gray-300"
-          }`}
-          onClick={() => setSelectedOption(option.id)}>
-          <div className="px-6 py-4 text-center">
-            <p className="text-gray-700 text-base">{option.icon}</p>
-            <div className="font-bold text-xl mb-2">{option.label}</div>
-          </div>
-        </Link>
-      ))}
+    <div className="min-w-[80vw]">
+      <h2 className="text-2xl font-bold mb-4">Inicie um novo Pedido</h2>
+
+      <div className="flex gap-4 ">
+        {options.map((option) => (
+          <Link href={option.route}
+            key={option.id}
+            className={`w-1/3 h-[75vh] rounded overflow-hidden shadow-lg flex flex-col items-center justify-center shadow-md cursor-pointer transition duration-300 hover:bg-gray-200
+              ${selectedOption === option.id
+              ? "border-4 border-purple-500"
+              : "hover:border-4 hover:border-gray-300"
+              }`}
+            onClick={() => setSelectedOption(option.id)}>
+            <div className="px-6 py-4 text-center">
+              <p className="text-gray-700 text-base">{option.icon}</p>
+              <div className="font-bold text-xl mb-2">{option.label}</div>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };

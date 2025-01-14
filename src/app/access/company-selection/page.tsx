@@ -83,7 +83,7 @@ function CompanySelection() {
             dispatch(fetchEmployees(data))
             dispatch(fetchPlaces(data))
 
-            router.push('/');
+            router.push('/pages/new-order');
             setError(null);
         } catch (error) {
             setError(error as RequestError);

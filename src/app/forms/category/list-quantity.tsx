@@ -25,7 +25,9 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(quantity.id))
     }
 
-    const quantities = [...(category?.quantities || [])].sort((a, b) => a.quantity - b.quantity)
+    const quantities = [...(category?.quantities || [])].sort((a, b) => a.quantity - b.quantity);
+    const isDefaultCategory = !category.is_additional && !category.is_complement;
+
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Quantidades</h2>
@@ -40,9 +42,11 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
                         </div>)}
 
                 </Carousel>
-                <ButtonIconText modalName="new-quantity" title="Quantidade">
-                    <QuantityForm category={category} />
-                </ButtonIconText>
+                {isDefaultCategory &&
+                    <ButtonIconText modalName="new-quantity" title="Quantidade">
+                        <QuantityForm category={category} />
+                    </ButtonIconText>
+                }
             </div>
         </div>
     )

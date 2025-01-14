@@ -16,7 +16,7 @@ import Category from '@/app/entities/category/category';
 import NumericField from '@/app/components/modal/fields/numeric';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
-    category?: Category
+    category: Category
 }
 
 const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
@@ -72,9 +72,11 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         modalHandler.hideModal(modalName);
     }
 
+    const isDefaultCategory = !category.is_additional && !category.is_complement;
+
     return (
         <>
-            <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity}/>
+            <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity} disabled={isUpdate} />
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id}/>
                 
@@ -82,7 +84,8 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal item={{...quantity, name: quantity.quantity.toString()}} name="quantity" onSubmit={submit} deleteItem={onDelete} />
+            {!isUpdate && <ButtonsModal item={{...quantity, name: quantity.quantity.toString()}} name="quantity" onSubmit={submit} />}
+            {isUpdate && isDefaultCategory && <ButtonsModal item={{...quantity, name: quantity.quantity.toString()}} name="quantity" deleteItem={onDelete} />}
         </>
     );
 };

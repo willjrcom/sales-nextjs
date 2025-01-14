@@ -6,8 +6,8 @@ import Category from "@/app/entities/category/category";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import ListSize from "../../../../forms/category/list-size";
-import ListQuantity from "../../../../forms/category/list-quantity";
+import ListSize from "../../../../../forms/category/list-size";
+import ListQuantity from "../../../../../forms/category/list-quantity";
 import CategoryForm from "@/app/forms/category/form";
 
 const PageCategoryEdit = () => {

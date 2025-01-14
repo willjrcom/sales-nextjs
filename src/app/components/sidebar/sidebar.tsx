@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IconType } from 'react-icons';
-import { FaUserTie, FaCog, FaPlus, FaSignOutAlt, FaRedo, FaUserLock, FaTh } from 'react-icons/fa';
+import { FaUserTie, FaPlus, FaSignOutAlt, FaRedo, FaUserLock, FaTh, FaSlidersH } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
@@ -78,7 +78,7 @@ const Sidebar = () => {
       <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/pages/user" />
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
       <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
-      <SidebarLinkItem icon={FaCog} label="Configurações" href="/" />
+      <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <SidebarLinkItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin} />
     </div>

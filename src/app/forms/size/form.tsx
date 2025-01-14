@@ -15,7 +15,7 @@ import RequestError from '@/app/api/error';
 import Category from '@/app/entities/category/category';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
-    category?: Category
+    category: Category
 }
 
 const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
@@ -69,12 +69,14 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
         modalHandler.hideModal(modalName);
     }
+    
+    const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name}/>
 
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active}/>
+            {isDefaultCategory && <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active}/>}
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id}/>
                 
@@ -82,7 +84,8 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />
+            {isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />}
+            {!isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />}
         </>
     );
 };
