@@ -14,12 +14,23 @@ export const CartToAdd = () => {
     const contextGroupItem = useGroupItem();
 
     useEffect(() => {
+        // Show only group item category
         if (contextGroupItem.groupItem?.category_id) {
-            setCategories(categories.filter((category) => category.id === contextGroupItem.groupItem?.category_id));
+            const filteredCategories = categories.filter((category) =>
+                category.id === contextGroupItem.groupItem?.category_id
+            )
+            setCategories(filteredCategories);
             return
         }
 
-        setCategories(Object.values(categoriesSlice.entities).filter((category) => category.products && category.products.length > 0 && !category.is_additional && !category.is_complement));
+        // Show all categories less additional and complement
+        const filteredCategories = Object.values(categoriesSlice.entities)
+            .filter((category) => category.products
+                && category.products.length > 0
+                && !category.is_additional
+                && !category.is_complement
+            );
+        setCategories(filteredCategories);
     }, [contextGroupItem.groupItem?.category_id])
 
     return (

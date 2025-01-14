@@ -32,6 +32,10 @@ const patterns = {
     "number-phone": {
         pattern: "#####-####",
         placeholder: "00000-0000"
+    },
+    "full-phone": {
+        pattern: "(##) #####-####",
+        placeholder: "(00) 00000-0000"
     }
 } as const; // Garantindo que o objeto 'patterns' tem um formato de constante para os valores
 

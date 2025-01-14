@@ -49,7 +49,10 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
                             className={`border p-3 rounded-lg cursor-pointer ${isSelected ? 'bg-blue-100' : 'bg-white'}`}
                             onClick={() => handleCategorySelection(category)}
                         >
-                            {category.image_path && <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />}
+                            {category.image_path &&
+                                <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />
+                            }
+                            
                             <h3 className="text-md font-bold text-center">{category.name}</h3>
 
                             {isSelected && <p className="text-sm text-blue-600 text-right">Adicionado</p>}

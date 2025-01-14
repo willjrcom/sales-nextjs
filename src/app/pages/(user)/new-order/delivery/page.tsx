@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCheck, FaSearch } from "react-icons/fa";
+import PatternField from "@/app/components/modal/fields/pattern";
 
 const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
@@ -36,7 +37,8 @@ const PageNewOrderDelivery = () => {
             <div className="flex items-center justify-center space-x-4">
                 <div className="flex flex-col w-1/3">
                     <label htmlFor="contato" className="text-sm font-semibold mb-2 text-gray-700">Contato do Cliente</label>
-                    <TextField
+                    <PatternField
+                        patternName="full-phone"
                         name="contato"
                         placeholder="Digite o contato do cliente"
                         setValue={setContact}

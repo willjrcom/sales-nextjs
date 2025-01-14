@@ -12,13 +12,23 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="relative p-4 bg-white rounded-lg shadow-md border hover:shadow-lg transition-shadow duration-200 w-full max-w-sm mx-auto">
             {/* Imagem do produto */}
             <div className="relative flex justify-center items-center">
-                <Image
-                    src={product.image_path}
-                    alt={`Imagem do produto ${product.name}`}
-                    width={200}
-                    height={130}
-                    className="rounded-lg mb-2 object-cover"
-                />
+                {product.image_path ? (
+                    <Image
+                        src={product.image_path}
+                        alt={`Imagem do produto ${product.name}`}
+                        width={200}
+                        height={130}
+                        className="rounded-lg mb-2 object-cover"
+                    />
+                ) : (
+                    <div
+                        className="rounded-lg mb-2 bg-gray-200 flex items-center justify-center"
+                        style={{ width: '200px', height: '130px' }}
+                    >
+                        <span className="text-gray-500">Imagem não disponível</span>
+                    </div>
+                )}
+
                 {/* Código do produto */}
                 <span
                     className="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg opacity-80"
