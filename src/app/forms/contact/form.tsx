@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction } from 'react';
-import { TextField } from '../../components/modal/field';
 import Contact from '@/app/entities/contact/contact';
 import PatternField from '@/app/components/modal/fields/pattern';
 
 interface ContactFormProps {
     contactParent: Contact;
     setContactParent: Dispatch<SetStateAction<Contact>>;
+    isHidden?: boolean;
 }
 
-const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
+const ContactForm = ({ contactParent, setContactParent, isHidden }: ContactFormProps) => {
     // Função para atualizar o estado do contato no componente pai
     const handleInputChange = (field: keyof Contact, value: any) => {
         setContactParent(prev => ({
@@ -27,6 +27,7 @@ const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
                     placeholder="(xx)"
                     setValue={value => handleInputChange('ddd', value)}  // Atualizando o estado no componente pai
                     value={contactParent.ddd}  // Usando o estado diretamente do componente pai
+                    disabled={isHidden}
                 />
             </div>
             <div className="w-2/3">
@@ -37,6 +38,7 @@ const ContactForm = ({ contactParent, setContactParent }: ContactFormProps) => {
                     placeholder="x xxxx-xxxx"
                     setValue={value => handleInputChange('number', value)}  // Atualizando o estado no componente pai
                     value={contactParent.number}  // Usando o estado diretamente do componente pai
+                    disabled={isHidden}
                 />
             </div>
         </div>

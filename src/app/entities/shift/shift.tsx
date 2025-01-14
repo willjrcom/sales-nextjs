@@ -5,7 +5,7 @@ export default class Shift {
     id: string = "";
 	current_order_number: number = 0;
     orders: Order[] = [];
-    redeems: string[] = [];
+    redeems: Redeem[] = [];
     start_change: number = 0;
     end_change: number = 0;
     attendant_id: string = "";
@@ -13,7 +13,7 @@ export default class Shift {
     opened_at: string = "";
     closed_at: string = "";
 
-    constructor(id: string = "", current_order_number: number = 0, orders: Order[] = [], redeems: string[] = [], start_change: number = 0, end_change: number = 0, attendant_id: string = "", attendant: Employee = new Employee(), opened_at: string = "", closed_at: string = "") {
+    constructor(id: string = "", current_order_number: number = 0, orders: Order[] = [], redeems: Redeem[] = [], start_change: number = 0, end_change: number = 0, attendant_id: string = "", attendant: Employee = new Employee(), opened_at: string = "", closed_at: string = "") {
         this.id = id;
         this.current_order_number = current_order_number;
         this.orders = orders;
@@ -25,4 +25,9 @@ export default class Shift {
         this.opened_at = opened_at;
         this.closed_at = closed_at;
     }
+}
+
+export class Redeem {
+    name: string = "";
+    value: number = 0;
 }

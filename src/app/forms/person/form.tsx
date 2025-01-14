@@ -1,4 +1,4 @@
-import { TextField, DateField, HiddenField } from "../../components/modal/field";
+import { TextField, DateField } from "../../components/modal/field";
 import AddressForm from "../address/form";
 import Person from "@/app/entities/person/person";
 import ContactForm from "../contact/form";
@@ -43,8 +43,8 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
 
             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee} disabled={isHidden} />
 
-            <ContactForm contactParent={contact} setContactParent={setContact} />
-            <AddressForm addressParent={person.address} setAddressParent={setAddress} />
+            <ContactForm contactParent={contact} setContactParent={setContact} isHidden />
+            <AddressForm addressParent={person.address} setAddressParent={setAddress} isHidden />
         </>
     );
 }

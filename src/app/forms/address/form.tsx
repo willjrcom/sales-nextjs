@@ -9,9 +9,10 @@ import { FaSearch } from 'react-icons/fa';
 interface AddressFormProps {
     addressParent: Address;
     setAddressParent: React.Dispatch<React.SetStateAction<Address>>;
+    isHidden?: boolean;
 }
 
-const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
+const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormProps) => {
     const [address, setAddress] = useState<Address>(addressParent || new Address());
     const { data } = useSession();
 
@@ -59,30 +60,29 @@ const AddressForm = ({addressParent, setAddressParent}: AddressFormProps) => {
         <hr className="my-4" />
 
         <div className="flex items-center space-x-4">
-            <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional/>
+            <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} />
             <button className='flex items-center space-x-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'
             onClick={getAddress}><FaSearch />&nbsp;Buscar</button>
         </div>
 
-        <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} />
+        <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} disabled={isHidden} />
 
-        <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={value => handleInputChange('number', value)} value={address.number}/>
+        <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={value => handleInputChange('number', value)} value={address.number} disabled={isHidden} />
 
-        <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={value => handleInputChange('neighborhood', value)} value={address.neighborhood}/>
+        <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={value => handleInputChange('neighborhood', value)} value={address.neighborhood} disabled={isHidden} />
 
-        <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={value => handleInputChange('complement', value)} value={address.complement} optional/>
+        <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={value => handleInputChange('complement', value)} value={address.complement} optional disabled={isHidden} />
 
-        <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={value => handleInputChange('reference', value)} value={address.reference} optional/>
+        <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={value => handleInputChange('reference', value)} value={address.reference} optional disabled={isHidden} />
 
-        <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city}/>
+        <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city} disabled={isHidden} />
 
-        <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId}/>
+        <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
         
-        <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId}/>
+        <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />
 
-        {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={value => handleInputChange('delivery_tax', value)} value={address.delivery_tax}/>}
+        {address.likeTax && <NumberField name="delivery_tax" friendlyName="Taxa de entrega" placeholder="Digite a taxa de entrega" setValue={value => handleInputChange('delivery_tax', value)} value={address.delivery_tax} />}
         
-
         <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id}/>
         <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id}/>
         </>
