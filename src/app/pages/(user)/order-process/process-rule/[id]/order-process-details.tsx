@@ -70,14 +70,6 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                 onClick={() => openCancelOrderProcess(orderProcess)}>
                     ✖ Cancelar item
                 </button>
-                <div className="flex gap-4">
-                    <button className="bg-yellow-400 text-black px-6 py-2 rounded-md font-semibold hover:bg-yellow-500">
-                        ⏸️ Pausar
-                    </button>
-                    <button className="bg-red-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-600">
-                        ✔️ Finalizar
-                    </button>
-                </div>
             </div>
         </div>
     );

@@ -56,7 +56,7 @@ const CardCategory = ({ category }: CardCategoryProps) => {
             <hr className="my-4" />
             <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
             <Carousel items={processRules}>
-            {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
+                {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
             </Carousel>
         </>
     )
@@ -78,15 +78,24 @@ const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
                 </p>
             </div>
             <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 bg-red-600 rounded-full"></span>
-                    <span className="text-red-600 font-semibold text-sm">
-                        {processRule.total_order_process_late || 0} Atrasados
-                    </span>
-                </div>
+                {processRule.total_order_process_late > 0 ? (
+                    <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 bg-red-600 rounded-full"></span>
+                        <span className="text-red-600 font-semibold text-sm">
+                            {processRule.total_order_process_late} Atrasados
+                        </span>
+                    </div>
+                ) : (
+                    <div>&nbsp;</div>
+                )}
+
+                {processRule.total_order_queue > 0 ? (
                 <div className="bg-yellow-400 text-white font-medium text-sm px-4 py-1 rounded-full">
-                    {processRule.total_order_queue || 0} em fila
+                    {processRule.total_order_queue} em fila
                 </div>
+                ) : (
+                <div>&nbsp;</div>
+                )}
             </div>
         </Link>
     )

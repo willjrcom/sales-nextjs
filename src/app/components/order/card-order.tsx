@@ -277,6 +277,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
             </div>
 
             {/* Resumo Financeiro */}
+            <hr className="my-4" />
             <div className="mb-4">
                 <h3 className="text-xl font-bold mb-2 text-gray-800">Resumo Financeiro</h3>
                 <div className="space-y-2 text-gray-700">
