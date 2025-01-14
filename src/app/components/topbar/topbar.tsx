@@ -56,7 +56,7 @@ const Topbar = () => {
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />
-        <TopbarItem label="Entregas" href="/pages/delivery-control" />
+        <TopbarItem label="Entregas" href="/pages/order-delivery-control" />
         {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
       </div>
 
