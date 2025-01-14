@@ -20,19 +20,19 @@ interface TopbarItemIconProps {
 }
 
 
-const TopbarItem: React.FC<TopbarItemProps> = ({ label, href, color }: TopbarItemProps) => (
+const TopbarItem = ({ label, href, color }: TopbarItemProps) => (
   <Link href={href} style={{ backgroundColor: color }} className='rounded'>
     <div className="btn px-4 py-1">{label}</div>
   </Link>
 );
 
-const TopbarItemIcon: React.FC<TopbarItemIconProps> = ({ icon: Icon, href }) => (
+const TopbarItemIcon = ({ icon: Icon, href }: TopbarItemIconProps) => (
   <Link href={href} className="text-2xl self-center">
       <Icon/>
   </Link>
 );
 
-const TopbarItemAlert: React.FC<TopbarItemIconProps> = ({ label, icon: Icon, href }) => (
+const TopbarItemAlert = ({ label, icon: Icon, href }: TopbarItemIconProps) => (
   <Link href={href} className="self-center">
     <div className="inline-flex items-center rounded px-4 py-1 bg-red-500"><Icon/>&nbsp;{label}</div>
   </Link>

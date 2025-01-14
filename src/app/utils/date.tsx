@@ -49,6 +49,18 @@ const ToUtcTimeWithSeconds = (dateString?: string) => {
     return formattedDate;
 }
 
+const ToUtcHoursMinutes = (dateString?: string) => {
+    if (!dateString) return "--:--"
+
+    const date = new Date(dateString);
+    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+
+    // Formata a data corretamente
+    const formattedDate = formatUTC(zonedDate, "HH:mm", { timeZone: "UTC" });
+
+    return formattedDate;
+}
+
 const ToUtcMinutesSeconds = (dateString?: string) => {
     if (!dateString) return "--:--"
 
@@ -69,4 +81,4 @@ function ConvertDurationToDate(durationNanoseconds: string | Number): Date {
 
 
 
-export { ToIsoDate, ToUtcDate, ToUtcDatetime, ToUtcTimeWithSeconds, ToUtcMinutesSeconds, ConvertDurationToDate };
+export { ToIsoDate, ToUtcDate, ToUtcDatetime, ToUtcTimeWithSeconds, ToUtcHoursMinutes, ToUtcMinutesSeconds, ConvertDurationToDate };
