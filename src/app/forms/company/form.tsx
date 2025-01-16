@@ -7,7 +7,7 @@ import NewCompany from '@/app/api/company/new/route';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { HiddenField, TextField } from '@/app/components/modal/field';
-import Access from '@/app/api/auth/access/route';
+import Access from '@/app/api/auth/access/access';
 import { useRouter } from 'next/navigation';
 import FormArray from '../../components/modal/form-array';
 import PatternField from '@/app/components/modal/fields/pattern';

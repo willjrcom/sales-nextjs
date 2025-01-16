@@ -1,6 +1,6 @@
 'use client';
 
-import Access from '@/app/api/auth/access/route';
+import Access from '@/app/api/auth/access/access';
 import GetCompany from '@/app/api/company/route';
 import RequestError from '@/app/api/error';
 import { ModalProvider, useModal } from '@/app/context/modal/context';
