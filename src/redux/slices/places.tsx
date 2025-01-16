@@ -1,4 +1,4 @@
-import GetPlaces from "@/app/api/place/route";
+import GetPlaces from "@/app/api/place/place";
 import createGenericSlice from "./generics";
 import Place from "@/app/entities/place/place";
 

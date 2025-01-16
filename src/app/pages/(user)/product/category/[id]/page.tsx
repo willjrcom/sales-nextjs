@@ -1,6 +1,6 @@
 'use client';
 
-import GetCategoryByID from "@/app/api/category/[id]/route";
+import GetCategoryByID from "@/app/api/category/[id]/category";
 import RequestError from "@/app/api/error";
 import Category from "@/app/entities/category/category";
 import { useSession } from "next-auth/react";

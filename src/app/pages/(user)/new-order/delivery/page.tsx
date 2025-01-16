@@ -1,8 +1,8 @@
 'use client';
 
-import GetClientByContact from "@/app/api/client/contact/route";
+import GetClientByContact from "@/app/api/client/contact/client";
 import RequestError from "@/app/api/error";
-import NewOrderDelivery from "@/app/api/order-delivery/new/route";
+import NewOrderDelivery from "@/app/api/order-delivery/new/order-delivery";
 import Client from "@/app/entities/client/client";
 import { TextField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";

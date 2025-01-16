@@ -1,7 +1,7 @@
 'use client';
 
 import RequestError from '@/app/api/error';
-import ForgetUserPassword from '@/app/api/user/forget-password/route';
+import ForgetUserPassword from '@/app/api/user/forget-password/user';
 import { TextField } from '@/app/components/modal/field';
 import Image from 'next/image';
 import Link from 'next/link';

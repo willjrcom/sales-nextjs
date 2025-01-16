@@ -4,7 +4,7 @@ import RedeemCard from "./redeem";
 import ChangeCard from "./change";
 import Shift from "@/app/entities/shift/shift";
 import RequestError from "@/app/api/error";
-import OpenShift from "@/app/api/shift/open/route";
+import OpenShift from "@/app/api/shift/open/shift";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import User from "@/app/entities/user/user";

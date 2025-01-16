@@ -4,7 +4,7 @@ import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
 import Order from '@/app/entities/order/order';
-import GetOrders from '@/app/api/order/route';
+import GetOrders from '@/app/api/order/order';
 
 // Configuração genérica do slice
 const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {

@@ -3,7 +3,7 @@ import { HiddenField, NumberField, SelectField, TextField } from '../../componen
 import Address, { addressUFsWithId, AddressTypesWithId } from '@/app/entities/address/address';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
-import GetAddressByCEP from '@/app/api/busca-cep/route';
+import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
 import { FaSearch } from 'react-icons/fa';
 
 interface AddressFormProps {

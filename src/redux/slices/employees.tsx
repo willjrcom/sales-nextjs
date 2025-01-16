@@ -1,6 +1,6 @@
 import Employee from "@/app/entities/employee/employee";
 import createGenericSlice from "./generics";
-import GetEmployees from "@/app/api/employee/route";
+import GetEmployees from "@/app/api/employee/employee";
 
 const employeesSlice = createGenericSlice<Employee>({ name: 'employees', getItems: GetEmployees })
 export const { addItem: addEmployee, removeItem: removeEmployee, updateItem: updateEmployee } = employeesSlice.actions;

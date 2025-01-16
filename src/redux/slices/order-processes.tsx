@@ -4,7 +4,7 @@ import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/api/error';
 import OrderProcess from '@/app/entities/order-process/order-process';
-import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/route';
+import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
 
 const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderProcess>) => {
     const adapter = createEntityAdapter<OrderProcess, string>({

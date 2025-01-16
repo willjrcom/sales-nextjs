@@ -1,4 +1,4 @@
-import GetClients from "@/app/api/client/route";
+import GetClients from "@/app/api/client/client";
 import createGenericSlice from "./generics";
 import Client from "@/app/entities/client/client";
 

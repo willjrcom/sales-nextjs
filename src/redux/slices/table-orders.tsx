@@ -1,5 +1,5 @@
 import createGenericSlice from "./generics";
-import GetOrderTables from "@/app/api/order-table/route";
+import GetOrderTables from "@/app/api/order-table/order-table";
 import OrderTable from "@/app/entities/order/order-table";
 
 const tableOrdersSlice = createGenericSlice<OrderTable>({ name: 'tableOrders', getItems: GetOrderTables })

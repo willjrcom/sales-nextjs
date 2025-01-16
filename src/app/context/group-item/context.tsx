@@ -4,7 +4,7 @@ import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import GroupItem from '@/app/entities/order/group-item';
 import Item from '@/app/entities/order/item';
-import GetGroupItemByID from '@/app/api/group-item/[id]/route';
+import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
 
 interface GroupItemContextProps<T> {
     groupItem: T | null;

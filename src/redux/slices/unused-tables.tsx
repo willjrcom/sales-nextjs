@@ -1,6 +1,6 @@
 import createGenericSlice from "./generics";
 import Table from "@/app/entities/table/table";
-import GetUnusedTables from "@/app/api/table/unused/route";
+import GetUnusedTables from "@/app/api/table/unused/table";
 
 const unusedTablesSlice = createGenericSlice<Table>({ name: 'tables', getItems: GetUnusedTables })
 export const { addItem: addUnusedTable, removeItem: removeUnusedTable, updateItem: updateUnusedTable } = unusedTablesSlice.actions;

@@ -12,8 +12,8 @@ import Place from "@/app/entities/place/place";
 import RequestError from "@/app/api/error";
 import Table from "@/app/entities/table/table";
 import { addUnusedTable, fetchUnusedTables, removeUnusedTable, updateUnusedTable } from "@/redux/slices/unused-tables";
-import AddTableToPlace from "@/app/api/place/table/add/route";
-import RemoveTableFromPlace from "@/app/api/place/table/remove/route";
+import AddTableToPlace from "@/app/api/place/table/add/place";
+import RemoveTableFromPlace from "@/app/api/place/table/remove/place";
 import Refresh from "@/app/components/crud/refresh";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade

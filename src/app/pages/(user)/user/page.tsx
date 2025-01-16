@@ -11,7 +11,7 @@ import { TextField } from "@/app/components/modal/field";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import GetCompany from "@/app/api/company/route";
+import GetCompany from "@/app/api/company/company";
 import { useSession } from "next-auth/react";
 import User from "@/app/entities/user/user";
 import Company from "@/app/entities/company/company";

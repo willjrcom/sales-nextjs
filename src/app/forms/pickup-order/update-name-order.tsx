@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/api/error';
-import UpdatePickupOrderName from '@/app/api/order-pickup/update/name/[id]/route';
+import UpdatePickupOrderName from '@/app/api/order-pickup/update/name/[id]/order-pickup';
 import { TextField } from '@/app/components/modal/field';
 import OrderPickup from '@/app/entities/order/order-pickup';
 import { useCurrentOrder } from '@/app/context/current-order/context';

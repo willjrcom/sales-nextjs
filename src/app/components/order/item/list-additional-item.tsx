@@ -1,6 +1,6 @@
 import RequestError from '@/app/api/error';
-import DeleteAdditionalItem from '@/app/api/item/delete/additional/route';
-import NewAdditionalItem from '@/app/api/item/update/additional/route';
+import DeleteAdditionalItem from '@/app/api/item/delete/additional/item';
+import NewAdditionalItem from '@/app/api/item/update/additional/item';
 import { useGroupItem } from '@/app/context/group-item/context';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';

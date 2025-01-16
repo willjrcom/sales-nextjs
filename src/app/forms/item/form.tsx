@@ -1,6 +1,6 @@
 import RequestError from "@/app/api/error";
-import NewItem, { NewItemProps } from "@/app/api/item/new/route";
-import GetProductByID from "@/app/api/product/[id]/route";
+import NewItem, { NewItemProps } from "@/app/api/item/new/item";
+import GetProductByID from "@/app/api/product/[id]/product";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
 import ErrorForms from "@/app/components/modal/error-forms"
 import { TextField } from "@/app/components/modal/field";

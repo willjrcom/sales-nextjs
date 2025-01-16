@@ -1,6 +1,6 @@
 import RequestError from '@/app/api/error';
-import FinishOrderProcess from '@/app/api/order-process/finish/route';
-import StartOrderProcess from '@/app/api/order-process/start/route';
+import FinishOrderProcess from '@/app/api/order-process/finish/order-process';
+import StartOrderProcess from '@/app/api/order-process/start/order-process';
 import { useModal } from '@/app/context/modal/context';
 import OrderProcess from '@/app/entities/order-process/order-process';
 import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-processes';

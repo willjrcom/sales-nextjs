@@ -14,7 +14,7 @@ import CardOrder from "@/app/components/order/card-order";
 import OrderTable from "@/app/entities/order/order-table";
 import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { FaPlus } from "react-icons/fa";
-import NewOrderTable from "@/app/api/order-table/new/route";
+import NewOrderTable from "@/app/api/order-table/new/order-table";
 import { useRouter } from "next/navigation";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade

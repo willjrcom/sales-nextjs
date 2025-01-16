@@ -1,6 +1,6 @@
 import RequestError from '@/app/api/error';
-import AddRemovedItem from '@/app/api/item/update/removed-item/add/route';
-import RemoveRemovedItem from '@/app/api/item/update/removed-item/remove/route';
+import AddRemovedItem from '@/app/api/item/update/removed-item/add/item';
+import RemoveRemovedItem from '@/app/api/item/update/removed-item/remove/item';
 import { useGroupItem } from '@/app/context/group-item/context';
 import Item from '@/app/entities/order/item';
 import { RootState } from '@/redux/store';

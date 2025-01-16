@@ -1,4 +1,4 @@
-import GetDeliveryDrivers from "@/app/api/delivery-driver/route";
+import GetDeliveryDrivers from "@/app/api/delivery-driver/delivery-driver";
 import createGenericSlice from "./generics";
 import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
 

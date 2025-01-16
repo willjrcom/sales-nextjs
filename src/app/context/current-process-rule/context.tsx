@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import OrderProcess from '@/app/entities/order-process/order-process';
-import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/route';
+import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
 
 interface CurrentProcessRuleContextProps<T> {
     orderProcesses: T[] | null;

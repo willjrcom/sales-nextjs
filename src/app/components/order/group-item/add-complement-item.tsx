@@ -1,5 +1,5 @@
 import RequestError from "@/app/api/error";
-import NewComplementGroupItem from "@/app/api/group-item/update/complement/route";
+import NewComplementGroupItem from "@/app/api/group-item/update/complement/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";

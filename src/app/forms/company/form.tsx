@@ -3,7 +3,7 @@ import ButtonsModal from '../../components/modal/buttons-modal';
 import Company, { ValidateCompanyForm } from '@/app/entities/company/company';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import NewCompany from '@/app/api/company/new/route';
+import NewCompany from '@/app/api/company/new/company';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import { HiddenField, TextField } from '@/app/components/modal/field';
@@ -12,8 +12,8 @@ import { useRouter } from 'next/navigation';
 import FormArray from '../../components/modal/form-array';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useModal } from '@/app/context/modal/context';
-import GetCompany from '@/app/api/company/route';
-import UpdateCompany from '@/app/api/company/update/route';
+import GetCompany from '@/app/api/company/company';
+import UpdateCompany from '@/app/api/company/update/company';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'

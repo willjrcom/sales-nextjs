@@ -1,7 +1,7 @@
 'use client';
 
 import RequestError from '@/app/api/error';
-import GetCurrentShift from '@/app/api/shift/current/route';
+import GetCurrentShift from '@/app/api/shift/current/shift';
 import { useModal } from '@/app/context/modal/context';
 import Shift from '@/app/entities/shift/shift';
 import { useSession } from 'next-auth/react';

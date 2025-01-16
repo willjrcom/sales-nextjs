@@ -4,7 +4,7 @@ import CreateFormsProps from '../create-forms-props';
 import RequestError from '@/app/api/error';
 import GroupItem from '@/app/entities/order/group-item';
 import { DateTimeField } from '@/app/components/modal/field';
-import ScheduleGroupItem from '@/app/api/group-item/update/schedule/route';
+import ScheduleGroupItem from '@/app/api/group-item/update/schedule/group-item';
 import { FaCalendarTimes, FaTrash } from 'react-icons/fa';
 import { useGroupItem } from '@/app/context/group-item/context';
 

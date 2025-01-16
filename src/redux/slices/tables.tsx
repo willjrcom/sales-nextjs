@@ -1,4 +1,4 @@
-import GetTables from "@/app/api/table/route";
+import GetTables from "@/app/api/table/table";
 import createGenericSlice from "./generics";
 import Table from "@/app/entities/table/table";
 

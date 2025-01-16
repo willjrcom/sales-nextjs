@@ -6,9 +6,9 @@ import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import DeleteQuantity from '@/app/api/quantity/delete/route';
-import NewQuantity from '@/app/api/quantity/new/route';
-import UpdateQuantity from '@/app/api/quantity/update/route';
+import DeleteQuantity from '@/app/api/quantity/delete/quantity';
+import NewQuantity from '@/app/api/quantity/new/quantity';
+import UpdateQuantity from '@/app/api/quantity/update/quantity';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';

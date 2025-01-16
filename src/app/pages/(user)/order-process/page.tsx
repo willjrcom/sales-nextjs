@@ -1,6 +1,6 @@
 "use client";
 
-import GetCategoriesWithOrderProcess from '@/app/api/category/all/with-order-process/route';
+import GetCategoriesWithOrderProcess from '@/app/api/category/all/with-order-process/category';
 import Carousel from '@/app/components/carousel/carousel';
 import Category from '@/app/entities/category/category';
 import ProcessRule from '@/app/entities/process-rule/process-rule';

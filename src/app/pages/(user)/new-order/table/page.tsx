@@ -1,7 +1,7 @@
 'use client';
 
 import RequestError from "@/app/api/error";
-import NewOrderTable from "@/app/api/order-table/new/route";
+import NewOrderTable from "@/app/api/order-table/new/order-table";
 import Table from "@/app/entities/table/table";
 import { SelectField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";

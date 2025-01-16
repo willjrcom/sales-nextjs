@@ -6,9 +6,9 @@ import ProcessRule, { ValidateProcessRuleForm } from '@/app/entities/process-rul
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import DeleteProcessRule from '@/app/api/process-rule/delete/route';
-import NewProcessRule from '@/app/api/process-rule/new/route';
-import UpdateProcessRule from '@/app/api/process-rule/update/route';
+import DeleteProcessRule from '@/app/api/process-rule/delete/process-rule';
+import NewProcessRule from '@/app/api/process-rule/new/process-rule';
+import UpdateProcessRule from '@/app/api/process-rule/update/process-rule';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';

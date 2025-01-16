@@ -4,7 +4,7 @@ import User from '@/app/entities/user/user';
 import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
-import UpdateUser from '@/app/api/user/update/route';
+import UpdateUser from '@/app/api/user/update/user';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';

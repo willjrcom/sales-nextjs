@@ -3,7 +3,7 @@ import React, { createContext, useContext, ReactNode, useState, useCallback} fro
 import { useSession } from 'next-auth/react';
 import RequestError from '@/app/api/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
-import GetOrderByID from '@/app/api/order/[id]/route';
+import GetOrderByID from '@/app/api/order/[id]/order';
 import GroupItem from '@/app/entities/order/group-item';
 
 interface CurrentOrderContextProps<T> {

@@ -3,13 +3,13 @@ import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ValidateClientForm } from '@/app/entities/client/client';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import UpdateClient from '@/app/api/client/update/route';
+import UpdateClient from '@/app/api/client/update/client';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
 import AddressForm from '../address/form';
 import Address from '@/app/entities/address/address';
-import UpdateAddressOrderDelivery from '@/app/api/order-delivery/update/address/route';
+import UpdateAddressOrderDelivery from '@/app/api/order-delivery/update/address/order-delivery';
 import { updateClient } from '@/redux/slices/clients';
 
 interface ClientAddressFormProps extends CreateFormsProps<Client> {

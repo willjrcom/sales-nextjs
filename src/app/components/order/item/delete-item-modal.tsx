@@ -1,5 +1,5 @@
 import RequestError from "@/app/api/error";
-import DeleteItem from "@/app/api/item/delete/route";
+import DeleteItem from "@/app/api/item/delete/item";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import Item from "@/app/entities/order/item";

@@ -6,9 +6,9 @@ import Category, { ValidateCategoryForm } from '@/app/entities/category/category
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import DeleteCategory from '@/app/api/category/delete/route';
-import NewCategory from '@/app/api/category/new/route';
-import UpdateCategory from '@/app/api/category/update/route';
+import DeleteCategory from '@/app/api/category/delete/category';
+import NewCategory from '@/app/api/category/new/category';
+import UpdateCategory from '@/app/api/category/update/category';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/api/error';
