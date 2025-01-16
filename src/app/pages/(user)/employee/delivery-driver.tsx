@@ -13,10 +13,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
+import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
+import RequestError from "@/app/api/error";
 
 const PageDeliveryDriver = () => {
     const [nome, setNome] = useState<string>("");
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
+    const [drivers, setDrivers] = useState<DeliveryDriver[]>([]);
+    const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
@@ -24,29 +28,32 @@ const PageDeliveryDriver = () => {
         if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
             dispatch(fetchDeliveryDrivers(data));
         }
-    
+
         const interval = setInterval(() => {
             if (data) {
                 dispatch(fetchDeliveryDrivers(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
-    
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.idToken, dispatch]);
-    
-    if (deliveryDriversSlice.loading) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-    
+
+    useEffect(() => {
+        const driversFound = Object.values(deliveryDriversSlice.entities).filter((driver) => !!driver.employee);
+        setDrivers(driversFound);
+    }, [deliveryDriversSlice.entities]);
+
+    console.log(drivers)
+    const filteredDrivers = drivers.filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))
+        .sort((a, b) => a.employee.name.localeCompare(b.employee.name));
+
     return (
         <>
-        {deliveryDriversSlice.error && <p className="mb-4 text-red-500">{deliveryDriversSlice.error?.message}</p>}
+            {deliveryDriversSlice.error && <p className="mb-4 text-red-500">{deliveryDriversSlice.error?.message}</p>}
             <CrudLayout
                 title="Motoboys"
                 searchButtonChildren={
-                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} optional/>
+                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} optional />
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-delivery-driver" icon={FaFilter}>
@@ -56,19 +63,19 @@ const PageDeliveryDriver = () => {
                 plusButtonChildren={
                     <ButtonIconTextFloat modalName="new-delivery-driver" position="bottom-right"
                         title="Novo motoboy">
-                        <DeliveryDriverForm/>
+                        <DeliveryDriverForm />
                     </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh
-                    slice={deliveryDriversSlice}
-                    fetchItems={fetchDeliveryDrivers}
+                        slice={deliveryDriversSlice}
+                        fetchItems={fetchDeliveryDrivers}
                     />
                 }
                 tableChildren={
-                    <CrudTable 
-                        columns={DeliveryDriverColumns()} 
-                        data={Object.values(deliveryDriversSlice.entities).sort((a, b) => a.employee.name.localeCompare(b.employee.name))} />
+                    <CrudTable
+                        columns={DeliveryDriverColumns()}
+                        data={filteredDrivers} />
                 }
             />
         </>
