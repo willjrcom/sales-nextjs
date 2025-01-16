@@ -75,7 +75,6 @@ const ShiftDashboard = () => {
     const [shift, setShift] = useState<Shift | null>();
     const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
-    const modalHandler = useModal();
     
     const fetchCurrentShift = async () => {
         if (!data) return;
@@ -84,9 +83,9 @@ const ShiftDashboard = () => {
             const currentShift = await GetCurrentShift(data);
             setError(null);
             setShift(currentShift);
-            modalHandler.hideModal("close-shift")
 
         } catch (error) {
+            setShift(null)
             setError(error as RequestError)
         }
     }

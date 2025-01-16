@@ -2,6 +2,7 @@ import RequestError from "@/app/api/error";
 import CloseShift from "@/app/api/shift/close/route";
 import ButtonsModal from "@/app/components/modal/buttons-modal";
 import PriceField from "@/app/components/modal/fields/price";
+import { useModal } from "@/app/context/modal/context";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -15,6 +16,7 @@ const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
     const [endChange, setEndChange] = useState<number>(0);
     const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
+    const modalHandler = useModal();
 
     const handleCloseShift = async (endChange: number) => {
         if (!data) return;
@@ -23,6 +25,7 @@ const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
             await CloseShift(endChange, data)
             setError(null);
             fetchShift();
+            modalHandler.hideModal("close-shift")
         } catch (error) {
             setError(error as RequestError);
         }
