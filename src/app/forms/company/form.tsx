@@ -11,13 +11,18 @@ import Access from '@/app/api/auth/access/route';
 import { useRouter } from 'next/navigation';
 import FormArray from '../../components/modal/form-array';
 import PatternField from '@/app/components/modal/fields/pattern';
+import { useModal } from '@/app/context/modal/context';
+import GetCompany from '@/app/api/company/route';
+import UpdateCompany from '@/app/api/company/update/route';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
+    const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
     const [company, setCompany] = useState<Company>(item || new Company());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<RequestError | null>(null);
     const { data, update } = useSession();
     const router = useRouter();
+    const modalHandler = useModal();
 
     const handleInputChange = (field: keyof Company, value: any) => {
         setCompany(prev => ({ ...prev, [field]: value }));
@@ -52,22 +57,36 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            const responseNewCompany = await NewCompany(company, data);
+            const responseNewCompany = isUpdate ? await UpdateCompany(company, data) : await NewCompany(company, data);
+            setError(null);
 
             if (!isUpdate) {
-                company.id = responseNewCompany.company_id;
+                const { company_id, schema } = responseNewCompany as { company_id: string, schema: string };
+                company.id = company_id;
+                
+                const response = await Access({ schema: schema }, data);
+                await update({
+                    ...data,
+                    user: {
+                        idToken: response
+                    },
+                });
+
+                router.push('/pages/new-order');
             }
 
-            const response = await Access({ schema: responseNewCompany.schema }, data);
+            const currentCompany = await GetCompany(data);
+
             await update({
                 ...data,
                 user: {
-                    idToken: response
+                    ...data.user,
+                    currentCompany: currentCompany,
                 },
-            });
+            })
+            
+            modalHandler.hideModal(modalName);
 
-            setError(null);
-            router.push('/');
         } catch (error) {
             setError(error as RequestError);
         }
@@ -78,7 +97,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
             <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
             <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
-            
+
             <hr className="my-4" />
             <FormArray
                 title='Contatos'
@@ -88,9 +107,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 onRemove={handleRemoveContact}
                 onChange={handleContactChange}
             />
-            
+
             <hr className="my-4" />
-            
+
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
             {error && <p className="text-red-500">{error.message}</p>}

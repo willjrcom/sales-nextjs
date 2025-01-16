@@ -7,6 +7,8 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import Company from '@/app/entities/company/company';
+import { useModal } from '@/app/context/modal/context';
+import CompanyForm from '@/app/forms/company/form';
 
 interface ItemProps {
   href?: string;
@@ -53,6 +55,8 @@ const Item = ({ href, className, children, onClick }: ItemProps) => {
 }
 
 const Sidebar = () => {
+  const modalHandler = useModal()
+
   const signOutToLogin = async () => {
     await signOut({ callbackUrl: '/login', redirect: true });
   }
@@ -67,9 +71,17 @@ const Sidebar = () => {
     setCompany(companyFound);
   }, [data?.user]);
 
+  const handleCompanyModal = async () => {
+    const onClose = () => {
+      modalHandler.hideModal("edit-company-" + company.id)
+    }
+
+    modalHandler.showModal("edit-company-" + company.id, "Editar Empresa", <CompanyForm item={company} />, "md", onClose)
+  }
+
   return (
-  <div className="w-16 h-screen bg-gray-800 text-white flex flex-col items-center transition-all duration-300 text-left fixed z-10 group hover:w-52 overflow-hidden">
-      <SidebarLinkItem className='h-[8vh]' icon={MdOutlineHomeWork} label={company.trade_name} />
+    <div className="w-16 h-screen bg-gray-800 text-white flex flex-col items-center transition-all duration-300 text-left fixed z-10 group hover:w-52 overflow-hidden">
+      <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} className='h-[8vh]' onClick={handleCompanyModal} />
       <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
       <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
