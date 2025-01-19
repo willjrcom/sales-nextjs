@@ -1,4 +1,6 @@
-export default class RequestError {
+'use client';
+
+class RequestError {
     message: string = "";
     status: number = 0;
     path: string = "";
@@ -41,5 +43,5 @@ const errorTranslations: Record<string, string> = {
     "place position already used by table:": "A posição ja está sendo utilizada por outra mesa",
 };
 
-
+export default RequestError;
 export { translateError }

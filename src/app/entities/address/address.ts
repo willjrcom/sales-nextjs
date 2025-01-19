@@ -19,7 +19,7 @@ export const addressUFs = [
     'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ]
 
-export const  addressUFsWithId: { id: string; name: string }[] = Array.from(addressUFs, (uf) => ({
+export const addressUFsWithId: { id: string; name: string }[] = Array.from(addressUFs, (uf) => ({
     id: uf,
     name: uf,
 }));

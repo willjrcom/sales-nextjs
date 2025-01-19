@@ -12,6 +12,12 @@ interface Response<T> {
     data: T;
 }
 
+interface ResponseError {
+    message: string;
+    status: number;
+    path: string;
+}
+
 const jsonHeaders = {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -52,8 +58,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
     
     if (!response.ok) {
         const body = await response.json();
-        const error = new RequestError();
-        error.message = body.error.message || "Erro desconhecido";
+        const error = body.error as ResponseError;
 
         error.message = translateError(error.message)
 

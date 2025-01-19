@@ -1,4 +1,3 @@
-import Person from "@/app/entities/person/person";
 import RequestApi from "../../request";
 import User from "@/app/entities/user/user";
 
