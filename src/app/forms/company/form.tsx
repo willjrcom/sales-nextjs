@@ -57,7 +57,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            const responseNewCompany = isUpdate ? await UpdateCompany(company, data) : await NewCompany(company, data);
+            const responseNewCompany = isUpdate ? await UpdateCompany(company, data) : await NewCompany(company);
             setError(null);
 
             if (!isUpdate) {
@@ -65,6 +65,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 company.id = company_id;
                 
                 const response = await Access({ schema: schema }, data);
+
                 await update({
                     ...data,
                     user: {

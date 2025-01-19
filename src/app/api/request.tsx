@@ -40,7 +40,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
 
     const fullPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`;
 
-    const res = await fetch(fullPath, {
+    const response = await fetch(fullPath, {
         method,
         body: body ? JSON.stringify(body) : undefined,
         headers: {
@@ -50,19 +50,19 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
         signal: AbortSignal.timeout(5000)
     });
     
-    if (!res.ok && res.status === 500) {
-        const body = await res.json();
+    if (!response.ok) {
+        const body = await response.json();
         const error = new RequestError();
-        error.message = body.message || "Erro desconhecido";
+        error.message = body.error.message || "Erro desconhecido";
 
         error.message = translateError(error.message)
 
-        error.status = res.status;
+        error.status = response.status;
         error.path = fullPath;
         throw error;
     }
 
-    const parsedBody = (await res.json()) as TR;
+    const parsedBody = (await response.json()) as TR;
     return {...parsedBody} as Response<TR>;
 };
 
