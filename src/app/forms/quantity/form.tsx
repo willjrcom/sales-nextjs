@@ -11,7 +11,7 @@ import NewQuantity from '@/app/api/quantity/new/quantity';
 import UpdateQuantity from '@/app/api/quantity/update/quantity';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import Category from '@/app/entities/category/category';
 import NumericField from '@/app/components/modal/fields/numeric';
 

@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
 import { useModal } from '@/app/context/modal/context';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import AddUserToCompany from '@/app/api/company/add/company';
 import RemoveUserFromCompany from '@/app/api/company/remove/company';
 import { TextField } from '@/app/components/modal/field';

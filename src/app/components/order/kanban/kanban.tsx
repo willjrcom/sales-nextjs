@@ -7,7 +7,7 @@ import CardOrder from "../card-order";
 import ReadyOrder from "@/app/api/order/status/ready/order";
 import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/order";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import { EntityState } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";

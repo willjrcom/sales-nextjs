@@ -10,7 +10,7 @@ import NewClient from '@/app/api/client/new/client';
 import UpdateClient from '@/app/api/client/update/client';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';

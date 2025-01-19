@@ -2,7 +2,7 @@ import Order from "@/app/entities/order/order";
 import StatusComponent from "../button/show-status";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import RoundComponent from "../button/round-component";
 import { ToUtcDatetime } from "@/app/utils/date";
 import ReadyOrder from "@/app/api/order/status/ready/order";

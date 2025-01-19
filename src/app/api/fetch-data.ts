@@ -1,6 +1,6 @@
 import { Session } from "next-auth";
 import { Dispatch, SetStateAction } from "react";
-import RequestError from "./error";
+import RequestError from "../utils/error";
 
 interface FetchDataProps<T> {
     getItems: (session: Session) => Promise<T[]>

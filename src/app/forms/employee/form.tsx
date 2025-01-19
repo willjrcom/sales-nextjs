@@ -10,7 +10,7 @@ import NewEmployee from '@/app/api/employee/new/employee';
 import UpdateEmployee from '@/app/api/employee/update/employee';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { ToIsoDate } from '@/app/utils/date';
 import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/employees';
 import { useDispatch } from 'react-redux';

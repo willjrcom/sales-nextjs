@@ -1,4 +1,4 @@
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import NewItem, { NewItemProps } from "@/app/api/item/new/item";
 import GetProductByID from "@/app/api/product/[id]/product";
 import ButtonsModal from "@/app/components/modal/buttons-modal"

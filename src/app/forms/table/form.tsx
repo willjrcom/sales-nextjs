@@ -11,7 +11,7 @@ import NewTable from '@/app/api/table/new/table';
 import UpdateTable from '@/app/api/table/update/table';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { addTable, removeTable, updateTable } from '@/redux/slices/tables';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';

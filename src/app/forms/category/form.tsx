@@ -11,7 +11,7 @@ import NewCategory from '@/app/api/category/new/category';
 import UpdateCategory from '@/app/api/category/update/category';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import RemovableItensComponent from './removable-ingredients';
 import AdditionalCategorySelector from './additional-category';
 import ComplementCategorySelector from './complement-category';

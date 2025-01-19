@@ -1,5 +1,5 @@
 import { Session } from "next-auth"
-import RequestError, { translateError } from "./error"
+import RequestError, { translateError } from "../utils/error"
 
 interface RequestApiProps<T> {
     path: string;

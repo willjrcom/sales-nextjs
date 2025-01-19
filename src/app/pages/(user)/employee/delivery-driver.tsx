@@ -14,7 +14,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
 import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 
 const PageDeliveryDriver = () => {
     const [nome, setNome] = useState<string>("");

@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import Place from "@/app/entities/place/place";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import Refresh from "@/app/components/crud/refresh";
 import { useModal } from "@/app/context/modal/context";
 import CardOrder from "@/app/components/order/card-order";

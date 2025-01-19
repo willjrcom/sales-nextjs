@@ -1,4 +1,4 @@
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import CloseShift from "@/app/api/shift/close/shift";
 import ButtonsModal from "@/app/components/modal/buttons-modal";
 import PriceField from "@/app/components/modal/fields/price";

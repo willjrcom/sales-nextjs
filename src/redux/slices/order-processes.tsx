@@ -2,7 +2,7 @@ import { GenericsProps, GenericState } from './generics';
 import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Update } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import OrderProcess from '@/app/entities/order-process/order-process';
 import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
 

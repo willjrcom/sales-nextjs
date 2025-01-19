@@ -3,7 +3,7 @@ import { ToUtcDate, ToUtcHoursMinutes } from "@/app/utils/date";
 import RedeemCard from "./redeem";
 import ChangeCard from "./change";
 import Shift from "@/app/entities/shift/shift";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import OpenShift from "@/app/api/shift/open/shift";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";

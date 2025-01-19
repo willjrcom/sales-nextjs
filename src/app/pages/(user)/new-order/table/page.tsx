@@ -1,6 +1,6 @@
 'use client';
 
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import Table from "@/app/entities/table/table";
 import { SelectField } from "@/app/components/modal/field";

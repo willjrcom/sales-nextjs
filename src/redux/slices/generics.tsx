@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, createEntityAdapter, EntityState, PayloadAction, Update } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 
 // Estado genérico adicional
 export interface GenericState {

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { CartAdded } from "@/app/components/order/cart/cart-added";
 import { CardOrderResume } from "@/app/components/order/resume/resume";

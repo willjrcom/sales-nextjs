@@ -1,4 +1,4 @@
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import FinishOrderProcess from '@/app/api/order-process/finish/order-process';
 import StartOrderProcess from '@/app/api/order-process/start/order-process';
 import { useModal } from '@/app/context/modal/context';

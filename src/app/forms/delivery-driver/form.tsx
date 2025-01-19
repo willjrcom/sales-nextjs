@@ -7,7 +7,7 @@ import DeleteDeliveryDriver from '@/app/api/delivery-driver/delete/delivery-driv
 import NewDeliveryDriver from '@/app/api/delivery-driver/new/delivery-driver';
 import UpdateDeliveryDriver from '@/app/api/delivery-driver/update/delivery-driver';
 import { useModal } from '@/app/context/modal/context';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { SelectField } from '@/app/components/modal/field';
 import Employee from '@/app/entities/employee/employee';
 import { useDispatch, useSelector } from 'react-redux';

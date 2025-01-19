@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FormatRefreshTime } from "../components/crud/refresh";
 import FetchData from "../api/fetch-data";
 import { Session } from "next-auth";
-import RequestError from "../api/error";
+import RequestError from "../utils/error";
 
 export interface ItemsContextProps<T> {
     items: T[];

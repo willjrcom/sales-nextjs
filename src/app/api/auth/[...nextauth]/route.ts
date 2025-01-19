@@ -4,7 +4,7 @@ import Login from "../login/login";
 import Company from "@/app/entities/company/company";
 import { NextAuthOptions } from "next-auth";
 import UserBackend from "@/app/entities/user/user";
-import RequestError from "../../error";
+import RequestError from "../../../utils/error";
 
 const authOptions: NextAuthOptions = {
     providers: [

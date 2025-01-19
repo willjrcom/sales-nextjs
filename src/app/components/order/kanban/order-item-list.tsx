@@ -2,7 +2,7 @@ import Order from "@/app/entities/order/order";
 import { FaLuggageCart, FaMotorcycle, FaUtensils } from "react-icons/fa";
 import CardOrder from "../card-order";
 import { useModal } from "@/app/context/modal/context";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 
 interface OrderItemListProps {
     order: Order;

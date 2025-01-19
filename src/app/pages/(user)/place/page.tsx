@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import Place from "@/app/entities/place/place";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import Table from "@/app/entities/table/table";
 import { addUnusedTable, fetchUnusedTables, removeUnusedTable, updateUnusedTable } from "@/redux/slices/unused-tables";
 import AddTableToPlace from "@/app/api/place/table/add/place";

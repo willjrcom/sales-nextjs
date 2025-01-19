@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import NewCompany from '@/app/api/company/new/company';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { HiddenField, TextField } from '@/app/components/modal/field';
 import Access from '@/app/api/auth/access/access';
 import { useRouter } from 'next/navigation';

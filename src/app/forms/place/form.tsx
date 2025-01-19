@@ -11,7 +11,7 @@ import NewPlace from '@/app/api/place/new/place';
 import UpdatePlace from '@/app/api/place/update/place';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { addPlace, removePlace, updatePlace } from '@/redux/slices/places';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';

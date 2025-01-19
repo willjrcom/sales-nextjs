@@ -1,4 +1,4 @@
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import NewComplementGroupItem from "@/app/api/group-item/update/complement/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";

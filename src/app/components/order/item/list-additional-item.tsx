@@ -1,4 +1,4 @@
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import DeleteAdditionalItem from '@/app/api/item/delete/additional/item';
 import NewAdditionalItem from '@/app/api/item/update/additional/item';
 import { useGroupItem } from '@/app/context/group-item/context';

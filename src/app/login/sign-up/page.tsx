@@ -1,6 +1,6 @@
 'use client';
 
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import NewUser from '@/app/api/user/new/user';
 import ErrorForms from '@/app/components/modal/error-forms';
 import { TextField } from '@/app/components/modal/field';

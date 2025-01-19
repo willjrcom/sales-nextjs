@@ -11,7 +11,7 @@ import NewSize from '@/app/api/size/new/size';
 import UpdateSize from '@/app/api/size/update/size';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import Category from '@/app/entities/category/category';
 
 interface SizeFormProps extends CreateFormsProps<Size> {

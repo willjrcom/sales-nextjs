@@ -5,7 +5,7 @@ import Carousel from '../../carousel/carousel';
 import AddComplementCard from './add-complement-item';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 
 interface ItemListProps {
     groupItem?: GroupItem | null;

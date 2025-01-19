@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Modal from "./modal";
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import { useModal } from "@/app/context/modal/context";
 import { useSession } from "next-auth/react";
 

@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { PaymentOrder, payMethodsWithId, ValidatePaymentForm } from '@/app/entities/order/order-payment';
 import PayOrder from '@/app/api/order/payment/order';
 import { useCurrentOrder } from '@/app/context/current-order/context';

@@ -7,7 +7,7 @@ import CreateFormsProps from '../create-forms-props';
 import UpdateUser from '@/app/api/user/update/user';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { ToIsoDate } from '@/app/utils/date';
 import Person, { ValidatePersonForm } from '@/app/entities/person/person';
 

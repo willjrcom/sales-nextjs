@@ -1,4 +1,4 @@
-import RequestError from "@/app/api/error";
+import RequestError from "@/app/utils/error";
 import AddRedeemToShift from "@/app/api/shift/redeem/add/shift";
 import ButtonsModal from "@/app/components/modal/buttons-modal";
 import { TextField } from "@/app/components/modal/field";

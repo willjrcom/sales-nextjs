@@ -12,7 +12,7 @@ import UpdateProduct from '@/app/api/product/update/product';
 import NewProduct from '@/app/api/product/new/product';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/api/error';
+import RequestError from '@/app/utils/error';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import Size from '@/app/entities/size/size';
