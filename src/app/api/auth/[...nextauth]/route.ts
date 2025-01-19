@@ -4,7 +4,6 @@ import Login from "../login/login";
 import Company from "@/app/entities/company/company";
 import { NextAuthOptions } from "next-auth";
 import UserBackend from "@/app/entities/user/user";
-import RequestError from "../../../utils/error";
 
 const authOptions: NextAuthOptions = {
     providers: [
@@ -33,7 +32,7 @@ const authOptions: NextAuthOptions = {
                     throw new Error("Credenciais inválidas");
                 } catch (error) {
                     console.error("Erro na autenticação:", error);
-                    throw new Error((error as RequestError).message || "Erro desconhecido");
+                    throw new Error((error as { message?: string }).message || "Erro desconhecido");
                 }
             },
         }),
