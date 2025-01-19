@@ -6,6 +6,7 @@ interface RequestApiProps<T> {
     body?: T;
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     headers?: any;
+    isLogin?: boolean
 }
 
 interface Response<T> {
@@ -39,7 +40,7 @@ const AddAccessToken = async (session: Session) => {
     return { "access-token": session.user.id }
 }
 
-const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProps<T>): Promise<Response<TR>> => {
+const RequestApi = async <T, TR>({ path, body, method, headers, isLogin }: RequestApiProps<T>): Promise<Response<TR>> => {
     if (!path.startsWith("/")) {
         throw new Error(`path: ${path} must start with /`);
     }
@@ -58,6 +59,10 @@ const RequestApi = async <T, TR>({ path, body, method, headers }: RequestApiProp
     
     if (!response.ok) {
         const body = await response.json();
+        if (isLogin) {
+            throw body.error ? body.error : body;
+        }
+
         const error = body.error as ResponseError;
 
         error.message = translateError(error.message)

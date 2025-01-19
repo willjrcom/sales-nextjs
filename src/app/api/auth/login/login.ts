@@ -16,6 +16,7 @@ const Login = async (credencials: LoginProps): Promise<LoginResponse> => {
         path: "/user/login",
         method: "POST",
         body: credencials,
+        isLogin: true
     });
     return response.data
 };
