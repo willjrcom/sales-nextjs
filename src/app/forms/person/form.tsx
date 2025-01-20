@@ -43,8 +43,8 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
 
             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee} disabled={isHidden} />
 
-            <ContactForm contactParent={contact} setContactParent={setContact} isHidden />
-            <AddressForm addressParent={person.address} setAddressParent={setAddress} isHidden />
+            <ContactForm contactParent={contact} setContactParent={setContact} isHidden={isHidden} />
+            <AddressForm addressParent={person.address} setAddressParent={setAddress} isHidden={isHidden} />
         </>
     );
 }
