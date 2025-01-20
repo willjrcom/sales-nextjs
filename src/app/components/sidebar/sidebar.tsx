@@ -76,7 +76,7 @@ const Sidebar = () => {
       modalHandler.hideModal("edit-company-" + company.id)
     }
 
-    modalHandler.showModal("edit-company-" + company.id, "Editar Empresa", <CompanyForm item={company} />, "md", onClose)
+    modalHandler.showModal("edit-company-" + company.id, "Editar Empresa", <CompanyForm item={company} isUpdate />, "md", onClose)
   }
 
   return (

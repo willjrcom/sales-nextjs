@@ -57,7 +57,7 @@ const DragAndDropGrid = () => {
         }, 30000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken, dispatch])
+    }, [data?.user.id_token, dispatch])
 
     useEffect(() => {
         setTableOrders(Object.values(tableOrdersSlice.entities));

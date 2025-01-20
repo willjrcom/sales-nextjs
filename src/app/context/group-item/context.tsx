@@ -31,7 +31,7 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
     const fetchData = async (id: string) => {
-        if (!data?.user?.idToken || !id) return;
+        if (!data?.user?.id_token || !id) return;
         try {
             const groupItem = await GetGroupItemByID(id, data);
             setgroupItem(groupItem);

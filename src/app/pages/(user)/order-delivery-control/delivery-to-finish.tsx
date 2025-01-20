@@ -48,7 +48,7 @@ const DeliveryOrderToFinish = () => {
         }, 10000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken, dispatch]);
+    }, [data?.user.id_token, dispatch]);
 
     useEffect(() => {
         const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped' && order.status === 'Ready')
@@ -75,7 +75,7 @@ const DeliveryOrderToFinish = () => {
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
-    }, [data?.user.idToken])
+    }, [data?.user.id_token])
 
     useEffect(() => {
         const newPoints: Point[] = [];

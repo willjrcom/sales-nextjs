@@ -10,15 +10,17 @@ import { fetchClients } from '@/redux/slices/clients';
 import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
 import { fetchEmployees } from '@/redux/slices/employees';
 import { fetchPlaces } from '@/redux/slices/places';
-import { AppDispatch, persistor, store } from '@/redux/store';
+import { AppDispatch, persistor, RootState, store } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { AddAccessToken } from '@/app/api/request';
+import { fetchUserCompanies } from '@/redux/slices/user-companies';
+import Company from '@/app/entities/company/company';
+import Refresh from '@/app/components/crud/refresh';
 
 export default function Page() {
     return (
@@ -36,8 +38,21 @@ function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const userCompaniesSlice = useSelector((state: RootState) => state.userCompanies);
     const dispatch = useDispatch<AppDispatch>();
     const modalHandler = useModal();
+
+    useEffect(() => {
+        if (data && Object.keys(userCompaniesSlice.entities).length === 0) {
+            dispatch(fetchUserCompanies(data));
+        }
+    }, [data?.user.id_token, dispatch]);
+
+    useEffect(() => {
+        const companiesFound = Object.values(userCompaniesSlice.entities) || []
+        setCompanies(companiesFound.sort((a, b) => a.trade_name.localeCompare(b.trade_name)))
+    }, [userCompaniesSlice.entities]);
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
@@ -64,11 +79,11 @@ function CompanySelection() {
             await update({
                 ...data,
                 user: {
-                    idToken: response,
+                    id_token: response,
                 },
             });
 
-            data.user.idToken = response;
+            data.user.id_token = response;
             const company = await GetCompany(data);
 
             await update({
@@ -100,31 +115,17 @@ function CompanySelection() {
         modalHandler.showModal("new-company", "Nova empresa", <CompanyForm />, "md", onClose)
     }
 
-    if (!data?.user?.companies || data.user.companies.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-                <h2 className="text-2xl font-bold">Não existem empresas disponíveis.</h2>
-                <p className="text-lg">Por favor, entre em contato com a empresa responsável pela sua conta.</p>
-                <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
-
-                <Link href={"/pages/new-company"}>
-                    <div className={`fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max`}
-                        style={{ zIndex: 1000 }}
-                    >
-                        <FaPlus className="text-sm" />
-                        <span>Nova empresa</span>
-                    </div>
-                </Link>
-            </div>
-        );
-    }
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <h1 className="text-4xl mb-10">Selecione uma Empresa</h1>
+            
+            <div className='flex justify-round gap-4 items-center mb-10'>
+                <h2 className="text-2xl">Selecione uma Empresa</h2>
+                <Refresh slice={userCompaniesSlice} fetchItems={fetchUserCompanies} removeText />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {data.user.companies.map(company => (
+                {companies.map(company => (
                     <button
                         key={company.schema_name}
                         data-schema-name={company.schema_name}
@@ -134,6 +135,13 @@ function CompanySelection() {
                         <h2 className="text-2xl font-bold">{company.trade_name}</h2>
                     </button>
                 ))}
+                {companies.length === 0 &&
+                    <>
+                        <h2 className="text-2xl font-bold">Não existem empresas disponíveis.</h2>
+                        <p className="text-lg">Por favor, entre em contato com a empresa responsável pela sua conta.</p>
+                    </>
+                }
+
                 <button onClick={newCompany}>
                     <div className={`fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max`}
                         style={{ zIndex: 1000 }}

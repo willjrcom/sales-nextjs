@@ -29,7 +29,7 @@ const PageCategoryEdit = () => {
 
     useEffect(() => {
         getCategory();
-    }, [data?.user.idToken, getCategory]);
+    }, [data?.user.id_token, getCategory]);
 
 
     if (!id || !category) {

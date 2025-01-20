@@ -68,8 +68,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         } catch (error) {}
         
         try {
-            const idToken = await AddIdToken(data);
-            header = idToken;
+            const id_token = await AddIdToken(data);
+            header = id_token;
         } catch (error) {}
         
         try {
@@ -81,7 +81,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             await update({
                 ...data,
                 user: {
-                    idToken: response
+                    id_token: response
                 },
             });
 

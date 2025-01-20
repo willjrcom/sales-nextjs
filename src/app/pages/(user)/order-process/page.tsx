@@ -32,7 +32,7 @@ const OrderProcess = () => {
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.idToken, dispatch]);
+    }, [data?.user.id_token, dispatch]);
 
     return (
         <div className='max-w-[85vw] flex-auto h-full'>

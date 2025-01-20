@@ -33,7 +33,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
   useEffect(() => {
     fetchProduct();
-  }, [data?.user.idToken, reloadProduct]);
+  }, [data?.user.id_token, reloadProduct]);
 
   const fetchProduct = async () => {
     setReloadProduct(false);
