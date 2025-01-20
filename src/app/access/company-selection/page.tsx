@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { Provider, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import { AddAccessToken } from '@/app/api/request';
 
 export default function Page() {
     return (
@@ -57,7 +58,8 @@ function CompanySelection() {
         }
 
         try {
-            const response = await Access({ schema: schemaName }, data);
+            const accessToken = await AddAccessToken(data)
+            const response = await Access({ schema: schemaName }, accessToken);
 
             await update({
                 ...data,
@@ -97,7 +99,7 @@ function CompanySelection() {
 
         modalHandler.showModal("new-company", "Nova empresa", <CompanyForm />, "md", onClose)
     }
-    
+
     if (!data?.user?.companies || data.user.companies.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">

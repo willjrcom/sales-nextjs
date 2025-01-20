@@ -12,7 +12,7 @@ interface PatternFieldProps {
 }
 
 // Tipando corretamente 'patterns' como um objeto, e não como um array
-const patterns = {
+export const patterns = {
     "cpf": {
         pattern: "###.###.###-##",
         placeholder: "000.000.000-00"

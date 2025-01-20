@@ -1,16 +1,15 @@
-import { Session } from "next-auth";
-import RequestApi, { AddAccessToken } from "../../request";
+import RequestApi from "../../request";
 
 interface AccessProps {
     schema: string;
 }
 
-const Access = async (credencials: AccessProps, session: Session): Promise<string> => {
+const Access = async (credencials: AccessProps, headers: any): Promise<string> => {
     const response = await RequestApi<AccessProps, string>({
         path: "/user/access",
         method: "POST",
         body: credencials,
-        headers: await AddAccessToken(session),
+        headers: headers,
     });
     return response.data
 };

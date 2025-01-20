@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Company, { ValidateCompanyForm } from '@/app/entities/company/company';
@@ -9,11 +11,12 @@ import RequestError from '@/app/utils/error';
 import { HiddenField, TextField } from '@/app/components/modal/field';
 import Access from '@/app/api/auth/access/access';
 import { useRouter } from 'next/navigation';
-import FormArray from '../../components/modal/form-array';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useModal } from '@/app/context/modal/context';
 import GetCompany from '@/app/api/company/company';
 import UpdateCompany from '@/app/api/company/update/company';
+import FormArrayPattern from '@/app/components/modal/form-array-pattern';
+import { AddAccessToken, AddIdToken } from '@/app/api/request';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
@@ -50,32 +53,65 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         });
     };
 
-    const submit = async () => {
+    const handleSubmit = async () => {
+        setError(null);
+        if (!data) return;
+
+        const validationErrors = ValidateCompanyForm(company);
+        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
+
+        let header;
+
+        try {
+            const accessToken = await AddAccessToken(data)
+            header = accessToken;
+        } catch (error) {}
+        
+        try {
+            const idToken = await AddIdToken(data);
+            header = idToken;
+        } catch (error) {}
+        
+        try {
+            const responseNewCompany = await NewCompany(company);
+            company.id = responseNewCompany.company_id;
+            
+            const response = await Access({ schema: responseNewCompany.schema }, header);
+
+            await update({
+                ...data,
+                user: {
+                    idToken: response
+                },
+            });
+
+            const currentCompany = await GetCompany(data, response);
+
+            await update({
+                ...data,
+                user: {
+                    ...data.user,
+                    currentCompany: currentCompany,
+                },
+            })
+
+            router.push('/pages/new-order');
+            modalHandler.hideModal(modalName);
+
+        } catch (error) {
+            setError(error as RequestError);
+        }
+    };
+
+    const handleUpdate = async () => {
+        setError(null);
         if (!data) return;
 
         const validationErrors = ValidateCompanyForm(company);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            const responseNewCompany = isUpdate ? await UpdateCompany(company, data) : await NewCompany(company);
-            setError(null);
-
-            if (!isUpdate) {
-                const { company_id, schema } = responseNewCompany as { company_id: string, schema: string };
-                company.id = company_id;
-                
-                const response = await Access({ schema: schema }, data);
-
-                await update({
-                    ...data,
-                    user: {
-                        idToken: response
-                    },
-                });
-
-                router.push('/pages/new-order');
-            }
-
+            await UpdateCompany(company, data);
             const currentCompany = await GetCompany(data);
 
             await update({
@@ -85,7 +121,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                     currentCompany: currentCompany,
                 },
             })
-            
+
             modalHandler.hideModal(modalName);
 
         } catch (error) {
@@ -100,10 +136,11 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
 
             <hr className="my-4" />
-            <FormArray
+            <FormArrayPattern
                 title='Contatos'
                 singleItemName='Contato'
                 items={company.contacts}
+                patternName='full-phone'
                 onAdd={handleAddContact}
                 onRemove={handleRemoveContact}
                 onChange={handleContactChange}
@@ -115,11 +152,16 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
             {error && <p className="text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
-            <ButtonsModal
+            {!isUpdate && <ButtonsModal
                 item={company}
                 name="Empresa"
-                onSubmit={submit}
-            />
+                onSubmit={handleSubmit}
+            />}
+            {isUpdate && <ButtonsModal
+                item={company}
+                name="Empresa"
+                onSubmit={handleUpdate}
+            />}
         </>
     );
 };
