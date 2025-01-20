@@ -60,7 +60,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         const validationErrors = ValidateCompanyForm(company);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        let header;
+        let header = {};
 
         try {
             const accessToken = await AddAccessToken(data)
@@ -73,7 +73,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         } catch (error) {}
         
         try {
-            const responseNewCompany = await NewCompany(company);
+            const responseNewCompany = await NewCompany(company, header);
             company.id = responseNewCompany.company_id;
             
             const response = await Access({ schema: responseNewCompany.schema }, header);
@@ -133,7 +133,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         <>
             <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
             <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
-            <TextField friendlyName="Email" name="email" value={company.email} setValue={value => handleInputChange('email', value)} />
 
             <hr className="my-4" />
             <FormArrayPattern
