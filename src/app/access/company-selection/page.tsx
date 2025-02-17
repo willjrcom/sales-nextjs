@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { AddAccessToken } from '@/app/api/request';
 import { fetchUserCompanies } from '@/redux/slices/user-companies';
 import Company from '@/app/entities/company/company';
 import Refresh from '@/app/components/crud/refresh';
@@ -117,41 +116,48 @@ function CompanySelection() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            
-            <div className='flex justify-round gap-4 items-center mb-10'>
+
+            {companies.length > 0 && <div className='flex justify-center items-center gap-4 mb-10'>
                 <h2 className="text-2xl">Selecione uma Empresa</h2>
                 <Refresh slice={userCompaniesSlice} fetchItems={fetchUserCompanies} removeText />
+            </div>}
+
+            {companies.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64">
+                    <h2 className="text-2xl font-bold text-center">Não existem empresas disponíveis.</h2>
+                    <p className="text-lg text-center">Por favor, cadastre a sua nova empresa</p>
+                    <p className="text-lg text-center">ou</p>
+                    <p className="text-lg text-center">entre em contato com a empresa responsável pela sua conta.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {companies.map(company => (
+                        <button
+                            key={company.schema_name}
+                            data-schema-name={company.schema_name}
+                            onClick={handleSubmit}
+                            className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition"
+                        >
+                            <h2 className="text-2xl font-bold">{company.trade_name}</h2>
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            <button onClick={newCompany}>
+                <div className="fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max"
+                    style={{ zIndex: 1000 }}
+                >
+                    <FaPlus className="text-sm" />
+                    <span>Nova empresa</span>
+                </div>
+            </button>
+
+            <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => signOut({ callbackUrl: '/login', redirect: true })}
+            >
+                Voltar ao login
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {companies.map(company => (
-                    <button
-                        key={company.schema_name}
-                        data-schema-name={company.schema_name}
-                        onClick={handleSubmit}
-                        className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition"
-                    >
-                        <h2 className="text-2xl font-bold">{company.trade_name}</h2>
-                    </button>
-                ))}
-                {companies.length === 0 &&
-                    <>
-                        <h2 className="text-2xl font-bold">Não existem empresas disponíveis.</h2>
-                        <p className="text-lg">Por favor, entre em contato com a empresa responsável pela sua conta.</p>
-                    </>
-                }
-
-                <button onClick={newCompany}>
-                    <div className={`fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max`}
-                        style={{ zIndex: 1000 }}
-                    >
-                        <FaPlus className="text-sm" />
-                        <span>Nova empresa</span>
-                    </div>
-                </button>
-            </div>
-
-            <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={() => signOut({ callbackUrl: '/login', redirect: true })}>Voltar ao login</div>
         </div>
     );
 }
