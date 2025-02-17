@@ -59,24 +59,12 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
         const validationErrors = ValidateCompanyForm(company);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
-
-        let header = {};
-
-        try {
-            const accessToken = await AddAccessToken(data)
-            header = accessToken;
-        } catch (error) {}
         
         try {
-            const id_token = await AddIdToken(data);
-            header = id_token;
-        } catch (error) {}
-        
-        try {
-            const responseNewCompany = await NewCompany(company, header);
+            const responseNewCompany = await NewCompany(company, data);
             company.id = responseNewCompany.company_id;
             
-            const response = await Access({ schema: responseNewCompany.schema }, header);
+            const response = await Access({ schema: responseNewCompany.schema }, data);
 
             await update({
                 ...data,

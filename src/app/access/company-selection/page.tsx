@@ -73,8 +73,7 @@ function CompanySelection() {
         }
 
         try {
-            const accessToken = await AddAccessToken(data)
-            const response = await Access({ schema: schemaName }, accessToken);
+            const response = await Access({ schema: schemaName }, data);
 
             await update({
                 ...data,
