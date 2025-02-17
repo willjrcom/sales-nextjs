@@ -12,9 +12,9 @@ export default withAuth(
     },
     {
         callbacks: {
-            authorized: ({ token }) => !!token, 
+            authorized: ({ token }) => !!token,
         }
     }
 );
 
-export const config = { matcher: ['/pages/:path*'] };
+export const config = { matcher: ['/((?!login|login/forget-password|login/sign-up|access/company-selection).*)'] };
