@@ -1,5 +1,6 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import Login from "../../user/login/login";
 import Company from "@/app/entities/company/company";
 import { NextAuthOptions } from "next-auth";
@@ -7,6 +8,10 @@ import UserBackend from "@/app/entities/user/user";
 
 const authOptions: NextAuthOptions = {
     providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID || "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        }),
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -74,7 +79,8 @@ const authOptions: NextAuthOptions = {
         },
     },
     pages: {
-        signIn: '/login', // Página de login personalizada
+        signIn: '/login',
+        newUser: '/login/sign-up',
     },
     debug: process.env.NODE_ENV === "development",
     cookies: {
