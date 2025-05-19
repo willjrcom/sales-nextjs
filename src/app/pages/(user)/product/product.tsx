@@ -24,20 +24,32 @@ const PageProducts = () => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
             dispatch(fetchCategories(data));
         }
-    
+
         const interval = setInterval(() => {
             if (data) {
                 dispatch(fetchCategories(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
-    
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.id_token, dispatch]);
 
     // products
     useEffect(() => {
-        if(Object.keys(categoriesSlice.entities).length === 0) return;
-        const productsByCategories = Object.values(categoriesSlice.entities).map((category) => category.products || []).flat();
+        if (Object.keys(categoriesSlice.entities).length === 0) return;
+        const productsByCategories = Object.values(categoriesSlice.entities)
+            .map((category) => {
+                return category.products?.map(product =>  {
+                    const size = category.sizes.find(size => size.id === product.size_id);
+                    console.log(size)
+                    return {
+                        ...product, 
+                        category: category,
+                        size: size
+                    } as Product
+                }) || []
+            }).flat();
+
         setProducts(productsByCategories)
         setCategoryID(Object.values(categoriesSlice.entities)[0].id)
     }, [categoriesSlice.entities]);
@@ -50,34 +62,34 @@ const PageProducts = () => {
 
     return (
         <>
-        {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
+            {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
             <CrudLayout title="Produtos"
                 searchButtonChildren={
-                    <SelectField 
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} optional/>
+                    <SelectField
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} optional />
                 }
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
                 }
                 plusButtonChildren={
                     <ButtonIconTextFloat modalName="new-product" title="Novo produto" position="bottom-right">
-                        <ProductForm/>
+                        <ProductForm />
                     </ButtonIconTextFloat>
                 }
                 refreshButton={
-                    <Refresh 
-                    slice={categoriesSlice}
-                    fetchItems={fetchCategories}
+                    <Refresh
+                        slice={categoriesSlice}
+                        fetchItems={fetchCategories}
                     />
                 }
                 tableChildren={
-                    <CrudTable 
-                        columns={ProductColumns()} 
+                    <CrudTable
+                        columns={ProductColumns()}
                         data={products.filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
                     </CrudTable>
-                } 
-                />
-            </>
+                }
+            />
+        </>
     )
 }
 export default PageProducts;
