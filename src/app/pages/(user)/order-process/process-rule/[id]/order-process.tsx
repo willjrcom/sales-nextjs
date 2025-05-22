@@ -7,6 +7,7 @@ import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-pro
 import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
+import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
 import { useDispatch } from 'react-redux';
 import ItemOrderProcess from './item';
 import GroupItem from '@/app/entities/order/group-item';
@@ -24,7 +25,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const modalHandler = useModal();
 
     const groupItem = orderProcess.group_item;
-    if (!groupItem) return;
+    if (!groupItem) return null;
     
     const startProcess = async (id: string) => {
         if (!data) return
@@ -67,39 +68,69 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const duration = new Date(now.getTime() - startAt.getTime());
     
     return (
-        <div className="flex flex-col md:flex-row items-center border border-blue-400 rounded-lg p-4 shadow-lg mt-4">
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <div className="flex  justify-between w-full px-4">
-                <div className='w-2/3'>
-                    {groupItem?.items?.map((item) => <ItemOrderProcess item={item} key={item.id} product={orderProcess.products.find(product => product.id === item.product_id)} />)}
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-6">
+            {error && <p className="px-6 py-4 text-red-500">{error.message}</p>}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                    <span className="text-gray-600 font-semibold">#{groupItem.id}</span>
+                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${orderProcess.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}`}>
+                        {orderProcess.status}
+                    </span>
                 </div>
-                <div className='w-1/3 text-right'>
-                    <p className="text-gray-600 font-medium">Quantidade total: <span className="font-bold">{groupItem?.quantity}</span></p>
-
-                    {groupItem?.observation && <p className="mt-4 text-sm text-gray-700">
-                        <span className="font-semibold text-red-600">OBS:</span> {groupItem?.observation}
-                    </p>}
-
-                    {/* Controles de iniciação e conclusão */}
-                    <div className='flex justify-end'>
-                        <button className="mt-4 mr-4 px-6 py-2 text-yellow-500 underline max-w-[10vw]"
-                            onClick={() => openGroupItemDetails(groupItem)}>
-                            Ver mais
-                        </button>
-                        {orderProcess.status === "Pending" && <button onClick={() => startProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 max-w-[10vw]">
-                            Iniciar
-                        </button>}
-                        {orderProcess.status === "Started" &&
-                            <button onClick={() => finishProcess(orderProcess.id)} className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 max-w-[10vw]">
-                                Finalizar
-                            </button>}
+                <button
+                    onClick={() => openGroupItemDetails(groupItem)}
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                    <HiEye className="mr-1" /> Ver detalhes
+                </button>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-4">
+                    <ul className="space-y-2">
+                        {groupItem.items.map((item) => (
+                            <li
+                                key={item.id}
+                                className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded"
+                            >
+                                <span className="text-gray-800">{item.quantity} x {item.name}</span>
+                                {/* additional details can go here */}
+                            </li>
+                        ))}
+                    </ul>
+                    {groupItem.observation && (
+                        <p className="mt-4 text-sm text-gray-600">
+                            <span className="font-semibold text-red-600">OBS:</span> {groupItem.observation}
+                        </p>
+                    )}
+                </div>
+                <div className="flex flex-col justify-between items-center md:items-end">
+                    <div className="text-center">
+                        <p className="text-sm text-gray-500">Total</p>
+                        <p className="text-3xl font-bold text-gray-800">{groupItem.quantity}</p>
                     </div>
-
-                    {orderProcess.status === "Started" && 
-                        <p className="mt-4 text-sm text-gray-700">
+                    <div className="w-full">
+                        {orderProcess.status === "Pending" && (
+                            <button
+                                onClick={() => startProcess(orderProcess.id)}
+                                className="w-full mt-4 inline-flex justify-center items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded"
+                            >
+                                <HiPlay className="mr-2" /> Iniciar
+                            </button>
+                        )}
+                        {orderProcess.status === "Started" && (
+                            <button
+                                onClick={() => finishProcess(orderProcess.id)}
+                                className="w-full mt-4 inline-flex justify-center items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded"
+                            >
+                                <HiCheckCircle className="mr-2" /> Finalizar
+                            </button>
+                        )}
+                    </div>
+                    {orderProcess.status === "Started" && (
+                        <p className="mt-2 text-sm text-gray-500">
                             Duração: {ToUtcTimeWithSeconds(duration.toISOString())}
                         </p>
-                    }
+                    )}
                 </div>
             </div>
         </div>
