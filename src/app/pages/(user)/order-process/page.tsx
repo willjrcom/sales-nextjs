@@ -35,12 +35,26 @@ const OrderProcess = () => {
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.id_token, dispatch]);
 
+    const noRuleCategories = categories.filter(c => !c.use_process_rule);
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
             <h1 className="text-2xl font-bold mb-4">Processos</h1>
-            <p className="text-sm text-gray-600 mb-4">
-                Categorias sem regra de processo: {categories.filter(c => !c.use_process_rule).map(c => c.name).join(', ') || 'Nenhuma'}
-            </p>
+            <div className="mb-6">
+                <h2 className="text-sm font-semibold text-gray-700 mb-2">Categorias sem regra de processo</h2>
+                <div className="flex flex-wrap gap-2">
+                    {noRuleCategories.length > 0 ? (
+                        noRuleCategories.map(cat => (
+                            <span key={cat.id} className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
+                                {cat.name}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                            Nenhuma
+                        </span>
+                    )}
+                </div>
+            </div>
             {categories?.map((category) => <CardCategory key={category.id} category={category} />)}
         </div>
     );
