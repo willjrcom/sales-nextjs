@@ -26,6 +26,18 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-800 antialiased;
+  }
+}
+
+@layer components {
+  button {
+    @apply cursor-pointer;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

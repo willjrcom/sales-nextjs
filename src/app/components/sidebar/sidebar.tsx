@@ -10,49 +10,38 @@ import Company from '@/app/entities/company/company';
 import { useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
 
-interface ItemProps {
-  href?: string;
-  className?: string;
-  children: React.ReactNode;
-  onClick?: () => Promise<void>;
-}
 
 interface SidebarLinkItemProps {
   href?: string;
   icon: IconType;
   label: string;
-  className?: string;
   onClick?: () => Promise<void>;
 }
 
-const SidebarLinkItem = ({ icon: Icon, label, href, className, onClick }: SidebarLinkItemProps) => {
+const SidebarLinkItem = ({ href, icon: Icon, label, onClick }: SidebarLinkItemProps) => {
+  const baseClasses =
+    'flex items-center w-full p-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors duration-200';
+  const content = (
+    <>
+      <Icon className="text-2xl flex-shrink-0" />
+      <span className="ml-3">{label}</span>
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} className={baseClasses}>
+        {content}
+      </Link>
+    );
+  }
   return (
-    <Item href={href} className={className} onClick={onClick}>
-      {/* Define um tamanho fixo e remove transformações no hover */}
-      <Icon style={{ fontSize: '1.5rem', transition: 'none' }} className="text-2xl mr-2.5 flex-shrink-0" />
-      <span className="text-left inline-block whitespace-nowrap overflow-hidden group-hover:block hidden transition-all duration-300 group-hover:max-w-xs">
-        {label}
-      </span>
-    </Item>
+    <button onClick={onClick} className={baseClasses + ' text-left'}>
+      {content}
+    </button>
   );
 };
 
 
-const Item = ({ href, className, children, onClick }: ItemProps) => {
-  if (!href) {
-    return (
-      <div className={className + ` w-full p-2.5 flex items-center transition-colors duration-300 text-white no-underline hover:bg-gray-700 focus:bg-gray-700 cursor-pointer`} onClick={onClick}>
-        {children}
-      </div>
-    )
-  }
-
-  return (
-    <Link href={href} className={className + ` w-full p-2.5 flex items-center transition-colors duration-300 text-white no-underline hover:bg-gray-700 focus:bg-gray-700`}>
-      {children}
-    </Link>
-  )
-}
 
 const Sidebar = () => {
   const modalHandler = useModal()
@@ -80,8 +69,8 @@ const Sidebar = () => {
   }
 
   return (
-    <div className="w-16 h-screen bg-gray-800 text-white flex flex-col items-center transition-all duration-300 text-left fixed z-10 group hover:w-52 overflow-hidden">
-      <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} className='h-[8vh]' onClick={handleCompanyModal} />
+    <nav className="w-52 min-h-screen bg-gray-800 text-white flex flex-col fixed z-10 overflow-y-auto">
+      <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
       <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
       <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
@@ -93,7 +82,7 @@ const Sidebar = () => {
       <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <SidebarLinkItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin} />
-    </div>
+    </nav>
   );
 };
 

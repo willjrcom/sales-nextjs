@@ -17,4 +17,4 @@ export default withAuth(
     }
 );
 
-export const config = { matcher: ['/((?!login|login/forget-password|login/sign-up|access/company-selection).*)'] };
+export const config = { matcher: ['/((?!_next|api/auth|login|login/forget-password|login/sign-up|access/company-selection|favicon.ico).*)'] };

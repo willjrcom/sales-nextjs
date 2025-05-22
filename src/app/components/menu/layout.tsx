@@ -13,13 +13,11 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     <ContextProviders>
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 flex flex-col ml-[64px]">
+        <div className="flex-1 flex flex-col ml-52">
           <Topbar />
           <main className="p-4 h-[89vh] min-w-0 max-w-[94vw] flex justify-center">
-            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto ">
-              <div className='min-w-[80vw]'>
-                {children}
-              </div>
+            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto">
+              <div className="min-w-[80vw]">{children}</div>
             </div>
           </main>
         </div>

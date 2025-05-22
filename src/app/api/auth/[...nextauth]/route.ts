@@ -1,4 +1,4 @@
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import Login from "../../user/login/login";
@@ -28,8 +28,9 @@ const authOptions: NextAuthOptions = {
                     if (response?.access_token) {
                         return {
                             id: response.access_token,
+                            name: response.user.name || email,
                             user: response.user,
-                            email: email,
+                            email,
                         };
                     }
 
@@ -43,11 +44,11 @@ const authOptions: NextAuthOptions = {
     ],
     secret: process.env.NEXTAUTH_SECRET,
     session: {
-        maxAge: 3 * 60 * 60, // 1 dia de sessão
+        maxAge: 24 * 60 * 60, // 1 dia de sessão
         strategy: "jwt",
     },
     jwt: {
-        maxAge: 3 * 60 * 60, // 1 dia de JWT
+        maxAge: 24 * 60 * 60, // 1 dia de JWT
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {

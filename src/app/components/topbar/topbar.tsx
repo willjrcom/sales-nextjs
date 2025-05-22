@@ -20,21 +20,31 @@ interface TopbarItemIconProps {
 }
 
 
-const TopbarItem = ({ label, href, color }: TopbarItemProps) => (
-  <Link href={href} style={{ backgroundColor: color }} className='rounded'>
-    <div className="btn px-4 py-1">{label}</div>
-  </Link>
-);
+const TopbarItem = ({ label, href, color }: TopbarItemProps) => {
+  const bgClasses = color === 'green' ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-700 hover:bg-gray-600';
+  return (
+    <Link
+      href={href}
+      className={`px-3 py-1 ${bgClasses} text-white text-sm rounded-md transition-colors duration-200`}
+    >
+      {label}
+    </Link>
+  );
+};
 
 const TopbarItemIcon = ({ icon: Icon, href }: TopbarItemIconProps) => (
-  <Link href={href} className="text-2xl self-center">
-      <Icon/>
+  <Link
+    href={href}
+    className="p-2 rounded hover:bg-gray-700 transition-colors duration-200"
+  >
+    <Icon className="text-xl text-gray-300" />
   </Link>
 );
 
 const TopbarItemAlert = ({ label, icon: Icon, href }: TopbarItemIconProps) => (
-  <Link href={href} className="self-center">
-    <div className="inline-flex items-center rounded px-4 py-1 bg-red-500"><Icon/>&nbsp;{label}</div>
+  <Link href={href} className="inline-flex items-center bg-red-500 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200 hover:bg-red-600">
+    <Icon className="mr-2 text-base" />
+    {label}
   </Link>
 );
 
@@ -52,7 +62,7 @@ const Topbar = () => {
   }, [contextCurrentOrder.order?.status]);
 
   return (
-    <div className="flex justify-between pl-[65px] pr-4 w-full items-center h-[8vh] box-border bg-gray-800 text-white pl-2">
+    <header className="flex justify-between items-center bg-gray-800 text-white h-16 w-full px-4 shadow-sm">
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />
@@ -62,11 +72,10 @@ const Topbar = () => {
 
       <div className="flex space-x-4">
         <TopbarItem label="Turno" href="/pages/shift" color='green'/>
-        <div>&nbsp;</div>
         <TopbarItemIcon icon={IoIosNotifications} href="/" />
         {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
       </div>
-    </div>
+    </header>
   )
 };
 

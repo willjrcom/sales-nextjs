@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
+import Button from '../components/ui/Button';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -73,7 +74,9 @@ const LoginForm = () => {
               <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
             </div>
 
-            <button onClick={handleSubmit} className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Conectar</button>
+            <Button onClick={handleSubmit} size="lg" className="w-full">
+              Conectar
+            </Button>
 
             <div className="flex justify-between mt-4 text-yellow-500">
               <Link href="/login/forget-password" className="hover:underline">Esqueceu a senha?</Link>
