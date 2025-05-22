@@ -35,12 +35,14 @@ const OrderProcess = () => {
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.id_token, dispatch]);
 
-    const noRuleCategories = categories.filter(c => !c.use_process_rule);
+    const noRuleCategories = categories.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement);
+    const validCategories = categories.filter(c => c.use_process_rule);
+
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
             <h1 className="text-2xl font-bold mb-4">Processos</h1>
             <div className="mb-6">
-                <h2 className="text-sm font-semibold text-gray-700 mb-2">Categorias sem regra de processo</h2>
+                <h2 className="text-sm font-semibold text-gray-700 mb-2">Categorias principais sem regra de processo</h2>
                 <div className="flex flex-wrap gap-2">
                     {noRuleCategories.length > 0 ? (
                         noRuleCategories.map(cat => (
@@ -55,7 +57,7 @@ const OrderProcess = () => {
                     )}
                 </div>
             </div>
-            {categories?.map((category) => <CardCategory key={category.id} category={category} />)}
+            {validCategories?.map((category) => <CardCategory key={category.id} category={category} />)}
         </div>
     );
 };
@@ -65,7 +67,13 @@ interface CardCategoryProps {
 }
 
 const CardCategory = ({ category }: CardCategoryProps) => {
-    if (!category.process_rules) return null;
+    if (!category.process_rules) {
+        return <>
+            <hr className="my-4" />
+            <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
+            <p className="text-red-500">Nenhum processo cadastrado!</p>
+        </>
+    };
     // <div key={category.id} className="p-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 
     const processRules = [...(category.process_rules || [])].sort((a, b) => a.order - b.order)

@@ -25,7 +25,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
                 type="number"
                 placeholder={placeholder}
                 disabled={disabled}
-                value={value}
+                value={value === undefined || value === null || isNaN(value) ? '' : value}
                 onChange={e => setValue(e.target.valueAsNumber)}
             />
         </div>
