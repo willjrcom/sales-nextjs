@@ -10,6 +10,7 @@ import { FaShoppingCart, FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangl
 import ShiftCard from './shift-card';
 import ShiftResume from './shift-resume';
 import { Redeems } from './redeem';
+import Decimal from 'decimal.js';
 
 interface SalesCardProps {
     title: string;
@@ -97,7 +98,7 @@ const ShiftDashboard = () => {
     const totalOrders = shift?.orders?.length || 0;
     const totalFinishedOrders = shift?.orders?.filter(order => order.status === 'Finished').length || 0;
     const totalCanceledOrders = shift?.orders?.filter(order => order.status === 'Canceled').length || 0;
-    const totalSales = shift?.orders?.reduce((total, order) => total + order.total_payable, 0) || 0;
+    const totalSales = shift?.orders?.reduce((total: Decimal, order) => new Decimal(total).plus(new Decimal(order.total_payable)), new Decimal(0)) || 0;
 
     return (
         <div className="p-8 bg-gray-100 h-[80vh] overflow-y-auto">
@@ -112,7 +113,7 @@ const ShiftDashboard = () => {
                     />
                     <SalesCard
                         title="Vendas Hoje"
-                        value={"R$ " + totalSales.toFixed(2)}
+                        value={"R$ " + new Decimal(totalSales).toFixed(2)}
                         icon={<FaMoneyBillWave size={30} className="text-gray-800" />}
                     />
                     <SalesCard

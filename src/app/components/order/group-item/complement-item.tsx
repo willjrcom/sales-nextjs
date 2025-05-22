@@ -2,6 +2,7 @@ import React from 'react';
 import ButtonDelete from '../../button/button-delete';
 import DeleteComplementItemModal from './delete-complement-modal';
 import GroupItem from '@/app/entities/order/group-item';
+import Decimal from 'decimal.js';
 
 interface ComplementItemCardProps {
     groupItem: GroupItem | null;
@@ -20,7 +21,7 @@ const ComplementItemCard = ({ groupItem }: ComplementItemCardProps) => {
                     <div className="text-sm font-medium">
                         {groupItem?.complement_item?.quantity} x {groupItem?.complement_item?.name}
                     </div>
-                    <div className="text-sm font-bold">R$ {(groupItem.complement_item!.quantity * groupItem.complement_item!.price).toFixed(2)}</div>
+                    <div className="text-sm font-bold">R$ {new Decimal(groupItem.complement_item!.price).times(groupItem.complement_item!.quantity).toFixed(2)}</div>
                 </div>
 
                 {isGroupItemStaging &&

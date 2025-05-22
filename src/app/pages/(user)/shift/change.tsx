@@ -2,6 +2,7 @@ import RequestError from "@/app/utils/error";
 import CloseShift from "@/app/api/shift/close/shift";
 import ButtonsModal from "@/app/components/modal/buttons-modal";
 import PriceField from "@/app/components/modal/fields/price";
+import Decimal from 'decimal.js';
 import { useModal } from "@/app/context/modal/context";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { useSession } from "next-auth/react";
@@ -13,16 +14,16 @@ interface ChangeCardProps {
 }
 
 const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
-    const [endChange, setEndChange] = useState<number>(0);
+    const [endChange, setEndChange] = useState<Decimal>(new Decimal(0));
     const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
     const modalHandler = useModal();
 
-    const handleCloseShift = async (endChange: number) => {
+    const handleCloseShift = async (endChange: Decimal) => {
         if (!data) return;
 
         try {
-            await CloseShift(endChange, data)
+            await CloseShift(endChange.toNumber(), data)
             setError(null);
             fetchShift();
             modalHandler.hideModal("close-shift")

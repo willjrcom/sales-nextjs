@@ -1,4 +1,5 @@
 import Item from '@/app/entities/order/item';
+import Decimal from 'decimal.js';
 import React from 'react';
 
 interface AdditionalItemCardProps {
@@ -14,7 +15,7 @@ const AdditionalItemCard = ({ item }: AdditionalItemCardProps) => {
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>
-                    <div className="text-sm font-bold">R$ {(item.quantity * item.price).toFixed(2)}</div>
+                    <div className="text-sm font-bold">R$ {new Decimal(item.price).times(item.quantity).toFixed(2)}</div>
                 </div>
             </div>
         </div>

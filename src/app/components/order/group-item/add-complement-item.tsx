@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import Decimal from "decimal.js";
 
 interface ComplementCardProps {
     groupItem?: GroupItem | null;
@@ -66,7 +67,7 @@ const AddComplementCard = ({ groupItem, product }: ComplementCardProps) => {
             {/* Informações do Produto */}
             <div className="text-center">
                 <h2 className="font-bold text-lg mb-1">{product.name}</h2>
-                <p className="text-gray-600 mb-2">R$ {product.price.toFixed(2)}</p>
+                <p className="text-gray-600 mb-2">R$ {new Decimal(product.price).toFixed(2)}</p>
             </div>
 
             {error && <p className="text-red-500 mb-4">{error.message}</p>}

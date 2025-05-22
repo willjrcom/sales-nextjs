@@ -12,6 +12,7 @@ import PriceField from "../../modal/fields/price"
 import UpdateChangeOrderDelivery from "@/app/api/order-delivery/update/change/order-delivery"
 import { SelectField } from "../../modal/field"
 import { payMethodsWithId } from "@/app/entities/order/order-payment"
+import Decimal from 'decimal.js';
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
@@ -37,12 +38,12 @@ export const OrderPaymentsResume = () => {
     const contextCurrentOrder = useCurrentOrder();
     const [error, setError] = useState<RequestError | null>(null)
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
-    const [change, setChange] = useState<number>(order?.delivery?.change || 0);
+    const [change, setChange] = useState<Decimal>(new Decimal(order?.delivery?.change || 0));
     const [paymentMethod, setPaymentMethod] = useState<string>(order?.delivery?.payment_method || "");
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
-        setChange(contextCurrentOrder.order?.delivery?.change || 0)
+        setChange(new Decimal(contextCurrentOrder.order?.delivery?.change || 0))
         setPaymentMethod(contextCurrentOrder.order?.delivery?.payment_method || "")
     }, [contextCurrentOrder.order])
 
@@ -62,7 +63,7 @@ export const OrderPaymentsResume = () => {
         if (!order || !order.delivery || !data) return
 
         try {
-            await UpdateChangeOrderDelivery(order.delivery.id, change, paymentMethod, data)
+            await UpdateChangeOrderDelivery(order.delivery.id, change.toNumber(), paymentMethod, data)
             setError(null)
             contextCurrentOrder.fetchData(order.id);
         } catch (error) {
@@ -73,8 +74,10 @@ export const OrderPaymentsResume = () => {
     const isStatusStagingOrPendingOrReady = order?.status == "Staging" || order?.status == "Pending" || order?.status == "Ready"
     const haveGroups = order && order?.group_items?.length > 0
     const isAnyGroupsStaging = haveGroups && order?.group_items?.some((group) => group.status == "Staging")
-    const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging
-    const subTotal = (order?.total_payable || 0) - (order?.delivery?.delivery_tax || 0)
+    const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging;
+    const totalPayableDecimal = new Decimal(order?.total_payable || "0");
+    const deliveryTaxDecimal = new Decimal((order?.delivery?.delivery_tax || "0"))
+    const subTotalDecimal = totalPayableDecimal.minus(deliveryTaxDecimal);
 
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
@@ -96,12 +99,12 @@ export const OrderPaymentsResume = () => {
             }
 
             <hr className="my-2" />
-            <p><strong>Subtotal:</strong> R$ {subTotal.toFixed(2)}</p>
-            {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {order.delivery.delivery_tax.toFixed(2)}</p>}
+            <p><strong>Subtotal:</strong> R$ {subTotalDecimal.toFixed(2)}</p>
+            {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {deliveryTaxDecimal.toFixed(2)}</p>}
 
             {/* <p>Desconto: R$ 5,00</p> */}
             <hr className="my-2" />
-            <p><strong>Total:</strong> R$ {(order?.total_payable || 0).toFixed(2)}</p>
+            <p><strong>Total:</strong> R$ {totalPayableDecimal.toFixed(2)}</p>
             <br />
 
             {/* Lançar Pedido */}

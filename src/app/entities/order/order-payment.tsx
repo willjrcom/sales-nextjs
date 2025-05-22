@@ -1,4 +1,5 @@
 import { z } from "zod";
+import Decimal from 'decimal.js';
 
 export type PayMethod = "Dinheiro" | "Visa" | "MasterCard" | "Ticket" | "VR" | "American Express" | "Elo" | "Diners Club" | "Hipercard" | "Visa Electron" | "Maestro" | "Alelo" | "PayPal" | "Outros";
 
@@ -27,11 +28,11 @@ export const payMethodsWithId: { id: string; name: string }[] = Array.from(payMe
 
 export class PaymentOrder {
     id: string = "";
-    total_paid: number = 0;
+    total_paid: Decimal = new Decimal(0);
     method: PayMethod = "Dinheiro";
     order_id: string = "";
 
-    constructor(id = "", total_paid = 0, method: PayMethod = "Dinheiro", order_id = "") {
+    constructor(id = "", total_paid: Decimal = new Decimal(0), method: PayMethod = "Dinheiro", order_id = "") {
         this.id = id;
         this.total_paid = total_paid;
         this.method = method;
@@ -40,14 +41,14 @@ export class PaymentOrder {
 }
 
 const SchemaPayment = z.object({
-    total_paid: z.number().nonnegative("Total inválido"),
+    total_paid: z.coerce.number().nonnegative("Total inválido"),
     method: z.enum(payMethods).refine((value) => value !== undefined, "Método inválido"),
     order_id: z.string().uuid("Categoria inválida"),
 });
 
 export const ValidatePaymentForm = (payment: PaymentOrder) => {
     const validatedFields = SchemaPayment.safeParse({
-        total_paid: payment.total_paid,
+        total_paid: payment.total_paid.toNumber(),
         method: payment.method,
         order_id: payment.order_id,
     });

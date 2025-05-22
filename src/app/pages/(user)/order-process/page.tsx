@@ -19,6 +19,7 @@ const OrderProcess = () => {
     const fetch = async () => {
         if (!data) return;
         const categoriesFound = await GetCategoriesWithOrderProcess(data);
+        console.log(categoriesFound)
         setCategories(categoriesFound);
     }
 
@@ -37,6 +38,9 @@ const OrderProcess = () => {
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
             <h1 className="text-2xl font-bold mb-4">Processos</h1>
+            <p className="text-sm text-gray-600 mb-4">
+                Categorias sem regra de processo: {categories.filter(c => !c.use_process_rule).map(c => c.name).join(', ') || 'Nenhuma'}
+            </p>
             {categories?.map((category) => <CardCategory key={category.id} category={category} />)}
         </div>
     );

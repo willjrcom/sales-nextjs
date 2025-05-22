@@ -1,5 +1,6 @@
 import Category from "../category/category";
 import Item from "./item";
+import Decimal from 'decimal.js';
 
 export type StatusGroupItem = "Staging" | "Pending" | "Started" | "Ready" | "Canceled";
 
@@ -10,7 +11,7 @@ export default class GroupItem {
   order_id: string = "";
   size: string = "";
   status: StatusGroupItem = "Staging";
-  total_price: number = 0;
+  total_price: Decimal = new Decimal(0);
   quantity: number = 0;
   need_print: boolean = false;
   use_process_rule: boolean = false;
@@ -25,7 +26,25 @@ export default class GroupItem {
   ready_at?: string;
   canceled_at?: string;
 
-  constructor(id = "", items: Item[] = [], order_id = "", size = "", status: StatusGroupItem = "Staging", total_price = 0, quantity = 0, need_print = false, use_process_rule = false, observation = "", category_id = "", complement_item_id = "", start_at?: string, pending_at?: string, started_at?: string, ready_at?: string, canceled_at?: string) {
+  constructor(
+    id = "",
+    items: Item[] = [],
+    order_id = "",
+    size = "",
+    status: StatusGroupItem = "Staging",
+    total_price: Decimal = new Decimal(0),
+    quantity = 0,
+    need_print = false,
+    use_process_rule = false,
+    observation = "",
+    category_id = "",
+    complement_item_id = "",
+    start_at?: string,
+    pending_at?: string,
+    started_at?: string,
+    ready_at?: string,
+    canceled_at?: string
+  ) {
     this.id = id;
     this.items = items;
     this.order_id = order_id;

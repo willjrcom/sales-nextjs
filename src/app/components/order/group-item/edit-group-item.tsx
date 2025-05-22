@@ -9,6 +9,7 @@ import ComplementItemList from "./list-complement-item";
 import ComplementItemCard from "./complement-item";
 import Item from "@/app/entities/order/item";
 import { CartToAdd } from "../cart/cart-to-add";
+import Decimal from "decimal.js";
 
 export default function EditGroupItem() {
     const contextGroupItem = useGroupItem();
@@ -36,6 +37,7 @@ const ShowGroupItem = () => {
     const [complementItem, setComplementItem] = useState<Item | null>();
 
     useEffect(() => {
+        console.log("updated: ", contextGroupItem.groupItem)
         setGroupItem(contextGroupItem.groupItem);
         
         if (contextGroupItem.groupItem?.complement_item) {
@@ -52,7 +54,7 @@ const ShowGroupItem = () => {
         <div className="bg-gray-100 p-3 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[30vw]">
             {/* Defina o min-h para o tamanho mínimo em telas pequenas, e lg:block para visibilidade em telas grandes */}
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
-
+            <p className="text-sm">id: {groupItem?.id}</p>
             {/* Produto Selecionado */}
             <div className="space-y-2">
                 {groupItem?.items?.map((item) => (
@@ -72,7 +74,7 @@ const ShowGroupItem = () => {
 
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total:</p>
-                <p className="text-xl font-bold">R$ {groupItem?.total_price.toFixed(2) || "0,00"}</p>
+                <p className="text-xl font-bold">R$ {new Decimal(groupItem?.total_price || "0").toFixed(2)}</p>
             </div>
             <hr className="my-4" />
             

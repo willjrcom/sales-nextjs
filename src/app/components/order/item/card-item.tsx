@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import React, { useState } from 'react';
 import { useModal } from '@/app/context/modal/context';
@@ -21,9 +22,13 @@ const ItemCard = ({ item }: CardProps) => {
         modalHandler.hideModal(modalName);
     };
 
-    let totalPrice = item.quantity * item.price;
-
-    totalPrice += item.additional_items?.reduce((total, item) => total + (item.quantity * item.price), 0) || 0;
+    // Calcular preço total com Decimal
+    let totalPriceDecimal = new Decimal(item.price).times(item.quantity);
+    const totalAdditionalsDecimal = item.additional_items?.reduce(
+        (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.price).times(it.quantity)),
+        new Decimal(0)
+    ) || new Decimal(0);
+    totalPriceDecimal = totalPriceDecimal.plus(totalAdditionalsDecimal);
     const isGroupItemStaging = contextGroupItem.groupItem?.status === "Staging"
 
     return (
@@ -40,7 +45,7 @@ const ItemCard = ({ item }: CardProps) => {
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>
-                    <div className="text-sm font-bold">R$ {totalPrice.toFixed(2)}</div>
+                    <div className="text-sm font-bold">R$ {totalPriceDecimal.toFixed(2)}</div>
 
                     {/* Count additionals */}
                     {(item.additional_items?.length || 0 > 0) && (

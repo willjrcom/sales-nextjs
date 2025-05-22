@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField, CheckboxField, NumberField, SelectField } from '../../components/modal/field';
+import { TextField, HiddenField, SelectField } from '../../components/modal/field';
+import PriceField from '@/app/components/modal/fields/price';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -57,7 +58,7 @@ const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: Pa
 
     return (
         <>
-            <NumberField friendlyName='Total Pago' name='total_paid' setValue={value => handleInputChange('total_paid', value)} value={payment.total_paid}/>
+            <PriceField friendlyName='Total Pago' name='total_paid' setValue={value => handleInputChange('total_paid', value)} value={payment.total_paid}/>
             <SelectField friendlyName='Método de pagamento' values={payMethodsWithId} name='method' setSelectedValue={value => handleInputChange('method', value)} selectedValue={payment.method}/>
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={payment.id}/>
             <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={order?.id}/>

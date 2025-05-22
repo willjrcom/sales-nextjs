@@ -1,4 +1,5 @@
 import Employee from "../employee/employee";
+import Decimal from 'decimal.js';
 import GroupItem from "./group-item";
 import OrderDelivery from "./order-delivery";
 import { PaymentOrder } from "./order-payment";
@@ -13,9 +14,9 @@ export default class Order {
     status: StatusOrder = "Staging";
     group_items: GroupItem[] = [];
     payments?: PaymentOrder[] = [];
-    total_payable: number = 0;
-    total_paid: number = 0;
-    total_change: number = 0;
+    total_payable: Decimal = new Decimal(0);
+    total_paid: Decimal = new Decimal(0);
+    total_change: Decimal = new Decimal(0);
     quantity_items: number = 0;
     observation: string = "";
     attendant_id: string = "";
@@ -29,7 +30,23 @@ export default class Order {
     canceled_at?: Date;
     archived_at?: Date;
 
-    constructor(id = "", order_number = 0, status: StatusOrder = "Staging", group_items: GroupItem[] = [], payments: PaymentOrder[] = [], total_payable = 0, total_paid = 0, total_change = 0, quantity_items = 0, observation = "", attendant_id = "", pending_at?: Date, finished_at?: Date, canceled_at?: Date, archived_at?: Date) {
+    constructor(
+        id = "",
+        order_number = 0,
+        status: StatusOrder = "Staging",
+        group_items: GroupItem[] = [],
+        payments: PaymentOrder[] = [],
+        total_payable: Decimal = new Decimal(0),
+        total_paid: Decimal = new Decimal(0),
+        total_change: Decimal = new Decimal(0),
+        quantity_items = 0,
+        observation = "",
+        attendant_id = "",
+        pending_at?: Date,
+        finished_at?: Date,
+        canceled_at?: Date,
+        archived_at?: Date
+    ) {
         this.id = id;
         this.order_number = order_number;
         this.status = status;

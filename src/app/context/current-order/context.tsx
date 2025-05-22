@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import RequestError from '@/app/utils/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import GetOrderByID from '@/app/api/order/[id]/order';
-import GroupItem from '@/app/entities/order/group-item';
 
 interface CurrentOrderContextProps<T> {
     order: T | null;

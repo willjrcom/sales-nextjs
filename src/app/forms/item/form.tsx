@@ -13,6 +13,7 @@ import { RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Decimal from "decimal.js";
 
 interface AddProductCardProps {
   product: Product;
@@ -61,6 +62,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       }
 
       const response = await NewItem(body, data)
+      console.log("response", response.group_item_id)
       contextGroupItem.fetchData(response.group_item_id);
 
       modalHandler.hideModal(modalName);
@@ -92,13 +94,13 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       {/* Valor unitario */}
       <div className="flex justify-between">
         <p className="text-lg font-bold">Valor unitário:</p>
-        <p className="text-lg font-bold">R$ {product.price.toFixed(2)}</p>
+        <p className="text-lg font-bold">R$ {new Decimal(product.price).toFixed(2)}</p>
       </div>
 
       {/* Total do item */}
       <div className="flex justify-between">
-        <p className="text-lg font-bold">Total:</p>
-        <p className="text-lg font-bold">R$ {(product.price * (quantity.quantity || 1)).toFixed(2)}</p>
+      <p className="text-lg font-bold">Total:</p>
+        <p className="text-lg font-bold">R$ {new Decimal(product.price).times(quantity.quantity || 1).toFixed(2)}</p>
       </div>
 
       {error && <p className="mb-4 text-red-500">{error.message}</p>}

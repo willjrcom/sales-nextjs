@@ -1,4 +1,5 @@
 import { z } from "zod";
+import Decimal from 'decimal.js';
 
 export const addressTypes = [
     'house',
@@ -47,12 +48,27 @@ export default class Address {
     city: string = '';
     uf: string = '';
     cep: string = '';
-    delivery_tax: number = 0;
+    delivery_tax: Decimal = new Decimal(0);
     likeTax: boolean = false;
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
-    constructor(id?: string, object_id = '', street = '', number = '', complement = '', reference = '', neighborhood = '', city = '', uf = '', cep = '', delivery_tax = 0, adress_type = '', likeTax: boolean = false, coordinates?: Coordinates) {
+constructor(
+    id?: string,
+    object_id = '',
+    street = '',
+    number = '',
+    complement = '',
+    reference = '',
+    neighborhood = '',
+    city = '',
+    uf = '',
+    cep = '',
+    delivery_tax: Decimal = new Decimal(0),
+    adress_type = '',
+    likeTax: boolean = false,
+    coordinates?: Coordinates
+) {
         this.id = id
         this.object_id = object_id
         this.street = street
@@ -122,7 +138,7 @@ export const SchemaAddress = z.object({
     neighborhood: z.string().min(3, 'Bairro precisa ter pelo menos 3 caracteres').max(100, 'Bairro precisa ter no máximo 100 caracteres'),
     city: z.string().min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres'),
     uf: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
-    delivery_tax: z.number().min(0, 'Taxa de entrega inválida'),
+    delivery_tax: z.coerce.number().min(0, 'Taxa de entrega inválida'),
     object_id: z.string().optional(),
 });
 
@@ -136,7 +152,7 @@ export const ValidateAddressForm = (address: Address) => {
         neighborhood: address.neighborhood,
         city: address.city,
         uf: address.uf,
-        delivery_tax: address.delivery_tax,
+        delivery_tax: address.delivery_tax.toNumber(),
         object_id: address.object_id
     });
 

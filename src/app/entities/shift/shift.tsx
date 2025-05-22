@@ -1,19 +1,31 @@
 import Employee from "../employee/employee";
+import Decimal from 'decimal.js';
 import Order from "../order/order";
 
 export default class Shift {
     id: string = "";
-	current_order_number: number = 0;
+    current_order_number: number = 0;
     orders: Order[] = [];
     redeems: Redeem[] = [];
-    start_change: number = 0;
-    end_change: number = 0;
+    start_change: Decimal = new Decimal(0);
+    end_change: Decimal = new Decimal(0);
     attendant_id: string = "";
     attendant: Employee = new Employee();
     opened_at: string = "";
     closed_at: string = "";
 
-    constructor(id: string = "", current_order_number: number = 0, orders: Order[] = [], redeems: Redeem[] = [], start_change: number = 0, end_change: number = 0, attendant_id: string = "", attendant: Employee = new Employee(), opened_at: string = "", closed_at: string = "") {
+    constructor(
+        id: string = "",
+        current_order_number: number = 0,
+        orders: Order[] = [],
+        redeems: Redeem[] = [],
+        start_change: Decimal = new Decimal(0),
+        end_change: Decimal = new Decimal(0),
+        attendant_id: string = "",
+        attendant: Employee = new Employee(),
+        opened_at: string = "",
+        closed_at: string = ""
+    ) {
         this.id = id;
         this.current_order_number = current_order_number;
         this.orders = orders;
@@ -29,5 +41,5 @@ export default class Shift {
 
 export class Redeem {
     name: string = "";
-    value: number = 0;
+    value: Decimal = new Decimal(0);
 }

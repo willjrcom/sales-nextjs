@@ -2,6 +2,7 @@ import RequestError from '@/app/utils/error';
 import DeleteAdditionalItem from '@/app/api/item/delete/additional/item';
 import NewAdditionalItem from '@/app/api/item/update/additional/item';
 import { useGroupItem } from '@/app/context/group-item/context';
+import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';
 import { RootState } from '@/redux/store';
@@ -15,7 +16,7 @@ interface ItemAdditional {
     category_id: string;
     product_id: string;
     additional_item_id?: string;
-    price: number;
+    price: Decimal;
 }
 
 interface ItemListProps {
@@ -117,12 +118,12 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         updateAdditionalItem(clickedItem)
 
         // Update additional item from Item
-        const newAdditionalItems = item.additional_items?.filter(item => item.product_id !== clickedItem.product_id) || [];
+        const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
         newAdditionalItems.push({ ...clickedItem, id: clickedItem.additional_item_id } as Item);
 
         setItem((prev) => ({
             ...prev,
-            total_price: prev.total_price + clickedItem.price,
+            total_price: new Decimal(prev.total_price).plus(new Decimal(clickedItem.price)),
             additional_items: newAdditionalItems
         }))
     };
@@ -137,11 +138,11 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             updateAdditionalItem(clickedItem)
 
             // Update additional item from Item
-            const newAdditionalItems = item.additional_items?.filter(item => item.product_id !== clickedItem.product_id) || [];
+            const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
 
             setItem((prev) => ({
                 ...prev,
-                total_price: prev.total_price - clickedItem.price,
+                total_price: new Decimal(prev.total_price).minus(new Decimal(clickedItem.price)),
                 additional_items: newAdditionalItems
             }))
 
@@ -159,11 +160,11 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         }
 
         // Update additional item from Item
-        const newAdditionalItems = item.additional_items?.filter(item => item.product_id !== clickedItem.product_id) || [];
+        const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
 
         setItem((prev) => ({
             ...prev,
-            total_price: prev.total_price - clickedItem.price,
+            total_price: new Decimal(prev.total_price).minus(new Decimal(clickedItem.price)),
             additional_items: newAdditionalItems
         }))
     };
@@ -172,7 +173,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         let name = item.name;
 
         if (isStaging) {
-            name += "- R$" + item.price.toFixed(2)
+            name += "- R$" + new Decimal(item.price).toFixed(2)
         }
         return (
             <div key={item.product_id} className="flex items-center space-x-4">

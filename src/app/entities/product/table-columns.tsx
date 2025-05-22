@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Product from "./product";
 import ButtonIcon from "@/app/components/button/button-icon";
 import ProductForm from "@/app/forms/product/form";
+import Decimal from "decimal.js";
 
 const ProductColumns = (): ColumnDef<Product>[] => [
   {
@@ -18,7 +19,10 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     id: 'Preço',
     accessorKey: 'price',
     header: 'Preço',
-    cell: info => `R$${info.getValue()}`,
+    cell: info => {
+      const value = info.getValue() as any;
+      return `R$${typeof value === 'object' && value.toFixed ? new Decimal(value).toFixed(2) : value}`;
+    },
   },
   {
     id: 'Categoria',

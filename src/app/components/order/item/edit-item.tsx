@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import React from 'react';
 import DeleteItemModal from './delete-item-modal';
@@ -17,7 +18,10 @@ const EditItem = ({ item }: EditItemProps) => {
 
     if (!itemState) return
 
-    const totalAdditionals = itemState.additional_items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0
+    const totalAdditionalsDecimal = itemState.additional_items?.reduce(
+        (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.price).times(it.quantity)),
+        new Decimal(0)
+    ) || new Decimal(0);
 
     return (
         <div
@@ -37,15 +41,15 @@ const EditItem = ({ item }: EditItemProps) => {
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-md">Produto</p>
-                <p className="text-lg font-bold">R$ {itemState.price.toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {new Decimal(itemState.price).toFixed(2)}</p>
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-md">Adicionais</p>
-                <p className="text-lg font-bold">R$ {totalAdditionals.toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {totalAdditionalsDecimal.toFixed(2)}</p>
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total</p>
-                <p className="text-lg font-bold">R$ {itemState.total_price.toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {new Decimal(itemState.total_price).toFixed(2)}</p>
             </div>
         </div>
     );

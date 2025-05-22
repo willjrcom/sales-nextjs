@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { TextField, NumberField, CheckboxField, RadioField, HiddenField } from '../../components/modal/field';
+import { TextField, CheckboxField, RadioField, HiddenField } from '../../components/modal/field';
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -71,6 +71,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             modalHandler.hideModal(modalName);
             
         } catch (error) {
+            console.log(error)
             setError(error as RequestError);
         }
     }

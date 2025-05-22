@@ -1,12 +1,13 @@
 import { NumericFormat } from 'react-number-format';
+import Decimal from 'decimal.js';
 
 interface PriceFieldProps {
     friendlyName?: string;
     name: string;
     placeholder?: string;
     disabled?: boolean;
-    value: number;
-    setValue: (value: number) => void;
+    value: Decimal;
+    setValue: (value: Decimal) => void;
     optional?: boolean;
 }
 
@@ -31,8 +32,8 @@ const PriceField = ({ friendlyName, name, disabled, value, setValue, placeholder
                 id={name}
                 name={name}
                 disabled={disabled}
-                value={value}
-                onValueChange={(values) => setValue(values.floatValue || 0)}  // Garante que estamos passando um número
+                value={value.toNumber()}
+                onValueChange={(values) => setValue(new Decimal(values.floatValue || 0))}
                 placeholder={placeholder}
                 className={InputClassName}
             />

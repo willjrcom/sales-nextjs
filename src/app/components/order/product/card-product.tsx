@@ -2,6 +2,7 @@ import Product from "@/app/entities/product/product";
 import Image from "next/image";
 import AddProductCard from "@/app/forms/item/form";
 import ButtonIconText from "../../button/button-icon-text";
+import Decimal from "decimal.js";
 
 interface ProductCardProps {
     product: Product;
@@ -41,7 +42,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {/* Informações do Produto */}
             <div className="text-center">
                 <h2 className="font-bold text-lg mb-1">{product.name}</h2>
-                <p className="text-gray-600 mb-2">R$ {product.price.toFixed(2)}</p>
+                <p className="text-gray-600 mb-2">R$ {new Decimal(product.price).toFixed(2)}</p>
             </div>
 
             {/* Tamanhos e botão */}

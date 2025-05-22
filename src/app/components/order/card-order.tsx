@@ -1,4 +1,5 @@
 import Order from "@/app/entities/order/order";
+import Decimal from 'decimal.js';
 import StatusComponent from "../button/show-status";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -105,10 +106,17 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     const isOrderStatusReady = order.status === "Ready";
     const isOrderStatusCanceled = order.status === "Canceled";
     const isOrderStatusFinished = order.status === "Finished";
-    const totalRest = order.total_payable - order.total_paid;
+
+    // Converter valores plain para Decimal
+    const totalChangeDecimal = new Decimal(order.total_change);
+    const totalPayableDecimal = new Decimal(order.total_payable);
+    const totalPaidDecimal = new Decimal(order.total_paid);
+    const totalRestDecimal = totalPayableDecimal.minus(totalPaidDecimal);
 
     const renderOrderTypeDetails = () => {
         if (order.delivery) {
+            const deliveryTaxDecimal = new Decimal(order.delivery.delivery_tax || "0");
+
             return (
                 <div className="text-gray-700">
                     <div className="flex justify-between items-center mb-4">
@@ -117,7 +125,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                     </div>
                     <p>
                         <strong>Taxa de Entrega:</strong>{" "}
-                        R$ {order.delivery.delivery_tax?.toFixed(2) || "0.00"}
+                        R$ {deliveryTaxDecimal.toFixed(2) || "0.00"}
                     </p>
                     <p>
                         <strong>Cliente:</strong> {order.delivery.client?.name}
@@ -252,7 +260,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                                         <div className="flex space-x-2">
                                             <RoundComponent>Qtd: {group.quantity}</RoundComponent>
                                             <RoundComponent>
-                                                Total: R$ {group.total_price.toFixed(2)}
+                                                Total: R$ {new Decimal(group.total_price).toFixed(2)}
                                             </RoundComponent>
                                         </div>
                                     </div>
@@ -284,25 +292,29 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                     {/* Total a Pagar */}
                     <p>
                         <span className="font-semibold">Total a Pagar:</span>{" "}
-                        <span className="text-red-600">R$ {order.total_payable.toFixed(2)}</span>
+                        <span className="text-red-600">R$ {totalPayableDecimal.toFixed(2)}</span>
                     </p>
 
                     {/* Total Pago */}
                     <p>
                         <span className="font-semibold">Total Pago:</span>{" "}
-                        <span className="text-green-600">R$ {order.total_paid.toFixed(2)}</span>
+                        <span className="text-green-600">R$ {totalPaidDecimal.toFixed(2)}</span>
                     </p>
 
-                    {totalRest > 0 && <p>
-                        <span className="font-semibold">Total Restante:</span>{" "}
-                        <span className="text-gray-600">R$ {totalRest.toFixed(2)}</span>
-                    </p>}
+                    {totalRestDecimal.gt(0) && (
+                        <p>
+                            <span className="font-semibold">Total Restante:</span>{" "}
+                            <span className="text-gray-600">R$ {totalRestDecimal.toFixed(2)}</span>
+                        </p>
+                    )}
 
                     {/* Troco */}
-                    {order.total_change > 0 && <p>
-                        <span className="font-semibold">Troco:</span>{" "}
-                        <span className="text-gray-600">R$ {order.total_change.toFixed(2)}</span>
-                    </p>}
+                    {totalChangeDecimal.gt(0) && (
+                        <p>
+                            <span className="font-semibold">Troco:</span>{" "}
+                            <span className="text-gray-600">R$ {totalChangeDecimal.toFixed(2)}</span>
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -319,7 +331,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                                             <strong>Método:</strong> {payment.method}
                                         </p>
                                         <p className="text-gray-700">
-                                            <strong>Valor:</strong> R$ {payment.total_paid.toFixed(2)}
+                                            <strong>Valor:</strong> R$ {new Decimal(payment.total_paid).toFixed(2)}
                                         </p>
                                     </div>
                                 </li>

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
+import React, { useState } from 'react';
+import { HiddenField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';

@@ -1,4 +1,5 @@
 import PriceField from "@/app/components/modal/fields/price";
+import Decimal from 'decimal.js';
 import { ToUtcDate, ToUtcHoursMinutes } from "@/app/utils/date";
 import RedeemCard from "./redeem";
 import ChangeCard from "./change";
@@ -18,7 +19,7 @@ interface ShiftProps {
 const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
     const { data } = useSession();
     const [user, setUser] = useState<User>(new User());
-    const [startChange, setStartChange] = useState<number>(shift?.start_change || 0);
+    const [startChange, setStartChange] = useState<Decimal>(new Decimal(shift?.start_change || 0));
     const [error, setError] = useState<RequestError | null>();
     const modalHandler = useModal();
 
@@ -32,7 +33,7 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
         if (!data) return;
 
         try {
-            await OpenShift(startChange, data)
+            await OpenShift(startChange.toNumber(), data)
             setError(null);
             fetchShift();
         } catch (error) {
@@ -85,7 +86,7 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
 
             <div className="ml-auto text-right justify-around block">
                 <div className="ml-auto text-right">
-                    <p>Troco início: <span className="font-semibold">R$ {shift.start_change.toFixed(2)}</span></p>
+                    <p>Troco início: <span className="font-semibold">R$ {new Decimal(shift.start_change).toFixed(2)}</span></p>
                     <button className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                     onClick={onOpenRedeemModal}
                     >Resgatar Dinheiro</button>
