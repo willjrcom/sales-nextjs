@@ -9,6 +9,8 @@ interface PatternFieldProps {
     setValue: (value: string) => void;
     patternName: keyof typeof patterns;  // Definindo que patternName deve ser uma chave de 'patterns'
     optional?: boolean;
+    /** If true, setValue will receive the formatted value including mask symbols; otherwise receives raw digits */
+    formatted?: boolean;
 }
 
 // Tipando corretamente 'patterns' como um objeto, e não como um array
@@ -41,7 +43,7 @@ export const patterns = {
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
 
-const PatternField = ({ friendlyName, name, disabled, value, setValue, patternName, optional }: PatternFieldProps) => {
+const PatternField = ({ friendlyName, name, disabled, value, setValue, patternName, optional, formatted = false }: PatternFieldProps) => {
     const { pattern, placeholder } = patterns[patternName];
 
     return (
@@ -58,7 +60,9 @@ const PatternField = ({ friendlyName, name, disabled, value, setValue, patternNa
                 name={name}
                 disabled={disabled}
                 value={value}
-                onValueChange={(values) => setValue(values.value)}  // Usando o método correto de 'onValueChange' para 'react-number-format'
+                onValueChange={({ value: raw, formattedValue }) =>
+                    setValue(formatted ? formattedValue : raw)
+                }
                 placeholder={placeholder}
                 className={InputClassName}
             />

@@ -139,6 +139,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
                             patternName='cpf'
                             setValue={setCpfToSearch}
                             value={cpfToSearch}
+                            formatted={true}
                         />
 
                         {/* Botões de Ação */}
