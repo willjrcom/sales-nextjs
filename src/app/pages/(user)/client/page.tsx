@@ -1,6 +1,7 @@
 'use client';
 
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import ClientForm from "@/app/forms/client/form";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
@@ -37,7 +38,7 @@ const PageClient = () => {
     return (
         <>
             {clientsSlice.error && <p className="mb-4 text-red-500">{clientsSlice.error?.message}</p>}
-            <CrudLayout title="Clientes"
+            <CrudLayout title={<PageTitle title="Clientes" tooltip="Gerencie o cadastro de clientes, incluindo busca e filtro por nome." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional/>
                 }

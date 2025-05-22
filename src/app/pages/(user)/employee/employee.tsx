@@ -2,6 +2,7 @@
 
 import EmployeeForm from "@/app/forms/employee/form";
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import Refresh from "@/app/components/crud/refresh";
@@ -46,7 +47,7 @@ const PageEmployee = () => {
         <>
         {employeesSlice.error && <p className="mb-4 text-red-500">{employeesSlice.error?.message}</p>}
             <CrudLayout
-                title="Funcionários"
+                title={<PageTitle title="Funcionários" tooltip="Gerencie funcionários, filtrando e editando registros." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do funcionário" setValue={setNome} value={nome} optional />
                 }

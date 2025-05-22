@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
+import PageTitle from '@/app/components/PageTitle';
 import { FaLuggageCart, FaMotorcycle, FaUtensils } from "react-icons/fa";
 
 
@@ -16,7 +17,7 @@ const PageNewOrder = () => {
 
   return (
     <div className="min-w-[80vw]">
-      <h2 className="text-2xl font-bold mb-4">Inicie um novo Pedido</h2>
+      <PageTitle title="Novo Pedido" tooltip="Selecione o tipo de pedido: Mesa, Entrega ou Balcão/Retirada." />
 
       <div className="flex gap-4 ">
         {options.map((option) => (

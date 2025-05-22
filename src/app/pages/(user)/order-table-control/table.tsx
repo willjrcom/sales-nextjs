@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import PageTitle from '@/app/components/PageTitle';
 
 const Table = ({ status, onClick }: { status: string, onClick: () => void }) => {
   const getStatusColor = () => {
@@ -37,7 +38,7 @@ const Tables = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-2xl font-bold mb-4">Mesas</h1>
+      <PageTitle title="Mesas" tooltip="Visualize e gerencie o status das mesas disponíveis, reserve ou libere conforme necessário." />
       <div className="flex flex-wrap">
         {tables.map((status, index) => (
           <Table 

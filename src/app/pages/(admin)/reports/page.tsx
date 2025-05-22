@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import ReportChart from '@/app/components/report/ReportChart';
+import PageTitle from '@/app/components/PageTitle';
 import { reportConfigs } from '@/app/components/report/reportConfigs';
 
 export default function ReportsPage() {
@@ -19,7 +20,7 @@ export default function ReportsPage() {
 
   return (
     <div className="p-4 ml-52">
-      <h1 className="text-2xl font-bold mb-4">Relatórios</h1>
+      <PageTitle title="Relatórios" tooltip="Visualize relatórios administrativos de vendas, desempenho e métricas." />
       <div className="mb-4 flex gap-4">
         <select
           value={selectedReportId}

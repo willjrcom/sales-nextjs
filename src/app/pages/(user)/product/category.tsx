@@ -2,6 +2,7 @@
 
 import CategoryForm from "@/app/forms/category/form";
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import CategoryColumns from "@/app/entities/category/table-columns";
 import Refresh from "@/app/components/crud/refresh";
@@ -42,7 +43,7 @@ const PageCategories = () => {
     return (
         <>
             {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
-            <CrudLayout title="Categorias"
+            <CrudLayout title={<PageTitle title="Categorias" tooltip="Gerencie categorias de produtos, permitindo adicionar, editar ou remover." />}
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
                 }

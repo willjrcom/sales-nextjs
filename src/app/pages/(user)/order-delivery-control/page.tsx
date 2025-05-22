@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import PageTitle from '@/app/components/PageTitle';
 import "./style.css";
 import DeliveryOrderToShip from "./delivery-to-ship";
 import DeliveryOrderToFinish from "./delivery-to-finish";
@@ -24,6 +25,7 @@ const PageDeliveryOrder = () => {
 
     return (
         <div>
+            <PageTitle title="Controle de Entregas" tooltip="Gerencie pedidos de entrega por status: A enviar, Na rua ou Finalizadas." />
             <div className="tabs">
                 <button
                     className={`tab ${activeTab === 'A enviar' ? 'active' : ''}`}

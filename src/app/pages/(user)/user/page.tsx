@@ -2,6 +2,7 @@
 
 import UserForm from "@/app/forms/user/form-profile";
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import UserColumns from "@/app/entities/user/table-columns";
 import Refresh from "@/app/components/crud/refresh";
@@ -51,7 +52,7 @@ const PageUser = () => {
     return (
         <>
             <CrudLayout
-                title="Usuários"
+                title={<PageTitle title="Usuários" tooltip="Gerencie usuários do sistema, atribua permissões e relações." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do usuário" setValue={setNome} value={nome} optional />
                 }

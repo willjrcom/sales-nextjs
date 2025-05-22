@@ -1,6 +1,7 @@
 'use client';
 
 import DeliveryDriverForm from "@/app/forms/delivery-driver/form";
+import PageTitle from '@/app/components/PageTitle';
 import CrudLayout from "@/app/components/crud/layout";
 import CrudTable from "@/app/components/crud/table";
 import Refresh from "@/app/components/crud/refresh";
@@ -51,7 +52,7 @@ const PageDeliveryDriver = () => {
         <>
             {deliveryDriversSlice.error && <p className="mb-4 text-red-500">{deliveryDriversSlice.error?.message}</p>}
             <CrudLayout
-                title="Motoboys"
+                title={<PageTitle title="Motoboys" tooltip="Gerencie motoboys e atribua entregas." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} optional />
                 }

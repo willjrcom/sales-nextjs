@@ -1,6 +1,7 @@
 "use client";
 
 import React, { CSSProperties, useEffect, useState } from "react";
+import PageTitle from '@/app/components/PageTitle';
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -224,6 +225,7 @@ const DragAndDropGrid = () => {
 
     return (
         <>
+            <PageTitle title="Configuração de Mesas" tooltip="Arraste as mesas para configurar o layout do salão." />
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="flex justify-around mb-4">

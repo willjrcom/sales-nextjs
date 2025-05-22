@@ -9,6 +9,7 @@ import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import PageTitle from '@/app/components/PageTitle';
 import { useDispatch } from 'react-redux';
 
 const OrderProcess = () => {
@@ -40,7 +41,7 @@ const OrderProcess = () => {
 
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
-            <h1 className="text-2xl font-bold mb-4">Processos</h1>
+            <PageTitle title="Processos" tooltip="Exibe as regras de processamento de pedidos, agrupadas por categoria, com indicadores de atraso e fila." />
             <div className="mb-6">
                 <h2 className="text-sm font-semibold text-gray-700 mb-2">Categorias principais sem regra de processo</h2>
                 <div className="flex flex-wrap gap-2">

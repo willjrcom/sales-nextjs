@@ -1,6 +1,7 @@
 'use client';
 
 import GetCategoryByID from "@/app/api/category/[id]/category";
+import PageTitle from '@/app/components/PageTitle';
 import RequestError from "@/app/utils/error";
 import Category from "@/app/entities/category/category";
 import { useSession } from "next-auth/react";
@@ -34,7 +35,7 @@ const PageCategoryEdit = () => {
 
     if (!id || !category) {
         return (
-            <h1>Categoria não encontrada</h1>
+            <PageTitle title="Categoria não encontrada" tooltip="Verifique o ID da categoria e tente novamente." />
         )
     }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import Refresh from "@/app/components/crud/refresh";
 import OrderKanban from "@/app/components/order/kanban/kanban";
 import CardOrderListItem from "@/app/components/order/kanban/card-list-orders";
@@ -46,7 +47,7 @@ const PageOrder = () => {
     return (
         <>
             <CrudLayout
-                title="Pedidos"
+                title={<PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />}
                 searchButtonChildren={
                     <div className="w-1/6">
                         <button className={"px-4 py-2 rounded " + classOrderStaging}

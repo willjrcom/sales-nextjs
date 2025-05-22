@@ -1,5 +1,6 @@
 import ProductForm from "@/app/forms/product/form";
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import Refresh from "@/app/components/crud/refresh";
@@ -63,7 +64,7 @@ const PageProducts = () => {
     return (
         <>
             {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
-            <CrudLayout title="Produtos"
+            <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
                 searchButtonChildren={
                     <SelectField
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} optional />

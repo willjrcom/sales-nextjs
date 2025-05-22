@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
 import { fetchOrderProcesses } from "@/redux/slices/order-processes";
 import CrudLayout from "@/app/components/crud/layout";
+import PageTitle from '@/app/components/PageTitle';
 import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";
 import OrderProcessCard from "./order-process";
@@ -105,7 +106,11 @@ const Component = () => {
     return (
         <>
             {orderProcessesSlice.error && <p className="mb-4 text-red-500">{orderProcessesSlice.error?.message}</p>}
-            <CrudLayout title={processRule.name || "Carregando..."}
+            <CrudLayout title={
+                processRule.name ?
+                    <PageTitle title={processRule.name} tooltip="Exibe e gerencia os pedidos em execução nesta etapa do processo." /> :
+                    "Carregando..."
+            }
                 searchButtonChildren={
                     <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional />
                 }
