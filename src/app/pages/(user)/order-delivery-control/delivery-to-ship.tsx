@@ -1,3 +1,4 @@
+"use client";
 import GetCompany from "@/app/api/company/company";
 import RequestError from "@/app/utils/error";
 import ShipOrderDelivery from "@/app/api/order-delivery/update/ship/order-delivery";

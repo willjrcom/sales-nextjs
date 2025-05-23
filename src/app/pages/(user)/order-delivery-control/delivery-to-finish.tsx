@@ -1,3 +1,4 @@
+"use client";
 import RequestError from "@/app/utils/error";
 import DeliveryOrderDelivery from "@/app/api/order-delivery/update/delivery/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";

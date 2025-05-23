@@ -1,3 +1,4 @@
+"use client";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
