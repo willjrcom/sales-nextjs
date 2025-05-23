@@ -39,7 +39,7 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
 
             <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional={!isEmployee} disabled={isHidden} />
 
-            <PatternField patternName="cpf" name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee} disabled={isHidden} />
+            <PatternField patternName="cpf" name="cpf" friendlyName="Cpf" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee} disabled={isHidden} formatted={true} />
 
             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee} disabled={isHidden} />
 

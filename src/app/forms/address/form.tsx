@@ -61,7 +61,7 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
         <hr className="my-4" />
 
         <div className="flex items-center space-x-4">
-            <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} />
+            <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} formatted={true}/>
             <button className='flex items-center space-x-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'
             onClick={getAddress}><FaSearch />&nbsp;Buscar</button>
         </div>

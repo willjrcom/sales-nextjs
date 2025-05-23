@@ -120,7 +120,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     return (
         <>
             <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
-            <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} />
+            <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} formatted={true} />
 
             <hr className="my-4" />
             <FormArrayPattern
