@@ -20,7 +20,6 @@ const OrderProcess = () => {
     const fetch = async () => {
         if (!data) return;
         const categoriesFound = await GetCategoriesWithOrderProcess(data);
-        console.log(categoriesFound)
         setCategories(categoriesFound);
     }
 

@@ -37,7 +37,6 @@ const ShowGroupItem = () => {
     const [complementItem, setComplementItem] = useState<Item | null>();
 
     useEffect(() => {
-        console.log("updated: ", contextGroupItem.groupItem)
         setGroupItem(contextGroupItem.groupItem);
         
         if (contextGroupItem.groupItem?.complement_item) {

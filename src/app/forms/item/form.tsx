@@ -62,7 +62,6 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       }
 
       const response = await NewItem(body, data)
-      console.log("response", response.group_item_id)
       contextGroupItem.fetchData(response.group_item_id);
 
       modalHandler.hideModal(modalName);

@@ -28,7 +28,6 @@ export const CartAdded = () => {
 
     if (!order) return null
 
-    console.log(order)
     return (
         <div className="bg-white w-4/5">
             <div className=" mb-2">

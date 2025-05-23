@@ -42,7 +42,7 @@ const PageProducts = () => {
             .map((category) => {
                 return category.products?.map(product =>  {
                     const size = category.sizes.find(size => size.id === product.size_id);
-                    console.log(size)
+                    
                     return {
                         ...product, 
                         category: category,

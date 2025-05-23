@@ -44,7 +44,6 @@ const PageDeliveryDriver = () => {
         setDrivers(driversFound);
     }, [deliveryDriversSlice.entities]);
 
-    console.log(drivers)
     const filteredDrivers = drivers.filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))
         .sort((a, b) => a.employee.name.localeCompare(b.employee.name));
 
