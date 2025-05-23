@@ -8,7 +8,7 @@ import { fetchCategories } from '@/redux/slices/categories';
 import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PageTitle from '@/app/components/PageTitle';
 import { useDispatch } from 'react-redux';
 
@@ -23,17 +23,19 @@ const OrderProcess = () => {
         setCategories(categoriesFound);
     }
 
+    // Initial fetch (guard against double invocation in React.StrictMode)
+    const initialFetched = useRef(false);
     useEffect(() => {
-        if (categories.length === 0) {
-            fetch()
-        }
-
-        const interval = setInterval(() => {
-            fetch()
-        }, 60000); // Atualiza a cada 60 segundos
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.id_token, dispatch]);
+        if (!data || initialFetched.current) return;
+        initialFetched.current = true;
+        fetch();
+    }, [data]);
+    // Polling every 60 seconds
+    useEffect(() => {
+        if (!data) return;
+        const interval = setInterval(() => fetch(), 60000);
+        return () => clearInterval(interval);
+    }, [data]);
 
     const noRuleCategories = categories.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement);
     const validCategories = categories.filter(c => c.use_process_rule);
