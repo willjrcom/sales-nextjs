@@ -15,6 +15,9 @@ import Table from "@/app/entities/table/table";
 import { addUnusedTable, fetchUnusedTables, removeUnusedTable, updateUnusedTable } from "@/redux/slices/unused-tables";
 import AddTableToPlace from "@/app/api/place/table/add/place";
 import RemoveTableFromPlace from "@/app/api/place/table/remove/place";
+import PlaceForm from "@/app/forms/place/form";
+import TableForm from "@/app/forms/table/form";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
@@ -232,7 +235,12 @@ const DragAndDropGrid = () => {
                     <div className="mr-4">
                         <div className="flex items-center justify-between">
                             <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} optional/>
+                        <div className="flex items-center gap-2">
+                            <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-right">
+                                <PlaceForm />
+                            </ButtonIconTextFloat>
                             <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
+                        </div>
                         </div>
                         <div className="min-h-[80vh]"
                             style={{
@@ -340,7 +348,12 @@ const DragAndDropGrid = () => {
                     <div>
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold mb-2">Mesas não alocadas</h3>
-                            <Refresh slice={unusedTablesSlice} fetchItems={fetchUnusedTables} removeText={true} />
+                            <div className="flex items-center gap-2">
+                                <ButtonIconTextFloat title="Nova Mesa" modalName="new-table" position="bottom-right">
+                                    <TableForm />
+                                </ButtonIconTextFloat>
+                                <Refresh slice={unusedTablesSlice} fetchItems={fetchUnusedTables} removeText={true} />
+                            </div>
                         </div>
                         <DroppableColumn key="unused-tables" id="unused-tables">
                             {unusedTables.map((item) => (
