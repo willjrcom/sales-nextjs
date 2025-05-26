@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { TextField, CheckboxField, RadioField, HiddenField } from '../../components/modal/field';
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -32,6 +33,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [uploading, setUploading] = useState<boolean>(false);
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
@@ -48,6 +50,36 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     const handleInputChange = (field: keyof Product, value: any) => {
         setProduct(prev => ({ ...prev, [field]: value }));
+    };
+    const s3Client = new S3Client({
+        region: process.env.NEXT_PUBLIC_AWS_REGION!,
+        credentials: {
+            accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
+            secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY!
+        }
+    });
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        const bucketName = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
+        const region = process.env.NEXT_PUBLIC_AWS_REGION!;
+        const key = `${Date.now()}-${file.name}`;
+        try {
+            await s3Client.send(new PutObjectCommand({
+                Bucket: bucketName,
+                Key: key,
+                Body: file,
+                ContentType: file.type,
+                ACL: 'public-read',
+            }));
+            const url = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
+            handleInputChange('image_path', url);
+        } catch (e: any) {
+            setError(new RequestError(e.message || 'Erro ao enviar imagem'));
+        } finally {
+            setUploading(false);
+        }
     };
 
     const submit = async () => {
@@ -152,7 +184,14 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             <PriceField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost} optional />
 
-            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={product.image_path} optional/>
+            <div className="mb-4">
+                <label htmlFor="image" className="block text-sm font-medium text-gray-700">Imagem</label>
+                <input type="file" id="image" accept="image/*" onChange={handleFileChange} />
+                {uploading && <p>Enviando imagem...</p>}
+                {product.image_path && (
+                    <img src={product.image_path} alt="Preview da imagem" className="mt-2 h-32" />
+                )}
+            </div>
 
             <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available}/>
 

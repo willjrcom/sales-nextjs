@@ -42,7 +42,8 @@
     "swiper": "^11.1.15",
     "uuid": "^9.0.1",
     "zod": "^3.23.8",
-    "decimal.js": "^10.3.1"
+    "decimal.js": "^10.3.1",
+    "@aws-sdk/client-s3": "^3.379.0"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.15",

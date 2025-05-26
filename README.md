@@ -34,3 +34,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## AWS S3 Utility Library
+
+This project includes a built-in AWS S3 utility under `src/lib/s3` providing:
+- `uploadObject({ key, body, contentType? }): Promise<string>`: Uploads data to S3 and returns its public URL.
+- `getObjectUrl(key: string): string`: Builds the public URL of an S3 object.
+- `getObject(key: string): Promise<any>`: Retrieves the raw object data.
+- `listObjects(prefix?: string): Promise<string[]>`: Lists object keys under a given prefix (folder).
+- `listObjectUrls(prefix?: string): Promise<string[]>`: Lists public URLs of objects under a prefix.
+
+Configure your AWS credentials and bucket name in environment variables, for example in `.env.local`:
+```bash
+AWS_REGION=your-aws-region
+AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+S3_BUCKET_NAME=your-s3-bucket-name
+```
