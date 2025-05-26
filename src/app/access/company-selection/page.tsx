@@ -5,6 +5,7 @@ import GetCompany from '@/app/api/company/company';
 import RequestError from '@/app/utils/error';
 import { ModalProvider, useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
+import Loading from '@/app/components/loading/Loading';
 import { fetchCategories } from '@/redux/slices/categories';
 import { fetchClients } from '@/redux/slices/clients';
 import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
@@ -41,6 +42,8 @@ function CompanySelection() {
     const userCompaniesSlice = useSelector((state: RootState) => state.userCompanies);
     const dispatch = useDispatch<AppDispatch>();
     const modalHandler = useModal();
+    const [selecting, setSelecting] = useState<boolean>(false);
+    const loadingCompanies = userCompaniesSlice.loading;
 
     useEffect(() => {
         if (data && Object.keys(userCompaniesSlice.entities).length === 0) {
@@ -71,6 +74,7 @@ function CompanySelection() {
             return;
         }
 
+        setSelecting(true);
         try {
             const response = await Access({ schema: schemaName }, data);
 
@@ -99,9 +103,11 @@ function CompanySelection() {
             dispatch(fetchPlaces(data))
 
             router.push('/pages/new-order');
+            setSelecting(false);
             setError(null);
         } catch (error) {
             setError(error as RequestError);
+            setSelecting(false);
         }
     }
 
@@ -114,15 +120,25 @@ function CompanySelection() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
+        <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            {loadingCompanies && (
+                <div className="flex justify-center items-center h-64 mb-10">
+                    <Loading />
+                </div>
+            )}
+            {selecting && (
+                <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-50">
+                    <Loading />
+                </div>
+            )}
 
-            {companies.length > 0 && <div className='flex justify-center items-center gap-4 mb-10'>
+            {!loadingCompanies && companies.length > 0 && <div className='flex justify-center items-center gap-4 mb-10'>
                 <h2 className="text-2xl">Selecione uma Empresa</h2>
                 <Refresh slice={userCompaniesSlice} fetchItems={fetchUserCompanies} removeText />
             </div>}
 
-            {companies.length === 0 ? (
+            {!loadingCompanies && (companies.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64">
                     <h2 className="text-2xl font-bold text-center">Não existem empresas disponíveis.</h2>
                     <p className="text-lg text-center">Por favor, cadastre a sua nova empresa</p>
@@ -142,7 +158,7 @@ function CompanySelection() {
                         </button>
                     ))}
                 </div>
-            )}
+            ) )}
 
             <button onClick={newCompany}>
                 <div className="fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max"

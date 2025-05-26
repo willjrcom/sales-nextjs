@@ -3,6 +3,7 @@ import { AppDispatch } from "@/redux/store";
 import { Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import Loading from "../loading/Loading";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { useDispatch } from "react-redux";
 
@@ -37,18 +38,15 @@ const Refresh = ({ fetchItems, fetchItemsByID, id, slice, removeText }: RefreshP
         }
     };
 
-    if (slice.loading && !removeText) {
-        return (
-            <div className="flex items-center gap-3">
-                <button disabled><HiOutlineRefresh /></button>
-                <label className="text-gray-800">Atualizando...</label>
-            </div>
-        );
-    }
+    const isLoading = slice.loading || isRefreshing;
     return (
         <div className="flex items-center gap-3">
-            <button onClick={handleRefresh}><HiOutlineRefresh /></button>
-            {!removeText && <label className="text-gray-800">Atualizado em {slice.lastUpdate}</label>}
+            <button onClick={!isLoading ? handleRefresh : undefined} disabled={isLoading}>
+                {isLoading ? <Loading /> : <HiOutlineRefresh className="h-5 w-5 text-gray-800" />}
+            </button>
+            {!removeText && (
+                <label className="text-gray-800">{`Atualizado em ${slice.lastUpdate}`}</label>
+            )}
         </div>
     );
 };

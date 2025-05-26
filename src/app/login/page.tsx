@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Loading from '../components/loading/Loading';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
 import Button from '../components/ui/Button';
@@ -14,6 +15,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -25,7 +27,8 @@ const LoginForm = () => {
   }
 
   const handleSubmit = async () => {
-    setError(''); // Reset error state before attempting sign-in
+    setError('');
+    setLoading(true);
 
     try {
       const res = await signIn('credentials', {
@@ -37,7 +40,8 @@ const LoginForm = () => {
 
       if (res?.error) {
         setError(res.error);
-        return;
+      } else if (res?.ok) {
+        router.push('/access/company-selection');
       }
 
       // Redirect on successful login
@@ -45,8 +49,10 @@ const LoginForm = () => {
         router.push('/access/company-selection');
       }
 
-    } catch (error) {
-      setError('Algo deu errado: ' + error);
+    } catch (err) {
+      setError('Algo deu errado: ' + err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,8 +80,13 @@ const LoginForm = () => {
               <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
             </div>
 
-            <Button onClick={handleSubmit} size="lg" className="w-full">
-              Conectar
+            <Button
+              onClick={handleSubmit}
+              size="lg"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? <Loading /> : 'Conectar'}
             </Button>
 
             <div className="flex justify-between mt-4 text-yellow-500">
