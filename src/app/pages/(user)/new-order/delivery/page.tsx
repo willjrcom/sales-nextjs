@@ -12,10 +12,10 @@ import PatternField from "@/app/components/modal/fields/pattern";
 
 const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
-    const [client, setClient] = useState<Client | null>();
-    const [error, setError] = useState<RequestError | null>(null)
+    const [client, setClient] = useState<Client | null>(null);
+    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
-
+    console.log(data?.user.id_token)
     const search = async () => {
         if (!data) return
         try {
@@ -32,35 +32,50 @@ const PageNewOrderDelivery = () => {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-center space-x-4">
-                <div className="flex flex-col w-1/3">
-                    <label htmlFor="contato" className="text-sm font-semibold mb-2 text-gray-700">Contato do Cliente</label>
-                    <PatternField
-                        patternName="full-phone"
-                        name="contato"
-                        placeholder="Digite o contato do cliente"
-                        setValue={setContact}
-                        value={contact}
-                        optional
-                    />
+        <div className="flex flex-col items-center justify-center min-h-full p-6">
+            <div className="w-full max-w-md space-y-6">
+                <h1 className="text-2xl font-bold text-gray-800 text-center">
+                    Novo Pedido - Delivery
+                </h1>
+
+                <div className="bg-white rounded-lg shadow p-6 space-y-6">
+                    <div className="flex flex-col space-y-4">
+                        <div>
+                            <label
+                                htmlFor="contato"
+                                className="block text-sm font-semibold mb-1 text-gray-700"
+                            >
+                                Contato do Cliente
+                            </label>
+                            <PatternField
+                                patternName="full-phone"
+                                name="contato"
+                                placeholder="Digite o contato do cliente"
+                                setValue={setContact}
+                                value={contact}
+                                optional
+                            />
+                        </div>
+
+                        <button
+                            onClick={search}
+                            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        >
+                            <FaSearch />
+                            <span>Buscar</span>
+                        </button>
+                    </div>
+
+                    {error && (
+                        <p className="text-red-500 text-center">{error.message}</p>
+                    )}
+
+                    {client && <CardClient client={client} />}
                 </div>
-                <button
-                    onClick={search}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                >
-                    <FaSearch />
-                    <span>Buscar</span>
-                </button>
             </div>
-            <div className="flex items-center justify-center space-x-4">
-                {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            </div>
-            
-            {client && <CardClient client={client} />}
         </div>
     );
-}
+};
 
 const CardClient = ({ client }: { client: Client | null | undefined }) => {
     const router = useRouter();
@@ -81,31 +96,34 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
     if (!client) return <>{error && <p className="mb-4 text-red-500">{error.message}</p>}</>;
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 space-y-4 max-w-lg mx-auto">
-            <h2 className="text-xl font-semibold text-gray-700">Cliente encontrado</h2>
-            <div className="space-y-2">
-                <p className="text-gray-600">Nome: <span className="font-semibold">{client.name}</span></p>
-                <p className="text-gray-600">Endereço: {client.address.street}, {client.address.number}</p>
-                <p className="text-gray-600">Bairro: {client.address.neighborhood}</p>
-                <p className="text-gray-600">Cidade: {client.address.city}</p>
-                <p className="text-gray-600">CEP: {client.address.cep}</p>
+        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+            <h2 className="text-xl font-semibold text-gray-800">Cliente Encontrado</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Client Info */}
+                <div className="space-y-2">
+                    <p className="text-gray-700">Nome: <span className="font-semibold">{client.name}</span></p>
+                    <p className="text-gray-700">Contato: <span className="font-semibold">({client.contact.ddd}) {client.contact.number}</span></p>
+                    <p className="text-gray-700">CPF: <span className="font-semibold">{client.cpf}</span></p>
+                </div>
+                {/* Address Info */}
+                <div className="space-y-2">
+                    <p className="text-gray-700">Endereço:</p>
+                    <p className="ml-4 text-gray-600">{client.address.street}, {client.address.number}</p>
+                    <p className="ml-4 text-gray-600">{client.address.neighborhood}</p>
+                    <p className="ml-4 text-gray-600">{client.address.city} - {client.address.uf}</p>
+                    <p className="ml-4 text-gray-600">CEP: {client.address.cep}</p>
+                </div>
             </div>
-
-            <div className="space-y-2">
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">({client.contact.ddd}) {client.contact.number}</span>
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{client.cpf}</span>
-            </div>
-
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            {error && <p className="text-red-500">{error.message}</p>}
             <button
                 onClick={() => newOrder(client)}
                 className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
             >
                 <FaCheck />
-                <span>Confirmar cliente</span>
+                <span>Confirmar Cliente</span>
             </button>
         </div>
     );
-}
+};
 
 export default PageNewOrderDelivery;

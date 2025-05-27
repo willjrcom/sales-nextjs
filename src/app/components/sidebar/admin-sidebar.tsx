@@ -81,7 +81,7 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
   };
 
   return (
-    <nav className="sticky top-0 w-52 h-screen bg-blue-800 text-white flex flex-col overflow-y-auto">
+    <nav className="sticky top-0 w-52 h-screen bg-blue-800 text-white flex flex-col overflow-hidden">
       <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
       <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
@@ -92,8 +92,10 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
       <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
       <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
-      <SidebarLinkItem icon={FaTools} label="User Mode" onClick={onToggleAdmin} />
-      <SidebarLinkItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin} />
+      <div className="mt-auto flex flex-col">
+        <SidebarLinkItem icon={FaTools} label="User Mode" onClick={onToggleAdmin} />
+        <SidebarLinkItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin} />
+      </div>
     </nav>
   );
 };

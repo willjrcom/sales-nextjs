@@ -14,13 +14,22 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [adminMode, setAdminMode] = useState(false);
   return (
     <ContextProviders>
-      <div className="flex overflow-x-hidden">
-        {adminMode
-          ? <AdminSidebar onToggleAdmin={() => setAdminMode(false)} />
-          : <Sidebar onToggleAdmin={() => setAdminMode(true)} />
-        }
-        <div className="flex-1 flex flex-col">
-          {!adminMode && <Topbar />}
+      <div className="relative flex overflow-hidden h-screen">
+        {/* Sidebars with slide transition */}
+        <div className={
+          `absolute inset-y-0 left-0 w-52 transition-transform duration-300 ease-in-out ` +
+          (adminMode ? 'translate-x-0 z-20' : '-translate-x-full z-10')
+        }>
+          <AdminSidebar onToggleAdmin={() => setAdminMode(false)} />
+        </div>
+        <div className={
+          `absolute inset-y-0 left-0 w-52 transition-transform duration-300 ease-in-out ` +
+          (adminMode ? '-translate-x-full z-10' : 'translate-x-0 z-20')
+        }>
+          <Sidebar onToggleAdmin={() => setAdminMode(true)} />
+        </div>
+        <div className="flex-1 flex flex-col ml-52">
+          <Topbar />
           <main className="p-4 h-[89vh] min-w-0 flex justify-center w-full">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-full">
               {children}

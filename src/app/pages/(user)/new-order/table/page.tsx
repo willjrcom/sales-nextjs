@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import PageTitle from "@/app/components/PageTitle";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchPlaces } from "@/redux/slices/places";
@@ -60,21 +61,40 @@ const PageNewOrderTable = () => {
     }
 
     return (
-        <>
-            <SelectField
-                friendlyName="Local" name="local" selectedValue={placeID} setSelectedValue={setPlaceID} values={Object.values(placesSlice.entities)} />
-            <SelectField
-                friendlyName="Mesa" name="mesa" selectedValue={tableID} setSelectedValue={setTableID} values={tables} />
-
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <div hidden={tableID.length === 0}>
-                <button onClick={() => newOrder(tableID)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+        <div className="flex items-center justify-center min-h-full p-4">
+            <div className="w-full max-w-md bg-white p-6 rounded-md shadow space-y-6">
+                <PageTitle
+                    title="Novo Pedido Mesa"
+                    tooltip="Selecione o local e a mesa para iniciar o pedido."
+                />
+                <SelectField
+                    friendlyName="Local"
+                    name="local"
+                    selectedValue={placeID}
+                    setSelectedValue={setPlaceID}
+                    values={Object.values(placesSlice.entities)}
+                />
+                <SelectField
+                    friendlyName="Mesa"
+                    name="mesa"
+                    selectedValue={tableID}
+                    setSelectedValue={setTableID}
+                    values={tables}
+                />
+                {error && (
+                    <p className="text-red-500">{error.message}</p>
+                )}
+                <button
+                    disabled={!tableID}
+                    onClick={() => newOrder(tableID)}
+                    className="flex items-center justify-center w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed space-x-2"
+                >
                     <FaPlus />
-                    <span>Novo pedido mesa</span>
+                    <span>Iniciar Pedido</span>
                 </button>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 export default PageNewOrderTable;
