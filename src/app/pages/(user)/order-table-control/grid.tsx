@@ -16,6 +16,44 @@ import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { FaPlus } from "react-icons/fa";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import { useRouter } from "next/navigation";
+// Sidebar listing active tables and showing elapsed usage time
+const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
+    const [now, setNow] = useState<Date>(new Date());
+    useEffect(() => {
+        const interval = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(interval);
+    }, []);
+    
+    const formatElapsed = (start: string) => {
+        const startDate = new Date(start);
+        if (isNaN(startDate.getTime())) return "--:--:--";
+        const diff = now.getTime() - startDate.getTime();
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+
+
+    console.log(orders)
+    const activeOrders = orders.filter(o => o.name);
+    return (
+        <aside className="w-64 p-4 bg-white rounded shadow ml-4">
+            <h3 className="text-lg font-semibold mb-2">Mesas em uso</h3>
+            {activeOrders.length === 0 ? (
+                <p>Nenhuma mesa em uso</p>
+            ) : (
+                <ul className="space-y-2">
+                    {activeOrders.map(order => (
+                        <li key={order.order_id} className="flex justify-between text-sm">
+                            <span>{order.name}</span>
+                            <span>{formatElapsed(order.created_at || '')}</span>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </aside>
+    );
+};
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -105,11 +143,17 @@ const DragAndDropGrid = () => {
         setTotalCols(maxX < 5 ? 5 : maxX + 1);
     }
 
+    // Filtra apenas pedidos ativos (não fechados) das mesas do local selecionado
+    const activeOrdersForPlace = tableOrders.filter(
+        order => order.status !== "Closed" 
+        && droppedTables.some(dt => dt.table_id === order.table_id)
+    );
+
     return (
         <>
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <div className="flex justify-center">
-                <div>
+            <div className="flex p-4">
+                <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} 
                         optional/>
@@ -137,6 +181,7 @@ const DragAndDropGrid = () => {
                         ))}
                     </div>
                 </div>
+                <SidebarActiveTables orders={activeOrdersForPlace} />
             </div>
         </>
     );

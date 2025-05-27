@@ -27,28 +27,33 @@ const OrderItemList = ({ order, error }: OrderItemListProps) => {
     };
     
     return (
-        <div className="flex items-center justify-between h-[5vh] border-black border rounded" onClick={OpenOrder}>
+        <div
+            className="flex items-center justify-between w-full bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+            onClick={OpenOrder}
+        >
             {/* Texto "Pedido X" */}
-            <div className="ml-4 text-lg font-bold">Pedido {order.order_number}</div>
+            <div className="text-lg font-semibold">Pedido {order.order_number}</div>
 
-            {/* Elemento Verde à Direita */}
-            {order.delivery && (
-                <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
-                    <FaMotorcycle className="w-6 h-6" />
-                </div>
-            )}
-            {order.table && (
-                <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
-                    <FaUtensils className="w-6 h-6" />
-                </div>
-            )}
-            {order.pickup && (
-                <div className="h-full w-[5vw] bg-blue-400 rounded text-white flex items-center justify-center">
-                    <FaLuggageCart className="w-6 h-6" />
-                </div>
-            )}
+            {/* Ícones à direita */}
+            <div className="flex items-center space-x-2">
+                {order.delivery && (
+                    <div className="p-2 bg-blue-500 rounded-full text-white">
+                        <FaMotorcycle className="w-5 h-5" />
+                    </div>
+                )}
+                {order.table && (
+                    <div className="p-2 bg-green-500 rounded-full text-white">
+                        <FaUtensils className="w-5 h-5" />
+                    </div>
+                )}
+                {order.pickup && (
+                    <div className="p-2 bg-yellow-500 rounded-full text-white">
+                        <FaLuggageCart className="w-5 h-5" />
+                    </div>
+                )}
+            </div>
         </div>
-    )
+    );
 }
 
 export default OrderItemList

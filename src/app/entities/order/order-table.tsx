@@ -10,10 +10,11 @@ export default class OrderTable {
   order_id: string = "";
   table_id: string = "";
   table: Table = new Table();
+  created_at: string = "";
   pending_at?: string = "";
   closed_at?: string = "";
 
-  constructor(id = "", name = "", contact = "", status: StatusOrderTable = "Staging", order_id = "", table_id = "", table: Table = new Table(), pending_at = "", closed_at = "") {
+  constructor(id = "", name = "", contact = "", status: StatusOrderTable = "Staging", order_id = "", table_id = "", table: Table = new Table(), created_at = "", pending_at = "", closed_at = "") {
     this.id = id;
     this.name = name;
     this.contact = contact;
@@ -21,6 +22,7 @@ export default class OrderTable {
     this.order_id = order_id;
     this.table_id = table_id;
     this.table = table;
+    this.created_at = created_at;
     this.pending_at = pending_at;
     this.closed_at = closed_at;
   }

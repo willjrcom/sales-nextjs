@@ -22,7 +22,6 @@ function OrderKanban({ slice }: OrderKanbanProps) {
     const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
-    const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
     const modalHandler = useModal();
     const dispatch = useDispatch<AppDispatch>();
@@ -45,7 +44,6 @@ function OrderKanban({ slice }: OrderKanbanProps) {
 
     useEffect(() => {
         setPreventDrag(false); // Ativa a flag para prevenir o arrasto
-        setLastClickTime(null);
     }, [preventDrag]);
 
     // Atualiza as listas com base no contexto
@@ -130,7 +128,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
 
     return (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragPending={(event) => setActiveId(event.id as string)}>
-            <div className="flex space-x-6 p-6">
+            <div className="flex space-x-6 p-6 flex-nowrap">
                 {/* Pendentes */}
                 <Droppable
                     id="Pending"

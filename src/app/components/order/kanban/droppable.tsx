@@ -28,11 +28,13 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
         backgroundColor,
         boxShadow: isOver ? "0 4px 10px rgba(0, 128, 0, 0.2)" : "none",
         transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-        width: "30vw",
+        // Responsive flex column: grow/shrink equally, minimum width to prevent too narrow
+        flex: "1 1 0px",
+        minWidth: "300px",
         height: "58vh",
         display: "flex",
-        alignItems: "center", // Centraliza os cards na coluna
-        justifyContent: "flex-start", // Alinha os cards no topo
+        alignItems: "flex-start", // Align items at top
+        justifyContent: "flex-start",
     };
 
     return (

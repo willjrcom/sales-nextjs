@@ -16,20 +16,20 @@ const PageNewOrder = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full items-center justify-center">
       <PageTitle title="Novo Pedido" tooltip="Selecione o tipo de pedido: Mesa, Entrega ou Balcão/Retirada." />
 
-      <div className="flex flex-wrap flex-1 gap-4">
+      <div className="flex justify-center items-center gap-6 w-full">
         {options.map((option) => (
           <Link
             href={option.route}
             key={option.id}
             onClick={() => setSelectedOption(option.id)}
             className={
-              `w-full sm:w-1/2 md:w-1/3 rounded overflow-hidden bg-white shadow-lg flex flex-col items-center justify-center cursor-pointer transition duration-300 p-4
+              `w-1/3 rounded-lg bg-white shadow-lg flex flex-col items-center justify-center p-6 transform transition-all duration-200
               ${selectedOption === option.id
-                ? 'border-4 border-purple-500'
-                : 'hover:border-4 hover:border-gray-300 hover:bg-gray-100'
+                ? 'border-4 border-purple-500 bg-purple-50'
+                : 'hover:scale-105 hover:shadow-2xl hover:border-4 hover:border-purple-300 hover:bg-purple-100'
               }`
             }
           >

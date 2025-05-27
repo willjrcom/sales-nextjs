@@ -49,9 +49,11 @@ const PageOrder = () => {
             <CrudLayout
                 title={<PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />}
                 searchButtonChildren={
-                    <div className="w-1/6">
-                        <button className={"px-4 py-2 rounded " + classOrderStaging}
-                        onClick={openStagingOrders}>
+                    <div>
+                        <button
+                            className={`px-4 py-2 rounded whitespace-nowrap ${classOrderStaging}`}
+                            onClick={openStagingOrders}
+                        >
                             {stagingOrders.length} pedidos em aberto
                         </button>
                     </div>
