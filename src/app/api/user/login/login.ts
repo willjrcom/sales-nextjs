@@ -8,7 +8,7 @@ interface LoginProps {
 
 interface LoginResponse {
     user: User;
-    access_token: string;
+    id_token: string;
 }
 
 const Login = async (credencials: LoginProps): Promise<LoginResponse> => {

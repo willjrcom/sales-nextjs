@@ -65,9 +65,9 @@ const authOptions: NextAuthOptions = {
 
                     const response = await Login({ email, password });
 
-                    if (response?.access_token) {
+                    if (response?.id_token) {
                         return {
-                            id: response.access_token,
+                            id: response.id_token,
                             name: response.user.name || email,
                             user: response.user,
                             email,
@@ -93,11 +93,16 @@ const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user, trigger, session }) {
             // Handle session updates (e.g., setting access_token via session.update)
-            if (trigger === "update" && session.user.access_token) {
-                token.access_token = session.user.access_token;
-                token.current_company = session.user.current_company;
-            } else if (trigger === "update" && session.user.user) {
-                token.user = session.user.user;
+            if (trigger === "update") {
+                if (session.user.access_token) {
+                    token.access_token = session.user.access_token;
+                }
+                if (session.user.current_company) {
+                    token.current_company = session.user.current_company;
+                }
+                if (session.user.user) {
+                    token.user = session.user.user;
+                }
             }
 
             // Initial sign in: store the access token (access_token) on the token object
