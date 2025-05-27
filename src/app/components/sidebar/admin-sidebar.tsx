@@ -81,7 +81,7 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
   };
 
   return (
-    <nav className="w-52 min-h-screen bg-blue-800 text-white flex flex-col fixed z-10 overflow-y-auto">
+    <nav className="sticky top-0 w-52 h-screen bg-blue-800 text-white flex flex-col overflow-y-auto">
       <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
       <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />

@@ -14,16 +14,16 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [adminMode, setAdminMode] = useState(false);
   return (
     <ContextProviders>
-      <div className="flex">
+      <div className="flex overflow-x-hidden">
         {adminMode
           ? <AdminSidebar onToggleAdmin={() => setAdminMode(false)} />
           : <Sidebar onToggleAdmin={() => setAdminMode(true)} />
         }
-        <div className="flex-1 flex flex-col ml-52">
+        <div className="flex-1 flex flex-col">
           {!adminMode && <Topbar />}
-          <main className="p-4 h-[89vh] min-w-0 max-w-[94vw] flex justify-center">
-            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto">
-              <div className="min-w-[80vw]">{children}</div>
+          <main className="p-4 h-[89vh] min-w-0 flex justify-center w-full">
+            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-full">
+              {children}
             </div>
           </main>
         </div>

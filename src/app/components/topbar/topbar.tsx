@@ -25,7 +25,7 @@ const TopbarItem = ({ label, href, color }: TopbarItemProps) => {
   return (
     <Link
       href={href}
-      className={`px-3 py-1 ${bgClasses} text-white text-sm rounded-md transition-colors duration-200`}
+      className={`flex items-center justify-center px-3 py-2 ${bgClasses} text-white text-sm rounded-md transition-colors duration-200`}
     >
       {label}
     </Link>
