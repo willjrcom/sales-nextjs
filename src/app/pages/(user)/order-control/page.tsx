@@ -66,7 +66,7 @@ const PageOrder = () => {
                 }
                 filterButtonChildren={
                     <p className="text-sm text-gray-600 mb-4 text-center">
-                        Arraste o pedido para a direita para marcar como Pronto.
+                        Arraste o pedido para a direita para alterar o status.
                     </p>
                 }
                 tableChildren={<OrderKanban slice={ordersSlice} />}

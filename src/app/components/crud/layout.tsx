@@ -27,11 +27,12 @@ const CrudLayout = ({
                     {refreshButton}
                 </div>
             </div>
-            {/* Optional filter or add buttons */}
-            {filterButtonChildren}
+            {/* Optional add button (e.g., new item) */}
             {plusButtonChildren}
             {/* Divider */}
             <div className="border-b my-4" />
+            {/* Optional filter or hint below divider */}
+            {filterButtonChildren}
             {/* Content with horizontal scroll if needed */}
             <div className="overflow-x-auto">
                 {tableChildren}
