@@ -1,4 +1,5 @@
 import Sidebar from '../sidebar/sidebar';
+import AdminSidebar from '../sidebar/admin-sidebar';
 import Topbar from '../topbar/topbar';
 import { Provider } from 'react-redux';
 import { ModalProvider } from '@/app/context/modal/context';
@@ -8,13 +9,18 @@ import { persistor, RootState, store } from '@/redux/store';
 import { useRef } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 
+import { useState } from 'react';
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+  const [adminMode, setAdminMode] = useState(false);
   return (
     <ContextProviders>
       <div className="flex">
-        <Sidebar />
+        {adminMode
+          ? <AdminSidebar onToggleAdmin={() => setAdminMode(false)} />
+          : <Sidebar onToggleAdmin={() => setAdminMode(true)} />
+        }
         <div className="flex-1 flex flex-col ml-52">
-          <Topbar />
+          {!adminMode && <Topbar />}
           <main className="p-4 h-[89vh] min-w-0 max-w-[94vw] flex justify-center">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto">
               <div className="min-w-[80vw]">{children}</div>
