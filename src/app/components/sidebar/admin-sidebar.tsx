@@ -9,6 +9,9 @@ import {
   FaTh,
   FaSlidersH,
   FaTools,
+  FaReceipt,
+  FaClock,
+  FaChartBar,
 } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from 'react-icons/md';
@@ -83,12 +86,15 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
   return (
     <nav className="sticky top-0 w-52 h-screen bg-blue-800 text-white flex flex-col overflow-hidden">
       <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
-      <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
-      <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
-      <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
-      <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
-      <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/pages/user" />
-      <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
+      <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/order-process" />
+      <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/product" />
+      <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/client" />
+      <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/employee" />
+      <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/admin-user" />
+      <SidebarLinkItem icon={FaTh} label="Mesas" href="/place" />
+      <SidebarLinkItem icon={FaPlus} label="Pedidos" href="/order" />
+      <SidebarLinkItem icon={FaClock} label="Turnos" href="/shift" />
+      <SidebarLinkItem icon={FaChartBar} label="Relatórios" href="/reports" />
       <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
       <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />

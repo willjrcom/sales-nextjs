@@ -41,6 +41,32 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                 </button>
             </div>
 
+            {/* Itens do grupo */}
+            {groupItem?.items && groupItem.items.length > 0 && (
+                <div className="mb-6 space-y-4">
+                    {groupItem.items.map(item => {
+                        const product = orderProcess.products.find(p => p.id === item.product_id);
+                        return (
+                            <div key={item.id} className="flex items-start space-x-4 bg-gray-50 rounded-lg shadow p-4">
+                                {product?.image_path && (
+                                    <img src={product.image_path} alt={product.name}
+                                        className="w-16 h-16 object-cover rounded" />
+                                )}
+                                <div>
+                                    <p className="font-semibold text-gray-800">
+                                        {item.quantity} x {item.name}
+                                    </p>
+                                    {product?.description && (
+                                        <p className="text-gray-500 text-sm mt-1">
+                                            {product.description}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
             {/* Content */}
             <div className="grid grid-cols-2 gap-6">
                 {/* Tempo de Processo */}
