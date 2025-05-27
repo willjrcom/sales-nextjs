@@ -52,7 +52,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
     return (
         <>
             {error && <p className='text-red-500'>{error.message}</p>}
-            <PersonForm person={user} setPerson={setPerson} isEmployee />
+            <PersonForm person={person} setPerson={setPerson} isEmployee />
             <ErrorForms errors={errors} />
             <ButtonsModal item={user} name="Usuário" onSubmit={submit} />
         </>

@@ -24,6 +24,7 @@ const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, on
                             name={`${singleItemName}-${index}`}
                             value={item}
                             setValue={(value) => onChange(index, value)}
+                            formatted={true}
                         />
                         <button
                             type="button"
