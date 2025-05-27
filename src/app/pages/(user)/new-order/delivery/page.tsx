@@ -15,7 +15,7 @@ const PageNewOrderDelivery = () => {
     const [client, setClient] = useState<Client | null>(null);
     const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
-    console.log(data?.user.access_token)
+    
     const search = async () => {
         if (!data) return
         try {

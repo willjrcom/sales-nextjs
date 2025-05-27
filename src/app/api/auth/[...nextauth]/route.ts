@@ -117,7 +117,7 @@ const authOptions: NextAuthOptions = {
             }
             // If token has sufficient time remaining, return it
             const now = Math.floor(Date.now() / 1000);
-            console.log(token.exp, now)
+            
             // Renew when less than 10 minutes (600 seconds) remain
             if (token.exp && now < (token.exp as number) - 600) {
                 return token;

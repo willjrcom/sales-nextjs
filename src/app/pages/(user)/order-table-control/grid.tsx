@@ -23,7 +23,7 @@ const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
         const interval = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(interval);
     }, []);
-    
+
     const formatElapsed = (start: string) => {
         const startDate = new Date(start);
         if (isNaN(startDate.getTime())) return "--:--:--";
@@ -33,8 +33,6 @@ const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
 
-
-    console.log(orders)
     const activeOrders = orders.filter(o => o.name);
     return (
         <aside className="w-64 p-4 bg-white rounded shadow ml-4">
@@ -145,8 +143,8 @@ const DragAndDropGrid = () => {
 
     // Filtra apenas pedidos ativos (não fechados) das mesas do local selecionado
     const activeOrdersForPlace = tableOrders.filter(
-        order => order.status !== "Closed" 
-        && droppedTables.some(dt => dt.table_id === order.table_id)
+        order => order.status !== "Closed"
+            && droppedTables.some(dt => dt.table_id === order.table_id)
     );
 
     return (
@@ -155,8 +153,8 @@ const DragAndDropGrid = () => {
             <div className="flex p-4">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
-                        <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} 
-                        optional/>
+                        <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
+                            optional />
                         <Refresh slice={tableOrdersSlice} fetchItems={fetchTableOrders} />
                     </div>
                     <div

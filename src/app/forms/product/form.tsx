@@ -103,7 +103,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             modalHandler.hideModal(modalName);
             
         } catch (error) {
-            console.log(error)
             setError(error as RequestError);
         }
     }
