@@ -1,5 +1,5 @@
 import Employee from "@/app/entities/employee/employee";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface NewEmployeeProps {
@@ -11,7 +11,7 @@ const NewEmployee = async (user_id: string, session: Session): Promise<string> =
         path: "/employee/new", 
         method: "POST",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

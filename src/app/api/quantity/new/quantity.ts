@@ -1,5 +1,5 @@
 import Quantity from "@/app/entities/quantity/quantity";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const NewQuantity = async (quantity: Quantity, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const NewQuantity = async (quantity: Quantity, session: Session): Promise<string
         path: "/product-category/quantity/new", 
         method: "POST",
         body: quantity,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

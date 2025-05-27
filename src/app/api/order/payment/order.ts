@@ -1,6 +1,6 @@
 import Order from "@/app/entities/order/order";
 import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { PaymentOrder } from "@/app/entities/order/order-payment";
 
 const PayOrder = async (payment: PaymentOrder, session: Session): Promise<string> => {
@@ -8,7 +8,7 @@ const PayOrder = async (payment: PaymentOrder, session: Session): Promise<string
         path: "/order/update/" + payment.order_id + "/payment", 
         method: "PUT",
         body: payment,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

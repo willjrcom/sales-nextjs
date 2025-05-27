@@ -22,11 +22,11 @@ const PageEditOrderControl = () => {
         } catch (error) {
             setError(error as RequestError);
         }
-    }, [data?.user.id_token, id]);
+    }, [data?.user.access_token, id]);
 
     useEffect(() => {
         getOrder();
-    }, [data?.user.id_token]);
+    }, [data?.user.access_token]);
 
     return (
         <div className="flex h-full bg-gray-100">

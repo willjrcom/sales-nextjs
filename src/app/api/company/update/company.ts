@@ -1,5 +1,5 @@
 import Company from "@/app/entities/company/company";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 
@@ -8,7 +8,7 @@ const UpdateCompany = async (company: Company, session: Session): Promise<string
         path: "/company/update", 
         method: "PUT",
         body: company,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

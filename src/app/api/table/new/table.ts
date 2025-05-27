@@ -1,5 +1,5 @@
 import Table from "@/app/entities/table/table";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const NewTable = async (table: Table, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const NewTable = async (table: Table, session: Session): Promise<string> => {
         path: "/table/new", 
         method: "POST",
         body: table,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

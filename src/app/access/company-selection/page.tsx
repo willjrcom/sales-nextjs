@@ -49,7 +49,7 @@ function CompanySelection() {
         if (data && Object.keys(userCompaniesSlice.entities).length === 0) {
             dispatch(fetchUserCompanies(data));
         }
-    }, [data?.user.id_token, dispatch]);
+    }, [data?.user.access_token, dispatch]);
 
     useEffect(() => {
         const companiesFound = Object.values(userCompaniesSlice.entities) || []
@@ -81,18 +81,18 @@ function CompanySelection() {
             await update({
                 ...data,
                 user: {
-                    id_token: response,
+                    access_token: response,
                 },
             });
 
-            data.user.id_token = response;
+            data.user.access_token = response;
             const company = await GetCompany(data);
 
             await update({
                 ...data,
                 user: {
                     ...data.user,
-                    currentCompany: company,
+                    current_company: company,
                 },
             })
 

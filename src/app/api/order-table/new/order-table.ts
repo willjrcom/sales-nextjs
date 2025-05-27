@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface NewOrderProps {
@@ -11,7 +11,7 @@ const NewOrderTable = async (table_id: string, session: Session): Promise<NewOrd
         path: "/order-table/new", 
         method: "POST",
         body: { table_id: table_id },
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

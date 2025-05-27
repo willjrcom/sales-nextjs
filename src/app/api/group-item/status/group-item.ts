@@ -1,5 +1,5 @@
 import GroupItem from "@/app/entities/order/group-item";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const UpdateGroupItem = async (groupItem: GroupItem, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const UpdateGroupItem = async (groupItem: GroupItem, session: Session): Promise<
         path: "/group-item/update/" + groupItem.id, 
         method: "PATCH",
         body: groupItem,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

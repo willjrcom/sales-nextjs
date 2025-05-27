@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 
 
@@ -6,7 +6,7 @@ const DeleteComplementGroupItem = async (groupItemId: string, session: Session):
     const response = await RequestApi<null, null>({
         path: "/group-item/update/" + groupItemId + "/complement-item", 
         method: "DELETE",
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

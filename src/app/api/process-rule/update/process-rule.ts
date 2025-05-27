@@ -1,5 +1,5 @@
 import ProcessRule from "@/app/entities/process-rule/process-rule";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const UpdateProcessRule = async (processRule: ProcessRule, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const UpdateProcessRule = async (processRule: ProcessRule, session: Session): Pr
         path: "/product-category/process-rule/update/" + processRule.id, 
         method: "PATCH",
         body: processRule,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

@@ -1,5 +1,5 @@
 import Shift from "@/app/entities/shift/shift";
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 
 interface AddRedeemProps {
@@ -13,7 +13,7 @@ const AddRedeemToShift = async (name: string, value: number, session: Session): 
         path: "/shift/redeem/add", 
         method: "PUT",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

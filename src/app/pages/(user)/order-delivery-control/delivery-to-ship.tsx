@@ -44,7 +44,7 @@ const DeliveryOrderToShip = () => {
         }, 10000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.id_token, dispatch]);
+    }, [data?.user.access_token, dispatch]);
 
     useEffect(() => {
         setOrders(Object.values(ordersSlice.entities).filter((order) => order.delivery?.status === 'Pending' && order.status === 'Ready'));
@@ -71,7 +71,7 @@ const DeliveryOrderToShip = () => {
 
     useEffect(() => {
         getCenterPoint();
-    }, [data?.user.id_token])
+    }, [data?.user.access_token])
 
     useEffect(() => {
         const newPoints: Point[] = [];
@@ -149,7 +149,7 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.id_token]);
+    }, [data?.user.access_token]);
 
     useEffect(() => {
         setDeliveryDrivers(Object.values(deliveryDriversSlice.entities));

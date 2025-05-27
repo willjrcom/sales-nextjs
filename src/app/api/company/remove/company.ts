@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface RemoveUserToCompanyProps {
@@ -11,7 +11,7 @@ const RemoveUserFromCompany = async (email: string, session: Session): Promise<s
         path: "/company/remove/user", 
         method: "POST",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

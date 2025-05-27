@@ -30,7 +30,7 @@ const PageCategoryEdit = () => {
 
     useEffect(() => {
         getCategory();
-    }, [data?.user.id_token, getCategory]);
+    }, [data?.user.access_token, getCategory]);
 
 
     if (!id || !category) {

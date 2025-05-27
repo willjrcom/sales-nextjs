@@ -41,7 +41,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.id_token, dispatch]);
+    }, [data?.user.access_token, dispatch]);
 
     useEffect(() => {
         setPreventDrag(false); // Ativa a flag para prevenir o arrasto

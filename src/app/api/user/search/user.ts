@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import User from "@/app/entities/user/user";
 
 interface SearchUserProps {
@@ -10,7 +10,7 @@ const SearchUser = async (search: SearchUserProps, session: Session): Promise<Us
         path: "/user/search",
         method: "POST",
         body: search,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

@@ -21,19 +21,19 @@ function decodeJwt(jwt: string) {
 }
 
 /**
- * Refreshes the access token (id_token) using backend endpoint
+ * Refreshes the access token (access_token) using backend endpoint
  */
 import RefreshAccessToken from '@/app/api/user/refresh-access-token/user';
 
 async function refreshAccessToken(token: any) {
     try {
         // Construct a fake session to reuse RefreshAccessToken helper
-        const session = { user: { id_token: token.id_token } } as unknown as import('next-auth').Session;
+        const session = { user: { access_token: token.access_token } } as unknown as import('next-auth').Session;
         const newToken = await RefreshAccessToken(session);
         const decoded = decodeJwt(newToken);
         return {
             ...token,
-            id_token: newToken,
+            access_token: newToken,
             exp: decoded.exp,
         };
     } catch (error) {
@@ -92,19 +92,22 @@ const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {
-            if (trigger === "update" && session.user.id_token) {
-                token.id_token = session.user.id_token;
-                token.currentCompany = session.user.currentCompany;
+            // Handle session updates (e.g., setting access_token via session.update)
+            if (trigger === "update" && session.user.access_token) {
+                token.access_token = session.user.access_token;
+                token.current_company = session.user.current_company;
             } else if (trigger === "update" && session.user.user) {
                 token.user = session.user.user;
             }
 
+            // Initial sign in: store the access token (access_token) on the token object
             if (user) {
                 token.email = user.email;
                 token.sub = user.id;
+                token.access_token = user.id;
                 token.user = user.user;
-                // decode expiration
-                const decoded = decodeJwt(token.id_token as string);
+                // decode expiration from the access_token
+                const decoded = decodeJwt(token.access_token as string);
                 if (decoded.exp) token.exp = decoded.exp;
             }
             // If token has sufficient time remaining, return it
@@ -120,12 +123,12 @@ const authOptions: NextAuthOptions = {
         },
 
         async session({ session, token }) {
-            // Transfere o id_token e outras informações do token para a sessão
+            // Transfere o access_token e outras informações do token para a sessão
             session.user = session.user || {};
             if (token.sub) session.user.id = token.sub;
-            if (token.id_token) session.user.id_token = token.id_token;
+            if (token.access_token) session.user.access_token = token.access_token;
             if (token.user) session.user.user = token.user;
-            if (token.currentCompany) session.user.currentCompany = token.currentCompany;
+            if (token.current_company) session.user.current_company = token.current_company;
         
             return session
         },
@@ -141,10 +144,10 @@ declare module "next-auth/jwt" {
     interface JWT {
         id: string;
         user: UserBackend;
-        id_token?: string;
+        access_token?: string;
         exp?: number;
         error?: string;
-        currentCompany?: Company;
+        current_company?: Company;
     }
 }
 
@@ -155,8 +158,8 @@ declare module "next-auth" {
 
     interface User {
         user: UserBackend;
-        id_token?: string;
-        currentCompany?: Company;
+        access_token?: string;
+        current_company?: Company;
     }
 }
 

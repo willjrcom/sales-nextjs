@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface NewDeliveryProps {
@@ -11,7 +11,7 @@ const NewOrderDelivery = async (client_id: string, session: Session): Promise<Ne
         path: "/order-delivery/new", 
         method: "POST",
         body: { client_id: client_id },
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

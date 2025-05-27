@@ -1,12 +1,12 @@
 import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import User from "@/app/entities/user/user";
 
 const GetUsers = async (session: Session): Promise<User[]> => {
     const response = await RequestApi<null, User[]>({
         path: "/company/users",
         method: "GET",
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

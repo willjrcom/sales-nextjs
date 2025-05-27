@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const NewDeliveryDriver = async (employee_id: string, session: Session): Promise<string> => {
@@ -6,7 +6,7 @@ const NewDeliveryDriver = async (employee_id: string, session: Session): Promise
         path: "/delivery-driver/new", 
         method: "POST",
         body: { employee_id: employee_id },
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

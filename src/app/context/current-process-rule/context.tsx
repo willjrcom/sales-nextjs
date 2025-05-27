@@ -25,7 +25,7 @@ export const CurrentProcessRuleProvider = ({ children }: { children: ReactNode }
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
     const fetchData = useCallback(async (id: string) => {
-        if (!data?.user.id_token) return;
+        if (!data?.user.access_token) return;
 
         try {
             const processesFound = await GetProcessesByProcessRuleID(id, data);
@@ -37,7 +37,7 @@ export const CurrentProcessRuleProvider = ({ children }: { children: ReactNode }
 
         setLoading(false);
 
-    }, [data?.user.id_token]);
+    }, [data?.user.access_token]);
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
 

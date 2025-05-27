@@ -1,5 +1,5 @@
 import Employee from "@/app/entities/employee/employee";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const UpdateEmployee = async (employee: Employee, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const UpdateEmployee = async (employee: Employee, session: Session): Promise<str
         path: "/employee/update/" + employee.id, 
         method: "PATCH",
         body: employee,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

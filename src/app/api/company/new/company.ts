@@ -1,5 +1,5 @@
 import Company from "@/app/entities/company/company";
-import RequestApi, { AddAccessToken, AddIdToken } from "../../request";
+import RequestApi, { AddIDToken, AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface NewCompanyResponseProps {
@@ -12,7 +12,7 @@ const NewCompany = async (company: Company, session: Session): Promise<NewCompan
         path: "/company/new", 
         method: "POST",
         body: company,
-        headers: await AddAccessToken(session),
+        headers: await AddIDToken(session),
     });
 
     return response.data

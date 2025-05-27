@@ -20,14 +20,14 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
     useEffect(() => {
         if (address.uf) return;
 
-        const company = data?.user.currentCompany;
+        const company = data?.user.current_company;
         if (!company) return;
 
         const companyAddress = company.address;
         if (!companyAddress) return;
 
         handleInputChange('uf', companyAddress.uf);
-    }, [data?.user.currentCompany]);
+    }, [data?.user.current_company]);
 
     const handleInputChange = (field: keyof Address, value: any) => {
         const newAddress = Object.assign({}, { ...address, [field]: value }) as Address; 

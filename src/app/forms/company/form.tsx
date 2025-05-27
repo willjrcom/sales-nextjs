@@ -16,7 +16,6 @@ import { useModal } from '@/app/context/modal/context';
 import GetCompany from '@/app/api/company/company';
 import UpdateCompany from '@/app/api/company/update/company';
 import FormArrayPattern from '@/app/components/modal/form-array-pattern';
-import { AddAccessToken, AddIdToken } from '@/app/api/request';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
@@ -69,7 +68,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             await update({
                 ...data,
                 user: {
-                    id_token: response
+                    access_token: response
                 },
             });
 
@@ -79,7 +78,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 ...data,
                 user: {
                     ...data.user,
-                    currentCompany: currentCompany,
+                    current_company: currentCompany,
                 },
             })
 
@@ -106,7 +105,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 ...data,
                 user: {
                     ...data.user,
-                    currentCompany: currentCompany,
+                    current_company: currentCompany,
                 },
             })
 

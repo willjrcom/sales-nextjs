@@ -55,7 +55,7 @@ const DragAndDropGrid = () => {
         if (data) {
             dispatch(fetchUnusedTables(data))
         }
-    }, [data?.user.id_token, dispatch])
+    }, [data?.user.access_token, dispatch])
 
     useEffect(() => {
         setPlaces(Object.values(placesSlice.entities));

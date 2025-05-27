@@ -1,5 +1,5 @@
 import size from "@/app/entities/size/size";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const Newsize = async (size: size, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const Newsize = async (size: size, session: Session): Promise<string> => {
         path: "/product-category/size/new", 
         method: "POST",
         body: size,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

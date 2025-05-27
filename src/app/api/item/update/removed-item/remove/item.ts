@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../../../request";
+import RequestApi, { AddAccessToken } from "../../../../request";
 import { Session } from "next-auth";
 
 export interface RemoveRemovedItemProps {
@@ -11,7 +11,7 @@ const RemoveRemovedItem = async (itemId: string, name: string, session: Session)
         path: "/item/delete/" + itemId + "/removed-item", 
         method: "DELETE",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

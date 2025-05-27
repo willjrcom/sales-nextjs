@@ -1,24 +1,18 @@
 import { Session } from 'next-auth';
-import RequestApi, { AddIdToken } from '../../request';
+import RequestApi, { AddAccessToken } from '../../request';
 
-interface RefreshAccessTokenResponse {
-  success: boolean;
-  data: string;
-}
 
 /**
- * Refresh the backend JWT (id_token) using the refresh endpoint.
+ * Refresh the backend JWT (access_token) using the refresh endpoint.
  */
 const RefreshAccessToken = async (session: Session): Promise<string> => {
-  const response = await RequestApi<null, RefreshAccessTokenResponse>({
+  const response = await RequestApi<null, string>({
     path: '/user/refresh-access-token',
     method: 'GET',
-    headers: await AddIdToken(session),
+    headers: await AddAccessToken(session),
   });
-  if (!response.data.success) {
-    throw new Error('Failed to refresh access token');
-  }
-  return response.data.data;
+  
+  return response.data;
 };
 
 export default RefreshAccessToken;

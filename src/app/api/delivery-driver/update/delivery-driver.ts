@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
 
@@ -7,7 +7,7 @@ const UpdateDeliveryDriver = async (order: DeliveryDriver, session: Session): Pr
         path: "/delivery-driver/update/" + order.id, 
         method: "PATCH",
         body: order,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

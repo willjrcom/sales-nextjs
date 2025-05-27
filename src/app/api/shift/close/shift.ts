@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface CloseShiftProps {
@@ -12,7 +12,7 @@ const CloseShift = async (endChange: number, session: Session): Promise<string> 
         path: "/shift/close", 
         method: "PUT",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

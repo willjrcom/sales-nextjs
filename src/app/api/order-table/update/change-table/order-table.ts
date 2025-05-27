@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 
 interface ChangeTableProps {
@@ -15,7 +15,7 @@ const ChangeTable = async (orderTableId: string, tableID: string, session: Sessi
         path: "/order-table/update/change-table/" + orderTableId, 
         method: "PATCH",
         body: changeTable,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

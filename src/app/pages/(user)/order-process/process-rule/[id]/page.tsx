@@ -60,7 +60,7 @@ const Component = () => {
         }
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.id_token, dispatch, currentProcessRuleID]);
+    }, [data?.user.access_token, dispatch, currentProcessRuleID]);
 
     useEffect(() => {
         const entities = Object.values(orderProcessesSlice.entities);
@@ -70,7 +70,7 @@ const Component = () => {
         }
     
         setOrderProcesses([...entities]); 
-    }, [data?.user.id_token, orderProcessesSlice.entities]);
+    }, [data?.user.access_token, orderProcessesSlice.entities]);
     
 
     useEffect(() => {

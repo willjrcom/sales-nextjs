@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "@/app/api/request";
+import RequestApi, { AddAccessToken } from "@/app/api/request";
 import { Session } from "next-auth";
 
 interface ShipOrderProps {
@@ -12,7 +12,7 @@ const ShipOrderDelivery = async (deliveryOrderIds: string[], driverId: string, s
         path: "/order-delivery/update/ship", 
         method: "POST",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

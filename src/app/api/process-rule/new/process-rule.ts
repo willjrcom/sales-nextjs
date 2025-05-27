@@ -1,5 +1,5 @@
 import ProcessRule from "@/app/entities/process-rule/process-rule";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const NewProcessRule = async (processRule: ProcessRule, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const NewProcessRule = async (processRule: ProcessRule, session: Session): Promi
         path: "/product-category/process-rule/new", 
         method: "POST",
         body: processRule,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

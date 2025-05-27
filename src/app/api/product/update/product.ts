@@ -1,5 +1,5 @@
 import Product from "@/app/entities/product/product";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const UpdateProduct = async (product: Product, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const UpdateProduct = async (product: Product, session: Session): Promise<string
         path: "/product/update/" + product.id, 
         method: "PATCH",
         body: product,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

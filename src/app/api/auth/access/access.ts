@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import RequestApi, { AddAccessToken } from "../../request";
+import RequestApi, { AddIDToken } from "../../request";
 
 interface AccessProps {
     schema: string;
@@ -10,7 +10,7 @@ const Access = async (credencials: AccessProps, session: Session): Promise<strin
         path: "/user/access",
         method: "POST",
         body: credencials,
-        headers: await AddAccessToken(session),
+        headers: await AddIDToken(session),
     });
     return response.data
 };

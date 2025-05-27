@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface OpenShiftProps {
@@ -12,7 +12,7 @@ const OpenShift = async (startChange: number, session: Session): Promise<string>
         path: "/shift/open", 
         method: "POST",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

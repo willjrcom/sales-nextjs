@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "@/app/api/request";
+import RequestApi, { AddAccessToken } from "@/app/api/request";
 import { Session } from "next-auth";
 
 interface UpdateChangeOrderDeliveryProps {
@@ -12,7 +12,7 @@ const UpdateChangeOrderDelivery = async (delivery_id: string, change: number, pa
         path: "/order-delivery/update/change/" + delivery_id, 
         method: "PUT",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

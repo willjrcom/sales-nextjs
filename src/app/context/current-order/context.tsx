@@ -25,7 +25,7 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
     const fetchData = useCallback(async (id?: string) => {
-        if (!data?.user.id_token) return;
+        if (!data?.user.access_token) return;
         
         if (!id) {
             id = order?.id;
@@ -41,7 +41,7 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
 
         setLoading(false);
 
-    }, [data?.user.id_token]);
+    }, [data?.user.access_token]);
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
 

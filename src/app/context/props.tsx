@@ -33,13 +33,13 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const { data } = useSession();
 
     const fetchData = useCallback(async () => {
-        if (!data?.user?.id_token) return; 
+        if (!data?.user?.access_token) return; 
         FetchData({ getItems, setItems, data, setError, setLoading });
     }, [data, getItems]);
 
     useEffect(() => {
         fetchData();
-    }, [data?.user.id_token]);
+    }, [data?.user.access_token]);
 
     const filterItems = (key: keyof T, value: string) => {
         if (!value) return items;

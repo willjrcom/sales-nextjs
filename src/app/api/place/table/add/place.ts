@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 import PlaceTable from "@/app/entities/place/place_table";
 
@@ -7,7 +7,7 @@ const AddTableToPlace = async (placeTable: PlaceTable, session: Session): Promis
         path: "/place/table", 
         method: "POST",
         body: placeTable,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

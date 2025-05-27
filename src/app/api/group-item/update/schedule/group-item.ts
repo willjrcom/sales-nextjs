@@ -1,5 +1,5 @@
 import GroupItem from "@/app/entities/order/group-item";
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 import { ToIsoDate } from "@/app/utils/date";
 
@@ -14,7 +14,7 @@ const ScheduleGroupItem = async (groupItem: GroupItem, session: Session, startAt
         path: "/group-item/update/schedule/" + groupItem.id, 
         method: "POST",
         body: { start_at: startAtString } as ScheduleGroupItemProps,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

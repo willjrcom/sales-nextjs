@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 
 interface DeleteUserProps {
     email: string;
@@ -11,7 +11,7 @@ const DeleteUser = async (body: DeleteUserProps, session: Session): Promise<stri
         path: "/user", 
         method: "DELETE",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

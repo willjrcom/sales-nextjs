@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 
 
@@ -6,7 +6,7 @@ const DeleteAdditionalItem = async (additionalItemId: string, session: Session):
     const response = await RequestApi<null, string>({
         path: "/item/delete/" + additionalItemId + "/additional", 
         method: "DELETE",
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

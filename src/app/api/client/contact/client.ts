@@ -1,6 +1,6 @@
 import Client from "@/app/entities/client/client";
 import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import Contact from "@/app/entities/contact/contact";
 
 const GetClientByContact = async (contact: string, session: Session): Promise<Client> => {
@@ -12,7 +12,7 @@ const GetClientByContact = async (contact: string, session: Session): Promise<Cl
         path: "/client/by-contact", 
         method: "POST",
         body: contactObj,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

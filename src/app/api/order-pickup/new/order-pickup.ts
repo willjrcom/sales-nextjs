@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 interface NewPickupProps {
@@ -10,7 +10,7 @@ const NewOrderPickup = async (name: string, session: Session): Promise<NewPickup
         path: "/order-pickup/new", 
         method: "POST",
         body: { name: name },
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

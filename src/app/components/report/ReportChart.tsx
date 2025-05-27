@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Chart, registerables } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
-import RequestApi, { AddIdToken } from '@/app/api/request';
+import RequestApi, { AddAccessToken } from '@/app/api/request';
 import { useSession } from 'next-auth/react';
 import GetCompany from '@/app/api/company/company';
 import Company from '@/app/entities/company/company';
@@ -55,7 +55,7 @@ export default function ReportChart({
         const schema = company.schema_name;
         let path = endpoint;
         let reqBody = body;
-        const headers = await AddIdToken(sessionData);
+        const headers = await AddAccessToken(sessionData);
         if (method === 'GET') {
           const params = { schema, ...(queryParams || {}) };
           const query = new URLSearchParams(

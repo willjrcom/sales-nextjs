@@ -1,4 +1,4 @@
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 
 
@@ -6,7 +6,7 @@ const NewComplementGroupItem = async (groupItemId: string, productId: string, se
     const response = await RequestApi<null, null>({
         path: "/group-item/update/" + groupItemId + "/complement-item/" + productId, 
         method: "POST",
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

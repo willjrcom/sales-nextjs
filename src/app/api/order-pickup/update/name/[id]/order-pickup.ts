@@ -1,5 +1,5 @@
 
-import RequestApi, { AddIdToken } from "@/app/api/request";
+import RequestApi, { AddAccessToken } from "@/app/api/request";
 import { Session } from "next-auth";
 
 interface UpdateNameProps {
@@ -13,7 +13,7 @@ const UpdatePickupOrderName = async (pickupOrderId: string, name: string, sessio
         path: "/order-pickup/update/name/" + pickupOrderId, 
         method: "PUT",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

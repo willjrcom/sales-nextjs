@@ -1,5 +1,5 @@
 import Table from "@/app/entities/table/table";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const UpdateTable = async (table: Table, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const UpdateTable = async (table: Table, session: Session): Promise<string> => {
         path: "/table/update/" + table.id, 
         method: "PATCH",
         body: table,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

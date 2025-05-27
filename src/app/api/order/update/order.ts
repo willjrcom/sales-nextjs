@@ -1,5 +1,5 @@
 import Order from "@/app/entities/order/order";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const UpdateOrder = async (order: Order, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const UpdateOrder = async (order: Order, session: Session): Promise<string> => {
         path: "/order/update/" + order.id, 
         method: "PATCH",
         body: order,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data

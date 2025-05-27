@@ -60,7 +60,7 @@ const LoginForm = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-yellow-500 relative">
+      <div className="hidden sm:block sm:w-1/2 bg-yellow-500 relative">
         <Image src="/img_login.jpg" alt="Login" fill style={{ objectFit: 'cover' }} />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
           <h2 className="text-2xl mb-2">GazalTech</h2>
@@ -68,16 +68,16 @@ const LoginForm = () => {
         </div>
       </div>
 
-      <div className="w-1/2 flex items-center justify-center bg-white">
+      <div className="w-full sm:w-1/2 flex items-center justify-center bg-white">
         <div className="w-full max-w-md px-8 py-10">
-          <h2 className="text-2xl mb-6">Conecte-se</h2>
-          {error && <p className="mb-4 text-red-500">{error}</p>}
+          <h2 className="text-2xl mb-6 hidden sm:block">Conecte-se</h2>
+          {error && <p className="mb-4 text-red-500 hidden sm:block">{error}</p>}
           <div className="flex flex-col">
             <TextField friendlyName='Email' name='email' placeholder='Digite seu email' setValue={setEmail} value={email} />
 
             <PasswordField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
 
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-4 hidden sm:flex">
               <input
                 type="checkbox"
                 id="remember"
@@ -98,7 +98,7 @@ const LoginForm = () => {
               {loading ? <Loading /> : 'Conectar'}
             </Button>
 
-            <div className="flex justify-between mt-4 text-yellow-500">
+            <div className="flex justify-between mt-4 text-yellow-500 hidden sm:flex">
               <Link href="/login/forget-password" className="hover:underline">Esqueceu a senha?</Link>
               <Link href="/login/sign-up" className="hover:underline">Novo usuário</Link>
             </div>

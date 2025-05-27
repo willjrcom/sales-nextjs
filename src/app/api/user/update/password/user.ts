@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import RequestApi, { AddIdToken } from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
 
 interface UpdateUserProps {
     email: string;
@@ -11,7 +11,7 @@ const UpdateUserPassword = async (body: UpdateUserProps, session: Session): Prom
         path: "/user/update/password", 
         method: "POST",
         body: body,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

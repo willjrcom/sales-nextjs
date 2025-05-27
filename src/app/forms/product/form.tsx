@@ -140,7 +140,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         }
 
         LoadCategories();
-    }, [data?.user.id_token, categoriesSlice.entities]);
+    }, [data?.user.access_token, categoriesSlice.entities]);
 
     useEffect(() => {
         const LoadSizes = async () => {
@@ -170,7 +170,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         LoadSizes();
 
-    }, [categories, product.category_id, data?.user.id_token])
+    }, [categories, product.category_id, data?.user.access_token])
 
     return (
         <>

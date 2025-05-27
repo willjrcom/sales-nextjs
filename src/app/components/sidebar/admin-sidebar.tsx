@@ -59,8 +59,8 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
   const [company, setCompany] = useState<Company>(new Company());
 
   useEffect(() => {
-    if (!data?.user.currentCompany) return;
-    setCompany(data.user.currentCompany as Company);
+    if (!data?.user.current_company) return;
+    setCompany(data.user.current_company as Company);
   }, [data?.user]);
 
   const handleCompanyModal = () => {

@@ -1,5 +1,5 @@
 import Category from "@/app/entities/category/category";
-import RequestApi, { AddIdToken } from "../../request";
+import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
 const NewCategory = async (category: Category, session: Session): Promise<string> => {
@@ -7,7 +7,7 @@ const NewCategory = async (category: Category, session: Session): Promise<string
         path: "/product-category/new", 
         method: "POST",
         body: category,
-        headers: await AddIdToken(session),
+        headers: await AddAccessToken(session),
     });
 
     return response.data
