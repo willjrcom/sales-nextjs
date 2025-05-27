@@ -17,6 +17,7 @@ const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [remember, setRemember] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -36,6 +37,7 @@ const LoginForm = () => {
         callbackUrl: '/access/company-selection',
         email,
         password,
+        remember,
       });
 
       if (res?.error) {
@@ -76,7 +78,14 @@ const LoginForm = () => {
             <PasswordField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
 
             <div className="flex items-center mb-4">
-              <input type="checkbox" id="remember" name="remember" className="mr-2" />
+              <input
+                type="checkbox"
+                id="remember"
+                name="remember"
+                className="mr-2"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
               <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
             </div>
 

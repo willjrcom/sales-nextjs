@@ -56,6 +56,7 @@ const authOptions: NextAuthOptions = {
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
+                remember: { label: "Lembrar conexão", type: "boolean" },
             },
             async authorize(credentials) {
                 const email = credentials?.email || "";

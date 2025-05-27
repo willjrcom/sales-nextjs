@@ -16,19 +16,21 @@ const PageNewOrder = () => {
   ];
 
   return (
-    <div className="min-w-[80vw]">
+    <div className="flex flex-col h-full w-full">
       <PageTitle title="Novo Pedido" tooltip="Selecione o tipo de pedido: Mesa, Entrega ou Balcão/Retirada." />
 
-      <div className="flex gap-4 ">
+      <div className="flex flex-1 gap-4">
         {options.map((option) => (
-          <Link href={option.route}
+          <Link
+            href={option.route}
             key={option.id}
-            className={`w-1/3 h-[75vh] rounded overflow-hidden shadow-lg flex flex-col items-center justify-center shadow-md cursor-pointer transition duration-300 hover:bg-gray-200
+            className={`flex-1 h-full rounded overflow-hidden shadow-lg flex flex-col items-center justify-center shadow-md cursor-pointer transition duration-300 hover:bg-gray-200
               ${selectedOption === option.id
-              ? "border-4 border-purple-500"
-              : "hover:border-4 hover:border-gray-300"
+                ? "border-4 border-purple-500"
+                : "hover:border-4 hover:border-gray-300"
               }`}
-            onClick={() => setSelectedOption(option.id)}>
+            onClick={() => setSelectedOption(option.id)}
+          >
             <div className="px-6 py-4 text-center">
               <p className="text-gray-700 text-base">{option.icon}</p>
               <div className="font-bold text-xl mb-2">{option.label}</div>
