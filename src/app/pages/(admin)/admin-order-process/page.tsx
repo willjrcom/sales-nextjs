@@ -6,7 +6,7 @@ import ReportChart from '@/app/components/report/ReportChart';
 import { reportConfigs } from '@/app/components/report/reportConfigs';
 
 export default function OrderProcessAdminPage() {
-  const reportIds = ['avg-process-step-duration', 'processed-count-by-rule'];
+  const reportIds = ['avg-process-step-duration', 'processed-count-by-rule', 'avg-process-duration-by-product', 'total-queue-time-by-group-item'];
   const opReports = reportConfigs.filter((c) => reportIds.includes(c.id));
   const today = new Date().toISOString().slice(0, 10);
   const initialDates = opReports.reduce((acc, cur) => {

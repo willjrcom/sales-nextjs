@@ -6,7 +6,7 @@ import ReportChart from '@/app/components/report/ReportChart';
 import { reportConfigs } from '@/app/components/report/reportConfigs';
 
 export default function PlaceAdminPage() {
-  const reportIds = ['sales-by-place'];
+  const reportIds = ['sales-by-place', 'top-tables'];
   const placeReports = reportConfigs.filter((c) => reportIds.includes(c.id));
   const today = new Date().toISOString().slice(0, 10);
   const initialDates = placeReports.reduce((acc, cur) => {

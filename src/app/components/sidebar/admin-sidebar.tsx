@@ -86,15 +86,15 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
   return (
     <nav className="sticky top-0 w-52 h-screen bg-blue-800 text-white flex flex-col overflow-hidden">
       <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
-      <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/order-process" />
-      <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/product" />
-      <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/client" />
-      <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/employee" />
-      <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/admin-user" />
-      <SidebarLinkItem icon={FaTh} label="Mesas" href="/place" />
-      <SidebarLinkItem icon={FaPlus} label="Pedidos" href="/order" />
-      <SidebarLinkItem icon={FaClock} label="Turnos" href="/shift" />
-      <SidebarLinkItem icon={FaChartBar} label="Relatórios" href="/reports" />
+      <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/admin-order-process" />
+      <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/admin-product" />
+      <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/admin-client" />
+      <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/admin-employee" />
+      <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/pages/admin-user" />
+      <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/admin-place" />
+      <SidebarLinkItem icon={FaPlus} label="Pedidos" href="/pages/admin-order" />
+      <SidebarLinkItem icon={FaClock} label="Turnos" href="/pages/admin-shift" />
+      <SidebarLinkItem icon={FaChartBar} label="Relatórios" href="/pages/admin-report" />
       <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
       <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
