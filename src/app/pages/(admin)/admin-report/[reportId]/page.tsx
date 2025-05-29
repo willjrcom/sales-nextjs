@@ -11,12 +11,13 @@ export default function ReportPage() {
   const router = useRouter();
   const reportId = params.reportId;
   const config = reportConfigs.find((c) => c.id === reportId);
-  if (!config) {
-    return <div className="p-4 ml-52">Relatório não encontrado.</div>;
-  }
   const today = new Date().toISOString().slice(0, 10);
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
+
+  if (!config) {
+    return <div className="p-4 ml-52">Relatório não encontrado.</div>;
+  }
 
   const body = config.inputType === 'dateRange'
       ? { start: new Date(startDate).toISOString(), end: new Date(endDate).toISOString() }
