@@ -85,8 +85,6 @@ const Sidebar = ({ onToggleAdmin }: SidebarProps) => {
       <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
       <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/pages/user" />
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
-      <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
-      <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <div className="mt-auto flex flex-col">
         {onToggleAdmin && (

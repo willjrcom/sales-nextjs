@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
+import { Toaster, toast } from 'react-hot-toast';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { useCurrentOrder } from '@/app/context/current-order/context';
 import EmployeeUserProfile from '../profile/profile';
@@ -53,6 +54,11 @@ const Topbar = () => {
   const [showCurrentOrder, setCurrentOrder] = useState(false);
   const { data } = useSession();
 
+  // Notificação: abre o toast com central de notificações
+  const handleNotifications = () => {
+    toast('Central de notificações', { icon: '🔔' });
+  };
+
   useEffect(() => {
     if (contextCurrentOrder.order?.status === "Staging") {
       setCurrentOrder(true);
@@ -62,7 +68,8 @@ const Topbar = () => {
   }, [contextCurrentOrder.order?.status]);
 
   return (
-    <header className="flex justify-between items-center bg-gray-800 text-white h-16 w-full px-4 shadow-sm">
+    <>
+      <header className="flex justify-between items-center bg-gray-800 text-white h-16 w-full px-4 shadow-sm">
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />
@@ -70,12 +77,19 @@ const Topbar = () => {
         {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
       </div>
 
-      <div className="flex space-x-4">
-        <TopbarItem label="Turno" href="/pages/shift" color='green'/>
-        <TopbarItemIcon icon={IoIosNotifications} href="/" />
-        {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
-      </div>
-    </header>
+        <div className="flex space-x-4">
+          <TopbarItem label="Turno" href="/pages/shift" color='green'/>
+          <button
+            onClick={handleNotifications}
+            className="p-2 rounded hover:bg-gray-700 transition-colors duration-200"
+          >
+            <IoIosNotifications className="text-xl text-gray-300" />
+          </button>
+          {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
+        </div>
+      </header>
+      <Toaster position="top-right" />
+    </>
   )
 };
 

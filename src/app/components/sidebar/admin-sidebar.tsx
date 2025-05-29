@@ -95,8 +95,6 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
       <SidebarLinkItem icon={FaPlus} label="Pedidos" href="/pages/admin-order" />
       <SidebarLinkItem icon={FaClock} label="Turnos" href="/pages/admin-shift" />
       <SidebarLinkItem icon={FaChartBar} label="Relatórios" href="/pages/admin-report" />
-      <SidebarLinkItem icon={MdOutlineHomeWork} label="Minha Empresa" href="/" />
-      <SidebarLinkItem icon={FaSlidersH} label="Configurações" href="/" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <div className="mt-auto flex flex-col">
         <SidebarLinkItem icon={FaTools} label="User Mode" onClick={onToggleAdmin} />

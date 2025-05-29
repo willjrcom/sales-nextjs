@@ -13,6 +13,7 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import Category from '@/app/entities/category/category';
+import { notifySuccess } from '@/app/utils/notifications';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
     category: Category
@@ -25,7 +26,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const { data } = useSession();
     const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    
+
     const handleInputChange = (field: keyof Size, value: any) => {
         setSize(prev => ({ ...prev, [field]: value }));
     };
@@ -47,9 +48,11 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
                 if (index !== -1) {
                     category.sizes[index] = size;
                 }
+                notifySuccess('Tamanho atualizado com sucesso');
             } else {
                 size.id = response;
                 category.sizes.push(size);
+                notifySuccess('Tamanho criado com sucesso');
             }
 
             modalHandler.hideModal(modalName);
@@ -69,18 +72,18 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
         modalHandler.hideModal(modalName);
     }
-    
+
     const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name} />
 
-            {isDefaultCategory && <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active}/>}
+            {isDefaultCategory && <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active} />}
 
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id}/>
-                
-            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id} />
+
+            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />

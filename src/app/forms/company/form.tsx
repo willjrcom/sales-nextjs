@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Company, { ValidateCompanyForm } from '@/app/entities/company/company';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import NewCompany from '@/app/api/company/new/company';
@@ -94,11 +95,14 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 },
             })
 
+            notifySuccess('Empresa criada com sucesso');
             router.push('/pages/new-order');
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setError(err);
+            notifyError(err.message || 'Erro ao criar empresa');
         }
     };
 
@@ -110,7 +114,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            await UpdateCompany(company, data);
+        await UpdateCompany(company, data);
             const currentCompany = await GetCompany(data);
 
             await update({
@@ -121,10 +125,13 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 },
             })
 
+            notifySuccess('Empresa atualizada com sucesso');
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setError(err);
+            notifyError(err.message || 'Erro ao atualizar empresa');
         }
     };
 
