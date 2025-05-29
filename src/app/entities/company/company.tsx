@@ -10,8 +10,19 @@ export default class Company {
     cnpj: string = "";
     contacts: string[] = [];
     address: Address = new Address();
+    preferences: Record<string, string> = {};
 
-    constructor(id = "", schema_name = "", business_name = "", email = "", trade_name = "", cnpj = "", contacts = [""], address = new Address()) {
+    constructor(
+        id = "",
+        schema_name = "",
+        business_name = "",
+        email = "",
+        trade_name = "",
+        cnpj = "",
+        contacts = [""],
+        address = new Address(),
+        preferences: Record<string, string> = {}
+    ) {
         this.id = id;
         this.schema_name = schema_name;
         this.business_name = business_name;
@@ -20,6 +31,7 @@ export default class Company {
         this.cnpj = cnpj;
         this.contacts = contacts;
         this.address = address;
+        this.preferences = preferences;
     }
 }
 

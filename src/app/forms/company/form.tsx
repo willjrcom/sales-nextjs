@@ -8,7 +8,9 @@ import CreateFormsProps from '../create-forms-props';
 import NewCompany from '@/app/api/company/new/company';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { HiddenField, TextField } from '@/app/components/modal/field';
+import { HiddenField, TextField, CheckboxField, NumberField } from '@/app/components/modal/field';
+import PriceField from '@/app/components/modal/fields/price';
+import Decimal from 'decimal.js';
 import Access from '@/app/api/auth/access/access';
 import { useRouter } from 'next/navigation';
 import PatternField from '@/app/components/modal/fields/pattern';
@@ -50,6 +52,16 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             updatedContacts[index] = value;
             return { ...prev, contacts: updatedContacts };
         });
+    };
+
+    const handlePreferenceChange = (key: string, value: any) => {
+        setCompany(prev => ({
+            ...prev,
+            preferences: {
+                ...prev.preferences,
+                [key]: String(value),
+            },
+        }));
     };
 
     const handleSubmit = async () => {
@@ -133,6 +145,45 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             />
 
             <hr className="my-4" />
+            {/* Preferences */}
+            <h3 className="text-md font-medium mb-2">Preferências</h3>
+            <CheckboxField
+                friendlyName="Entrega disponível"
+                name="enable_delivery"
+                value={company.preferences.enable_delivery === 'true'}
+                setValue={value => handlePreferenceChange('enable_delivery', value)}
+            />
+            <CheckboxField
+                friendlyName="Mesas disponíveis"
+                name="enable_tables"
+                value={company.preferences.enable_tables === 'true'}
+                setValue={value => handlePreferenceChange('enable_tables', value)}
+            />
+            <CheckboxField
+                friendlyName="Exigir valor mínimo para entrega gratuita"
+                name="enable_min_order_value_for_free_delivery"
+                value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
+                setValue={value => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
+            />
+            <NumberField
+                friendlyName="Taxa de mesa (%)"
+                name="table_tax_rate"
+                value={parseFloat(company.preferences.table_tax_rate || '0')}
+                setValue={value => handlePreferenceChange('table_tax_rate', value)}
+            />
+            <PriceField
+                friendlyName="Valor mínimo para entrega gratuita"
+                name="min_order_value_for_free_delivery"
+                value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
+                setValue={value => handlePreferenceChange('min_order_value_for_free_delivery', value)}
+                disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
+            />
+            <PriceField
+                friendlyName="Taxa mínima de entrega"
+                name="min_delivery_tax"
+                value={new Decimal(company.preferences.min_delivery_tax || '0')}
+                setValue={value => handlePreferenceChange('min_delivery_tax', value)}
+            />
 
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
