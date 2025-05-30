@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DeliveryDriver from '@/app/entities/delivery-driver/delivery-driver';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
@@ -23,7 +24,6 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
     const [employees, setEmployees] = useState<Employee[]>([]);
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     useEffect(() => {
@@ -35,41 +35,47 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const submit = async () => {
         if (!data) return;
         if (selectedEmployeeId == "") {
-            setError(new RequestError('Selecione um motoboy'));
+            notifyError('Selecione um motoboy');
             return
         }
         
         try {
             deliveryDriver.employee_id = selectedEmployeeId
             const response = isUpdate ? await UpdateDeliveryDriver(deliveryDriver, data) : await NewDeliveryDriver(deliveryDriver.employee_id, data)
-            setError(null);
 
             deliveryDriver.employee = Object.values(employeesSlice.entities).filter(employee => employee.id === selectedEmployeeId)[0]
 
             if (!isUpdate) {
                 deliveryDriver.id = response
                 dispatch(addDeliveryDriver(deliveryDriver));
+                notifySuccess('Motoboy adicionado com sucesso');
             } else {
                 dispatch(updateDeliveryDriver({ type: "UPDATE", payload: { id: deliveryDriver.id, changes: deliveryDriver }}));
+                notifySuccess('Motoboy atualizado com sucesso');
             }
 
             modalHandler.hideModal(modalName);
-            setError(null);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao salvar motoboy');
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteDeliveryDriver(deliveryDriver.id, data);
-        dispatch(removeDeliveryDriver(deliveryDriver.id));
-        modalHandler.hideModal(modalName);
+        try {
+            DeleteDeliveryDriver(deliveryDriver.id, data);
+            dispatch(removeDeliveryDriver(deliveryDriver.id));
+            notifySuccess('Motoboy removido com sucesso');
+            modalHandler.hideModal(modalName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover motoboy');
+        }
     }
     
     return (
         <>
-            {error && <p className='text-red-500'>{error.message}</p>}
             {!isUpdate && <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={employees} />}
             {isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" deleteItem={onDelete} />}
             {!isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} />}

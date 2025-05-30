@@ -24,7 +24,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
     const [company, setCompany] = useState<Company>(item || new Company());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [error, setError] = useState<RequestError | null>(null);
     const { data, update } = useSession();
     const router = useRouter();
     const modalHandler = useModal();
@@ -63,10 +62,25 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 [key]: String(value),
             },
         }));
+        // Notificar mudança de preferência
+        const labels: Record<string,string> = {
+            enable_delivery: 'Entrega disponível',
+            enable_tables: 'Mesas disponíveis',
+            enable_min_order_value_for_free_delivery: 'Exigir valor mínimo para entrega gratuita',
+            table_tax_rate: 'Taxa de mesa (%)',
+            min_order_value_for_free_delivery: 'Valor mínimo para entrega gratuita',
+            min_delivery_tax: 'Taxa mínima de entrega',
+        };
+        const label = labels[key] || key;
+        const isToggle = ['enable_delivery','enable_tables','enable_min_order_value_for_free_delivery'].includes(key);
+        if (isToggle) {
+            notifySuccess(`${label} ${value ? 'ativada' : 'desativada'}`);
+        } else {
+            notifySuccess(`${label} alterada para ${value}`);
+        }
     };
 
     const handleSubmit = async () => {
-        setError(null);
         if (!data) return;
 
         const validationErrors = ValidateCompanyForm(company);
@@ -101,13 +115,11 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
         } catch (error) {
             const err = error as RequestError;
-            setError(err);
             notifyError(err.message || 'Erro ao criar empresa');
         }
     };
 
     const handleUpdate = async () => {
-        setError(null);
         if (!data) return;
 
         const validationErrors = ValidateCompanyForm(company);
@@ -130,7 +142,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
         } catch (error) {
             const err = error as RequestError;
-            setError(err);
             notifyError(err.message || 'Erro ao atualizar empresa');
         }
     };
@@ -177,6 +188,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 name="table_tax_rate"
                 value={parseFloat(company.preferences.table_tax_rate || '0')}
                 setValue={value => handlePreferenceChange('table_tax_rate', value)}
+                disabled={company.preferences.enable_tables !== 'true'}
             />
             <PriceField
                 friendlyName="Valor mínimo para entrega gratuita"
@@ -194,7 +206,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
-            {error && <p className="text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             {!isUpdate && <ButtonsModal
                 item={company}

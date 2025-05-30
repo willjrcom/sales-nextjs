@@ -2,7 +2,7 @@ import RequestError from "@/app/utils/error";
 import NewItem, { NewItemProps } from "@/app/api/item/new/item";
 import GetProductByID from "@/app/api/product/[id]/product";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
-import ErrorForms from "@/app/components/modal/error-forms"
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from "@/app/components/modal/field";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { useGroupItem } from "@/app/context/group-item/context";
@@ -28,8 +28,6 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const [product, setProduct] = useState<Product>(item || new Product());
   const [quantity, setQuantity] = useState<Quantity>(new Quantity());
   const [observation, setObservation] = useState('');
-  const [error, setError] = useState<RequestError | null>(null);
-  const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [reloadProduct, setReloadProduct] = useState(false);
 
   useEffect(() => {
@@ -63,10 +61,11 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       const response = await NewItem(body, data)
       contextGroupItem.fetchData(response.group_item_id);
-
+      notifySuccess('Item adicionado com sucesso');
       modalHandler.hideModal(modalName);
     } catch (error) {
-      setError(error as RequestError);
+      const err = error as RequestError;
+      notifyError(err.message || 'Erro ao adicionar item');
     }
   }
 
@@ -87,7 +86,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       <p className="text-sm">{product.description}</p>
       <p className="text-lg font-bold">Tamanho {product.size.name}</p>
       <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
-      <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional/>
+      <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
       <hr className="my-4" />
 
       {/* Valor unitario */}
@@ -98,12 +97,10 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       {/* Total do item */}
       <div className="flex justify-between">
-      <p className="text-lg font-bold">Total:</p>
+        <p className="text-lg font-bold">Total:</p>
         <p className="text-lg font-bold">R$ {new Decimal(product.price).times(quantity.quantity || 1).toFixed(2)}</p>
       </div>
 
-      {error && <p className="mb-4 text-red-500">{error.message}</p>}
-      <ErrorForms errors={errors} />
       <ButtonsModal item={product} name="produto" onSubmit={submit} isAddItem={true} />
     </div>
   )

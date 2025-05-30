@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { HiddenField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -25,7 +26,6 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const [quantity, setQuantity] = useState<Quantity>(item || new Quantity());
     
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const handleInputChange = (field: keyof Quantity, value: any) => {
@@ -42,34 +42,37 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
         try {
             const response = isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
-            setError(null);
-
             if (isUpdate) {
                 const index = category.quantities.findIndex(q => q.id === quantity.id);
                 if (index !== -1) {
                     category.quantities[index] = quantity;
                 }
+                notifySuccess('Quantidade atualizada com sucesso');
             } else {
                 quantity.id = response;
                 category.quantities.push(quantity);
+                notifySuccess('Quantidade adicionada com sucesso');
             }
-
             modalHandler.hideModal(modalName);
-
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao salvar quantidade');
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
-        await DeleteQuantity(quantity.id, data);
-        
-        if (category) {
-            category.quantities = category.quantities.filter(q => q.id !== quantity.id);
+        try {
+            await DeleteQuantity(quantity.id, data);
+            if (category) {
+                category.quantities = category.quantities.filter(q => q.id !== quantity.id);
+            }
+            notifySuccess('Quantidade removida com sucesso');
+            modalHandler.hideModal(modalName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover quantidade');
         }
-
-        modalHandler.hideModal(modalName);
     }
 
     const isDefaultCategory = !category.is_additional && !category.is_complement;
@@ -82,7 +85,6 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
                 
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id}/>
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             {!isUpdate && <ButtonsModal item={{...quantity, name: quantity.quantity.toString()}} name="quantity" onSubmit={submit} />}
             {isUpdate && isDefaultCategory && <ButtonsModal item={{...quantity, name: quantity.quantity.toString()}} name="quantity" deleteItem={onDelete} />}

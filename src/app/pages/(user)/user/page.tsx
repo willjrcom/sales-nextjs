@@ -1,6 +1,5 @@
 'use client';
 
-import UserForm from "@/app/forms/user/form-profile";
 import CrudLayout from "@/app/components/crud/layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
@@ -12,43 +11,33 @@ import { TextField } from "@/app/components/modal/field";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import GetCompany from "@/app/api/company/company";
 import { useSession } from "next-auth/react";
-import User from "@/app/entities/user/user";
-import Company from "@/app/entities/company/company";
 import { fetchUsers } from "@/redux/slices/users";
 import UserFormRelation from "@/app/forms/user/form-relation";
 
 const PageUser = () => {
     const [nome, setNome] = useState<string>("");
-    const [company, setCompany] = useState<Company>(new Company());
     const usersSlice = useSelector((state: RootState) => state.users);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    
+
 
     useEffect(() => {
         if (data && Object.keys(usersSlice.entities).length === 0) {
             dispatch(fetchUsers(data));
         }
-    
+
         const interval = setInterval(() => {
             if (data) {
                 dispatch(fetchUsers(data));
             }
         }, 60000); // Atualiza a cada 60 segundos
-    
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.access_token, dispatch]);
 
-    if (!company) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-    
     const filteredUsers = Object.values(usersSlice.entities).filter(user => user.name.includes(nome)).sort((a, b) => a.name.localeCompare(b.name));
-    
+
     return (
         <>
             <CrudLayout
@@ -74,8 +63,8 @@ const PageUser = () => {
                     />
                 }
                 tableChildren={
-                    <CrudTable 
-                        columns={UserColumns()} 
+                    <CrudTable
+                        columns={UserColumns()}
                         data={filteredUsers} />
                 }
             />

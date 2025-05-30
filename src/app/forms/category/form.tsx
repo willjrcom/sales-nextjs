@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -82,14 +83,18 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             if (!isUpdate) {
                 category.id = response
                 dispatch(addCategory(category));
+                notifySuccess('Categoria criada com sucesso');
                 modalHandler.hideModal(modalName);
             } else {
                 dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: category } }));
                 if (setItem) setItem(category)
+                notifySuccess('Categoria atualizada com sucesso');
             }
 
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setError(err);
+            notifyError(err.message || 'Erro ao salvar categoria');
         }
     }
 
@@ -100,8 +105,10 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         if (!isUpdate) {
             modalHandler.hideModal(modalName);
+            notifySuccess('Categoria removida com sucesso');
         } else {
             router.back();
+            notifySuccess('Categoria removida com sucesso');
         }
     }
 

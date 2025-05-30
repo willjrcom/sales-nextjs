@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
 import UpdateUser from '@/app/api/user/update/user';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
@@ -17,7 +18,6 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
     const [user, setUser] = useState<User>(item || new User());
     const [person, setPerson] = useState<Person>(user as Person);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [error, setError] = useState<RequestError | null>(null);
     const { data, update } = useSession();
 
     const submit = async () => {
@@ -34,24 +34,22 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
         
         try {
             await UpdateUser(newUser, data)
-            setError(null);
-
             await update({
                 ...data,
                 user: {
                     person: newUser
                 },
             })
-
+            notifySuccess('Perfil atualizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao atualizar perfil');
         }
     }
 
     return (
         <>
-            {error && <p className='text-red-500'>{error.message}</p>}
             <PersonForm person={person} setPerson={setPerson} isEmployee />
             <ErrorForms errors={errors} />
             <ButtonsModal item={user} name="Usuário" onSubmit={submit} />

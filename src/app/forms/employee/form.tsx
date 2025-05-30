@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PersonForm from '../person/form';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Person from '@/app/entities/person/person';
 import Employee, { ValidateEmployeeForm } from '@/app/entities/employee/employee';
 import { useSession } from 'next-auth/react';
@@ -15,13 +16,12 @@ import { ToIsoDate } from '@/app/utils/date';
 import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/employees';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import { HiddenField, TextField } from '@/app/components/modal/field';
+import { HiddenField } from '@/app/components/modal/field';
 import User from '@/app/entities/user/user';
 import NewUser from '@/app/api/user/new/user';
 import SearchUser from '@/app/api/user/search/user';
 import { FaCheck } from 'react-icons/fa';
 import PatternField from '@/app/components/modal/fields/pattern';
-import PriceField from '@/app/components/modal/fields/price';
 
 interface EmployeeFormProps extends CreateFormsProps<Employee> {
     isDisabledPerson?: boolean;
@@ -34,7 +34,6 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     const [userFound, setUserFound] = useState<User>();
     const [person, setPerson] = useState<Person>(item || new Person());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [error, setError] = useState<RequestError | null>(null);
     const [cpfToSearch, setCpfToSearch] = useState<string>('');
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
@@ -51,12 +50,12 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         if (!data) return;
 
         try {
-            const user = await SearchUser({cpf: cpfToSearch}, data);
+            const user = await SearchUser({ cpf: cpfToSearch }, data);
             setUserFound(user);
-            setError(null);
         } catch (error) {
             setUserFound(undefined);
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message);
         }
     }
 
@@ -81,13 +80,13 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
 
         try {
             await UpdateEmployee(newEmployee, data)
-            setError(null);
             dispatch(updateEmployee({ type: "UPDATE", payload: { id: newEmployee.id, changes: newEmployee } }));
+            notifySuccess('Funcionário atualizado com sucesso');
 
             modalHandler.hideModal(modalName);
-            setError(null);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao atualizar funcionário');
         }
     }
 
@@ -100,35 +99,39 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         }
 
         const validationErrors = ValidateEmployeeForm(newEmployee);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
+        if (Object.values(validationErrors).length > 0) return notifyError(validationErrors.toString());
 
         try {
             const responseUser = await NewUser(newEmployee, "", true)
             const responseEmployee = await NewEmployee(responseUser, data)
-            setError(null);
 
             newEmployee.id = responseEmployee
             dispatch(addEmployee(newEmployee));
+            notifySuccess('Funcionário criado com sucesso');
 
             modalHandler.hideModal(modalName);
-            setError(null);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao criar funcionário');
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteEmployee(employee.id, data);
-        dispatch(removeEmployee(employee.id));
-        modalHandler.hideModal(modalName);
+        try {
+            DeleteEmployee(employee.id, data);
+            dispatch(removeEmployee(employee.id));
+            notifySuccess('Funcionário removido com sucesso');
+            modalHandler.hideModal(modalName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover funcionário');
+        }
     }
 
     const classTotalColumns = isUpdate ? "grid-cols-1" : "grid-cols-3";
     return (
         <>
-            {error && <p className="text-red-500">{error.message}</p>}
-
             <div className={"grid " + classTotalColumns + " gap-4 items-start w-full max-w-7xl mx-auto"}>
                 {/* Coluna da Esquerda: Buscar por CPF */}
                 {!isUpdate && <div className="flex justify-center items-center shadow-md h-[80vh] min-w-[20vw]">

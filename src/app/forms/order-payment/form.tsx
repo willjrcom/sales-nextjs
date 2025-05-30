@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField, SelectField } from '../../components/modal/field';
+import { HiddenField, SelectField } from '../../components/modal/field';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import PriceField from '@/app/components/modal/fields/price';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -23,7 +24,6 @@ const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: Pa
     const modalName = isUpdate ? 'edit-payment-' + item?.id : 'add-payment'
     const modalHandler = useModal();
     const [payment, setPayment] = useState<PaymentOrder>(item || new PaymentOrder());
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
@@ -43,16 +43,16 @@ const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: Pa
 
         try {
             await PayOrder(payment, data)
-            setError(null);
             setOrderPaymentError(null);
             setOrderError(null);
 
             contextCurrentOrder.fetchData(order.id);
-
+            notifySuccess('Pagamento realizado com sucesso');
             modalHandler.hideModal(modalName);
-
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setOrderPaymentError(err);
+            notifyError(err.message || 'Erro ao processar pagamento');
         }
     }
 
@@ -63,7 +63,6 @@ const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: Pa
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={payment.id}/>
             <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={order?.id}/>
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal item={payment} name="Tamanho" onSubmit={submit} isAddItem />
         </>

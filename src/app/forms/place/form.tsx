@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { TextField, HiddenField } from '../../components/modal/field';
 import Place, { ValidatePlaceForm } from '@/app/entities/place/place';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -21,7 +22,6 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalHandler = useModal();
     const [place, setPlace] = useState<Place>(item || new Place());
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const dispatch = useDispatch<AppDispatch>();
     
@@ -37,27 +37,34 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
         try {
             const response = isUpdate ? await UpdatePlace(place, data) : await NewPlace(place, data)
-            setError(null);
 
             if (!isUpdate) {
                 place.id = response
                 dispatch(addPlace(place));
+                notifySuccess('Local criado com sucesso');
             } else {
                 dispatch(updatePlace({ type: "UPDATE", payload: {id: place.id, changes: place}}));
+                notifySuccess('Local atualizado com sucesso');
             }
 
             modalHandler.hideModal(modalName);
-
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao salvar local');
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
-        DeletePlace(place.id, data);
-        dispatch(removePlace(place.id));
-        modalHandler.hideModal(modalName);
+        try {
+            DeletePlace(place.id, data);
+            dispatch(removePlace(place.id));
+            notifySuccess('Local removido com sucesso');
+            modalHandler.hideModal(modalName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover local');
+        }
     }
 
     return (
@@ -68,7 +75,6 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id}/>
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal item={place} name="Local" onSubmit={submit} deleteItem={onDelete} />
         </>

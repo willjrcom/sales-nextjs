@@ -4,6 +4,7 @@ import Client, { ValidateClientForm } from '@/app/entities/client/client';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import UpdateClient from '@/app/api/client/update/client';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
@@ -22,7 +23,6 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
     const [client, setClient] = useState<Client>(item as Client)
     const [address, setAddress] = useState<Address>(client.address)
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     useEffect(() => {
@@ -37,19 +37,19 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
         try {
             await UpdateClient(client, data);
             await UpdateAddressOrderDelivery(deliveryOrderId, data)
-            setError(null);
 
             updateClient({ type: "UPDATE", payload: {id: client.id, changes: client}});
+            notifySuccess('Endereço atualizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao atualizar endereço');
         }
     }
 
     return (
         <>
             <AddressForm addressParent={client.address} setAddressParent={setAddress} />
-            {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal
                 item={client}

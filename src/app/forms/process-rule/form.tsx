@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, NumberField, HiddenField, TimeField, SelectField } from '../../components/modal/field';
 import ProcessRule, { ValidateProcessRuleForm } from '@/app/entities/process-rule/process-rule';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -24,9 +25,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const [category, setCategory] = useState<Category>(new Category());
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const dispatch = useDispatch<AppDispatch>();
-
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     useEffect(() => {
@@ -47,28 +46,35 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
         try {
             const response = isUpdate ? await UpdateProcessRule(processRule, data) : await NewProcessRule(processRule, data);
-            setError(null);
 
             if (!isUpdate) {
                 processRule.id = response
                 dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: [...category.process_rules, processRule] } } }));
+                notifySuccess('Regra de processo criada com sucesso');
             } else {
                 const updatedProcessRules = category.process_rules.map(rule => rule.id === processRule.id ? processRule : rule)
                 dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: updatedProcessRules } } }));
+                notifySuccess('Regra de processo atualizada com sucesso');
             }
 
             modalHandler.hideModal(modalName);
-
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao salvar regra de processo');
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteProcessRule(processRule.id, data);
-        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: category.process_rules.filter(rule => rule.id !== processRule.id) } } }));
-        modalHandler.hideModal(modalName);
+        try {
+            DeleteProcessRule(processRule.id, data);
+            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: category.process_rules.filter(rule => rule.id !== processRule.id) } } }));
+            notifySuccess('Regra de processo removida com sucesso');
+            modalHandler.hideModal(modalName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover regra de processo');
+        }
     }
 
     return (
@@ -88,7 +94,6 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} deleteItem={onDelete} />
         </>

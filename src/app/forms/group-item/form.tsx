@@ -7,11 +7,11 @@ import { DateTimeField } from '@/app/components/modal/field';
 import ScheduleGroupItem from '@/app/api/group-item/update/schedule/group-item';
 import { FaCalendarTimes, FaTrash } from 'react-icons/fa';
 import { useGroupItem } from '@/app/context/group-item/context';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 
 const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
     const [groupItem, setGroupItem] = useState<GroupItem>(item as GroupItem);
     const [startAt, setStartAt] = useState<string | null | undefined>(item?.start_at);
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
     const contextGroupItem = useGroupItem();
 
@@ -20,13 +20,23 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
         if (newStartAt === null) newStartAt = "";
         
         try {
+            const prev = groupItem.start_at;
             await ScheduleGroupItem(groupItem, data, newStartAt);
             setGroupItem({ ...groupItem, start_at: newStartAt });
             setStartAt(newStartAt);
             contextGroupItem.fetchData(groupItem.id);
-            setError(null);
+            
+            // Notificação de sucesso conforme ação
+            let msg = '';
+            if ((!prev || prev === '') && newStartAt) msg = 'Agendamento criado com sucesso';
+            else if (prev && newStartAt) msg = 'Agendamento atualizado com sucesso';
+            else if (prev && !newStartAt) msg = 'Agendamento removido com sucesso';
+            else msg = 'Agendamento processado com sucesso';
+            notifySuccess(msg);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao agendar');
+            notifyError(err.message || 'Erro ao agendar');
         }
     };
 
@@ -75,7 +85,6 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
                     </button>
                 )}
             </div>
-            {error && <p className="text-red-500">{error.message}</p>}
         </>
     );
 };

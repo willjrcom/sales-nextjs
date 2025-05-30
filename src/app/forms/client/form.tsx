@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PersonForm from '../person/form';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ValidateClientForm } from '@/app/entities/client/client';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { ToIsoDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -22,7 +23,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const [client, setClient] = useState<Client>(item as Client || new Client())
     const [person, setPerson] = useState<Person>(client as Person);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     
@@ -40,18 +40,20 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         
         try {
             const response = isUpdate ? await UpdateClient(newClient, data) : await NewClient(newClient, data)
-            setError(null);
             
             if (!isUpdate) {
                 newClient.id = response
                 dispatch(addClient({...newClient}));
+                notifySuccess('Cliente criado com sucesso');
             } else {
                 dispatch(updateClient({ type: "UPDATE", payload: {id: newClient.id, changes: newClient}}));
+                notifySuccess('Cliente atualizado com sucesso');
             }
             
             modalHandler.hideModal(modalName);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao salvar cliente');
         }
     }
 
@@ -60,18 +62,18 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
         try {
             await DeleteClient(client.id, data);
-            setError(null);
             dispatch(removeClient(client.id));
+            notifySuccess('Cliente removido com sucesso');
             modalHandler.hideModal(modalName)
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover cliente');
         }
     }
 
     return (
         <>
             <PersonForm person={person} setPerson={setPerson} />
-            {error && <p className='text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal
                 item={client}

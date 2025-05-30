@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Table, { ValidateTableForm } from '@/app/entities/table/table';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -47,8 +48,11 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             }
 
             modalHandler.hideModal(modalName);
+            notifySuccess(isUpdate ? 'Mesa atualizada com sucesso' : 'Mesa criada com sucesso');
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setError(err);
+            notifyError(err.message || 'Erro ao salvar mesa');
         }
     }
 
@@ -57,6 +61,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         DeleteTable(table.id, data);
         dispatch(removeTable(table.id));
         modalHandler.hideModal(modalName);
+        notifySuccess('Mesa removida com sucesso');
     }
 
     return (

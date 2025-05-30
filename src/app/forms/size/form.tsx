@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Size, { ValidateSizeForm } from '@/app/entities/size/size';
+import { notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -58,7 +59,9 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
             modalHandler.hideModal(modalName);
 
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setError(err);
+            notifyError(err.message || 'Erro ao salvar tamanho');
         }
     }
 
@@ -71,6 +74,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
         }
 
         modalHandler.hideModal(modalName);
+        notifySuccess('Tamanho removido com sucesso');
     }
 
     const isDefaultCategory = !category.is_additional && !category.is_complement;

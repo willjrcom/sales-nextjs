@@ -19,6 +19,7 @@ import { AppDispatch, RootState } from '@/redux/store';
 import Size from '@/app/entities/size/size';
 import { updateCategory } from '@/redux/slices/categories';
 import PriceField from '@/app/components/modal/fields/price';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
@@ -101,9 +102,12 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: category.products.map(p => p.id === product.id ? product : p)} } }));
             }
             modalHandler.hideModal(modalName);
+            notifySuccess(isUpdate ? 'Produto atualizado com sucesso' : 'Produto criado com sucesso');
             
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            setError(err);
+            notifyError(err.message || 'Erro ao salvar produto');
         }
     }
 
@@ -112,6 +116,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         DeleteProduct(product.id, data);
         dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: category.products.filter(p => p.id !== product.id)} } }));
         modalHandler.hideModal(modalName);
+        notifySuccess('Produto removido com sucesso');
     }
 
     useEffect(() => {

@@ -7,6 +7,7 @@ import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
 import AddUserToCompany from '@/app/api/company/add/company';
 import RemoveUserFromCompany from '@/app/api/company/remove/company';
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from '@/app/components/modal/field';
 import { fetchUsers, removeUser } from '@/redux/slices/users';
 import { useDispatch } from 'react-redux';
@@ -16,7 +17,6 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
     const modalName = isUpdate ? 'edit-user-' + item?.id : 'edit-user'
     const modalHandler = useModal();
     const [user, setUser] = useState<User>(item || new User());
-    const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
@@ -25,12 +25,12 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
 
         try {
             await AddUserToCompany(user.email, data)
-            setError(null);
-
             dispatch(fetchUsers(data));
+            notifySuccess('Usuário adicionado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao adicionar usuário');
         }
     }
 
@@ -39,19 +39,18 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
 
         try {
             await RemoveUserFromCompany(user.email, data)
-            setError(null);
-
             dispatch(removeUser(user.id))
+            notifySuccess('Usuário removido com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao remover usuário');
         }
     }
 
     if (isUpdate && user) {
         return (
             <>
-                {error && <p className='text-red-500'>{error.message}</p>}
                 <p className='text-gray-600'><strong>Email:</strong> {user.email}</p>
                 <p className='text-gray-600'><strong>Nome:</strong> {user.name}</p>
                 {user.contact && <p className='text-gray-600'><strong>Telefone:</strong> ({user.contact.ddd}) {user.contact.number}</p>}
@@ -63,7 +62,6 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
 
     return (
         <>
-            {error && <p className='text-red-500'>{error.message}</p>}
             <TextField name="email" friendlyName="Email" placeholder="Digite o e-mail" setValue={value => setUser(prev => ({ ...prev, email: value }))} value={user.email} />
             <ButtonsModal item={user} name="Usuário" onSubmit={handleAddUserToCompany} />
         </>
