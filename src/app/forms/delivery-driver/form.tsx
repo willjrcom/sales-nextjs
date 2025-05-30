@@ -48,10 +48,10 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             if (!isUpdate) {
                 deliveryDriver.id = response
                 dispatch(addDeliveryDriver(deliveryDriver));
-                notifySuccess('Motoboy adicionado com sucesso');
+                notifySuccess(`Motoboy ${deliveryDriver.employee.name} adicionado com sucesso`);
             } else {
                 dispatch(updateDeliveryDriver({ type: "UPDATE", payload: { id: deliveryDriver.id, changes: deliveryDriver }}));
-                notifySuccess('Motoboy atualizado com sucesso');
+                notifySuccess(`Motoboy ${deliveryDriver.employee.name} atualizado com sucesso`);
             }
 
             modalHandler.hideModal(modalName);
@@ -66,7 +66,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
         try {
             DeleteDeliveryDriver(deliveryDriver.id, data);
             dispatch(removeDeliveryDriver(deliveryDriver.id));
-            notifySuccess('Motoboy removido com sucesso');
+            notifySuccess(`Motoboy ${deliveryDriver.employee.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;

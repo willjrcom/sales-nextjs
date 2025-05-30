@@ -41,10 +41,10 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
             if (!isUpdate) {
                 place.id = response
                 dispatch(addPlace(place));
-                notifySuccess('Local criado com sucesso');
+                notifySuccess(`Local ${place.name} criado com sucesso`);
             } else {
                 dispatch(updatePlace({ type: "UPDATE", payload: {id: place.id, changes: place}}));
-                notifySuccess('Local atualizado com sucesso');
+                notifySuccess(`Local ${place.name} atualizado com sucesso`);
             }
 
             modalHandler.hideModal(modalName);
@@ -59,11 +59,11 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
         try {
             DeletePlace(place.id, data);
             dispatch(removePlace(place.id));
-            notifySuccess('Local removido com sucesso');
+            notifySuccess(`Local ${place.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover local');
+            notifyError(err.message || `Erro ao remover local ${place.name}`);
         }
     }
 

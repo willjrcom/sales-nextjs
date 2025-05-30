@@ -44,10 +44,10 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             if (!isUpdate) {
                 newClient.id = response
                 dispatch(addClient({...newClient}));
-                notifySuccess('Cliente criado com sucesso');
+                notifySuccess(`Cliente ${client.name} criado com sucesso`);
             } else {
                 dispatch(updateClient({ type: "UPDATE", payload: {id: newClient.id, changes: newClient}}));
-                notifySuccess('Cliente atualizado com sucesso');
+                notifySuccess(`Cliente ${client.name} atualizado com sucesso`);
             }
             
             modalHandler.hideModal(modalName);
@@ -63,11 +63,11 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         try {
             await DeleteClient(client.id, data);
             dispatch(removeClient(client.id));
-            notifySuccess('Cliente removido com sucesso');
+            notifySuccess(`Cliente ${client.name} removido com sucesso`);
             modalHandler.hideModal(modalName)
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover cliente');
+            notifyError(err.message || `Erro ao remover cliente ${client.name}`);
         }
     }
 

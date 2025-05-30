@@ -83,12 +83,12 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             if (!isUpdate) {
                 category.id = response
                 dispatch(addCategory(category));
-                notifySuccess('Categoria criada com sucesso');
+                notifySuccess(`Categoria ${category.name} criada com sucesso`);
                 modalHandler.hideModal(modalName);
             } else {
                 dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: category } }));
                 if (setItem) setItem(category)
-                notifySuccess('Categoria atualizada com sucesso');
+                notifySuccess(`Categoria ${category.name} atualizada com sucesso`);
             }
 
         } catch (error) {
@@ -105,10 +105,10 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         if (!isUpdate) {
             modalHandler.hideModal(modalName);
-            notifySuccess('Categoria removida com sucesso');
+            notifySuccess(`Categoria ${category.name} removida com sucesso`);
         } else {
             router.back();
-            notifySuccess('Categoria removida com sucesso');
+            notifySuccess(`Categoria ${category.name} removida com sucesso`);
         }
     }
 

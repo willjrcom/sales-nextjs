@@ -81,7 +81,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         try {
             await UpdateEmployee(newEmployee, data)
             dispatch(updateEmployee({ type: "UPDATE", payload: { id: newEmployee.id, changes: newEmployee } }));
-            notifySuccess('Funcionário atualizado com sucesso');
+            notifySuccess(`Funcionário ${employee.name} atualizado com sucesso`);
 
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -107,12 +107,12 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
 
             newEmployee.id = responseEmployee
             dispatch(addEmployee(newEmployee));
-            notifySuccess('Funcionário criado com sucesso');
+            notifySuccess(`Funcionário ${employee.name} criado com sucesso`);
 
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message || 'Erro ao criar funcionário');
+            notifyError(err.message || `Erro ao criar funcionário ${employee.name}`);
         }
     }
 
@@ -125,7 +125,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover funcionário');
+            notifyError(err.message || `Erro ao remover funcionário ${employee.name}`);
         }
     }
 

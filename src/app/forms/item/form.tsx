@@ -61,7 +61,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       const response = await NewItem(body, data)
       contextGroupItem.fetchData(response.group_item_id);
-      notifySuccess('Item adicionado com sucesso');
+      notifySuccess(`Item ${item.name} adicionado com sucesso`);
       modalHandler.hideModal(modalName);
     } catch (error) {
       const err = error as RequestError;

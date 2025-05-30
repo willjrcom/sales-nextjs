@@ -43,12 +43,13 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             if (!isUpdate) {
                 table.id = response
                 dispatch(addTable(table));
+            notifySuccess(`Mesa ${table.name} criada com sucesso`);
             } else {
                 dispatch(updateTable({ type: "UPDATE", payload: { id: table.id, changes: table } }));
+            notifySuccess(`Mesa ${table.name} atualizada com sucesso`);
             }
 
             modalHandler.hideModal(modalName);
-            notifySuccess(isUpdate ? 'Mesa atualizada com sucesso' : 'Mesa criada com sucesso');
         } catch (error) {
             const err = error as RequestError;
             setError(err);
@@ -61,7 +62,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         DeleteTable(table.id, data);
         dispatch(removeTable(table.id));
         modalHandler.hideModal(modalName);
-        notifySuccess('Mesa removida com sucesso');
+        notifySuccess(`Mesa ${table.name} removida com sucesso`);
     }
 
     return (

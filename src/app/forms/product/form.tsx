@@ -46,7 +46,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     useEffect(() => {
         const size = category.sizes.find(size => size.id === product.size_id);
         if (!size) return
-        setSize(size)    
+        setSize(size)
     }, [product.size_id]);
 
     const handleInputChange = (field: keyof Product, value: any) => {
@@ -97,13 +97,14 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             if (!isUpdate) {
                 product.id = response
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: [...category.products, product]} } }));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { products: [...category.products, product] } } }));
+                notifySuccess(`Produto ${product.name} criado com sucesso`);
             } else {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: category.products.map(p => p.id === product.id ? product : p)} } }));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { products: category.products.map(p => p.id === product.id ? product : p) } } }));
+                notifySuccess(`Produto ${product.name} atualizado com sucesso`);
             }
             modalHandler.hideModal(modalName);
-            notifySuccess(isUpdate ? 'Produto atualizado com sucesso' : 'Produto criado com sucesso');
-            
+
         } catch (error) {
             const err = error as RequestError;
             setError(err);
@@ -114,9 +115,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: {products: category.products.filter(p => p.id !== product.id)} } }));
+        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { products: category.products.filter(p => p.id !== product.id) } } }));
         modalHandler.hideModal(modalName);
-        notifySuccess('Produto removido com sucesso');
+        notifySuccess(`Produto ${product.name} removido com sucesso`);
     }
 
     useEffect(() => {
@@ -132,7 +133,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                     setRecordCategories([]);
                     return;
                 }
-                
+
                 for (const category of Object.values(categoriesSlice.entities)) {
                     records.push({ id: category.id, name: category.name })
                 }
@@ -164,9 +165,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 for (const size of category.sizes) {
                     records.push({ id: size.id, name: size.name })
                 }
-    
+
                 setRecordSizes(records);
-                
+
             } catch (error) {
                 setError(error as RequestError);
             }
@@ -178,11 +179,11 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     return (
         <>
-            <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code}/>
+            <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code} />
 
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name} />
 
-            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description} optional/>
+            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description} optional />
 
             <PriceField friendlyName='Preço' name='price' setValue={value => handleInputChange('price', value)} value={product.price} />
 
@@ -197,13 +198,13 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 )}
             </div>
 
-            <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available}/>
+            <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available} />
 
-            <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories}/>
+            <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories} />
 
-            <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes}/>
-                
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id}/>
+            <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes} />
+
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id} />
 
             {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />

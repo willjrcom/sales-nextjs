@@ -49,11 +49,11 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
                 if (index !== -1) {
                     category.sizes[index] = size;
                 }
-                notifySuccess('Tamanho atualizado com sucesso');
+                notifySuccess(`Tamanho ${size.name} atualizado com sucesso`);
             } else {
                 size.id = response;
                 category.sizes.push(size);
-                notifySuccess('Tamanho criado com sucesso');
+                notifySuccess(`Tamanho ${size.name} criado com sucesso`);
             }
 
             modalHandler.hideModal(modalName);
@@ -74,7 +74,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
         }
 
         modalHandler.hideModal(modalName);
-        notifySuccess('Tamanho removido com sucesso');
+        notifySuccess(`Tamanho ${size.name} removido com sucesso`);
     }
 
     const isDefaultCategory = !category.is_additional && !category.is_complement;

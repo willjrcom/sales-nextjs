@@ -47,11 +47,11 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
                 if (index !== -1) {
                     category.quantities[index] = quantity;
                 }
-                notifySuccess('Quantidade atualizada com sucesso');
+                notifySuccess(`Quantidade ${quantity.quantity} atualizada com sucesso`);
             } else {
                 quantity.id = response;
                 category.quantities.push(quantity);
-                notifySuccess('Quantidade adicionada com sucesso');
+                notifySuccess(`Quantidade ${quantity.quantity} adicionada com sucesso`);
             }
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -67,7 +67,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
             if (category) {
                 category.quantities = category.quantities.filter(q => q.id !== quantity.id);
             }
-            notifySuccess('Quantidade removida com sucesso');
+            notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;

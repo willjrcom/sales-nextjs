@@ -26,11 +26,11 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
         try {
             await AddUserToCompany(user.email, data)
             dispatch(fetchUsers(data));
-            notifySuccess('Usuário adicionado com sucesso');
+            notifySuccess(`Usuário ${user.name} adicionado com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message || 'Erro ao adicionar usuário');
+            notifyError(err.message || `Erro ao adicionar usuário ${user.name}`);
         }
     }
 
@@ -40,11 +40,11 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
         try {
             await RemoveUserFromCompany(user.email, data)
             dispatch(removeUser(user.id))
-            notifySuccess('Usuário removido com sucesso');
+            notifySuccess(`Usuário ${user.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover usuário');
+            notifyError(err.message || `Erro ao remover usuário ${user.name}`);
         }
     }
 
