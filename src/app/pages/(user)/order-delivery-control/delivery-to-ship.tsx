@@ -34,12 +34,12 @@ const DeliveryOrderToShip = () => {
 
     useEffect(() => {
         if (data && Object.keys(ordersSlice.entities).length === 0) {
-            dispatch(fetchDeliveryOrders(data));
+            dispatch(fetchDeliveryOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchDeliveryOrders(data));
+                dispatch(fetchDeliveryOrders({ session: data }));
             }
         }, 10000); // Atualiza a cada 30 segundos
 
@@ -139,12 +139,12 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
 
     useEffect(() => {
         if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
-            dispatch(fetchDeliveryDrivers(data));
+            dispatch(fetchDeliveryDrivers({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchDeliveryDrivers(data));
+                dispatch(fetchDeliveryDrivers({ session: data }));
             }
         }, 30000); // Atualiza a cada 30 segundos
 
@@ -174,7 +174,7 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
             setError(null);
-            dispatch(fetchDeliveryOrders(data));
+            dispatch(fetchDeliveryOrders({ session: data }));
             modalHandler.hideModal("ship-delivery");
         } catch (error) {
             setError(error as RequestError);

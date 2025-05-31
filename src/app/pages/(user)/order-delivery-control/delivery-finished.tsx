@@ -31,12 +31,12 @@ const DeliveryOrderFinished = () => {
 
     useEffect(() => {
         if (data && Object.keys(deliveryOrdersSlice.entities).length === 0) {
-            dispatch(fetchDeliveryOrders(data));
+            dispatch(fetchDeliveryOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchDeliveryOrders(data));
+                dispatch(fetchDeliveryOrders({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
@@ -82,7 +82,7 @@ const DeliveryOrderFinished = () => {
                 <h3 className="text-lg font-semibold mb-2">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
-            {orderID && <ButtonIconTextFloat modalName={"show-order-"+orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders(data))}>
+            {orderID && <ButtonIconTextFloat modalName={"show-order-"+orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders({ session: data }))}>
                 <CardOrder orderId={orderID} />
             </ButtonIconTextFloat>}
         </>

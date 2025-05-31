@@ -23,12 +23,12 @@ const PageProducts = () => {
 
     useEffect(() => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
-            dispatch(fetchCategories(data));
+            dispatch(fetchCategories({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchCategories(data));
+                dispatch(fetchCategories({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
@@ -40,11 +40,11 @@ const PageProducts = () => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
         const productsByCategories = Object.values(categoriesSlice.entities)
             .map((category) => {
-                return category.products?.map(product =>  {
+                return category.products?.map(product => {
                     const size = category.sizes.find(size => size.id === product.size_id);
-                    
+
                     return {
-                        ...product, 
+                        ...product,
                         category: category,
                         size: size
                     } as Product
@@ -63,7 +63,6 @@ const PageProducts = () => {
 
     return (
         <>
-            {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
             <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
                 searchButtonChildren={
                     <SelectField

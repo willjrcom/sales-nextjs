@@ -25,12 +25,12 @@ const PageNewOrderTable = () => {
 
     useEffect(() => {
         if (data && Object.keys(placesSlice.entities).length === 0) {
-            dispatch(fetchPlaces(data));
+            dispatch(fetchPlaces({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchPlaces(data));
+                dispatch(fetchPlaces({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 

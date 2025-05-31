@@ -1,6 +1,10 @@
 import { Session } from "next-auth"
 import RequestError, { translateError } from "../utils/error"
 
+export interface GetAllResponse<T> {
+    items: T[];
+    headers: Headers;
+}
 interface RequestApiProps<T> {
     path: string;
     body?: T;
@@ -11,6 +15,7 @@ interface RequestApiProps<T> {
 
 interface Response<T> {
     data: T;
+    headers: Headers;
 }
 
 interface ResponseError {
@@ -56,7 +61,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin }: Reque
         },
         signal: AbortSignal.timeout(5000)
     });
-    
+
     if (!response.ok) {
         const body = await response.json();
         if (isLogin) {
@@ -72,8 +77,8 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin }: Reque
         throw error;
     }
 
-    const parsedBody = (await response.json()) as TR;
-    return {...parsedBody} as Response<TR>;
+    const parsedBody = (await response.json());
+    return { data: parsedBody.data, headers: response.headers } as Response<TR>;
 };
 
 const RequestExternalApi = async <T, TR>({ path, body, method, headers }: RequestApiProps<T>): Promise<TR> => {
@@ -84,7 +89,7 @@ const RequestExternalApi = async <T, TR>({ path, body, method, headers }: Reques
         signal: AbortSignal.timeout(5000),
         credentials: 'omit'
     });
-    
+
     if (!res.ok && res.status === 500) {
         const body = await res.json();
         const error = new RequestError();
@@ -98,7 +103,7 @@ const RequestExternalApi = async <T, TR>({ path, body, method, headers }: Reques
     }
 
     const parsedBody = (await res.json()) as TR;
-    return {...parsedBody};
+    return { ...parsedBody };
 };
 
 

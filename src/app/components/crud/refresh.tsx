@@ -1,4 +1,4 @@
-import { GenericState } from "@/redux/slices/generics";
+import { FetchItemsArgs, GenericState } from "@/redux/slices/generics";
 import { AppDispatch } from "@/redux/store";
 import { Session } from "next-auth";
 import { useSession } from "next-auth/react";
@@ -6,16 +6,30 @@ import { useState } from "react";
 import Loading from "../loading/Loading";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { useDispatch } from "react-redux";
+import { notifyError } from "@/app/utils/notifications";
 
-interface RefreshProps{
-    fetchItems?: (session: Session) => any;
+interface RefreshProps {
+    /**
+     * Fetch items thunk, receives session, page, perPage
+     */
+    fetchItems?: (data: FetchItemsArgs) => any;
+    /**
+     * Fetch by ID thunk
+     */
     fetchItemsByID?: (params: { id: string; session: Session }) => any;
+    /** ID for fetchItemsByID */
     id?: string;
+    /** Current page (1-based) */
+    page?: number;
+    /** Items per page */
+    perPage?: number;
+    /** Generic slice for loading and lastUpdate */
     slice: GenericState;
+    /** Hide text label */
     removeText?: boolean;
 }
 
-const Refresh = ({ fetchItems, fetchItemsByID, id, slice, removeText }: RefreshProps) => {
+const Refresh = ({ fetchItems, fetchItemsByID, id, page, perPage, slice, removeText }: RefreshProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
@@ -26,13 +40,13 @@ const Refresh = ({ fetchItems, fetchItemsByID, id, slice, removeText }: RefreshP
         setRefreshing(true);
         try {
             if (fetchItems) {
-                dispatch(fetchItems(data));
+                dispatch(fetchItems({ session: data, page: page, perPage: perPage }));
             } else if (fetchItemsByID && id) {
-                dispatch(fetchItemsByID({id, session: data}));
+                dispatch(fetchItemsByID({ id, session: data }));
 
             }
         } catch (error) {
-            console.error("Erro ao atualizar os dados:", error);
+            notifyError("Erro ao atualizar os dados:" + error);
         } finally {
             setRefreshing(false);
         }

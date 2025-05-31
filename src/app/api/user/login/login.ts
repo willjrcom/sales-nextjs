@@ -18,6 +18,7 @@ const Login = async (credencials: LoginProps): Promise<LoginResponse> => {
         body: credencials,
         isLogin: true
     });
+    console.log("aaaaaa "+ response)
     return response.data
 };
 

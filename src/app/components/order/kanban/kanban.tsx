@@ -30,12 +30,12 @@ function OrderKanban({ slice }: OrderKanbanProps) {
 
     useEffect(() => {
         if (data && Object.keys(slice.entities).length === 0) {
-            dispatch(fetchOrders(data));
+            dispatch(fetchOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchOrders(data));
+                dispatch(fetchOrders({ session: data }));
             }
         }, 30000); // Atualiza a cada 30 segundos
 
@@ -90,7 +90,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             if (!orderId || !data) return;
             try {
                 await ReadyOrder(orderId, data);
-                dispatch(fetchOrders(data));
+                dispatch(fetchOrders({ session: data }));
             } catch (error) { }
 
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
@@ -99,7 +99,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             try {
                 await FinishOrder(orderId, data);
                 moveOrder(readyOrders, "Finished");
-                dispatch(fetchOrders(data));
+                dispatch(fetchOrders({ session: data }));
             } catch (error) {
                 OpenOrder(orderId, error as RequestError);
             }

@@ -155,7 +155,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                 try {
                     await CloseTable(order.table?.id, data);
                     setError(null);
-                    dispatch(fetchTableOrders(data));
+                    dispatch(fetchTableOrders({ session: data }));
                     fetchOrder();
                 } catch (error) {
                     setError(error as RequestError);

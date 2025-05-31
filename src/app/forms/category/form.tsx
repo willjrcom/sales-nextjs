@@ -54,12 +54,12 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
     useEffect(() => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
-            dispatch(fetchCategories(data));
+            dispatch(fetchCategories({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchCategories(data));
+                dispatch(fetchCategories({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 

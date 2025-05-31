@@ -22,12 +22,12 @@ const PageCategories = () => {
     
     useEffect(() => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
-            dispatch(fetchCategories(data));
+            dispatch(fetchCategories({ session: data }));
         }
     
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchCategories(data));
+                dispatch(fetchCategories({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
     
@@ -42,7 +42,6 @@ const PageCategories = () => {
 
     return (
         <>
-            {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
             <CrudLayout title={<PageTitle title="Categorias" tooltip="Gerencie categorias de produtos, permitindo adicionar, editar ou remover." />}
                 filterButtonChildren={
                     <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>

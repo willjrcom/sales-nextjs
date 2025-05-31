@@ -1,10 +1,11 @@
-import { GenericsProps, GenericState } from './generics';
+import { FetchItemsArgs, GenericsProps, GenericState } from './generics';
 import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Update } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/utils/error';
 import Order from '@/app/entities/order/order';
 import GetOrders from '@/app/api/order/order';
+import { notifyError } from '@/app/utils/notifications';
 
 // Configuração genérica do slice
 const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
@@ -18,15 +19,15 @@ const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
     // Combina o estado inicial do adapter com estados adicionais
     const initialState = adapter.getInitialState<GenericState>({
         loading: false,
-        error: null,
+        totalCount: 0,
         lastUpdate: FormatRefreshTime(new Date()),
     });
 
     // Criar o thunk assíncrono para buscar dados
-    const fetchOrders = createAsyncThunk(`${name}/fetch`, async (session: Session, { rejectWithValue }) => {
+    const fetchOrders = createAsyncThunk(`${name}/fetch`, async ({session, page, perPage}: FetchItemsArgs, { rejectWithValue }) => {
         try {
-            const items = await getItems!(session);
-            return items;
+            const response = await getItems!(session, page, perPage);
+            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count")) || 0};
         } catch (error) {
             return rejectWithValue(error);
         }
@@ -54,13 +55,13 @@ const createOrdersSlice = ({ name, getItems }: GenericsProps<Order>) => {
                 })
                 .addCase(fetchOrders.fulfilled, (state, action) => {
                     state.loading = false;
-                    state.error = null;
-                    adapter.setAll(state, action.payload); // Substitui todos os itens
+                    adapter.setAll(state, action.payload.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
                 })
                 .addCase(fetchOrders.rejected, (state, action) => {
                     state.loading = false;
-                    state.error = action.payload as RequestError;
+                    const err = action.payload as RequestError;
+                    notifyError(err.message);
                 });
         },
     });

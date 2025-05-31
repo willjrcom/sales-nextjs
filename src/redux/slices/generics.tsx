@@ -2,18 +2,26 @@ import { createSlice, createAsyncThunk, createEntityAdapter, EntityState, Payloa
 import { Session } from 'next-auth';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/utils/error';
+import { notifyError } from '@/app/utils/notifications';
+import { GetAllResponse } from '@/app/api/request';
 
 // Estado genérico adicional
 export interface GenericState {
     loading: boolean;
-    error: RequestError | null;
+    totalCount: number;
     lastUpdate: string;
 }
 
 export interface GenericsProps<T> {
     name: string;
-    getItems?: (session: Session) => Promise<T[]>;
-    getItemsByID?: (id: string, session: Session) => Promise<T[]>;
+    getItems?: (session: Session, page?: number, perPage?: number) => Promise<GetAllResponse<T>>;
+    getItemsByID?: (id: string, session: Session) => Promise<GetAllResponse<T>>;
+}
+
+export interface FetchItemsArgs {
+    session: Session;
+    page?: number;
+    perPage?: number;
 }
 
 // Configuração genérica do slice
@@ -28,15 +36,15 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
     // Combina o estado inicial do adapter com estados adicionais
     const initialState = adapter.getInitialState<GenericState>({
         loading: false,
-        error: null,
+        totalCount: 0,
         lastUpdate: FormatRefreshTime(new Date()),
     });
 
     // Criar o thunk assíncrono para buscar dados
-    const fetchItems = createAsyncThunk(`${name}/fetch`, async (session: Session, { rejectWithValue }) => {
+    const fetchItems = createAsyncThunk(`${name}/fetch`, async ({session, page, perPage}: FetchItemsArgs, { rejectWithValue }) => {
         try {
-            const items = await getItems!(session);
-            return items;
+            const response = await getItems!(session, page, perPage);
+            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count")) || 0};
         } catch (error) {
             return rejectWithValue(error);
         }
@@ -64,13 +72,14 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
                 })
                 .addCase(fetchItems.fulfilled, (state, action) => {
                     state.loading = false;
-                    state.error = null;
-                    adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
+                    state.totalCount = action.payload.totalCount;
+                    adapter.setAll(state, action.payload.payload);
                 })
                 .addCase(fetchItems.rejected, (state, action) => {
                     state.loading = false;
-                    state.error = action.payload as RequestError;
+                    const err = action.payload as RequestError;
+                    notifyError(err.message);
                 });
         },
     });

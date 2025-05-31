@@ -20,18 +20,18 @@ const PageEmployee = () => {
     const employeesSlice = useSelector((state: RootState) => state.employees);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    
+
     useEffect(() => {
         if (data && Object.keys(employeesSlice.entities).length === 0) {
-            dispatch(fetchEmployees(data));
+            dispatch(fetchEmployees({ session: data }));
         }
-    
+
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchEmployees(data));
+                dispatch(fetchEmployees({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
-    
+
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.access_token, dispatch]);
 
@@ -40,12 +40,11 @@ const PageEmployee = () => {
             <h1>Carregando página...</h1>
         )
     }
-    
+
     const filteredEmployees = Object.values(employeesSlice.entities).filter(employee => employee.name.includes(nome)).sort((a, b) => a.name.localeCompare(b.name));
-    
+
     return (
         <>
-        {employeesSlice.error && <p className="mb-4 text-red-500">{employeesSlice.error?.message}</p>}
             <CrudLayout
                 title={<PageTitle title="Funcionários" tooltip="Gerencie funcionários, filtrando e editando registros." />}
                 searchButtonChildren={
@@ -69,8 +68,8 @@ const PageEmployee = () => {
                     />
                 }
                 tableChildren={
-                    <CrudTable 
-                        columns={EmployeeColumns()} 
+                    <CrudTable
+                        columns={EmployeeColumns()}
                         data={filteredEmployees} />
                 }
             />

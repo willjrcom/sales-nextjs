@@ -50,10 +50,10 @@ const DragAndDropGrid = () => {
 
     useEffect(() => {
         if (data && Object.values(placesSlice.entities).length == 0) {
-            dispatch(fetchPlaces(data));
+            dispatch(fetchPlaces({ session: data }));
         }
         if (data) {
-            dispatch(fetchUnusedTables(data))
+            dispatch(fetchUnusedTables({ session: data }))
         }
     }, [data?.user.access_token, dispatch])
 
@@ -234,13 +234,13 @@ const DragAndDropGrid = () => {
                 <div className="flex justify-around mb-4">
                     <div className="mr-4">
                         <div className="flex items-center justify-between">
-                            <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} optional/>
-                        <div className="flex items-center gap-2">
-                            <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-right">
-                                <PlaceForm />
-                            </ButtonIconTextFloat>
-                            <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
-                        </div>
+                            <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} optional />
+                            <div className="flex items-center gap-2">
+                                <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-right">
+                                    <PlaceForm />
+                                </ButtonIconTextFloat>
+                                <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
+                            </div>
                         </div>
                         <div className="min-h-[80vh]"
                             style={{

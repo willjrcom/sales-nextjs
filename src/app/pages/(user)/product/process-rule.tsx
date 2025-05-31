@@ -24,12 +24,12 @@ export default function PageProcessRules() {
 
     useEffect(() => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
-            dispatch(fetchCategories(data));
+            dispatch(fetchCategories({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchCategories(data));
+                dispatch(fetchCategories({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
@@ -51,11 +51,10 @@ export default function PageProcessRules() {
 
     return (
         <>
-            {categoriesSlice.error && <p className="mb-4 text-red-500">{categoriesSlice.error?.message}</p>}
             <CrudLayout title={<PageTitle title="Processos" tooltip="Defina as etapas de processamento para produtos, com ordem e tempo ideal." />}
                 searchButtonChildren={
                     <SelectField
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} optional/>
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} optional />
                 }
                 filterButtonChildren={
                     <h1>Filtro</h1>

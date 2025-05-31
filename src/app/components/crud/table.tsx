@@ -15,6 +15,14 @@ interface DataProps<T extends BaseRow> {
     setSelectedRows?: Dispatch<SetStateAction<Set<string>>>; // Opcional
     selectedRow?: string | null; // Estado para seleção única (externo)
     setSelectedRow?: Dispatch<SetStateAction<string>>; // Setter para seleção única
+    /**
+     * Callback invoked when page or pageSize changes (zero-based pageIndex)
+     */
+    onPageChange?: (pageIndex: number, pageSize: number) => void;
+    /**
+     * Total count of items (for server-side pagination)
+     */
+    totalCount?: number;
 }
 
 const CrudTable = <T extends BaseRow,>({
@@ -24,7 +32,9 @@ const CrudTable = <T extends BaseRow,>({
     selectedRows: externalSelectedRows,
     setSelectedRows: externalSetSelectedRows,
     selectedRow: externalSelectedRow,
-    setSelectedRow: externalSetSelectedRow
+    setSelectedRow: externalSetSelectedRow,
+    totalCount,
+    onPageChange,
 }: DataProps<T>) => {
     const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
     const [internalSelectedRow, setInternalSelectedRow] = useState<string | null>(null);
@@ -37,7 +47,7 @@ const CrudTable = <T extends BaseRow,>({
     const setSelectedRow = externalSetSelectedRow ?? setInternalSelectedRow;
 
     const [pageSize, setPageSize] = useState(10); // Tamanho da página
-    const [pageIndex, setPageIndex] = useState(0); // Página atual
+    const [pageIndex, setPageIndex] = useState(0); // Página atual (zero-based)
 
     const toggleRowSelection = (rowId: string) => {
         if (rowSelectionType === "checkbox") {
@@ -72,11 +82,15 @@ const CrudTable = <T extends BaseRow,>({
 
     const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
+    const pageCount = totalCount != null ? Math.ceil(totalCount / pageSize) : undefined;
+    const manualPagination = totalCount != null;
     const table = useReactTable({
         columns,
         data,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(), // Habilita paginação
+        manualPagination,
+        getPaginationRowModel: getPaginationRowModel(),
+        pageCount,
         state: {
             pagination: { pageIndex, pageSize },
         },
@@ -84,6 +98,7 @@ const CrudTable = <T extends BaseRow,>({
             const newState = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
             setPageIndex(newState.pageIndex);
             setPageSize(newState.pageSize);
+            if (onPageChange) onPageChange(newState.pageIndex, newState.pageSize);
         },
     });
 
@@ -169,7 +184,7 @@ const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRow
                     )}
                     {rowSelectionType === "radio" && (
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <input type="radio" className="form-radio" checked={isRowSelected(row.original.id)} onChange={() => toggleRowSelection(row.original.id)}/>
+                            <input type="radio" className="form-radio" checked={isRowSelected(row.original.id)} onChange={() => toggleRowSelection(row.original.id)} />
                         </th>
                     )}
                     {row.getVisibleCells().map(cell => (

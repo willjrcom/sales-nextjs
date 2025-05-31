@@ -83,12 +83,12 @@ const DragAndDropGrid = () => {
 
     useEffect(() => {
         if (data) {
-            dispatch(fetchTableOrders(data));
+            dispatch(fetchTableOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchTableOrders(data));
+                dispatch(fetchTableOrders({ session: data }));
             }
         }, 30000); // Atualiza a cada 60 segundos
 
@@ -210,7 +210,7 @@ const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: Orde
                 try {
                     const response = await NewOrderTable(tableID, data)
                     router.push('/pages/order-control/' + response.order_id)
-                    dispatch(fetchTableOrders(data));
+                    dispatch(fetchTableOrders({ session: data }));
                     setError(null);
                     onClose()
                 } catch (error) {

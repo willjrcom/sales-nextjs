@@ -1,8 +1,8 @@
 import { Session } from "next-auth";
-import RequestApi, { AddIDToken, AddAccessToken } from "../../request";
+import RequestApi, { AddIDToken, AddAccessToken, GetAllResponse } from "../../request";
 import Company from "@/app/entities/company/company";
 
-const GetUserCompanies = async (session: Session): Promise<Company[]> => {
+const GetUserCompanies = async (session: Session, page = 1, perPage = 10): Promise<GetAllResponse<Company>> => {
     let header = {}
     try {
         header = await AddAccessToken(session);
@@ -11,11 +11,12 @@ const GetUserCompanies = async (session: Session): Promise<Company[]> => {
     }
 
     const response = await RequestApi<null, Company[]>({
-        path: "/user/companies",
+        path: `/user/companies?page=${page}&per_page=${perPage}`,
         method: "GET",
         headers: header,
     });
-    return response.data
+    
+    return { items: response.data, headers: response.headers }
 };
 
 export default GetUserCompanies

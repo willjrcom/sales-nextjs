@@ -1,14 +1,14 @@
 import Category from "@/app/entities/category/category";
-import RequestApi, { AddAccessToken } from "../request";
+import RequestApi, { AddAccessToken, GetAllResponse } from "../request";
 import { Session } from "next-auth";
 
-const GetCategories = async (session: Session): Promise<Category[]> => {
+const GetCategories = async (session: Session): Promise<GetAllResponse<Category>> => {
     const response = await RequestApi<null, Category[]>({
-        path: "/product-category/all", 
+        path: "/product-category/all",
         method: "GET",
         headers: await AddAccessToken(session),
     });
-    return response.data
+    return { items: response.data, headers: response.headers }
 };
 
 export default GetCategories

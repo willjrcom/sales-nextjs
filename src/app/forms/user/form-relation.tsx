@@ -25,7 +25,7 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
 
         try {
             await AddUserToCompany(user.email, data)
-            dispatch(fetchUsers(data));
+            dispatch(fetchUsers({ session: data }));
             notifySuccess(`Usuário ${user.name} adicionado com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {

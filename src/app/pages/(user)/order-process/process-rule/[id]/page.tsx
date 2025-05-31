@@ -105,7 +105,6 @@ const Component = () => {
 
     return (
         <>
-            {orderProcessesSlice.error && <p className="mb-4 text-red-500">{orderProcessesSlice.error?.message}</p>}
             <CrudLayout title={
                 processRule.name ?
                     <PageTitle title={processRule.name} tooltip="Exibe e gerencia os pedidos em execução nesta etapa do processo." /> :

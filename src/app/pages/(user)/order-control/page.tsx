@@ -20,12 +20,12 @@ const PageOrder = () => {
 
     useEffect(() => {
         if (data && Object.keys(ordersSlice.entities).length === 0) {
-            dispatch(fetchOrders(data));
+            dispatch(fetchOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchOrders(data));
+                dispatch(fetchOrders({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 

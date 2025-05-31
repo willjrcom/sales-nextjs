@@ -24,12 +24,12 @@ const PageUser = () => {
 
     useEffect(() => {
         if (data && Object.keys(usersSlice.entities).length === 0) {
-            dispatch(fetchUsers(data));
+            dispatch(fetchUsers({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchUsers(data));
+                dispatch(fetchUsers({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 

@@ -21,6 +21,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { fetchUserCompanies } from '@/redux/slices/user-companies';
 import Company from '@/app/entities/company/company';
 import Refresh from '@/app/components/crud/refresh';
+import { FetchItemsArgs } from '@/redux/slices/generics';
 
 export default function Page() {
     return (
@@ -47,7 +48,7 @@ function CompanySelection() {
 
     useEffect(() => {
         if (data && Object.keys(userCompaniesSlice.entities).length === 0) {
-            dispatch(fetchUserCompanies(data));
+            dispatch(fetchUserCompanies({ session: data } as FetchItemsArgs));
         }
     }, [data?.user.access_token, dispatch]);
 
@@ -96,11 +97,11 @@ function CompanySelection() {
                 },
             })
 
-            dispatch(fetchClients(data))
-            dispatch(fetchCategories(data))
-            dispatch(fetchDeliveryDrivers(data))
-            dispatch(fetchEmployees(data))
-            dispatch(fetchPlaces(data))
+            dispatch(fetchClients({ session: data } as FetchItemsArgs))
+            dispatch(fetchCategories({ session: data, page: 1, perPage: 1000 } as FetchItemsArgs))
+            dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs))
+            dispatch(fetchEmployees({ session: data } as FetchItemsArgs))
+            dispatch(fetchPlaces({ session: data, page: 1, perPage: 100 } as FetchItemsArgs))
 
             router.push('/pages/new-order');
             setSelecting(false);
@@ -158,7 +159,7 @@ function CompanySelection() {
                         </button>
                     ))}
                 </div>
-            ) )}
+            ))}
 
             <button onClick={newCompany}>
                 <div className="fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max"

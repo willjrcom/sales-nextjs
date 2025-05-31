@@ -39,12 +39,12 @@ const DeliveryOrderToFinish = () => {
 
     useEffect(() => {
         if (data && Object.keys(deliveryOrdersSlice.entities).length === 0) {
-            dispatch(fetchDeliveryOrders(data));
+            dispatch(fetchDeliveryOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchDeliveryOrders(data));
+                dispatch(fetchDeliveryOrders({ session: data }));
             }
         }, 10000); // Atualiza a cada 30 segundos
 
@@ -127,7 +127,7 @@ const DeliveryOrderToFinish = () => {
                 </div>
             </div>
             {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
-                <FinishDelivery deliveryID={selectedDeliveryID} orderID={orderID}/>
+                <FinishDelivery deliveryID={selectedDeliveryID} orderID={orderID} />
             </ButtonIconTextFloat>}
         </>
     )
@@ -170,7 +170,7 @@ const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
         try {
             await DeliveryOrderDelivery(deliveryID, data);
             setError(null);
-            dispatch(fetchDeliveryOrders(data));
+            dispatch(fetchDeliveryOrders({ session: data }));
             modalHandler.hideModal("finish-delivery");
             showOrder(orderID)
         } catch (error) {
@@ -180,7 +180,7 @@ const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
 
     return (
         <>
-        <div className="items-center mb-4">
+            <div className="items-center mb-4">
                 <p className="text-sm text-gray-600">Confirma que a entrega foi finalizada?</p>
             </div>
             {error && <p className="text-red-500 mb-4">{error.message}</p>}

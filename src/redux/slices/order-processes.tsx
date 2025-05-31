@@ -5,6 +5,7 @@ import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import RequestError from '@/app/utils/error';
 import OrderProcess from '@/app/entities/order-process/order-process';
 import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
+import { notifyError } from '@/app/utils/notifications';
 
 const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderProcess>) => {
     const adapter = createEntityAdapter<OrderProcess, string>({
@@ -17,15 +18,15 @@ const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderPr
     // Combina o estado inicial do adapter com estados adicionais
     const initialState = adapter.getInitialState<GenericState>({
         loading: false,
-        error: null,
+        totalCount: 0,
         lastUpdate: FormatRefreshTime(new Date()),
     });
 
     // Criar o thunk assíncrono para buscar dados
     const fetchOrderProcesses = createAsyncThunk(`${name}/fetch`, async (payload: { id: string; session: Session }, { rejectWithValue }) => {
         try {
-            const items = await getItemsByID!(payload.id, payload.session);
-            return items;
+            const response = await getItemsByID!(payload.id, payload.session);
+            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count")) || 0};
         } catch (error) {
             return rejectWithValue(error);
         }
@@ -53,13 +54,13 @@ const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderPr
                 })
                 .addCase(fetchOrderProcesses.fulfilled, (state, action) => {
                     state.loading = false;
-                    state.error = null;
-                    adapter.setAll(state, action.payload); // Substitui todos os itens
                     state.lastUpdate = FormatRefreshTime(new Date());
+                    adapter.setAll(state, action.payload.payload); // Substitui todos os itens
                 })
                 .addCase(fetchOrderProcesses.rejected, (state, action) => {
                     state.loading = false;
-                    state.error = action.payload as RequestError;
+                    const err = action.payload as RequestError;
+                    notifyError(err.message);
                 });
         },
     });

@@ -15,24 +15,25 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
 import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
-import RequestError from "@/app/utils/error";
+import { FetchItemsArgs } from "@/redux/slices/generics";
 
 const PageDeliveryDriver = () => {
     const [nome, setNome] = useState<string>("");
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const [drivers, setDrivers] = useState<DeliveryDriver[]>([]);
-    const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
+    const [pageIndex, setPageIndex] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
         if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
-            dispatch(fetchDeliveryDrivers(data));
+            dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs));
         }
 
         const interval = setInterval(() => {
             if (data) {
-                dispatch(fetchDeliveryDrivers(data));
+                dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
@@ -49,7 +50,6 @@ const PageDeliveryDriver = () => {
 
     return (
         <>
-            {deliveryDriversSlice.error && <p className="mb-4 text-red-500">{deliveryDriversSlice.error?.message}</p>}
             <CrudLayout
                 title={<PageTitle title="Motoboys" tooltip="Gerencie motoboys e atribua entregas." />}
                 searchButtonChildren={
@@ -75,7 +75,13 @@ const PageDeliveryDriver = () => {
                 tableChildren={
                     <CrudTable
                         columns={DeliveryDriverColumns()}
-                        data={filteredDrivers} />
+                        data={filteredDrivers}
+                        totalCount={deliveryDriversSlice.totalCount}
+                        onPageChange={(newPage, newSize) => {
+                            setPageIndex(newPage);
+                            setPageSize(newSize);
+                        }}
+                    />
                 }
             />
         </>
