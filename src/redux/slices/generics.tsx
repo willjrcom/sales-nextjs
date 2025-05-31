@@ -44,7 +44,7 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
     const fetchItems = createAsyncThunk(`${name}/fetch`, async ({session, page, perPage}: FetchItemsArgs, { rejectWithValue }) => {
         try {
             const response = await getItems!(session, page, perPage);
-            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count")) || 0};
+            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count"))};
         } catch (error) {
             return rejectWithValue(error);
         }

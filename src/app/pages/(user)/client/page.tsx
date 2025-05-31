@@ -20,14 +20,14 @@ const PageClient = () => {
     const clientsSlice = useSelector((state: RootState) => state.clients);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const [pageIndex, setPageIndex] = useState(0);
+    const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
-        if (data && Object.keys(clientsSlice.entities).length === 0) {
+        if (data) {
             dispatch(fetchClients({ session: data, page: pageIndex, perPage: pageSize }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data, dispatch, pageIndex, pageSize]);
 
     return (
         <>
@@ -57,9 +57,9 @@ const PageClient = () => {
                         columns={ClientColumns()}
                         data={Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name))}
                         totalCount={clientsSlice.totalCount}
-                        onPageChange={(pageIndex, pageSize) => {
-                            setPageIndex(pageIndex);
-                            setPageSize(pageSize);
+                        onPageChange={(newPageIndex, newPageSize) => {
+                            setPageIndex(newPageIndex + 1);
+                            setPageSize(newPageSize);
                         }}>
                     </CrudTable>
                 }

@@ -46,7 +46,7 @@ const CrudTable = <T extends BaseRow,>({
     const selectedRow = externalSelectedRow ?? internalSelectedRow;
     const setSelectedRow = externalSetSelectedRow ?? setInternalSelectedRow;
 
-    const [pageSize, setPageSize] = useState(10); // Tamanho da página
+    const [pageSize, setPageSize] = useState(10); // Items por página
     const [pageIndex, setPageIndex] = useState(0); // Página atual (zero-based)
 
     const toggleRowSelection = (rowId: string) => {
@@ -82,8 +82,10 @@ const CrudTable = <T extends BaseRow,>({
 
     const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
-    const pageCount = totalCount != null ? Math.ceil(totalCount / pageSize) : undefined;
-    const manualPagination = totalCount != null;
+    // Server-side pagination if totalCount is provided and positive
+    const hasServerPagination = totalCount != null && totalCount > 0;
+    const pageCount = hasServerPagination ? Math.ceil(totalCount / pageSize) : undefined;
+    const manualPagination = hasServerPagination;
     const table = useReactTable({
         columns,
         data,
