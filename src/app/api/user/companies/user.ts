@@ -2,7 +2,7 @@ import { Session } from "next-auth";
 import RequestApi, { AddIDToken, AddAccessToken, GetAllResponse } from "../../request";
 import Company from "@/app/entities/company/company";
 
-const GetUserCompanies = async (session: Session, page = 1, perPage = 10): Promise<GetAllResponse<Company>> => {
+const GetUserCompanies = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Company>> => {
     let header = {}
     try {
         header = await AddAccessToken(session);

@@ -2,7 +2,7 @@ import Order from "@/app/entities/order/order";
 import RequestApi, { AddAccessToken, GetAllResponse } from "../../../request";
 import { Session } from "next-auth";
 
-const GetOrdersWithDelivery = async (session: Session, page: number = 1, perPage: number = 10): Promise<GetAllResponse<Order>> => {
+const GetOrdersWithDelivery = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Order>> => {
     const response = await RequestApi<null, Order[]>({
         path: "/order/all/delivery", 
         method: "GET",
