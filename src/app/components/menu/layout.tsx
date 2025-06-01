@@ -30,8 +30,8 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         </div>
         <div className="flex-1 flex flex-col ml-52">
           <Topbar />
-          <main className="p-4 h-[89vh] min-w-0 flex justify-center w-full">
-            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-full">
+        <main className="p-4 h-[89vh] min-w-0 flex justify-center w-full">
+            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-full h-full box-border">
               {children}
             </div>
           </main>

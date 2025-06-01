@@ -9,6 +9,7 @@ import { RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { notifyError } from '@/app/utils/notifications';
 
 interface ItemAdditional {
     name: string;
@@ -43,7 +44,6 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
 
 const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     const [additionalItemsToAdd, setAdditionalItems] = useState<ItemAdditional[]>([]);
-    const [error, setError] = useState<RequestError | null>(null);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
@@ -82,8 +82,8 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             // Atualiza o estado com os itens convertidos
             setAdditionalItems(items);
 
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error : RequestError | any) {
+            notifyError(error);
         }
     }, [item.id]);
 
@@ -91,16 +91,15 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         if (!data) return
 
         const categoryFound = categoriesSlice.entities[clickedItem.category_id]
-        if (!categoryFound) return setError(new RequestError("Categoria indisponivel"))
+        if (!categoryFound) return notifyError("Categoria indisponivel")
 
         const quantityFound = categoryFound?.quantities.find(quantity => quantity.quantity === clickedItem.quantity)
-        if (!quantityFound) return setError(new RequestError("Quantidade indisponivel"))
+        if (!quantityFound) return notifyError("Quantidade indisponivel")
 
         try {
             clickedItem.additional_item_id = await NewAdditionalItem(item.id, { product_id: clickedItem.product_id, quantity_id: quantityFound?.id }, data)
-            setError(null)
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error)
         }
 
         // Update additional items to add
@@ -111,7 +110,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     }
 
     const handleIncrement = (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 5) return setError(new RequestError("Maximo de 5 itens adicionais"))
+        if (clickedItem.quantity === 5) return notifyError("Maximo de 5 itens adicionais")
 
         clickedItem.quantity += 1
 
@@ -129,7 +128,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     };
 
     const handleDecrement = async (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 0 || !data) return setError(new RequestError("Minimo de 5 itens adicionais"))
+        if (clickedItem.quantity === 0 || !data) return notifyError("Minimo de 5 itens adicionais")
 
         clickedItem.quantity -= 1
 
@@ -149,14 +148,13 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             return
         }
 
-        if (!clickedItem.additional_item_id) return setError(new RequestError("Item indisponivel"))
+        if (!clickedItem.additional_item_id) return notifyError("Item indisponivel")
 
         // Delete additional item
         try {
             await DeleteAdditionalItem(clickedItem.additional_item_id, data)
-            setError(null)
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error)
         }
 
         // Update additional item from Item
@@ -204,7 +202,6 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             <br className="my-4" />
             <h4 className="text-2md font-bold">Itens adicionais</h4>
             <hr className='my-4' />
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}
                 {additionalItemsToAdd.length === 0 && <p className="text-gray-500">Nenhum item disponível</p>}

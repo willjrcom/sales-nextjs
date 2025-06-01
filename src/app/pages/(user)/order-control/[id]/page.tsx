@@ -28,12 +28,10 @@ const PageEditOrderControl = () => {
         getOrder();
     }, [data?.user.access_token]);
 
-    return (
-        <div className="flex h-full bg-gray-100">
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+    return (<>
             <CartAdded />
             <CardOrderResume />
-        </div>
+    </>
     );
 }
 export default PageEditOrderControl

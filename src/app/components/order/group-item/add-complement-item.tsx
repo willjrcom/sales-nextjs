@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Decimal from "decimal.js";
+import { notifyError } from "@/app/utils/notifications";
 
 interface ComplementCardProps {
     groupItem?: GroupItem | null;
@@ -17,7 +18,6 @@ interface ComplementCardProps {
 
 const AddComplementCard = ({ groupItem, product }: ComplementCardProps) => {
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const contextGroupItem = useGroupItem();
     const modalHandler = useModal();
 
@@ -26,11 +26,10 @@ const AddComplementCard = ({ groupItem, product }: ComplementCardProps) => {
 
         try {
             await NewComplementGroupItem(groupItem?.id || "", product.id, data)
-            setError(null)
             contextGroupItem.fetchData(groupItem?.id || "")
             modalHandler.hideModal("add-complement-item-group-item-" + groupItem?.id)
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao adicionar complemento");
         }
     }
 
@@ -69,8 +68,6 @@ const AddComplementCard = ({ groupItem, product }: ComplementCardProps) => {
                 <h2 className="font-bold text-lg mb-1">{product.name}</h2>
                 <p className="text-gray-600 mb-2">R$ {new Decimal(product.price).toFixed(2)}</p>
             </div>
-
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
 
             {/* Tamanhos e botão */}
             <div className="flex items-center justify-between space-x-2">

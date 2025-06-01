@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import ButtonIconTextFloat from "../../button/button-float";
 import EditGroupItem from "../group-item/edit-group-item";
@@ -29,21 +31,21 @@ export const CartAdded = () => {
     if (!order) return null
 
     return (
-        <div className="bg-white w-4/5">
-            <div className=" mb-2">
+        <div className="flex flex-col flex-1 w-full min-w-0 box-border bg-white h-full overflow-x-hidden">
+            <div className="mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
                     <ButtonIconTextFloat size="xl"
                         position="bottom-right"
-                        title="Novo grupo de itens" 
-                        modalName="edit-group-item" 
+                        title="Novo grupo de itens"
+                        modalName="edit-group-item"
                         onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
                         <EditGroupItem />
                     </ButtonIconTextFloat>
                 </div>
             </div>
 
-            <div className="overflow-y-auto overflow-x-auto h-[76vh]">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
                 {Object.entries(groupedItems).map(([key, groupItems], index) => {
                     if (Object.values(categoriesSlice.entities).length === 0) return
                     const category = categoriesSlice.entities[key]

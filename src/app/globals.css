@@ -49,3 +49,8 @@ body {
   background-color: #333; /* Cor de fundo (substitua pela cor desejada) */
   color: #fff; /* Cor do texto (substitua pela cor desejada) */
 }
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}

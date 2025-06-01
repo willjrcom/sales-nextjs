@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react"
 import { useCurrentOrder } from "@/app/context/current-order/context"
 import Order from "@/app/entities/order/order"
@@ -17,19 +18,36 @@ import Decimal from 'decimal.js';
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
     }, [contextCurrentOrder.order])
 
     return (
-        <div className="w-1/5 bg-gray-50 p-3 overflow-y-auto">
+        <>
+            <button
+                type="button"
+                onClick={() => setIsOpen(prev => !prev)}
+                className={`fixed top-1/2 transform -translate-y-1/2 z-50 [writing-mode:vertical-rl] rotate-180 cursor-pointer focus:outline-none bg-blue-500 text-white p-2 rounded-l-md transition-all duration-300 ${isOpen ? 'right-[30vw]' : 'right-0'}`}
+            >
+                Resumo
+            </button>
 
-            <OrderPaymentsResume />
-            {order?.delivery && <DeliveryCard />}
-            {order?.pickup && <PickupCard />}
-            {order?.table && <TableCard />}
-        </div>
+            <div className="fixed right-0 top-0 h-full z-40">
+                <div className={`h-full bg-blue-500 text-white overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-[30vw]' : 'w-0'} origin-right`}>
+                    {isOpen && (
+                        <div className="p-4 text-black">
+                            <h2 className="text-lg font-bold text-white">Resumo</h2>
+                            <OrderPaymentsResume />
+                            {order?.delivery && <DeliveryCard />}
+                            {order?.pickup && <PickupCard />}
+                            {order?.table && <TableCard />}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </>
     );
 };
 

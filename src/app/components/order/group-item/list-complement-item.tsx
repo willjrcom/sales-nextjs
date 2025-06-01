@@ -6,6 +6,7 @@ import AddComplementCard from './add-complement-item';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import RequestError from '@/app/utils/error';
+import { notifyError } from '@/app/utils/notifications';
 
 interface ItemListProps {
     groupItem?: GroupItem | null;
@@ -14,7 +15,6 @@ interface ItemListProps {
 const ComplementItemList = ({ groupItem }: ItemListProps) => {
     const [complementItems, setComplementItems] = useState<Product[]>([]);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const [error, setError] = useState<RequestError | null>(null);
 
     useEffect(() => {
         try {
@@ -46,8 +46,8 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
 
             const validSizeItems = validItems.filter(item => item.size.name === groupItem.size);
             setComplementItems(validSizeItems);
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error)
             setComplementItems([]);
         }
     }, [groupItem?.id]);
@@ -55,7 +55,6 @@ const ComplementItemList = ({ groupItem }: ItemListProps) => {
     return (
         <div>
             <br className="my-4" />
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {complementItems.length === 0 && <p className="text-gray-500">Nenhum produto disponível</p>}
                 <Carousel items={complementItems}>

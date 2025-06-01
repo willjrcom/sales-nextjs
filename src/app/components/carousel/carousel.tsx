@@ -1,6 +1,4 @@
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+"use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 
@@ -11,8 +9,9 @@ interface CarouselProps<T> {
 
 const Carousel = <T extends { id: string }>({ items, children }: CarouselProps<T>) => {
     return (
-        <Swiper
-        className="w-full"
+        <div className="w-full max-w-full overflow-hidden box-border">
+            <Swiper
+                className="w-full max-w-full"
             modules={[Navigation, Pagination, A11y]}
             navigation
             pagination={{ clickable: true, dynamicBullets: true }}
@@ -40,6 +39,7 @@ const Carousel = <T extends { id: string }>({ items, children }: CarouselProps<T
                 <SwiperSlide key={item.id}>{children(item)}</SwiperSlide>
             ))}
         </Swiper>
+        </div>
     );
 };
 

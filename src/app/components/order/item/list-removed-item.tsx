@@ -7,6 +7,7 @@ import { RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { notifyError } from '@/app/utils/notifications';
 
 interface ItemListProps {
     item: Item;
@@ -15,7 +16,6 @@ interface ItemListProps {
 const RemovedItemList = ({ item }: ItemListProps) => {
     const [removableItems, setRemovableItems] = useState<string[]>([]);
     const [removedItems, setRemovedItems] = useState<string[]>(item.removed_items || []);
-    const [error, setError] = useState<RequestError | null>(null);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
@@ -31,8 +31,8 @@ const RemovedItemList = ({ item }: ItemListProps) => {
             // Atualiza o estado com os itens convertidos
             setRemovableItems(category.removable_ingredients);
 
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error);
         }
     }, [item.category_id, categoriesSlice]);
 
@@ -42,9 +42,8 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         try {
             await AddRemovedItem(item.id, name, data);
             setRemovedItems((prev) => [...prev, name]); // Adiciona o item ao estado local
-            setError(null);
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error);
         }
     };
 
@@ -54,9 +53,8 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         try {
             await RemoveRemovedItem(item.id, name, data);
             setRemovedItems((prev) => prev.filter((item) => item !== name)); // Remove o item do estado local
-            setError(null);
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error);
         }
     };
 
@@ -95,7 +93,6 @@ const RemovedItemList = ({ item }: ItemListProps) => {
             <br className="my-4" />
             <h4 className="text-2md font-bold">Itens a remover</h4>
             <hr className='my-4' />
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
             <div className="space-y-4">
                 {removableItems?.map((removableItem) => <RemovedItemCard key={removableItem} item={removableItem} />)}
                 {(!removableItems || removableItems?.length === 0) && <p className="text-gray-500">Nenhum item disponível</p>}

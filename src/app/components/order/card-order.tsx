@@ -20,6 +20,7 @@ import CloseTable from "@/app/api/order-table/status/finish/order-table";
 import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
+import { notifyError } from "@/app/utils/notifications";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -29,8 +30,6 @@ interface CardOrderProps {
 const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
-    const [error, setError] = useState<RequestError | null>(null);
-    const [errorPayment, setErrorPayment] = useState<RequestError | null>(errorRequest || null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
@@ -40,9 +39,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
         try {
             await contextCurrentOrder.fetchData(orderId);
-            setError(null);
         } catch (error) {
-            setError(error as RequestError);
             setOrder(null);
         }
     };
@@ -56,11 +53,10 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
         try {
             await ReadyOrder(order.id, data);
-            setError(null);
-            setErrorPayment(null);
             fetchOrder();
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || "Erro ao marcar como pronto");
         }
 
         modalHandler.hideModal("ready-order-" + order.id);
@@ -71,11 +67,10 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
         try {
             await FinishOrder(order.id, data);
-            setError(null);
-            setErrorPayment(null);
             fetchOrder();
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || "Erro ao marcar como finalizado");
         }
 
         modalHandler.hideModal("finish-order-" + order.id);
@@ -86,11 +81,10 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
         try {
             await CancelOrder(order.id, data);
-            setError(null);
-            setErrorPayment(null);
             fetchOrder();
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message || "Erro ao cancelar pedido");
         }
 
         modalHandler.hideModal("cancel-order-" + order.id);
@@ -154,11 +148,11 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
                 try {
                     await CloseTable(order.table?.id, data);
-                    setError(null);
                     dispatch(fetchTableOrders({ session: data }));
                     fetchOrder();
                 } catch (error) {
-                    setError(error as RequestError);
+                    const err = error as RequestError;
+                    notifyError(err.message || "Erro ao fechar mesa");
                 }
             }
 
@@ -207,8 +201,6 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-            {error && error.message != errorPayment?.message && <p className="mb-4 text-red-500">{error.message}</p>}
-            {errorPayment && <p className="mb-4 text-red-500">{errorPayment.message}</p>}
 
             {/* Layout Responsivo */}
             <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 mb-6">
@@ -343,13 +335,11 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                 )}
             </div>
 
-            {error && error.message != errorPayment?.message && <p className="mb-4 text-red-500">{error.message}</p>}
-            {errorPayment && <p className="mb-4 text-red-500">{errorPayment.message}</p>}
 
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
-                {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" onCloseModal={() => setErrorPayment(null)}>
-                    <PaymentForm setOrderPaymentError={setErrorPayment} setOrderError={setError} />
+                {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
+                    <PaymentForm />
                 </ButtonIconText>}
 
                 {isOrderStatusFinished && <div>&nbsp;</div>}

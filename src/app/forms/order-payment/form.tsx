@@ -16,11 +16,9 @@ import { useCurrentOrder } from '@/app/context/current-order/context';
 import Order from '@/app/entities/order/order';
 
 interface PaymentFormProps extends CreateFormsProps<PaymentOrder> {
-    setOrderPaymentError: (error: RequestError | null) => void;
-    setOrderError: (error: RequestError | null) => void;
 }
 
-const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: PaymentFormProps) => {
+const PaymentForm = ({ item, isUpdate,  }: PaymentFormProps) => {
     const modalName = isUpdate ? 'edit-payment-' + item?.id : 'add-payment'
     const modalHandler = useModal();
     const [payment, setPayment] = useState<PaymentOrder>(item || new PaymentOrder());
@@ -43,15 +41,12 @@ const PaymentForm = ({ item, isUpdate, setOrderPaymentError, setOrderError }: Pa
 
         try {
             await PayOrder(payment, data)
-            setOrderPaymentError(null);
-            setOrderError(null);
 
             contextCurrentOrder.fetchData(order.id);
             notifySuccess('Pagamento realizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
-            setOrderPaymentError(err);
             notifyError(err.message || 'Erro ao processar pagamento');
         }
     }

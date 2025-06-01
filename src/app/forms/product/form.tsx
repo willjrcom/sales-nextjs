@@ -32,7 +32,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [uploading, setUploading] = useState<boolean>(false);
     const dispatch = useDispatch<AppDispatch>();
@@ -77,7 +76,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             const url = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
             handleInputChange('image_path', url);
         } catch (e: any) {
-            setError(new RequestError(e.message || 'Erro ao enviar imagem'));
+            notifyError(e.message || 'Erro ao enviar imagem');
         } finally {
             setUploading(false);
         }
@@ -90,24 +89,38 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         try {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
-            setError(null);
 
             product.category = category;
             product.size = size;
 
             if (!isUpdate) {
                 product.id = response
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { products: [...category.products, product] } } }));
+                dispatch(updateCategory({
+                    type: "UPDATE",
+                    payload: {
+                        id: category.id,
+                        changes: {
+                            products: [...(category.products ?? []), product]
+                        }
+                    }
+                }));
                 notifySuccess(`Produto ${product.name} criado com sucesso`);
             } else {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { products: category.products.map(p => p.id === product.id ? product : p) } } }));
+                dispatch(updateCategory({
+                    type: "UPDATE",
+                    payload: {
+                        id: category.id,
+                        changes: {
+                            products: (category.products ?? []).map(p => p.id === product.id ? product : p)
+                        }
+                    }
+                }));
                 notifySuccess(`Produto ${product.name} atualizado com sucesso`);
             }
             modalHandler.hideModal(modalName);
 
         } catch (error) {
             const err = error as RequestError;
-            setError(err);
             notifyError(err.message || 'Erro ao salvar produto');
         }
     }
@@ -115,7 +128,15 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const onDelete = async () => {
         if (!data) return;
         DeleteProduct(product.id, data);
-        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { products: category.products.filter(p => p.id !== product.id) } } }));
+        dispatch(updateCategory({
+            type: "UPDATE",
+            payload: {
+                id: category.id,
+                changes: {
+                    products: (category.products ?? []).filter(p => p.id !== product.id)
+                }
+            }
+        }));
         modalHandler.hideModal(modalName);
         notifySuccess(`Produto ${product.name} removido com sucesso`);
     }
@@ -139,8 +160,8 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 }
                 setRecordCategories(records);
 
-            } catch (error) {
-                setError(error as RequestError);
+            } catch (error: RequestError | any) {
+                notifyError(error);
             }
         }
 
@@ -168,8 +189,8 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
                 setRecordSizes(records);
 
-            } catch (error) {
-                setError(error as RequestError);
+            } catch (error: RequestError | any) {
+                notifyError(error);
             }
         }
 
@@ -206,7 +227,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id} />
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal item={product} name='produto' onSubmit={submit} deleteItem={onDelete} />
         </>

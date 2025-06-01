@@ -22,6 +22,7 @@ import { fetchUserCompanies } from '@/redux/slices/user-companies';
 import Company from '@/app/entities/company/company';
 import Refresh from '@/app/components/crud/refresh';
 import { FetchItemsArgs } from '@/redux/slices/generics';
+import { notifyError } from '@/app/utils/notifications';
 
 export default function Page() {
     return (
@@ -38,7 +39,6 @@ export default function Page() {
 function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [companies, setCompanies] = useState<Company[]>([]);
     const userCompaniesSlice = useSelector((state: RootState) => state.userCompanies);
     const dispatch = useDispatch<AppDispatch>();
@@ -61,17 +61,17 @@ function CompanySelection() {
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
 
         if (!schemaName) {
-            setError(new RequestError('Schema inválido!'));
+            notifyError('Schema inválido!');
             return;
         }
 
         if (!data) {
-            setError(new RequestError('Sessão inválida!'));
+            notifyError('Sessão inválida!');
             return;
         }
 
         if (!data.user?.id) {
-            setError(new RequestError('Token ID inválido!'));
+            notifyError('Token ID inválido!');
             return;
         }
 
@@ -105,9 +105,9 @@ function CompanySelection() {
 
             router.push('/pages/new-order');
             setSelecting(false);
-            setError(null);
         } catch (error) {
-            setError(error as RequestError);
+            const err = error as RequestError;
+            notifyError(err.message);
             setSelecting(false);
         }
     }
@@ -122,7 +122,6 @@ function CompanySelection() {
 
     return (
         <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             {loadingCompanies && (
                 <div className="flex justify-center items-center h-64 mb-10">
                     <Loading />

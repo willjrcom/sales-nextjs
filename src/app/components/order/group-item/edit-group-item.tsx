@@ -1,3 +1,5 @@
+"use client";
+
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useEffect, useState } from "react";
 import ItemCard from "../item/card-item";

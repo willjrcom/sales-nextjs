@@ -1,3 +1,4 @@
+"use client";
 import GroupItem from "@/app/entities/order/group-item"
 import Category from "@/app/entities/category/category";
 import Decimal from 'decimal.js';
@@ -11,7 +12,7 @@ interface CategoryOrderProps {
 
 const CategoryOrder = ({ groupItems, category }: CategoryOrderProps) => {
     return (
-        <div className="mb-6 bg-gray-100 p-4">
+        <div className="mb-6 bg-gray-100 p-4 box-border overflow-x-hidden w-full max-w-[70vw]">
             {/* Título da categoria com botão de edição */}
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">{category.name}</h2>
@@ -25,16 +26,12 @@ const CategoryOrder = ({ groupItems, category }: CategoryOrderProps) => {
             <hr />
             <br />
 
-            {/* Container para grupos com scroll horizontal */}
-            <div className="overflow-x-auto">
-                <div className=" space-x-4">
-                    <Carousel items={groupItems}>
-                        {(group) => (
-                            <GroupItemCard key={group.id} groupItem={group} />
-                        )}
-                    </Carousel>
-                </div>
-            </div>
+            {/* Carousel de grupos de itens */}
+            <Carousel items={groupItems}>
+                {(group) => (
+                    <GroupItemCard key={group.id} groupItem={group} />
+                )}
+            </Carousel>
         </div>
     );
 };

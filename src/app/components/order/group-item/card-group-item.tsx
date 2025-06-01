@@ -1,3 +1,4 @@
+"use client";
 import GroupItem from "@/app/entities/order/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
 import ButtonIcon from "../../button/button-icon";
@@ -21,8 +22,8 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     contextGroupItem.updateGroupItem(groupItem);
   }
 
-  return (
-    <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200">
+    return (
+    <div className="w-[30vw] p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200">
       {/* Header */}
       <div className="flex justify-between items-center">
         <StatusComponent status={groupItem.status} />

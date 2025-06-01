@@ -40,19 +40,15 @@ const PageProducts = () => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
         const productsByCategories = Object.values(categoriesSlice.entities)
             .map((category) => {
-                return category.products?.map(product => {
-                    const size = category.sizes.find(size => size.id === product.size_id);
-
+                return category.products?.map(product => {;
                     return {
                         ...product,
                         category: category,
-                        size: size
                     } as Product
                 }) || []
             }).flat();
 
         setProducts(productsByCategories)
-        setCategoryID(Object.values(categoriesSlice.entities)[0].id)
     }, [categoriesSlice.entities]);
 
     if (categoriesSlice.loading) {
