@@ -82,10 +82,18 @@ const CrudTable = <T extends BaseRow,>({
 
     const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
-    // Server-side pagination if totalCount is provided and positive
-    const hasServerPagination = totalCount != null && totalCount > 0;
-    const pageCount = hasServerPagination ? Math.ceil(totalCount / pageSize) : undefined;
-    const manualPagination = hasServerPagination;
+    // Determine mode: server-side if onPageChange callback is provided
+    const isServerPagination = typeof onPageChange === 'function';
+    // Total count provided for server-side pagination
+    const hasTotalCount = totalCount != null && totalCount > 0;
+    // Compute total pages:
+    // - Server-side with totalCount: use provided totalCount
+    // - Server-side without totalCount: leave undefined (unknown pages)
+    // - Client-side: derive from data length
+    const pageCount = isServerPagination
+        ? (hasTotalCount ? Math.ceil(totalCount / pageSize) : undefined)
+        : Math.ceil(data.length / pageSize);
+    const manualPagination = isServerPagination;
     const table = useReactTable({
         columns,
         data,
@@ -166,13 +174,15 @@ interface TBodyProps<T extends BaseRow> {
 }
 
 const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected }: TBodyProps<T>) => {
-    if (table.getRowModel().rows.length === 0) {
+    const { pageIndex, pageSize } = table.getState().pagination;
+    const allRows = table.getRowModel().rows;
+    const pagedRows = allRows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+    if (pagedRows.length === 0) {
         return noResults({ columns });
     }
-
     return (
         <tbody className="bg-white divide-y divide-gray-200">
-            {table.getRowModel().rows.map(row => (
+            {pagedRows.map(row => (
                 <tr key={row.original.id} className="hover:bg-gray-100">
                     {rowSelectionType === "checkbox" && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -186,7 +196,12 @@ const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRow
                     )}
                     {rowSelectionType === "radio" && (
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <input type="radio" className="form-radio" checked={isRowSelected(row.original.id)} onChange={() => toggleRowSelection(row.original.id)} />
+                            <input
+                                type="radio"
+                                className="form-radio"
+                                checked={isRowSelected(row.original.id)}
+                                onChange={() => toggleRowSelection(row.original.id)}
+                            />
                         </th>
                     )}
                     {row.getVisibleCells().map(cell => (
