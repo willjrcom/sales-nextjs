@@ -10,10 +10,11 @@ interface ModalProps<T> {
     name: string;
     onSubmit?: () => void   
     deleteItem?: () => void;
-    isAddItem?: boolean
+    isAddItem?: boolean;
+    isRemoveItem?: boolean;
 }
 
-const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onSubmit, deleteItem, isAddItem }: ModalProps<T>) => {
+const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onSubmit, deleteItem, isAddItem, isRemoveItem }: ModalProps<T>) => {
     const modalHandler = useModal();
     const { data } = useSession();
     const modalName = "delete-" + name + "-" + item.id;
@@ -44,7 +45,8 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
     }
 
     const onCloseModal = () => {
-        modalHandler.showModal(modalName, "Excluir " + item.name, <ModalDelete />, "md", onClose)
+        const title = isRemoveItem ? "Remover " + item.name : "Excluir " + item.name;
+        modalHandler.showModal(modalName, title, <ModalDelete />, "md", onClose)
     }
 
     let buttonName = item.id !== '' ? 'Atualizar' : 'Cadastrar'
@@ -60,7 +62,7 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
 
             {item.id !== '' && deleteItem &&
             <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onCloseModal} >
-                Excluir
+                {isRemoveItem ? 'Remover' : 'Excluir'}
             </button>
             }
         </div>
