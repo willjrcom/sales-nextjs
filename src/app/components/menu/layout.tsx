@@ -19,14 +19,14 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       <div className="relative flex overflow-hidden h-screen">
         {/* Sidebars with slide transition */}
         <div className={
-          `absolute inset-y-0 left-0 w-52 transition-transform duration-300 ease-in-out ` +
+          `absolute inset-y-0 left-0 w-12 hover:w-52 transition-all duration-300 ease-in-out ` +
           (adminMode ? 'translate-x-0 z-20' : '-translate-x-full z-10')
         }>
           <AdminSidebar onToggleAdmin={() => setAdminMode(false)} setHover={setIsHover} />
         </div>
 
         <div className={
-          `absolute inset-y-0 left-0 w-52 transition-transform duration-300 ease-in-out ` +
+          `absolute inset-y-0 left-0 w-12 hover:w-52 transition-all duration-300 ease-in-out ` +
           (adminMode ? '-translate-x-full z-10' : 'translate-x-0 z-20')
         }>
           <Sidebar onToggleAdmin={() => setAdminMode(true)} setHover={setIsHover} />
