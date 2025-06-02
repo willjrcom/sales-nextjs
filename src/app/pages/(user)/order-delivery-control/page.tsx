@@ -24,7 +24,7 @@ const PageDeliveryOrder = () => {
     };
 
     return (
-        <>
+        <div className="container mx-auto p-6">
             <PageTitle title="Controle de Entregas" tooltip="Gerencie pedidos de entrega por status: A enviar, Na rua ou Finalizadas." />
             <div className="tabs">
                 <button
@@ -47,7 +47,7 @@ const PageDeliveryOrder = () => {
                 </button>
             </div>
             <div className="content">{renderContent()}</div>
-        </>
+        </div>
     );
 };
 

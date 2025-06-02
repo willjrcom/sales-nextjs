@@ -12,7 +12,7 @@ interface CategoryOrderProps {
 
 const CategoryOrder = ({ groupItems, category }: CategoryOrderProps) => {
     return (
-        <div className="mb-6 bg-gray-100 p-4 box-border max-w-[100vw]">
+        <div className="mb-6 bg-gray-100 p-4 box-border">
             {/* Título da categoria com botão de edição */}
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">{category.name}</h2>

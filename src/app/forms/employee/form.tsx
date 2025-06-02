@@ -134,30 +134,31 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         <>
             <div className={"grid " + classTotalColumns + " gap-4 items-start w-full max-w-7xl mx-auto"}>
                 {/* Coluna da Esquerda: Buscar por CPF */}
-                {!isUpdate && <div className="flex justify-center items-center shadow-md h-[80vh] min-w-[20vw]">
-                    <div className="w-full block rounded-md p-8">
-                        <PatternField
-                            name="cpf"
-                            friendlyName="Buscar por CPF"
-                            patternName='cpf'
-                            setValue={setCpfToSearch}
-                            value={cpfToSearch}
-                            formatted={true}
-                        />
-
-                        {/* Botões de Ação */}
-                        <div className="mt-6">
-                            <ButtonsModal
-                                item={employee}
-                                name="Funcionário"
-                                onSubmit={searchUserByCpf}
+                {!isUpdate &&
+                    <div className="flex justify-center items-center shadow-md h-[80vh]">
+                        <div className="w-full block rounded-md p-8">
+                            <PatternField
+                                name="cpf"
+                                friendlyName="Buscar por CPF"
+                                patternName='cpf'
+                                setValue={setCpfToSearch}
+                                value={cpfToSearch}
+                                formatted={true}
                             />
+
+                            {/* Botões de Ação */}
+                            <div className="mt-6">
+                                <ButtonsModal
+                                    item={employee}
+                                    name="Funcionário"
+                                    onSubmit={searchUserByCpf}
+                                />
+                            </div>
+
+                            <CardUser user={userFound} />
                         </div>
 
-                        <CardUser user={userFound} />
-                    </div>
-
-                </div>}
+                    </div>}
 
                 {!isUpdate && <div className="flex justify-center items-center h-[80vh]">
                     <p className="text-center text-gray-500">ou</p>

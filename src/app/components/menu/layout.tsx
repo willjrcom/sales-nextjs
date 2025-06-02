@@ -34,8 +34,8 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
         <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${isHover ? 'ml-52' : 'ml-12'}`}>
           <Topbar />
-          <main className="p-4 h-[90vh] min-w-[90vw] flex justify-center">
-            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto max-w-[90vw] h-full box-border">
+          <main className="p-4 h-[90vh] flex justify-center">
+            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-[90vw] h-full box-border">
               {children}
             </div>
           </main>
