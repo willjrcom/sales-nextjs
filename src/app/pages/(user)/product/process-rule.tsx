@@ -40,7 +40,6 @@ export default function PageProcessRules() {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
         const processRulesByCategories = Object.values(categoriesSlice.entities).map((category) => category.process_rules || []).flat();
         setProcessRules(processRulesByCategories)
-        setCategoryID(Object.values(categoriesSlice.entities)[0].id)
     }, [categoriesSlice.entities]);
 
     if (categoriesSlice.loading) {

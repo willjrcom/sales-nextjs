@@ -130,7 +130,7 @@ const DragAndDropGrid = () => {
                 setDroppedTables(newDroppedTables);
                 setUnusedTables(newUnusedTables);
 
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
+                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables ?? [] } } }));
                 dispatch(addUnusedTable(table));
                 return
             }
@@ -157,7 +157,7 @@ const DragAndDropGrid = () => {
                 setUnusedTables(newUnusedTables);
                 setDroppedTables(newDroppedTables);
 
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables } } }));
+                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables ?? [] } } }));
                 dispatch(removeUnusedTable(table.id));
                 return
             }
@@ -181,7 +181,7 @@ const DragAndDropGrid = () => {
                     return
                 }
 
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables } } }));
+                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables ?? [] } } }));
                 setDroppedTables(newDroppedTables);
                 return
             }
@@ -236,7 +236,7 @@ const DragAndDropGrid = () => {
                         <div className="flex items-center justify-between">
                             <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} optional />
                             <div className="flex items-center gap-2">
-                                <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-right">
+                                <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-left">
                                     <PlaceForm />
                                 </ButtonIconTextFloat>
                                 <Refresh slice={placesSlice} fetchItems={fetchPlaces} />

@@ -49,11 +49,11 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
             if (!isUpdate) {
                 processRule.id = response
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: [...category.process_rules, processRule] } } }));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: [...(category.process_rules ?? []), processRule] } } }));
                 notifySuccess(`Regra de processo ${processRule.name} criada com sucesso`);
             } else {
                 const updatedProcessRules = category.process_rules.map(rule => rule.id === processRule.id ? processRule : rule)
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: updatedProcessRules } } }));
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: updatedProcessRules ?? [] } } }));
                 notifySuccess(`Regra de processo ${processRule.name} atualizada com sucesso`);
             }
 
@@ -68,7 +68,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         if (!data) return;
         try {
             DeleteProcessRule(processRule.id, data);
-            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: category.process_rules.filter(rule => rule.id !== processRule.id) } } }));
+            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: category.process_rules.filter(rule => rule.id !== processRule.id) ?? [] } } }));
             notifySuccess(`Regra de processo ${processRule.name} removida com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
