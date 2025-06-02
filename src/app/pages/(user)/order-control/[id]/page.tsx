@@ -7,10 +7,10 @@ import RequestError from "@/app/utils/error";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { CartAdded } from "@/app/components/order/cart/cart-added";
 import { CardOrderResume } from "@/app/components/order/resume/resume";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageEditOrderControl = () => {
     const { id } = useParams();
-    const [error, setError] = useState<RequestError | null>(null)
     const { data } = useSession();
     const contextCurrentOrder = useCurrentOrder();
 
@@ -18,9 +18,8 @@ const PageEditOrderControl = () => {
         if (!id || !data) return;
         try {
             contextCurrentOrder.fetchData(id as string);
-            setError(null);
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao buscar pedido");
         }
     }, [data?.user.access_token, id]);
 
@@ -28,10 +27,10 @@ const PageEditOrderControl = () => {
         getOrder();
     }, [data?.user.access_token]);
 
-    return (<>
-            <CartAdded />
-            <CardOrderResume />
-    </>
+    return (<div className="w-full">
+        <CartAdded />
+        <CardOrderResume />
+    </div>
     );
 }
 export default PageEditOrderControl

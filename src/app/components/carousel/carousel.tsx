@@ -9,9 +9,9 @@ interface CarouselProps<T> {
 
 const Carousel = <T extends { id: string }>({ items, children }: CarouselProps<T>) => {
     return (
-        <div className="w-full max-w-full overflow-hidden box-border">
+        <div className=" overflow-hidden box-border">
             <Swiper
-                className="w-full max-w-full"
+                className=""
             modules={[Navigation, Pagination, A11y]}
             navigation
             pagination={{ clickable: true, dynamicBullets: true }}

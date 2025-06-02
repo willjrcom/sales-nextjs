@@ -31,7 +31,7 @@ export const CartAdded = () => {
     if (!order) return null
 
     return (
-        <div className="box-border bg-white h-full overflow-x-hidden">
+        <div className="box-border bg-white h-full flex flex-col overflow-x-hidden">
             <div className="mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
                 <div onClick={() => contextGroupItem.resetGroupItem()}>
@@ -45,6 +45,7 @@ export const CartAdded = () => {
                 </div>
             </div>
 
+            <div className="flex-1 overflow-y-auto">
             {Object.entries(groupedItems).map(([key, groupItems]) => {
                 if (Object.values(categoriesSlice.entities).length === 0) return
                 const category = categoriesSlice.entities[key]
@@ -53,6 +54,7 @@ export const CartAdded = () => {
                     <CategoryOrder key={key} category={category} groupItems={groupItems} />
                 )
             })}
+            </div>
         </div>
     )
 }

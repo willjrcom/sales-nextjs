@@ -48,8 +48,8 @@ const ShowGroupItem = ({ isOpened }: ShowGroupItemProps) => {
                 Carrinho
             </button>
 
-            <div className="fixed right-0 inset-y-4 border border-gray-300 rounded-l-md z-40">
-                <div className={`h-full bg-gray-200 overflow-y-auto overflow-x-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-[40vw]' : 'w-0'} origin-right`}>
+            <div className={`fixed bg-gray-200 right-0 inset-y-8 border border-gray-300 rounded-l-md z-40 transition-all duration-300 ease-in-out ${isOpen ? 'w-[40vw]' : 'w-0'} origin-right`}>
+                <div className="h-full p-4 overflow-y-auto flex flex-col">
                     {isOpen && <GroupItemCard />}
                 </div>
             </div>
@@ -76,7 +76,7 @@ const GroupItemCard = () => {
     const isGroupItemStaging = groupItem?.status === "Staging"
 
     return (
-        <div className="p-4 text-black min-w-full">
+        <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Produtos selecionados</h2>
                 {groupItem?.status && <StatusComponent status={groupItem.status} />}
@@ -85,6 +85,7 @@ const GroupItemCard = () => {
             <hr className="my-4" />
             {/* Produto Selecionado */}
             <div className="space-y-2">
+                {(!groupItem || groupItem?.items?.length === 0) && <p>Nenhum produto selecionado</p>}
                 {groupItem?.items?.map((item) => (
                     <ItemCard item={item} key={item.id} />
                 ))}
