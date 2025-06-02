@@ -48,7 +48,7 @@ const SchemaPayment = z.object({
 
 export const ValidatePaymentForm = (payment: PaymentOrder) => {
     const validatedFields = SchemaPayment.safeParse({
-        total_paid: payment.total_paid.toNumber(),
+        total_paid: new Decimal(payment.total_paid).toNumber(),
         method: payment.method,
         order_id: payment.order_id,
     });

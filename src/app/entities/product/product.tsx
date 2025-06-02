@@ -57,11 +57,10 @@ const SchemaProduct = z.object({
 export const ValidateProductForm = (product: Product) => {
     const validatedFields = SchemaProduct.safeParse({
         code: product.code,
-        image_path: product.image_path,
         name: product.name,
         description: product.description,
-        price: product.price.toNumber(),
-        cost: product.cost.toNumber(),
+        price: new Decimal(product.price).toNumber(),
+        cost: new Decimal(product.cost).toNumber(),
         category_id: product.category_id,
         size_id: product.size_id,
         is_available: product.is_available

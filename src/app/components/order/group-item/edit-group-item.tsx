@@ -15,32 +15,56 @@ import Decimal from "decimal.js";
 
 export default function EditGroupItem() {
     const contextGroupItem = useGroupItem();
-    
+
     if (!contextGroupItem.groupItem || contextGroupItem.groupItem?.status === "Staging") {
         return (
-            <div className="flex h-[68vh]">
+            <div >
                 {/* Componente à esquerda: ocupa 70% da tela */}
                 <CartToAdd />
-                <ShowGroupItem />
+                <ShowGroupItem isOpened={false} />
             </div>
         );
     }
 
     return (
-        <div className="flex h-[68vh]">
-            <ShowGroupItem />
+        <GroupItemCard />
+    );
+}
+
+interface ShowGroupItemProps {
+    isOpened: boolean
+}
+
+const ShowGroupItem = ({ isOpened }: ShowGroupItemProps) => {
+    const [isOpen, setIsOpen] = useState(isOpened || false);
+
+    return (
+        <div>
+            <button
+                type="button"
+                onClick={() => setIsOpen(prev => !prev)}
+                className={`fixed top-1/2 transform -translate-y-1/2 z-50 [writing-mode:vertical-rl] rotate-180 cursor-pointer focus:outline-none bg-green-500 text-white p-2 rounded-r-md transition-all duration-300 ${isOpen ? 'right-[30vw]' : 'right-0'}`}
+            >
+                Carrinho
+            </button>
+
+            <div className="fixed right-0 top-0 h-full z-40">
+                <div className={`h-full bg-gray-200 text-white overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-[30vw]' : 'w-0'} origin-right`}>
+                    {isOpen && <GroupItemCard />}
+                </div>
+            </div>
         </div>
     );
 }
 
-const ShowGroupItem = () => {
+const GroupItemCard = () => {
     const contextGroupItem = useGroupItem();
     const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
     const [complementItem, setComplementItem] = useState<Item | null>();
 
     useEffect(() => {
         setGroupItem(contextGroupItem.groupItem);
-        
+
         if (contextGroupItem.groupItem?.complement_item) {
             setComplementItem(contextGroupItem.groupItem.complement_item)
         } else {
@@ -52,7 +76,7 @@ const ShowGroupItem = () => {
     const isGroupItemStaging = groupItem?.status === "Staging"
 
     return (
-        <div className="bg-gray-100 p-3 space-y-4 overflow-y-auto h-full lg:block hidden lg:w-[30vw]">
+        <div className="p-4 text-black min-w-full">
             {/* Defina o min-h para o tamanho mínimo em telas pequenas, e lg:block para visibilidade em telas grandes */}
             <h2 className="text-xl font-semibold">Produtos selecionados</h2>
             <p className="text-sm">id: {groupItem?.id}</p>
@@ -69,7 +93,7 @@ const ShowGroupItem = () => {
                 <ComplementItemList groupItem={groupItem} />
             </ButtonIconText>}
 
-            {containItems && complementItem && 
+            {containItems && complementItem &&
                 <ComplementItemCard groupItem={groupItem} />
             }
 
@@ -78,11 +102,11 @@ const ShowGroupItem = () => {
                 <p className="text-xl font-bold">R$ {new Decimal(groupItem?.total_price || "0").toFixed(2)}</p>
             </div>
             <hr className="my-4" />
-            
+
             {groupItem?.status && <p><strong>Status:</strong> <StatusComponent status={groupItem.status} /></p>}
-            {groupItem?.status == "Staging" as StatusGroupItem && 
+            {groupItem?.status == "Staging" as StatusGroupItem &&
                 <GroupItemForm item={groupItem} />
             }
         </div>
     );
-}
+};

@@ -29,7 +29,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         <StatusComponent status={groupItem.status} />
 
         <div onClick={() => setGroupItem(groupItem)}>
-          <ButtonIcon modalName={"edit-group-item-" + groupItem.id} size={groupItem.status === "Staging" ? "xl" : "sm"} onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}>
+          <ButtonIcon modalName={"edit-group-item-" + groupItem.id} size={groupItem.status === "Staging" ? "xl" : "md"} onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}>
             <EditGroupItem key={groupItem.id} />
           </ButtonIcon>
         </div>

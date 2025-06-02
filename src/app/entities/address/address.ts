@@ -152,7 +152,7 @@ export const ValidateAddressForm = (address: Address) => {
         neighborhood: address.neighborhood,
         city: address.city,
         uf: address.uf,
-        delivery_tax: address.delivery_tax.toNumber(),
+        delivery_tax: new Decimal(address.delivery_tax).toNumber(),
         object_id: address.object_id
     });
 
