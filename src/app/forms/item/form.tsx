@@ -83,8 +83,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   return (
     <div className="overflow-y-auto">
       <h3 className="text-lg font-semibold mb-4">{product.name}</h3>
-      <p className="text-sm font-bold">descrição: {product.description}</p>
-      <p className="text-md font-bold">Tamanho {product.size.name}</p>
+      <p className="text-sm font-bold">Descrição: <span className="font-normal">{product.description}</span></p>
+      <p className="text-sm font-bold">Tamanho: <span className="font-normal">{product.size.name}</span></p>
       <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
       <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
       <hr className="my-4" />
@@ -138,7 +138,7 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
           Selecione uma quantidade:
         </label>
 
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           {quantities.map((quantity) => (
             <button
               key={quantity.id}
