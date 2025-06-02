@@ -12,6 +12,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { useState } from 'react';
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [adminMode, setAdminMode] = useState(false);
+  const [isHover, setIsHover] = useState(false);
+
   return (
     <ContextProviders>
       <div className="relative flex overflow-hidden h-screen">
@@ -20,17 +22,19 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
           `absolute inset-y-0 left-0 w-52 transition-transform duration-300 ease-in-out ` +
           (adminMode ? 'translate-x-0 z-20' : '-translate-x-full z-10')
         }>
-          <AdminSidebar onToggleAdmin={() => setAdminMode(false)} />
+          <AdminSidebar onToggleAdmin={() => setAdminMode(false)} setHover={setIsHover} />
         </div>
+
         <div className={
           `absolute inset-y-0 left-0 w-52 transition-transform duration-300 ease-in-out ` +
           (adminMode ? '-translate-x-full z-10' : 'translate-x-0 z-20')
         }>
-          <Sidebar onToggleAdmin={() => setAdminMode(true)} />
+          <Sidebar onToggleAdmin={() => setAdminMode(true)} setHover={setIsHover} />
         </div>
-        <div className="flex-1 flex flex-col ml-52">
+
+        <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${isHover ? 'ml-52' : 'ml-12'}`}>
           <Topbar />
-        <main className="p-4 h-[89vh] min-w-0 flex justify-center w-full">
+          <main className="p-4 h-[89vh] min-w-0 flex justify-center w-full">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-full h-full box-border">
               {children}
             </div>

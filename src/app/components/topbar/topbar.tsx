@@ -33,21 +33,13 @@ const TopbarItem = ({ label, href, color }: TopbarItemProps) => {
   );
 };
 
-const TopbarItemIcon = ({ icon: Icon, href }: TopbarItemIconProps) => (
-  <Link
-    href={href}
-    className="p-2 rounded hover:bg-gray-700 transition-colors duration-200"
-  >
-    <Icon className="text-xl text-gray-300" />
-  </Link>
-);
-
 const TopbarItemAlert = ({ label, icon: Icon, href }: TopbarItemIconProps) => (
   <Link href={href} className="inline-flex items-center bg-red-500 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200 hover:bg-red-600">
     <Icon className="mr-2 text-base" />
     {label}
   </Link>
 );
+
 
 const Topbar = () => {
   const contextCurrentOrder = useCurrentOrder();

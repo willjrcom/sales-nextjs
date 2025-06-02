@@ -113,91 +113,87 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     }
 
     const isUpdated = JSON.stringify(category) !== JSON.stringify(item)
-    const classIsUpdate = isUpdate ? "w-[80vw]" : "";
 
     return (
-        <div className={classIsUpdate}>
-            {/* Bloco de Dados Básicos */}
-            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h2 className="text-md font-medium mb-4">Dados Básicos</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 className="text-md font-medium mb-4">Dados Básicos</h2>
 
-                <TextField
-                    friendlyName="Nome"
-                    name="name"
-                    setValue={value => handleInputChange('name', value)}
-                    value={category.name}
-                />
-                <TextField
-                    friendlyName="Imagem"
-                    name="image_path"
-                    setValue={value => handleInputChange('image_path', value)}
-                    value={category.image_path}
-                    optional
-                />
-                <CheckboxField
-                    friendlyName="Deseja imprimir no pedido?"
-                    name="need_print"
-                    setValue={value => handleInputChange('need_print', value)}
-                    value={category.need_print}
-                    optional
-                />
-                <CheckboxField
-                    friendlyName="Deseja produzir com processos?"
-                    name="use_process_rule"
-                    setValue={value => handleInputChange('use_process_rule', value)}
-                    value={category.use_process_rule}
-                    optional
-                />
+            <TextField
+                friendlyName="Nome"
+                name="name"
+                setValue={value => handleInputChange('name', value)}
+                value={category.name}
+            />
+            <TextField
+                friendlyName="Imagem"
+                name="image_path"
+                setValue={value => handleInputChange('image_path', value)}
+                value={category.image_path}
+                optional
+            />
+            <CheckboxField
+                friendlyName="Deseja imprimir no pedido?"
+                name="need_print"
+                setValue={value => handleInputChange('need_print', value)}
+                value={category.need_print}
+                optional
+            />
+            <CheckboxField
+                friendlyName="Deseja produzir com processos?"
+                name="use_process_rule"
+                setValue={value => handleInputChange('use_process_rule', value)}
+                value={category.use_process_rule}
+                optional
+            />
 
-                {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
-                {selectedType === "Normal" && (
-                    <>
-                        <hr className="my-4" />
-                        <AdditionalCategorySelector
-                            additionalCategories={Object.values(categoriesSlice.entities)}
-                            selectedCategory={category}
-                            setSelectedCategory={setCategory}
-                        />
+            {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
+            {selectedType === "Normal" && (
+                <>
+                    <hr className="my-4" />
+                    <AdditionalCategorySelector
+                        additionalCategories={Object.values(categoriesSlice.entities)}
+                        selectedCategory={category}
+                        setSelectedCategory={setCategory}
+                    />
 
-                        <hr className="my-4" />
-                        <ComplementCategorySelector
-                            complementCategories={Object.values(categoriesSlice.entities)}
-                            selectedCategory={category}
-                            setSelectedCategory={setCategory}
-                        />
-                    </>
-                )}
+                    <hr className="my-4" />
+                    <ComplementCategorySelector
+                        complementCategories={Object.values(categoriesSlice.entities)}
+                        selectedCategory={category}
+                        setSelectedCategory={setCategory}
+                    />
+                </>
+            )}
 
 
-                {/* Bloco de Ingredientes Removíveis */}
-                <hr className="my-4" />
-                <RemovableItensComponent item={category} setItem={setCategory} />
+            {/* Bloco de Ingredientes Removíveis */}
+            <hr className="my-4" />
+            <RemovableItensComponent item={category} setItem={setCategory} />
 
-                {/* Bloco de Tipo de Categoria */}
-                {!isUpdate && (
-                    <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
-                )}
+            {/* Bloco de Tipo de Categoria */}
+            {!isUpdate && (
+                <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
+            )}
 
-                {/* Campo Oculto para ID */}
-                <HiddenField
-                    name="id"
-                    setValue={value => handleInputChange('id', value)}
-                    value={category.id}
-                />
+            {/* Campo Oculto para ID */}
+            <HiddenField
+                name="id"
+                setValue={value => handleInputChange('id', value)}
+                value={category.id}
+            />
 
-                {/* Exibição de Erros */}
-                {error && <p className="mb-4 text-red-500 text-center">{error.message}</p>}
-                <ErrorForms errors={errors} />
+            {/* Exibição de Erros */}
+            {error && <p className="mb-4 text-red-500 text-center">{error.message}</p>}
+            <ErrorForms errors={errors} />
 
-                <hr className="my-6" />
+            <hr className="my-6" />
 
-                {/* Botões para Atualizar ou Excluir */}
-                {isUpdated ? (
-                    <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />
-                ) : (
-                    <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />
-                )}
-            </div>
+            {/* Botões para Atualizar ou Excluir */}
+            {isUpdated ? (
+                <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />
+            ) : (
+                <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />
+            )}
         </div>
     );
 };

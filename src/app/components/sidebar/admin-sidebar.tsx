@@ -54,9 +54,10 @@ const SidebarLinkItem = ({ href, icon: Icon, label, onClick }: SidebarLinkItemPr
 
 interface AdminSidebarProps {
   onToggleAdmin?: () => void;
+  setHover?: (value: boolean) => void;
 }
 
-const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
+const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
   const modalHandler = useModal();
   const { data } = useSession();
   const [company, setCompany] = useState<Company>(new Company());
@@ -84,7 +85,11 @@ const AdminSidebar = ({ onToggleAdmin }: AdminSidebarProps) => {
   };
 
   return (
-    <nav className="sticky top-0 w-12 hover:w-52 h-screen bg-blue-800 text-white flex flex-col overflow-hidden">
+    <nav
+      onMouseEnter={() => setHover?.(true)}
+      onMouseLeave={() => setHover?.(false)}
+      className="sticky top-0 w-12 hover:w-52 h-screen bg-blue-800 text-white flex flex-col overflow-hidden"
+    >
       <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
       <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/admin-order-process" />
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/admin-product" />
