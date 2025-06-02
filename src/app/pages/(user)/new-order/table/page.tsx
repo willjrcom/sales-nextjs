@@ -12,12 +12,12 @@ import PageTitle from "@/app/components/PageTitle";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchPlaces } from "@/redux/slices/places";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageNewOrderTable = () => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
     const [tables, setTables] = useState<Table[]>([]);
-    const [error, setError] = useState<RequestError | null>(null);
     const router = useRouter();
     const placesSlice = useSelector((state: RootState) => state.places);
     const dispatch = useDispatch<AppDispatch>();
@@ -54,9 +54,8 @@ const PageNewOrderTable = () => {
         try {
             const response = await NewOrderTable(tableID, data)
             router.push('/pages/order-control/' + response.order_id)
-            setError(null);
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
         }
     }
 
@@ -81,9 +80,7 @@ const PageNewOrderTable = () => {
                     setSelectedValue={setTableID}
                     values={tables}
                 />
-                {error && (
-                    <p className="text-red-500">{error.message}</p>
-                )}
+                
                 <button
                     disabled={!tableID}
                     onClick={() => newOrder(tableID)}

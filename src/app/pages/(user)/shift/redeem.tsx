@@ -8,6 +8,7 @@ import { useModal } from "@/app/context/modal/context";
 import Shift from "@/app/entities/shift/shift";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { notifyError } from "@/app/utils/notifications";
 
 interface RedeemCardProps {
     fetchShift: () => void;
@@ -16,7 +17,6 @@ interface RedeemCardProps {
 const RedeemCard = ({ fetchShift }: RedeemCardProps) => {
     const [name, setName] = useState<string>("");
     const [value, setValue] = useState<Decimal>(new Decimal(0));
-    const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -25,17 +25,15 @@ const RedeemCard = ({ fetchShift }: RedeemCardProps) => {
 
         try {
             await AddRedeemToShift(name, value.toNumber(), data)
-            setError(null);
             fetchShift();
             modalHandler.hideModal("add-redeem")
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao adicionar resgate");
         }
     }
 
     return (
         <>
-            {error && <p className="text-red-500">{error.message}</p>}
             <TextField friendlyName='Motivo' name='name' value={name} setValue={setName} />
             <PriceField friendlyName='Valor' name='value' value={value} setValue={setValue} />
             <ButtonsModal item={{ id: "", name: "Adicionar resgate" }} onSubmit={() => handleAddRedeem(name, value)} name='Adcionar resgate' />

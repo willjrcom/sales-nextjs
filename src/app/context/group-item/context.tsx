@@ -5,6 +5,7 @@ import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import GroupItem from '@/app/entities/order/group-item';
 import Item from '@/app/entities/order/item';
 import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
+import { notifyError } from '@/app/utils/notifications';
 
 interface GroupItemContextProps<T> {
     groupItem: T | null;
@@ -15,7 +16,6 @@ interface GroupItemContextProps<T> {
     removeItem: (id: string) => void;
     updateGroupItem: (item: T) => void;
     updateLastUpdate: () => void;
-    getError: () => RequestError | null;
     getLoading: () => boolean;
     getLastUpdate: () => string;
 }
@@ -26,7 +26,6 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const [groupItem, setgroupItem] = useState<GroupItem | null>(null);
     const { data } = useSession();
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<RequestError | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     
@@ -35,10 +34,9 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
         try {
             const groupItem = await GetGroupItemByID(id, data);
             setgroupItem(groupItem);
-            setError(null);
             return groupItem;
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao buscar group item");
             return null;
         }
     };
@@ -67,12 +65,11 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
 
-    const getError = () => error;
     const getLoading = () => loading;
     const getLastUpdate = () => lastUpdate;
 
     return (
-        <ContextGroupItem.Provider value={{ groupItem, fetchData, resetGroupItem, getItemByID, addItem, removeItem, updateGroupItem: updateGroupItem, updateLastUpdate, getError, getLoading, getLastUpdate }}>
+        <ContextGroupItem.Provider value={{ groupItem, fetchData, resetGroupItem, getItemByID, addItem, removeItem, updateGroupItem: updateGroupItem, updateLastUpdate, getLoading, getLastUpdate }}>
             {children}
         </ContextGroupItem.Provider>
     );

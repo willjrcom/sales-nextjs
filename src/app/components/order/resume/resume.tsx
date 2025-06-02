@@ -14,6 +14,7 @@ import UpdateChangeOrderDelivery from "@/app/api/order-delivery/update/change/or
 import { SelectField } from "../../modal/field"
 import { payMethodsWithId } from "@/app/entities/order/order-payment"
 import Decimal from 'decimal.js';
+import { notifyError } from "@/app/utils/notifications";
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
@@ -54,7 +55,6 @@ export const CardOrderResume = () => {
 export const OrderPaymentsResume = () => {
     const { data } = useSession();
     const contextCurrentOrder = useCurrentOrder();
-    const [error, setError] = useState<RequestError | null>(null)
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const [change, setChange] = useState<Decimal>(new Decimal(order?.delivery?.change || 0));
     const [paymentMethod, setPaymentMethod] = useState<string>(order?.delivery?.payment_method || "");
@@ -70,10 +70,9 @@ export const OrderPaymentsResume = () => {
 
         try {
             await PendingOrder(order.id, data)
-            setError(null)
             contextCurrentOrder.fetchData(order.id);
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao lançar pedido");
         }
     }
 
@@ -82,10 +81,9 @@ export const OrderPaymentsResume = () => {
 
         try {
             await UpdateChangeOrderDelivery(order.delivery.id, change.toNumber(), paymentMethod, data)
-            setError(null)
             contextCurrentOrder.fetchData(order.id);
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao atualizar troco");
         }
     }
 
@@ -101,7 +99,7 @@ export const OrderPaymentsResume = () => {
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
             {order?.status && <p><StatusComponent status={order?.status} /></p>}
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            
             <br />
             {/* Total do pedido */}
             {order?.delivery &&

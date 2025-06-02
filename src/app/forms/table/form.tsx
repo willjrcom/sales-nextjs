@@ -22,7 +22,6 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalHandler = useModal();
     const [table, setTable] = useState<Table>(item || new Table());
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const dispatch = useDispatch<AppDispatch>();
     
@@ -38,7 +37,6 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
         try {
             const response = isUpdate ? await UpdateTable(table, data) : await NewTable(table, data)
-            setError(null);
 
             if (!isUpdate) {
                 table.id = response
@@ -50,10 +48,8 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             }
 
             modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            setError(err);
-            notifyError(err.message || 'Erro ao salvar mesa');
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao salvar mesa');
         }
     }
 
@@ -73,7 +69,6 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name}/>
 
-            {error && <p className='mb-4 text-red-500'>{error.message}</p>}
             <ErrorForms errors={errors} />
             <ButtonsModal item={table} name="Table" onSubmit={submit} deleteItem={onDelete} />
         </>

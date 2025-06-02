@@ -7,23 +7,20 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { notifyError } from '@/app/utils/notifications';
 
 const RegisterForm = () => {
     const [email, setEmail] = useState('');
-    const [error, setError] = useState<RequestError | null>(null);
     const router = useRouter();
 
     const submit = async () => {
-        setError(null);
-
         try {
             await ForgetUserPassword(email);
-            setError(null);
             setEmail('');
             router.push('/login');
 
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao alterar senha");
         }
     }
 
@@ -41,9 +38,9 @@ const RegisterForm = () => {
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto ">
                     <div className="flex flex-col">
                         <TextField friendlyName='E-mail' name='email' placeholder='Digite seu e-mail' setValue={setEmail} value={email} />
-                        {error && <p className="mb-4 text-red-500">{error.message}</p>}
                     </div>
                 </div>
+
                 <div className="w-full max-w-md px-8 py-4 bg-white">
                     <button onClick={submit} className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Enviar nova senha</button>
                     <div className="flex justify-between mt-4 text-yellow-500">

@@ -7,6 +7,7 @@ import { useModal } from "@/app/context/modal/context";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { notifyError } from "@/app/utils/notifications";
 
 interface ChangeCardProps {
     openedAt: string;
@@ -15,7 +16,6 @@ interface ChangeCardProps {
 
 const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
     const [endChange, setEndChange] = useState<Decimal>(new Decimal(0));
-    const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -24,17 +24,15 @@ const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
 
         try {
             await CloseShift(endChange.toNumber(), data)
-            setError(null);
             fetchShift();
             modalHandler.hideModal("close-shift")
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao fechar turno");
         }
     }
 
     return (
         <>
-            {error && <p className="text-red-500">{error.message}</p>}
             <PriceField friendlyName='Troco final' name='end_change' value={endChange} setValue={setEndChange} />
             <ButtonsModal item={{ id: "", name: "Fechar turno" }} onSubmit={() => handleCloseShift(endChange)} name={'Turno: ' + ToUtcDatetime(openedAt)} />
         </>

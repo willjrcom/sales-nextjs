@@ -11,6 +11,7 @@ import ShiftCard from './shift-card';
 import ShiftResume from './shift-resume';
 import { Redeems } from './redeem';
 import Decimal from 'decimal.js';
+import { notifyError } from '@/app/utils/notifications';
 
 interface SalesCardProps {
     title: string;
@@ -74,7 +75,6 @@ const SalesSummary = () => {
 
 const ShiftDashboard = () => {
     const [shift, setShift] = useState<Shift | null>();
-    const [error, setError] = useState<RequestError | null>();
     const { data } = useSession();
     
     const fetchCurrentShift = async () => {
@@ -82,12 +82,11 @@ const ShiftDashboard = () => {
 
         try {
             const currentShift = await GetCurrentShift(data);
-            setError(null);
             setShift(currentShift);
 
-        } catch (error) {
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao buscar turno atual");
             setShift(null)
-            setError(error as RequestError)
         }
     }
 

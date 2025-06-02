@@ -25,7 +25,6 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const modalHandler = useModal();
     const [size, setSize] = useState<Size>(item || new Size());
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const handleInputChange = (field: keyof Size, value: any) => {
@@ -42,7 +41,6 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
         try {
             const response = isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
-            setError(null);
 
             if (isUpdate) {
                 const index = category.sizes.findIndex(s => s.id === size.id);
@@ -58,10 +56,8 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             modalHandler.hideModal(modalName);
 
-        } catch (error) {
-            const err = error as RequestError;
-            setError(err);
-            notifyError(err.message || 'Erro ao salvar tamanho');
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao salvar tamanho');
         }
     }
 
@@ -89,7 +85,6 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <ErrorForms errors={errors} />
             {isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />}
             {!isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />}

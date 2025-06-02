@@ -16,6 +16,7 @@ import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { FaPlus } from "react-icons/fa";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import { useRouter } from "next/navigation";
+import { notifyError } from "@/app/utils/notifications";
 // Sidebar listing active tables and showing elapsed usage time
 const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
     const [now, setNow] = useState<Date>(new Date());
@@ -79,7 +80,6 @@ const DragAndDropGrid = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
-    const [error, setError] = useState<RequestError | null>(null);
 
     useEffect(() => {
         if (data) {
@@ -115,14 +115,6 @@ const DragAndDropGrid = () => {
         reloadGrid(place.tables);
     }, [placeSelectedID])
 
-    useEffect(() => {
-        if (error && error.message != "") {
-            setTimeout(() => {
-                setError(null);
-            }, 10000);
-        }
-    }, [error])
-
     const reloadGrid = (tables: PlaceTable[]) => {
         if (!tables || tables.length === 0) return;
         const xyPositions = tables.map((table) => new GridItem(table.column, table.row))
@@ -148,45 +140,41 @@ const DragAndDropGrid = () => {
     );
 
     return (
-        <>
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
-            <div className="flex p-4">
-                <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                        <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
-                            optional />
-                        <Refresh slice={tableOrdersSlice} fetchItems={fetchTableOrders} />
-                    </div>
-                    <div
-                        style={{
-                            display: "grid",
-                            gridTemplateColumns: `repeat(${totalCols - 1}, 100px) auto`,
-                            gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
-                            gap: "4px",
-                            position: "relative",
-                            backgroundColor: "#f4f4f4",
-                            padding: "20px",
-                        }}
-                    >
-                        {/* Células da grade */}
-                        {grid.map((cell) => (
-                            <Cell key={`${cell.x}-${cell.y}`}>
-                                {droppedTables?.filter((item) => item.column === cell.x && item.row === cell.y)
-                                    .map((item) => (
-                                        <TableItem key={`${item.table_id}-${item.row}-${item.column}`} placeTable={item} order={tableOrders?.find((order) => order.table_id === item.table_id && order.status !== "Closed")} />
-                                    ))}
-                            </Cell>
-                        ))}
-                    </div>
+        <div className="flex p-4">
+            <div className="flex-1">
+                <div className="flex items-center justify-between">
+                    <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
+                        optional />
+                    <Refresh slice={tableOrdersSlice} fetchItems={fetchTableOrders} />
                 </div>
-                <SidebarActiveTables orders={activeOrdersForPlace} />
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: `repeat(${totalCols - 1}, 100px) auto`,
+                        gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
+                        gap: "4px",
+                        position: "relative",
+                        backgroundColor: "#f4f4f4",
+                        padding: "20px",
+                    }}
+                >
+                    {/* Células da grade */}
+                    {grid.map((cell) => (
+                        <Cell key={`${cell.x}-${cell.y}`}>
+                            {droppedTables?.filter((item) => item.column === cell.x && item.row === cell.y)
+                                .map((item) => (
+                                    <TableItem key={`${item.table_id}-${item.row}-${item.column}`} placeTable={item} order={tableOrders?.find((order) => order.table_id === item.table_id && order.status !== "Closed")} />
+                                ))}
+                        </Cell>
+                    ))}
+                </div>
             </div>
-        </>
+            <SidebarActiveTables orders={activeOrdersForPlace} />
+        </div>
     );
 };
 
 const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: OrderTable }) => {
-    const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const router = useRouter();
@@ -211,16 +199,14 @@ const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: Orde
                     const response = await NewOrderTable(tableID, data)
                     router.push('/pages/order-control/' + response.order_id)
                     dispatch(fetchTableOrders({ session: data }));
-                    setError(null);
                     onClose()
-                } catch (error) {
-                    setError(error as RequestError);
+                } catch (error: RequestError | any) {
+                    notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
                 }
             }
 
             const button = () => (
                 <>
-                    {error && <p className="mb-4 text-red-500">{error.message}</p>}
                     <p className="mb-4"><strong>Mesa:</strong> {placeTable.table.name}</p>
                     <p className="mb-4">Deseja iniciar um novo pedido?</p>
                     <button onClick={() => newOrder(placeTable.table_id)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">

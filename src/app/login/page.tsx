@@ -9,12 +9,12 @@ import Loading from '../components/loading/Loading';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
 import Button from '../components/ui/Button';
+import { notifyError } from '../utils/notifications';
 
 const LoginForm = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
   const [remember, setRemember] = useState<boolean>(false);
@@ -28,7 +28,6 @@ const LoginForm = () => {
   }
 
   const handleSubmit = async () => {
-    setError('');
     setLoading(true);
 
     try {
@@ -41,7 +40,7 @@ const LoginForm = () => {
       });
 
       if (res?.error) {
-        setError(res.error);
+        notifyError(res.error);
       } else if (res?.ok) {
         router.push('/access/company-selection');
       }
@@ -52,7 +51,7 @@ const LoginForm = () => {
       }
 
     } catch (err) {
-      setError('Algo deu errado: ' + err);
+      notifyError('Algo deu errado: ' + err);
     } finally {
       setLoading(false);
     }
@@ -71,7 +70,6 @@ const LoginForm = () => {
       <div className="w-full sm:w-1/2 flex items-center justify-center bg-white">
         <div className="w-full max-w-md px-8 py-10">
           <h2 className="text-2xl mb-6 hidden sm:block">Conecte-se</h2>
-          {error && <p className="mb-4 text-red-500 hidden sm:block">{error}</p>}
           <div className="flex flex-col">
             <TextField friendlyName='Email' name='email' placeholder='Digite seu email' setValue={setEmail} value={email} />
 

@@ -107,7 +107,7 @@ function CompanySelection() {
             setSelecting(false);
         } catch (error) {
             const err = error as RequestError;
-            notifyError(err.message);
+            notifyError(err.message || 'Ocorreu um erro ao selecionar a empresa');
             setSelecting(false);
         }
     }

@@ -7,6 +7,8 @@ import RequestApi, { AddAccessToken } from '@/app/api/request';
 import { useSession } from 'next-auth/react';
 import GetCompany from '@/app/api/company/company';
 import Company from '@/app/entities/company/company';
+import { notifyError } from '@/app/utils/notifications';
+import RequestError from '@/app/utils/error';
 
 Chart.register(...registerables);
 
@@ -36,13 +38,12 @@ export default function ReportChart({
   const [labels, setLabels] = useState<string[]>([]);
   const [values, setValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (sessionData) {
       GetCompany(sessionData)
         .then(setCompany)
-        .catch(() => setError('Error fetching company'));
+        .catch(() => notifyError('Error fetching company'));
     }
   }, [sessionData]);
 
@@ -50,7 +51,6 @@ export default function ReportChart({
     async function fetchData() {
       if (!sessionData || !company) return;
       setLoading(true);
-      setError(null);
       try {
         const schema = company.schema_name;
         let path = endpoint;
@@ -79,8 +79,8 @@ export default function ReportChart({
         const newValues = data.map((item) => Number(item[dataKey]));
         setLabels(newLabels);
         setValues(newValues);
-      } catch (err: any) {
-        setError(err?.message || 'Error fetching data');
+      } catch (err: RequestError | any) {
+        notifyError(err?.message || 'Error fetching data');
       } finally {
         setLoading(false);
       }
@@ -99,9 +99,6 @@ export default function ReportChart({
 
   if (loading) {
     return <p>Loading...</p>;
-  }
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
   }
 
   const chartData = {

@@ -18,12 +18,6 @@ interface Response<T> {
     headers: Headers;
 }
 
-interface ResponseError {
-    message: string;
-    status: number;
-    path: string;
-}
-
 const jsonHeaders = {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -68,7 +62,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin }: Reque
             throw body.error ? body.error : body;
         }
 
-        const error = body.error as ResponseError;
+        const error = body.error as RequestError;
 
         error.message = translateError(error.message)
 

@@ -8,10 +8,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageNewOrderPickup = () => {
     const [orderName, setOrderName] = useState('');
-    const [error, setError] = useState<RequestError | null>(null)
     const router = useRouter();
     const { data } = useSession();
 
@@ -20,9 +20,8 @@ const PageNewOrderPickup = () => {
         try {
             const response = await NewOrderPickup(name, data)
             router.push('/pages/order-control/' + response.order_id)
-            setError(null)
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
         }
     }
 
@@ -49,7 +48,6 @@ const PageNewOrderPickup = () => {
                 <FaPlus />
                 <span>Iniciar pedido</span>
             </button>
-            {error && <p className="text-red-500">{error.message}</p>}
         </div>
     );
 }

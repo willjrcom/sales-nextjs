@@ -9,11 +9,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCheck, FaSearch } from "react-icons/fa";
 import PatternField from "@/app/components/modal/fields/pattern";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
     const [client, setClient] = useState<Client | null>(null);
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
     
     const search = async () => {
@@ -24,10 +24,9 @@ const PageNewOrderDelivery = () => {
                 setClient(clientFound);
             }
 
-            setError(null);
-        } catch (error) {
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Ocorreu um erro ao buscar o cliente');
             setClient(null);
-            setError(error as RequestError);
         }
     }
 
@@ -66,10 +65,6 @@ const PageNewOrderDelivery = () => {
                         </button>
                     </div>
 
-                    {error && (
-                        <p className="text-red-500 text-center">{error.message}</p>
-                    )}
-
                     {client && <CardClient client={client} />}
                 </div>
             </div>
@@ -79,7 +74,6 @@ const PageNewOrderDelivery = () => {
 
 const CardClient = ({ client }: { client: Client | null | undefined }) => {
     const router = useRouter();
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     const newOrder = async (client: Client) => {
@@ -87,13 +81,12 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
         try {
             const response = await NewOrderDelivery(client.id, data);
             router.push('/pages/order-control/' + response.order_id);
-            setError(null);
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
         }
     }
 
-    if (!client) return <>{error && <p className="mb-4 text-red-500">{error.message}</p>}</>;
+    if (!client) return <p className="text-red-500">Cliente não encontrado</p>;
 
     return (
         <div className="bg-white rounded-lg shadow p-6 space-y-6">
@@ -114,7 +107,7 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
                     <p className="ml-4 text-gray-600">CEP: {client.address.cep}</p>
                 </div>
             </div>
-            {error && <p className="text-red-500">{error.message}</p>}
+            
             <button
                 onClick={() => newOrder(client)}
                 className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"

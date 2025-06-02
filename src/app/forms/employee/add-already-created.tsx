@@ -72,7 +72,6 @@ interface CardUserProps {
 }
 
 const CardUser = ({ user }: CardUserProps) => {
-    const [error, setError] = useState<RequestError | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
@@ -86,13 +85,8 @@ const CardUser = ({ user }: CardUserProps) => {
             employee.id = response
             dispatch(addEmployee(employee));
 
-            setError(null);
-        } catch (error) {
-            setError(error as RequestError);
-
-            setInterval(() => {
-                setError(null);
-            }, 5000);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao criar funcionário');
         }
     }
 
@@ -114,7 +108,6 @@ const CardUser = ({ user }: CardUserProps) => {
                 <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{user.cpf}</span>
             </div>
 
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <button
                 onClick={() => newEmployee(user)}
                 className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"

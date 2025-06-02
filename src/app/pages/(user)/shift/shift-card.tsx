@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import User from "@/app/entities/user/user";
 import { useModal } from "@/app/context/modal/context";
+import { notifyError } from "@/app/utils/notifications";
 
 interface ShiftProps {
     shift?: Shift | null;
@@ -20,7 +21,6 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
     const { data } = useSession();
     const [user, setUser] = useState<User>(new User());
     const [startChange, setStartChange] = useState<Decimal>(new Decimal(shift?.start_change || 0));
-    const [error, setError] = useState<RequestError | null>();
     const modalHandler = useModal();
 
     useEffect(() => {
@@ -34,10 +34,9 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
 
         try {
             await OpenShift(startChange.toNumber(), data)
-            setError(null);
             fetchShift();
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao abrir turno");
         }
     }
 
@@ -69,7 +68,6 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
                     <PriceField friendlyName='Troco inicial' name='start_change' value={startChange} setValue={setStartChange} />
                     <button className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                         onClick={handleOpenShift}>Abrir turno</button>
-                    {error && <p className="text-red-500">{error.message}</p>}
                 </div>
             </div>
         )
@@ -81,7 +79,6 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
                 <h2 className="text-xl font-bold">Olá, {user.name}</h2>
                 <p>Turno aberto às: <span className="font-semibold">{ToUtcHoursMinutes(shift.opened_at)}</span></p>
                 <p>Data: <span className="font-semibold">{ToUtcDate(shift.opened_at)}</span></p>
-                {error && <p className="text-red-500">{error.message}</p>}
             </div>
 
             <div className="ml-auto text-right justify-around block">

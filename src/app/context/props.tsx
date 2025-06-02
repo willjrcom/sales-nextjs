@@ -15,7 +15,6 @@ export interface ItemsContextProps<T> {
     updateItem: (item: T) => void;
     removeItem: (id: string) => void;
     updateLastUpdate: () => void;
-    getError: () => RequestError | null;
     getLoading: () => boolean;
     getLastUpdate: () => string;
 }
@@ -27,14 +26,13 @@ interface GenericProviderProps<T> {
 const GenericProvider = <T extends { id: string },>({ getItems }: GenericProviderProps<T>) => {
     const [items, setItems] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<RequestError | null>(null);
     const formattedTime = FormatRefreshTime(new Date())
     const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
     const { data } = useSession();
 
     const fetchData = useCallback(async () => {
         if (!data?.user?.access_token) return; 
-        FetchData({ getItems, setItems, data, setError, setLoading });
+        FetchData({ getItems, setItems, data, setLoading });
     }, [data, getItems]);
 
     useEffect(() => {
@@ -68,11 +66,10 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
 
-    const getError = () => error;
     const getLoading = () => loading;
     const getLastUpdate = () => lastUpdate;
 
-    return { items, fetchData, findByID, filterItems, setItemsState, addItem, updateItem, removeItem, updateLastUpdate, getError, getLoading, getLastUpdate }
+    return { items, fetchData, findByID, filterItems, setItemsState, addItem, updateItem, removeItem, updateLastUpdate, getLoading, getLastUpdate }
 }
 
 export default GenericProvider

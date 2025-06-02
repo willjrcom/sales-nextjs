@@ -13,6 +13,7 @@ import ItemOrderProcess from './item';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import { ToUtcTimeWithSeconds } from '@/app/utils/date';
+import { notifyError } from '@/app/utils/notifications';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -21,7 +22,6 @@ interface OrderProcessCardProps {
 const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null)
     const modalHandler = useModal();
 
     const groupItem = orderProcess.group_item;
@@ -32,10 +32,9 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         try {
             await StartOrderProcess(id, data)
-            setError(null)
             dispatch(updateOrderProcess({ type: "UPDATE", payload: { id, changes: { status: "Started" } } }))
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
         }
     }
 
@@ -44,10 +43,9 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         try {
             await FinishOrderProcess(id, data)
-            setError(null)
             dispatch(removeOrderProcess(id))
-        } catch (error) {
-            setError(error as RequestError)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');
         }
     }
 
@@ -69,7 +67,6 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-6">
-            {error && <p className="px-6 py-4 text-red-500">{error.message}</p>}
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                     <span className="text-gray-600 font-semibold">#{groupItem.id}</span>

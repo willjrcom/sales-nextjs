@@ -19,6 +19,7 @@ import PlaceForm from "@/app/forms/place/form";
 import TableForm from "@/app/forms/table/form";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
+import { notifyError } from "@/app/utils/notifications";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -46,7 +47,6 @@ const DragAndDropGrid = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
-    const [error, setError] = useState<RequestError | null>(null);
 
     useEffect(() => {
         if (data && Object.values(placesSlice.entities).length == 0) {
@@ -76,14 +76,6 @@ const DragAndDropGrid = () => {
         setDroppedTables(place.tables || []);
         reloadGrid(place.tables);
     }, [placeSelectedID])
-
-    useEffect(() => {
-        if (error && error.message != "") {
-            setTimeout(() => {
-                setError(null);
-            }, 10000);
-        }
-    }, [error])
 
     const reloadGrid = (tables: PlaceTable[]) => {
         if (!tables || tables.length === 0) return;
@@ -122,8 +114,8 @@ const DragAndDropGrid = () => {
 
                 try {
                     await RemoveTableFromPlace(table.id, data)
-                } catch (error) {
-                    setError(error as RequestError)
+                } catch (error: RequestError | any) {
+                    notifyError(error.message || 'Ocorreu um erro ao remover o pedido');
                     return
                 }
 
@@ -149,8 +141,8 @@ const DragAndDropGrid = () => {
 
                 try {
                     await AddTableToPlace(placeTable, data)
-                } catch (error) {
-                    setError(error as RequestError)
+                } catch (error: RequestError | any) {
+                    notifyError(error.message || "Erro ao alocar mesa")
                     return
                 }
 
@@ -176,8 +168,8 @@ const DragAndDropGrid = () => {
 
                 try {
                     await AddTableToPlace(placeTable, data)
-                } catch (error) {
-                    setError(error as RequestError)
+                } catch (error: RequestError | any) {
+                    notifyError(error.message || "Erro ao mover mesa")
                     return
                 }
 
@@ -197,7 +189,7 @@ const DragAndDropGrid = () => {
         const lastRowUsed = [...droppedTables || []].find((item) => item.row === totalRows - 1);
 
         if (lastRowUsed) {
-            setError(new RequestError("Nao é possivel remover uma linha que existe em uma mesa"));
+            notifyError("Nao é possivel remover uma linha que existe em uma mesa");
             return;
         }
 
@@ -216,7 +208,7 @@ const DragAndDropGrid = () => {
         const lastColumnUsed = [...droppedTables || []].find((item) => item.column === totalCols - 1);
 
         if (lastColumnUsed) {
-            setError(new RequestError("Nao é possivel remover uma coluna que existe em uma mesa"));
+            notifyError("Nao é possivel remover uma coluna que existe em uma mesa");
             return;
         }
 
@@ -229,7 +221,6 @@ const DragAndDropGrid = () => {
     return (
         <>
             <PageTitle title="Configuração de Mesas" tooltip="Arraste as mesas para configurar o layout do salão." />
-            {error && <p className="mb-4 text-red-500">{error.message}</p>}
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="flex justify-around mb-4">
                     <div className="mr-4">

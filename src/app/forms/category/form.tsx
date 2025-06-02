@@ -30,7 +30,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const [category, setCategory] = useState<Category>(item || new Category());
     const [selectedType, setSelectedType] = useState<TypeCategory>("Normal");
     const { data } = useSession();
-    const [error, setError] = useState<RequestError | null>(null);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const dispatch = useDispatch<AppDispatch>();
@@ -78,7 +77,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         try {
             const response = isUpdate ? await UpdateCategory(category, data) : await NewCategory(category, data)
-            setError(null);
 
             if (!isUpdate) {
                 category.id = response
@@ -93,7 +91,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         } catch (error) {
             const err = error as RequestError;
-            setError(err);
             notifyError(err.message || 'Erro ao salvar categoria');
         }
     }
@@ -183,7 +180,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             />
 
             {/* Exibição de Erros */}
-            {error && <p className="mb-4 text-red-500 text-center">{error.message}</p>}
             <ErrorForms errors={errors} />
 
             <hr className="my-6" />

@@ -12,13 +12,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { notifyError } from '@/app/utils/notifications';
 
 const RegisterForm = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [user, setUser] = useState<Person>(new Person());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [error, setError] = useState<RequestError | null>(null);
     const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
 
@@ -30,13 +30,11 @@ const RegisterForm = () => {
         return null; // Evita renderizar HTML até o componente estar pronto
     }
     const submit = async () => {
-        setError(null);
-
         if (password !== confirmPassword && password.length > 0) {
-            setError(new RequestError('As senhas nao conferem'));
+            notifyError('As senhas nao conferem');
             return
         } else if (password.length < 8) {
-            setError(new RequestError('A senha deve ter pelo menos 8 caracteres'));
+            notifyError('A senha deve ter pelo menos 8 caracteres');
             return
         }
 
@@ -53,12 +51,11 @@ const RegisterForm = () => {
         user.address.object_id = undefined;
         try {
             await NewUser({ ...user } as User, password);
-            setError(null);
             setUser(new Person());
             router.push('/login');
 
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao cadastrar usuario");
         }
     }
 
@@ -81,12 +78,10 @@ const RegisterForm = () => {
                 <h2 className="text-2xl mb-6">Cadastro</h2>
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto flex-1">
                     <div className="flex flex-col">
-                        {error && <p className="mb-4 text-red-500">{error.message}</p>}
                         <ErrorForms errors={errors} />
                         <PersonForm person={user} setPerson={setUser} isEmployee />
                         <TextField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
                         <TextField friendlyName='Confirmar Senha' name='confirmPassword' placeholder='Confirme sua senha' setValue={setConfirmPassword} value={confirmPassword} />
-                        {error && <p className="mb-4 text-red-500">{error.message}</p>}
                         <ErrorForms errors={errors} />
                     </div>
                 </div>
