@@ -23,7 +23,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   }
 
     return (
-    <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200">
+    <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200 max-h-[40vh] overflow-y-auto">
       {/* Header */}
       <div className="flex justify-between items-center">
         <StatusComponent status={groupItem.status} />
