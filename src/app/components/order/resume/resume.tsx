@@ -29,16 +29,16 @@ export const CardOrderResume = () => {
             <button
                 type="button"
                 onClick={() => setIsOpen(prev => !prev)}
-                className={`fixed top-1/2 transform -translate-y-1/2 z-50 [writing-mode:vertical-rl] rotate-180 cursor-pointer focus:outline-none bg-blue-500 text-white p-2 rounded-l-md transition-all duration-300 ${isOpen ? 'right-[30vw]' : 'right-0'}`}
+                className={`fixed top-1/2 transform -translate-y-1/2 z-50 [writing-mode:vertical-rl] rotate-180 cursor-pointer focus:outline-none bg-green-500 text-white p-2 rounded-r-md transition-all duration-300 ${isOpen ? 'right-[30vw]' : 'right-0'}`}
             >
                 Resumo
             </button>
 
             <div className="fixed right-0 top-0 h-full z-40">
-                <div className={`h-full bg-blue-500 text-white overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-[30vw]' : 'w-0'} origin-right`}>
+                <div className={`h-full bg-gray-200 text-white overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-[30vw]' : 'w-0'} origin-right`}>
                     {isOpen && (
                         <div className="p-4 text-black">
-                            <h2 className="text-lg font-bold text-white">Resumo</h2>
+                            <h2 className="text-lg font-bold text-black">Resumo</h2>
                             <OrderPaymentsResume />
                             {order?.delivery && <DeliveryCard />}
                             {order?.pickup && <PickupCard />}
