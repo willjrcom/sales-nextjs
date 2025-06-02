@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { notifyError } from "@/app/utils/notifications";
 
 const DeliveryOrderToFinish = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -140,7 +141,6 @@ interface ModalData {
 
 const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
     const dispatch = useDispatch<AppDispatch>();
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -161,20 +161,18 @@ const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
         if (!data) return
 
         if (!deliveryID) {
-            setError(new RequestError('Selecione uma entrega'));
+            notifyError('Selecione uma entrega');
             return
         }
 
-        setError(null);
 
         try {
             await DeliveryOrderDelivery(deliveryID, data);
-            setError(null);
             dispatch(fetchDeliveryOrders({ session: data }));
             modalHandler.hideModal("finish-delivery");
             showOrder(orderID)
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error);
         }
     }
 
@@ -183,7 +181,7 @@ const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
             <div className="items-center mb-4">
                 <p className="text-sm text-gray-600">Confirma que a entrega foi finalizada?</p>
             </div>
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
+            
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Confirmar entrega</button>
         </>
     )

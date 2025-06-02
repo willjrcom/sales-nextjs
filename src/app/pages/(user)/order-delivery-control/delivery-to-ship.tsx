@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaMotorcycle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { notifyError } from "@/app/utils/notifications";
 
 const DeliveryOrderToShip = () => {
     const ordersSlice = useSelector((state: RootState) => state.deliveryOrders);
@@ -29,7 +30,6 @@ const DeliveryOrderToShip = () => {
     const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
 
     useEffect(() => {
@@ -57,13 +57,13 @@ const DeliveryOrderToShip = () => {
         if (!data) return
 
         const company = await GetCompany(data);
-        if (!company) return setError(new RequestError("Nenhuma empresa encontrada"));
+        if (!company) return notifyError("Nenhuma empresa encontrada");
 
         const address = company.address;
-        if (!company.address) return setError(new RequestError("Nenhuma endereço encontrada"));
+        if (!company.address) return notifyError("Nenhuma endereço encontrada");
 
         const coordinates = address.coordinates;
-        if (!coordinates) return setError(new RequestError("Nenhuma coordenada encontrada"));
+        if (!coordinates) return notifyError("Nenhuma coordenada encontrada");
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
@@ -103,10 +103,10 @@ const DeliveryOrderToShip = () => {
 
     return (
         <>
-            {error && <p className="text-red-500">{error.message}</p>}
             <div className="flex justify-end items-center">
                 <Refresh slice={ordersSlice} fetchItems={fetchDeliveryOrders} />
             </div>
+
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
@@ -117,6 +117,7 @@ const DeliveryOrderToShip = () => {
                     <Map mapId="delivery-to-ship" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>
+            
             {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaMotorcycle} title="Enviar entrega" position="bottom-right">
                 <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} />
             </ButtonIconTextFloat>}
@@ -133,7 +134,6 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
     const dispatch = useDispatch<AppDispatch>();
     const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
     const [deliveryDrivers, setDeliveryDrivers] = useState<DeliveryDriver[]>([]);
-    const [error, setError] = useState<RequestError | null>(null);
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -159,25 +159,22 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         if (!data) return
 
         if (deliveryIDs.length === 0) {
-            setError(new RequestError('Selecione pelo menos uma entrega'));
+            notifyError('Selecione pelo menos uma entrega');
             return
         }
 
         if (!selectedDriver) {
-            setError(new RequestError('Selecione um entregador'));
+            notifyError('Selecione um entregador');
             return
         };
-
-        setError(null);
 
         const deliveryOrderIds = Array.from(deliveryIDs);
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
-            setError(null);
             dispatch(fetchDeliveryOrders({ session: data }));
             modalHandler.hideModal("ship-delivery");
-        } catch (error) {
-            setError(error as RequestError);
+        } catch (error: RequestError | any) {
+            notifyError(error);
         }
     }
 
@@ -203,7 +200,7 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
                     }}
                 </Carousel>
             </div>
-            {error && <p className="text-red-500 mb-4">{error.message}</p>}
+
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>
         </>
     )
