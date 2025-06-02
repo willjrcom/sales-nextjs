@@ -83,8 +83,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   return (
     <div className="overflow-y-auto">
       <h3 className="text-lg font-semibold mb-4">{product.name}</h3>
-      <p className="text-sm">{product.description}</p>
-      <p className="text-lg font-bold">Tamanho {product.size.name}</p>
+      <p className="text-sm font-bold">descrição: {product.description}</p>
+      <p className="text-md font-bold">Tamanho {product.size.name}</p>
       <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
       <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
       <hr className="my-4" />

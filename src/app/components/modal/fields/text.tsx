@@ -7,11 +7,13 @@ interface TextFieldProps {
     setValue: (value: string) => void;
     pattern?: string;
     optional?: boolean;
+    /** Callback fired when user presses Enter in the input */
+    onEnter?: () => void;
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
-const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern, optional}: TextFieldProps) => {
+const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern, optional, onEnter }: TextFieldProps) => {
     return (
         <div className="mb-4">
             {friendlyName && (
@@ -27,7 +29,13 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}
-                onChange={(e) => setValue(e.target.value)} // A função setValue agora aceita diretamente o valor
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        onEnter?.();
+                    }
+                }}
                 pattern={pattern}
             />
         </div>
