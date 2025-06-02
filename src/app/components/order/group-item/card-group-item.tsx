@@ -62,7 +62,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
             {item.additional_items && (
               <ul className="mt-2 pl-4 list-disc text-sm text-gray-600">
                 {item.additional_items.map((add) => (
-                  <li className="text-green-500" key={add.id}>
+                  <li className="text-green-600" key={add.id}>
                     {add.name} - R$ {new Decimal(add.price).toFixed(2)}
                   </li>
                 ))}

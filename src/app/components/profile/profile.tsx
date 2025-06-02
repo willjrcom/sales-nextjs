@@ -36,7 +36,7 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
                 <hr className="my-4" />
                 <UserForm item={user} />
             </>,
-            "sm", onClose
+            "md", onClose
         )
     }
     return (
