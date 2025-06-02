@@ -236,7 +236,7 @@ const DragAndDropGrid = () => {
                         <div className="flex items-center justify-between">
                             <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places} optional />
                             <div className="flex items-center gap-2">
-                                <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-left">
+                                <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-right">
                                     <PlaceForm />
                                 </ButtonIconTextFloat>
                                 <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
@@ -349,7 +349,7 @@ const DragAndDropGrid = () => {
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold mb-2">Mesas não alocadas</h3>
                             <div className="flex items-center gap-2">
-                                <ButtonIconTextFloat title="Nova Mesa" modalName="new-table" position="bottom-right">
+                                <ButtonIconTextFloat title="Nova Mesa" modalName="new-table" position="bottom-right-1">
                                     <TableForm />
                                 </ButtonIconTextFloat>
                                 <Refresh slice={unusedTablesSlice} fetchItems={fetchUnusedTables} removeText={true} />

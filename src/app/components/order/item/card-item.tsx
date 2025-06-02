@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
-import React, { useState } from 'react';
+import React from 'react';
 import { useModal } from '@/app/context/modal/context';
 import EditItem from './edit-item';
 import ButtonDelete from '../../button/button-delete';
@@ -12,7 +12,6 @@ interface CardProps {
 }
 
 const ItemCard = ({ item }: CardProps) => {
-    const [isHovered, setIsHovered] = useState(false);
     const contextGroupItem = useGroupItem();
     const modalHandler = useModal();
     const modalName = "edit-item-" + item.id;
@@ -34,8 +33,6 @@ const ItemCard = ({ item }: CardProps) => {
     return (
         <div
             className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
         >
             {/* Estado padrão */}
             <div className="flex justify-between items-center">
@@ -45,7 +42,6 @@ const ItemCard = ({ item }: CardProps) => {
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>
-                    <div className="text-sm font-bold">R$ {totalPriceDecimal.toFixed(2)}</div>
 
                     {/* Count additionals */}
                     {(item.additional_items?.length || 0 > 0) && (
@@ -60,6 +56,8 @@ const ItemCard = ({ item }: CardProps) => {
                             {item.removed_items?.reduce((total) => total + 1, 0)}
                         </div>
                     )}
+                    
+                    <div className="text-sm font-bold">R$ {totalPriceDecimal.toFixed(2)}</div>
                 </div>
                 &nbsp;
                 {isGroupItemStaging && (

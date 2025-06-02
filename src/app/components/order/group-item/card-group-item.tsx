@@ -29,13 +29,12 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         <StatusComponent status={groupItem.status} />
 
         <div onClick={() => setGroupItem(groupItem)}>
-          <ButtonIcon modalName={"edit-group-item-" + groupItem.id} size={groupItem.status === "Staging" ? "xl" : "md"} onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}>
+          <ButtonIcon title="Carrinho" modalName={"edit-group-item-" + groupItem.id} size={groupItem.status === "Staging" ? "xl" : "md"} onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}>
             <EditGroupItem key={groupItem.id} />
           </ButtonIcon>
         </div>
       </div>
 
-      <div className="flex justify-between items-center"></div>
       <div className="flex items-center space-x-4">
         <p className="text-sm">
           <strong>Quantidade total:</strong> {groupItem.quantity}
@@ -63,8 +62,13 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
             {item.additional_items && (
               <ul className="mt-2 pl-4 list-disc text-sm text-gray-600">
                 {item.additional_items.map((add) => (
-                  <li key={add.id}>
+                  <li className="text-green-500" key={add.id}>
                     {add.name} - R$ {new Decimal(add.price).toFixed(2)}
+                  </li>
+                ))}
+                {item.removed_items?.map((rem) => (
+                  <li className="text-red-500" key={rem}>
+                    {rem}
                   </li>
                 ))}
               </ul>
@@ -78,7 +82,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
           <h3 className="text-md font-semibold border-b pb-2">Complemento</h3>
           <div className="flex justify-between">
-            <p className="text-gray-700">{groupItem.complement_item.name}</p>
+            <p className="text-gray-700">{groupItem.complement_item.quantity} x {groupItem.complement_item.name}</p>
             <p className="font-semibold">R$ {new Decimal(groupItem.complement_item.price).toFixed(2)}</p>
           </div>
         </div>

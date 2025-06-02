@@ -36,7 +36,7 @@ export const CartToAdd = () => {
     return (
         <div className=" flex-auto p-4 bg-gray-100 space-y-3 mr-4 overflow-y-auto h-full">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Carrinho</h1>
+                <h2 className="text-xl font-semibold">Categorias</h2>
                 <Refresh slice={categoriesSlice} fetchItems={fetchCategories} />
             </div>
             <div>
