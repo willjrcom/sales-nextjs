@@ -23,11 +23,11 @@ interface SidebarLinkItemProps {
 
 const SidebarLinkItem = ({ href, icon: Icon, label, onClick }: SidebarLinkItemProps) => {
   const baseClasses =
-    'flex items-center w-full p-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors duration-200';
+    'grid grid-cols-[min-content,1fr] gap-x-3 items-center w-full p-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors duration-200';
   const content = (
     <>
       <Icon className="text-2xl flex-shrink-0" />
-      <span className="ml-3">{label}</span>
+      <span className="whitespace-nowrap">{label}</span>
     </>
   );
   if (href) {
