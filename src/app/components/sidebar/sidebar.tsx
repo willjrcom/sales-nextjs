@@ -76,7 +76,7 @@ const Sidebar = ({ onToggleAdmin }: SidebarProps) => {
   }
 
   return (
-    <nav className="sticky top-0 w-52 h-screen bg-gray-800 text-white flex flex-col overflow-hidden">
+    <nav className="sticky top-0 w-12 hover:w-52 h-screen bg-gray-800 text-white flex flex-col overflow-hidden transition-all duration-300 ease-in-out">
       <SidebarLinkItem icon={MdOutlineHomeWork} label={company.trade_name} onClick={handleCompanyModal} />
       <SidebarLinkItem icon={FaPlus} label="Novo Pedido" href="/pages/new-order" />
       <SidebarLinkItem icon={TiFlowMerge} label="Processos" href="/pages/order-process" />
