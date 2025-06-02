@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchEmployees } from "@/redux/slices/employees";
 import { useSession } from "next-auth/react";
+import AddEmployeeAlreadyCreated from "@/app/forms/employee/add-already-created";
 
 const PageEmployee = () => {
     const [nome, setNome] = useState<string>("");
@@ -56,10 +57,16 @@ const PageEmployee = () => {
                     </ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <ButtonIconTextFloat modalName="new-employee" position="bottom-right" size="xl"
-                        title="Novo funcionario">
-                        <EmployeeForm />
-                    </ButtonIconTextFloat>
+                    <>
+                        <ButtonIconTextFloat modalName="new-employee" position="bottom-right" size="xl"
+                            title="Novo funcionario">
+                            <EmployeeForm />
+                        </ButtonIconTextFloat>
+                        <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right-1" size="xl"
+                            title="Adicionar pelo usuário">
+                            <AddEmployeeAlreadyCreated />
+                        </ButtonIconTextFloat>
+                    </>
                 }
                 refreshButton={
                     <Refresh
