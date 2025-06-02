@@ -3,7 +3,6 @@ import Size from "@/app/entities/size/size";
 import SizeForm from "@/app/forms/size/form";
 import { useModal } from "@/app/context/modal/context";
 import Category from "@/app/entities/category/category";
-import Carousel from "@/app/components/carousel/carousel";
 
 interface ListSizeProps {
     category: Category;
@@ -31,22 +30,21 @@ const ListSize = ({ category }: ListSizeProps) => {
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
-            <div className="flex items-center space-x-4">
-                <Carousel items={sizes}>
-                    {(size) => (
-                        <div onClick={() => onEdit(size)}
-                            key={size.id}
-                            className="border p-2 rounded-md text-center bg-white ml-16 w-32 cursor-pointer"
-                        >
-                            {size.name}
-                        </div>
-                    )}
-                </Carousel>
-                {isDefaultCategory &&
+            <div className="flex flex-wrap gap-4">
+                {sizes.map((size) => (
+                    <div
+                        onClick={() => onEdit(size)}
+                        key={size.id}
+                        className="border p-2 rounded-md text-center bg-white w-32 cursor-pointer"
+                    >
+                        {size.name}
+                    </div>
+                ))}
+                {isDefaultCategory && (
                     <ButtonIconText modalName="new-size" title="Tamanho">
                         <SizeForm category={category} />
                     </ButtonIconText>
-                }
+                )}
             </div>
         </div>
     )
