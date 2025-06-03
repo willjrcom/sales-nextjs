@@ -27,18 +27,10 @@ const PageDeliveryDriver = () => {
     const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
-        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
-            dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs));
-        }
-
-        const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs));
-            }
-        }, 60000); // Atualiza a cada 60 segundos
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch]);
+        if (!data) return
+        
+        dispatch(fetchDeliveryDrivers({ session: data, page: pageIndex, perPage: pageSize } as FetchItemsArgs));
+    }, [data, dispatch, pageIndex, pageSize]);
 
     useEffect(() => {
         const driversFound = Object.values(deliveryDriversSlice.entities).filter((driver) => !!driver.employee);

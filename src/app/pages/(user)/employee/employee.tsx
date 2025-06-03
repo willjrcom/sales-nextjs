@@ -21,19 +21,13 @@ const PageEmployee = () => {
     const employeesSlice = useSelector((state: RootState) => state.employees);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
+    const [pageIndex, setPageIndex] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
         if (data && Object.keys(employeesSlice.entities).length === 0) {
-            dispatch(fetchEmployees({ session: data }));
+            dispatch(fetchEmployees({ session: data, page: pageIndex, perPage: pageSize }));
         }
-
-        const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchEmployees({ session: data }));
-            }
-        }, 60000); // Atualiza a cada 60 segundos
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.access_token, dispatch]);
 
     if (employeesSlice.loading) {
