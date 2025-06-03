@@ -82,14 +82,8 @@ const CrudTable = <T extends BaseRow,>({
 
     const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
-    // Determine mode: server-side if onPageChange callback is provided
     const isServerPagination = typeof onPageChange === 'function';
-    // Total count provided for server-side pagination
     const hasTotalCount = totalCount != null && totalCount > 0;
-    // Compute total pages:
-    // - Server-side with totalCount: use provided totalCount
-    // - Server-side without totalCount: leave undefined (unknown pages)
-    // - Client-side: derive from data length
     const pageCount = isServerPagination
         ? (hasTotalCount ? Math.ceil(totalCount / pageSize) : undefined)
         : Math.ceil(data.length / pageSize);
