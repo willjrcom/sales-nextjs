@@ -1,5 +1,6 @@
 import { ColumnDef, Table, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel } from "@tanstack/react-table";
 import { Dispatch, SetStateAction, useState } from "react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface BaseRow {
     id: string;
@@ -21,7 +22,7 @@ interface DataProps<T extends BaseRow> {
     totalCount?: number;
     /**
      * Callback invoked when server-side pagination changes.
-     * Receives session, new pageIndex, and pageSize.
+     * Receives new pageIndex and pageSize.
      */
     onPageChange?: (pageIndex: number, pageSize: number) => void;
 }
@@ -233,31 +234,32 @@ const Pagination = <T,>({ table }: PaginationProps<T>) => {
 
     return (
         <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center justify-center gap-4 flex-1">
+            <div className="flex items-center gap-2">
                 <button
-                    className="px-4 py-2 bg-gray-200 rounded-md"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {'<'} Anterior
+                    <FiChevronLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+                    Anterior
                 </button>
-                <span>
-                    Página <strong>{pageIndex + 1}</strong> de {table.getPageCount()}
+                <span className="text-sm text-gray-700">
+                    Página <strong className="font-medium">{pageIndex + 1}</strong> de <strong className="font-medium">{table.getPageCount()}</strong>
                 </span>
                 <button
-                    className="px-4 py-2 bg-gray-200 rounded-md"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Próximo {'>'}
+                    Próximo
+                    <FiChevronRight className="h-4 w-4 ml-2" aria-hidden="true" />
                 </button>
             </div>
-
-            <div className="ml-auto">
+            <div>
                 <select
-                    className="p-2 bg-gray-200 rounded-md"
                     value={pageSize}
                     onChange={(e) => table.setPageSize(Number(e.target.value))}
+                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 bg-white text-sm rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                     {[10, 20, 30, 40, 50].map(size => (
                         <option key={size} value={size}>
