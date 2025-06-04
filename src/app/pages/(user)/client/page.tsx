@@ -14,20 +14,24 @@ import { fetchClients } from "@/redux/slices/clients";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
+import { useMemo } from 'react';
 
 const PageClient = () => {
     const [nome, setNome] = useState<string>("");
     const clientsSlice = useSelector((state: RootState) => state.clients);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const [pageIndex, setPageIndex] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pagination, setPagination] = useState({ pageIndex: 1, pageSize: 10 });
 
     useEffect(() => {
         if (data) {
-            dispatch(fetchClients({ session: data, page: pageIndex, perPage: pageSize }));
+            dispatch(fetchClients({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
         }
-    }, [data, dispatch, pageIndex, pageSize]);
+    }, [data, dispatch, pagination]);
+
+    const sortedClients = useMemo(() => {
+        return Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name));
+    }, [clientsSlice.entities]);
 
     return (
         <>
@@ -48,18 +52,19 @@ const PageClient = () => {
                     <Refresh
                         fetchItems={fetchClients}
                         slice={clientsSlice}
-                        page={pageIndex}
-                        perPage={pageSize}
+                        page={pagination.pageIndex}
+                        perPage={pagination.pageSize}
                     />
                 }
                 tableChildren={
                     <CrudTable
                         columns={ClientColumns()}
-                        data={Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name))}
+                        data={sortedClients}
                         totalCount={clientsSlice.totalCount}
-                        onPageChange={(newPageIndex, newPageSize) => {
-                            setPageIndex(newPageIndex + 1);
-                            setPageSize(newPageSize);
+                        pagination={pagination}
+                        setPagination={setPagination}
+                        onPageChange={(newPagination) => {
+                            setPagination(newPagination);
                         }}>
                     </CrudTable>
                 }

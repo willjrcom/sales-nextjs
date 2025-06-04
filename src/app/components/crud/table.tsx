@@ -1,5 +1,5 @@
 import { ColumnDef, Table, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel } from "@tanstack/react-table";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface BaseRow {
     id: string;
@@ -18,11 +18,14 @@ interface DataProps<T extends BaseRow> {
     /**
      * Callback invoked when page or pageSize changes (zero-based pageIndex)
      */
-    onPageChange?: (pageIndex: number, pageSize: number) => void;
+    onPageChange?: (pagination: Pagination) => void;
     /**
      * Total count of items (for server-side pagination)
      */
     totalCount?: number;
+
+    pagination: Pagination;
+    setPagination: Dispatch<SetStateAction<Pagination>>;
 }
 
 const CrudTable = <T extends BaseRow,>({
@@ -35,6 +38,8 @@ const CrudTable = <T extends BaseRow,>({
     setSelectedRow: externalSetSelectedRow,
     totalCount,
     onPageChange,
+    pagination,
+    setPagination,
 }: DataProps<T>) => {
     const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
     const [internalSelectedRow, setInternalSelectedRow] = useState<string | null>(null);
@@ -45,9 +50,6 @@ const CrudTable = <T extends BaseRow,>({
 
     const selectedRow = externalSelectedRow ?? internalSelectedRow;
     const setSelectedRow = externalSetSelectedRow ?? setInternalSelectedRow;
-
-    const [pageSize, setPageSize] = useState(10); // Items por página
-    const [pageIndex, setPageIndex] = useState(0); // Página atual (zero-based)
 
     const toggleRowSelection = (rowId: string) => {
         if (rowSelectionType === "checkbox") {
@@ -82,12 +84,18 @@ const CrudTable = <T extends BaseRow,>({
 
     const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
-    const isServerPagination = typeof onPageChange === 'function';
-    const hasTotalCount = totalCount != null && totalCount > 0;
-    const pageCount = isServerPagination
-        ? (hasTotalCount ? Math.ceil(totalCount / pageSize) : undefined)
-        : Math.ceil(data.length / pageSize);
-    const manualPagination = isServerPagination;
+    const manualPagination = totalCount != undefined;
+
+    useEffect(() => {
+        if (manualPagination && onPageChange) {
+            onPageChange(pagination);
+        }
+    }, [pagination.pageIndex, pagination.pageSize, manualPagination, onPageChange]);
+
+    const pageCount = manualPagination
+        ? Math.ceil(totalCount / pagination.pageSize)
+        : Math.ceil(data.length / pagination.pageSize);
+
     const table = useReactTable({
         columns,
         data,
@@ -95,14 +103,13 @@ const CrudTable = <T extends BaseRow,>({
         manualPagination,
         getPaginationRowModel: getPaginationRowModel(),
         pageCount,
-        state: {
-            pagination: { pageIndex, pageSize },
-        },
+        state: { pagination: pagination },
         onPaginationChange: (updater) => {
-            const newState = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
-            setPageIndex(newState.pageIndex);
-            setPageSize(newState.pageSize);
-            if (onPageChange) onPageChange(newState.pageIndex, newState.pageSize);
+            const newState = typeof updater === 'function' ? updater(pagination) : updater;
+            setPagination(newState);
+            if (manualPagination && onPageChange) {
+                onPageChange(newState);
+            }
         },
     });
 
@@ -111,7 +118,7 @@ const CrudTable = <T extends BaseRow,>({
             <div className="overflow-y-auto h-[50vh]">
                 <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md">
                     {tHead({ table, rowSelectionType, toggleAllRowsSelection, isAllRowsSelected })}
-                    {tBody({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected })}
+                    {tBody({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected, manualPagination })}
                 </table>
             </div>
             {Pagination({ table })}
@@ -161,16 +168,18 @@ const tHead = <T extends BaseRow,>({ table, rowSelectionType, toggleAllRowsSelec
 
 interface TBodyProps<T extends BaseRow> {
     table: Table<T>;
-    columns: any[];
+    columns: ColumnDef<T>[];
     toggleRowSelection: (rowId: string) => void;
     isRowSelected: (rowId: string) => boolean;
     rowSelectionType: RowSelectionType;
+    manualPagination: boolean;
 }
 
-const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected }: TBodyProps<T>) => {
+const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected, manualPagination }: TBodyProps<T>) => {
     const { pageIndex, pageSize } = table.getState().pagination;
     const allRows = table.getRowModel().rows;
-    const pagedRows = allRows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+    const pagedRows = manualPagination ? allRows : allRows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+
     if (pagedRows.length === 0) {
         return noResults({ columns });
     }
@@ -210,7 +219,7 @@ const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRow
 };
 
 interface noResultsProps {
-    columns: any[];
+    columns: ColumnDef<any>[];
 }
 
 const noResults = ({ columns }: noResultsProps) => {
