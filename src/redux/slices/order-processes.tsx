@@ -26,7 +26,7 @@ const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderPr
     const fetchOrderProcesses = createAsyncThunk(`${name}/fetch`, async (payload: { id: string; session: Session }, { rejectWithValue }) => {
         try {
             const response = await getItemsByID!(payload.id, payload.session);
-            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count")) || 0};
+            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count"))};
         } catch (error) {
             return rejectWithValue(error);
         }

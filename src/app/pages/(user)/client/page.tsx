@@ -21,13 +21,19 @@ const PageClient = () => {
     const clientsSlice = useSelector((state: RootState) => state.clients);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const [pagination, setPagination] = useState({ pageIndex: 1, pageSize: 10 });
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     useEffect(() => {
         if (data) {
+            console.log('fetching clients...');
             dispatch(fetchClients({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
         }
-    }, [data, dispatch, pagination]);
+    }, [data, pagination.pageIndex, pagination.pageSize, dispatch]);
+
+    useEffect(() => {
+        console.log('pagination mudou:', pagination);
+    }, [pagination]);
+
 
     const sortedClients = useMemo(() => {
         return Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name));
@@ -61,12 +67,10 @@ const PageClient = () => {
                         columns={ClientColumns()}
                         data={sortedClients}
                         totalCount={clientsSlice.totalCount}
-                        pagination={pagination}
-                        setPagination={setPagination}
-                        onPageChange={(newPagination) => {
-                            setPagination(newPagination);
-                        }}>
-                    </CrudTable>
+                        onPageChange={(pageIndex, pageSize) => {
+                            setPagination({ pageIndex, pageSize });
+                        }}
+                    />
                 }
             />
         </>

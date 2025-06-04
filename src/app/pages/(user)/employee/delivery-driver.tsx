@@ -23,14 +23,11 @@ const PageDeliveryDriver = () => {
     const [drivers, setDrivers] = useState<DeliveryDriver[]>([]);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const [pageIndex, setPageIndex] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
-
+    const defaultPageSize = 10;
     useEffect(() => {
-        if (!data) return
-        
-        dispatch(fetchDeliveryDrivers({ session: data, page: pageIndex, perPage: pageSize } as FetchItemsArgs));
-    }, [data, dispatch, pageIndex, pageSize]);
+        if (!data) return;
+        dispatch(fetchDeliveryDrivers({ session: data, page: 1, perPage: defaultPageSize } as FetchItemsArgs));
+    }, [data, dispatch]);
 
     useEffect(() => {
         const driversFound = Object.values(deliveryDriversSlice.entities).filter((driver) => !!driver.employee);
@@ -70,8 +67,8 @@ const PageDeliveryDriver = () => {
                         data={filteredDrivers}
                         totalCount={deliveryDriversSlice.totalCount}
                         onPageChange={(newPage, newSize) => {
-                            setPageIndex(newPage);
-                            setPageSize(newSize);
+                            if (!data) return;
+                            dispatch(fetchDeliveryDrivers({ session: data, page: newPage + 1, perPage: newSize } as FetchItemsArgs));
                         }}
                     />
                 }
