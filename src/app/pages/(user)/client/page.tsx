@@ -25,15 +25,9 @@ const PageClient = () => {
 
     useEffect(() => {
         if (data) {
-            console.log('fetching clients...');
             dispatch(fetchClients({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
         }
     }, [data, pagination.pageIndex, pagination.pageSize, dispatch]);
-
-    useEffect(() => {
-        console.log('pagination mudou:', pagination);
-    }, [pagination]);
-
 
     const sortedClients = useMemo(() => {
         return Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name));
