@@ -101,16 +101,6 @@ export const reportConfigs: ReportConfig[] = [
     dataKey: 'quantity',
   },
   {
-    id: 'current-stock-by-category',
-    name: 'Estoque Atual por Categoria',
-    endpoint: '/report/current-stock-by-category',
-    method: 'POST',
-    chartType: 'bar',
-    inputType: 'none',
-    labelKey: 'category',
-    dataKey: 'quantity',
-  },
-  {
     id: 'clients-registered-by-day',
     name: 'Clientes Registrados por Dia',
     endpoint: '/report/clients-registered-by-day',
