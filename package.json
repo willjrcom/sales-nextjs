@@ -2,10 +2,12 @@
   "name": "sales-nextjs",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
+    "start_electron": "electron .",
     "lint": "next lint"
   },
   "dependencies": {
@@ -44,6 +46,7 @@
     "serialize-javascript": "^6.0.2",
     "swiper": "^11.1.15",
     "uuid": "^9.0.1",
+    "wait-on": "^8.0.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -56,6 +59,7 @@
     "@types/serialize-javascript": "^5.0.4",
     "@types/uuid": "^9.0.8",
     "cross-env": "^7.0.3",
+    "electron": "^36.4.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
