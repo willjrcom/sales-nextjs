@@ -88,7 +88,6 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/product" />
       <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
       <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
-      <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/pages/user" />
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <div className="mt-auto flex flex-col">

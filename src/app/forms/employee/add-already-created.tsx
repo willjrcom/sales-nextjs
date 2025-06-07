@@ -1,6 +1,7 @@
 import NewEmployee from "@/app/api/employee/new/employee";
 import SearchUser from "@/app/api/user/search/user";
 import PatternField from "@/app/components/modal/fields/pattern";
+import { useModal } from "@/app/context/modal/context";
 import Employee from "@/app/entities/employee/employee";
 import User from "@/app/entities/user/user";
 import RequestError from "@/app/utils/error";
@@ -74,6 +75,7 @@ interface CardUserProps {
 const CardUser = ({ user }: CardUserProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
+    const modalHandler = useModal();
 
     const newEmployee = async (user: User) => {
         if (!data) return;
@@ -85,6 +87,8 @@ const CardUser = ({ user }: CardUserProps) => {
             employee.id = response
             dispatch(addEmployee(employee));
 
+            modalHandler.hideModal('new-already-created-employee');
+            
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao criar funcionário');
         }

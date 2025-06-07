@@ -19,6 +19,9 @@ import { AppDispatch } from '@/redux/store';
 import { HiddenField } from '@/app/components/modal/field';
 import User from '@/app/entities/user/user';
 import NewUser from '@/app/api/user/new/user';
+import RemoveUserFromCompany from '@/app/api/company/remove/company';
+import { removeUser } from '@/redux/slices/users';
+import AddUserToCompany from '@/app/api/company/add/company';
 
 interface EmployeeFormProps extends CreateFormsProps<Employee> {
     isDisabledPerson?: boolean;
@@ -86,6 +89,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
 
         try {
             const responseUser = await NewUser(newEmployee, "", true)
+            await AddUserToCompany(newEmployee.email, data)
             const responseEmployee = await NewEmployee(responseUser, data)
 
             newEmployee.id = responseEmployee
@@ -102,8 +106,12 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     const onDelete = async () => {
         if (!data) return;
         try {
-            DeleteEmployee(employee.id, data);
+            await DeleteEmployee(employee.id, data);
             dispatch(removeEmployee(employee.id));
+            
+            await RemoveUserFromCompany(employee.email, data)
+            dispatch(removeUser(employee.user_id))
+            
             notifySuccess('Funcionário removido com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {

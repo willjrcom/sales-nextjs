@@ -95,7 +95,6 @@ const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
       <SidebarLinkItem icon={MdFastfood} label="Cardápio" href="/pages/admin-product" />
       <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/admin-client" />
       <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/admin-employee" />
-      <SidebarLinkItem icon={FaUserLock} label="Usuários" href="/pages/admin-user" />
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/admin-place" />
       <SidebarLinkItem icon={FaPlus} label="Pedidos" href="/pages/admin-order" />
       <SidebarLinkItem icon={FaClock} label="Turnos" href="/pages/admin-shift" />

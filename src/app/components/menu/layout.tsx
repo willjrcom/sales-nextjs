@@ -16,7 +16,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
   return (
     <ContextProviders>
-      <div className="relative flex overflow-hidden h-screen text-black">
+      <div className="relative flex overflow-hidden h-screen text-black bg-gray-100">
         {/* Sidebars with slide transition */}
         <div className={
           `absolute inset-y-0 left-0 w-12 hover:w-52 transition-all duration-300 ease-in-out ` +
@@ -34,7 +34,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
         <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${isHover ? 'ml-52' : 'ml-12'}`}>
           <Topbar />
-          <main className="p-4 h-[90vh] flex justify-center bg-gray-100">
+          <main className="p-4 h-[90vh] flex justify-center">
             <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-[90vw] h-full box-border">
               {children}
             </div>

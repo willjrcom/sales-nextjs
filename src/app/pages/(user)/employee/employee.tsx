@@ -57,7 +57,7 @@ const PageEmployee = () => {
                             <EmployeeForm />
                         </ButtonIconTextFloat>
                         <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right-1" size="xl"
-                            title="Adicionar pelo usuário">
+                            title="Adicionar existente">
                             <AddEmployeeAlreadyCreated />
                         </ButtonIconTextFloat>
                     </>
