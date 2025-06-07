@@ -121,7 +121,7 @@ function CompanySelection() {
     }
 
     return (
-        <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
+        <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100 text-black">
             {loadingCompanies && (
                 <div className="flex justify-center items-center h-64 mb-10">
                     <Loading />

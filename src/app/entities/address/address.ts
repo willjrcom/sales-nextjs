@@ -49,7 +49,7 @@ export default class Address {
     uf: string = '';
     cep: string = '';
     delivery_tax: Decimal = new Decimal(0);
-    likeTax: boolean = false;
+    isClient: boolean = false;
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
@@ -66,7 +66,7 @@ constructor(
     cep = '',
     delivery_tax: Decimal = new Decimal(0),
     adress_type = '',
-    likeTax: boolean = false,
+    isClient: boolean = false,
     coordinates?: Coordinates
 ) {
         this.id = id
@@ -80,7 +80,7 @@ constructor(
         this.uf = uf
         this.cep = cep
         this.delivery_tax = delivery_tax
-        this.likeTax = likeTax
+        this.isClient = isClient
         this.coordinates = coordinates || new Coordinates()
         this.address_type = adress_type
     }

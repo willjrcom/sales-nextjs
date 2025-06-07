@@ -34,7 +34,7 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
     }, [contact]);
 
     return (
-        <>
+        <div className="text-black">
             <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={person.name} disabled={isHidden} />
 
             <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={person.email} optional={!isEmployee} disabled={isHidden} />
@@ -45,7 +45,7 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
 
             <ContactForm contactParent={contact} setContactParent={setContact} isHidden={isHidden} />
             <AddressForm addressParent={person.address} setAddressParent={setAddress} isHidden={isHidden} />
-        </>
+        </div>
     );
 }
 

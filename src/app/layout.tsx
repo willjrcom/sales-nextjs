@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="br">
-      <body className={inter.className}>
+      <body className={inter.className + " text-black"} >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

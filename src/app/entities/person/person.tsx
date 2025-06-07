@@ -10,14 +10,14 @@ export default class Person {
     contact: Contact = new Contact();
     address: Address = new Address();
 
-    constructor(name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), likeTax: boolean = false) {
+    constructor(name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), isClient: boolean = false) {
         this.name = name;
         this.email = email;
         this.cpf = cpf;
         this.birthday = birthday;
         this.contact = contact;
         this.address = Object.assign(new Address(), address);
-        this.address.likeTax = likeTax
+        this.address.isClient = isClient
     }
 };
 

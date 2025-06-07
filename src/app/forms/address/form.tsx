@@ -80,16 +80,16 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
 
         <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
         
-        <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />
+        {address.isClient && <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />}
 
-        <PriceField
-            name="delivery_tax"
+        {address.isClient && <PriceField
+            name="delivery_tax" 
             friendlyName="Taxa de entrega"
             placeholder="Digite a taxa de entrega"
             setValue={value => handleInputChange('delivery_tax', value)}
             value={address.delivery_tax}
             disabled={isHidden}
-        />
+        />}
         
         <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id}/>
         <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id}/>

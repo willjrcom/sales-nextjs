@@ -7,8 +7,9 @@
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
     "start_electron": "electron .",
-    "lint": "next lint"
+    "build_electron": "electron-builder"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.817.0",
@@ -60,6 +61,7 @@
     "@types/uuid": "^9.0.8",
     "cross-env": "^7.0.3",
     "electron": "^36.4.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
