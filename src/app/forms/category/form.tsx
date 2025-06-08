@@ -72,7 +72,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
             if (!isUpdate) {
                 category.id = response
-                dispatch(addCategory(category));
+                dispatch(fetchCategories({ session: data }));
                 notifySuccess(`Categoria ${category.name} criada com sucesso`);
                 modalHandler.hideModal(modalName);
             } else {

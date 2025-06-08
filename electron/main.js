@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const waitOn = require('wait-on');
@@ -20,6 +20,7 @@ async function createWindow(port) {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
         }
     });
 
@@ -48,6 +49,15 @@ async function waitForFrontendAndCreateWindow(port) {
         console.error('Erro ao esperar frontend subir:', err);
     }
 }
+
+// IPC handler para imprimir pedidos via processo principal
+ipcMain.handle('printer', async (_event, { html, options }) => {
+    const printWin = new BrowserWindow({ show: false });
+    await printWin.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+    await new Promise((resolve) => printWin.webContents.once('did-finish-load', resolve));
+    printWin.webContents.print(options);
+    printWin.close();
+});
 
 app.whenReady().then(() => {
     // Inicia backend Go

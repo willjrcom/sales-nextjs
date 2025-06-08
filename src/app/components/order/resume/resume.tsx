@@ -15,6 +15,7 @@ import { SelectField } from "../../modal/field"
 import { payMethodsWithId } from "@/app/entities/order/order-payment"
 import Decimal from 'decimal.js';
 import { notifyError } from "@/app/utils/notifications";
+import printOrder from "../../print/print-order";
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
@@ -71,6 +72,8 @@ export const OrderPaymentsResume = () => {
         try {
             await PendingOrder(order.id, data)
             contextCurrentOrder.fetchData(order.id);
+
+            printOrder({ orderID: order.id, session: data });
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao lançar pedido");
         }

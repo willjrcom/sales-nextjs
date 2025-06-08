@@ -21,6 +21,8 @@ import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { notifyError } from "@/app/utils/notifications";
+import printOrder from "@/app/components/print/print-order";
+import { FaPrint } from "react-icons/fa";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -377,6 +379,14 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                                 Confirmar
                             </button>
                         </ButtonIconText>}
+                    {/* Botão de impressão */}
+                    <button
+                        onClick={() => data && printOrder({ orderID: order.id, session: data })}
+                        className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
+                    >
+                        <FaPrint />
+                        <span>Imprimir</span>
+                    </button>
                 </div>
             </div>
         </div>
