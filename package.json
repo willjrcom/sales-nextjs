@@ -5,6 +5,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
+    "prod": "cross-env NODE_OPTIONS='--inspect' next build && next start",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -18,22 +18,17 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
     } else {
         html = String(result);
     }
-    if (window.electronAPI?.getPrinters && window.electronAPI?.printer) {
-        const printers = await window.electronAPI.getPrinters();
-        let printerName: string | undefined;
-        if (printers.length === 0) {
-            console.warn('Nenhuma impressora disponível. Usando padrão.');
-        } else if (printers.length === 1) {
-            printerName = printers[0].name;
-        } else {
-            const list = printers.map((p, i) => `${i + 1}: ${p.name}`).join('\n');
-            const choice = window.prompt(`Selecione a impressora:\n${list}`, '1');
-            const idx = parseInt(choice || '1', 10) - 1;
-            if (printers[idx]) {
-                printerName = printers[idx].name;
+    if (window.electronAPI?.printer) {
+        let printerName = session.user.current_company?.preferences["print_order"] || "default";
+
+        if (printerName === "default") {
+            const printers = await window.electronAPI.getPrinters();
+            if (printers.length > 0) {
+                printerName = printers[0].name;
             }
         }
-        await window.electronAPI.printer(html, printerName, { silent: false, printBackground: true });
+
+        await window.electronAPI.printer(html, printerName, { silent: true, printBackground: true });
     } else {
         const w = window.open('', '_blank', 'width=800,height=600');
         if (!w) return;

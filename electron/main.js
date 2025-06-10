@@ -130,7 +130,7 @@ app.whenReady().then(() => {
     const isWin = process.platform === 'win32';
     const npmCmd = isWin ? 'npm.cmd' : 'npm';
 
-    nextDev = spawn(npmCmd, ['run', 'dev'], {
+    nextDev = spawn(npmCmd, ['run', 'start'], {
         cwd: nextPath,
         shell: true,
     });

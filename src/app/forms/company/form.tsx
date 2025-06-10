@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Company, { ValidateCompanyForm } from '@/app/entities/company/company';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -9,7 +9,7 @@ import CreateFormsProps from '../create-forms-props';
 import NewCompany from '@/app/api/company/new/company';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { HiddenField, TextField, CheckboxField, NumberField } from '@/app/components/modal/field';
+import { HiddenField, TextField, CheckboxField, NumberField, SelectField } from '@/app/components/modal/field';
 import PriceField from '@/app/components/modal/fields/price';
 import Decimal from 'decimal.js';
 import Access from '@/app/api/auth/access/access';
@@ -79,6 +79,23 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             notifySuccess(`${label} alterada para ${value}`);
         }
     };
+    // Carrega impressoras disponíveis via Electron
+    const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.electronAPI?.getPrinters) {
+            (async () => {
+                try {
+                    if (!window.electronAPI) return;
+                    const list = await window.electronAPI.getPrinters();
+                    setPrinters(
+                        list.map((p: any) => ({ id: p.name, name: p.name }))
+                    );
+                } catch (err) {
+                    console.error('Error loading printers', err);
+                }
+            })();
+        }
+    }, []);
 
     const handleSubmit = async () => {
         if (!data) return;
@@ -202,6 +219,15 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 name="min_delivery_tax"
                 value={new Decimal(company.preferences.min_delivery_tax || '0')}
                 setValue={value => handlePreferenceChange('min_delivery_tax', value)}
+            />
+            {/* Impressora de pedido */}
+            <SelectField
+                friendlyName="Impressora de pedido"
+                name="print_order"
+                values={printers}
+                selectedValue={company.preferences.print_order || ''}
+                setSelectedValue={value => handlePreferenceChange('print_order', value)}
+                optional
             />
 
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
