@@ -135,7 +135,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 optional
             />
             <CheckboxField
-                friendlyName="Deseja imprimir no pedido?"
+                friendlyName="Deseja imprimir ao lançar o pedido?"
                 name="need_print"
                 setValue={value => handleInputChange('need_print', value)}
                 value={category.need_print}

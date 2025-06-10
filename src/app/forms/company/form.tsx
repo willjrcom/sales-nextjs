@@ -221,13 +221,37 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 setValue={value => handlePreferenceChange('min_delivery_tax', value)}
             />
             {/* Impressora de pedido */}
+            <CheckboxField
+                friendlyName="Deseja imprimir ao lançar o pedido?"
+                name="enable_print_order"
+                value={company.preferences.enable_tables === 'true'}
+                setValue={value => handlePreferenceChange('enable_tables', value)}
+            />
             <SelectField
                 friendlyName="Impressora de pedido"
-                name="print_order"
+                name="printer_order"
                 values={printers}
-                selectedValue={company.preferences.print_order || ''}
-                setSelectedValue={value => handlePreferenceChange('print_order', value)}
+                selectedValue={company.preferences.printer_order || ''}
+                setSelectedValue={value => handlePreferenceChange('printer_order', value)}
                 optional
+                disabled={company.preferences.enable_print_order === 'false'}
+            />
+
+            {/* Impressora de pedido */}
+            <CheckboxField
+                friendlyName="Deseja imprimir ao lançar a entrega?"
+                name="enable_print_delivery"
+                value={company.preferences.enable_tables === 'true'}
+                setValue={value => handlePreferenceChange('enable_tables', value)}
+            />
+            <SelectField
+                friendlyName="Impressora de entrega"
+                name="printer_delivery"
+                values={printers}
+                selectedValue={company.preferences.printer_delivery || ''}
+                setSelectedValue={value => handlePreferenceChange('printer_delivery', value)}
+                optional
+                disabled={company.preferences.enable_print_delivery === 'false'}
             />
 
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />

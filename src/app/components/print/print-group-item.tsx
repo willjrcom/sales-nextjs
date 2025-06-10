@@ -1,18 +1,20 @@
 "use client";
+import GetGroupItemPrintByID from "@/app/api/print/print-group-item";
 import GetOrderPrintByID from "@/app/api/print/print-order"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
 
-interface PrintOrderProps {
-    orderID: string;
+interface PrintGroupItemProps {
+    groupItemID: string;
+    printerName?: string;
     session: Session;
 }
 
-const printOrder = async ({ orderID, session }: PrintOrderProps) => {
+const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupItemProps) => {
     if (typeof window === 'undefined') return;
 
     // obtém o conteúdo de impressão (pode vir como Blob ou string)
-    const result = await GetOrderPrintByID(orderID, session) as any;
+    const result = await GetGroupItemPrintByID(groupItemID, session) as any;
     let html: string;
     if (result instanceof Blob) {
         html = await result.text();
@@ -20,7 +22,7 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
         html = String(result);
     }
     if (window.electronAPI?.printer) {
-        let printerName = session.user.current_company?.preferences["print_order"] || "default";
+        printerName = printerName || "default";
 
         if (printerName === "default") {
             const printers = await window.electronAPI.getPrinters();
@@ -46,4 +48,4 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
     }
 };
 
-export default printOrder
+export default printGroupItem

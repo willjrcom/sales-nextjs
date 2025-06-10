@@ -14,6 +14,7 @@ export default class GroupItem {
   total_price: Decimal = new Decimal(0);
   quantity: number = 0;
   need_print: boolean = false;
+  printer_name: string;
   use_process_rule: boolean = false;
   observation: string = "";
   category_id: string = "";
@@ -35,6 +36,7 @@ export default class GroupItem {
     total_price: Decimal = new Decimal(0),
     quantity = 0,
     need_print = false,
+    printer_name: string,
     use_process_rule = false,
     observation = "",
     category_id = "",
@@ -53,6 +55,7 @@ export default class GroupItem {
     this.total_price = total_price;
     this.quantity = quantity;
     this.need_print = need_print;
+    this.printer_name = printer_name;
     this.use_process_rule = use_process_rule;
     this.observation = observation;
     this.category_id = category_id;
