@@ -4,7 +4,7 @@
   "private": true,
   "main": "electron/main.js",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS='--inspect' next dev  --turbopack",
+    "dev": "cross-env NODE_OPTIONS='--inspect' next dev  ",
     "prod": "cross-env NODE_OPTIONS='--inspect' next build && next start",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000/login && npm run start_electron\"",
     "build": "next build",

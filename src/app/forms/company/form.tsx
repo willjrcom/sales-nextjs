@@ -224,8 +224,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <CheckboxField
                 friendlyName="Deseja imprimir ao lançar o pedido?"
                 name="enable_print_order"
-                value={company.preferences.enable_tables === 'true'}
-                setValue={value => handlePreferenceChange('enable_tables', value)}
+                value={company.preferences.enable_print_order === 'true'}
+                setValue={value => handlePreferenceChange('enable_print_order', value)}
             />
             <SelectField
                 friendlyName="Impressora de pedido"
@@ -241,8 +241,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <CheckboxField
                 friendlyName="Deseja imprimir ao lançar a entrega?"
                 name="enable_print_delivery"
-                value={company.preferences.enable_tables === 'true'}
-                setValue={value => handlePreferenceChange('enable_tables', value)}
+                value={company.preferences.enable_print_delivery === 'true'}
+                setValue={value => handlePreferenceChange('enable_print_delivery', value)}
             />
             <SelectField
                 friendlyName="Impressora de entrega"

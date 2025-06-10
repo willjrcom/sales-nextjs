@@ -20,6 +20,9 @@ import TableForm from "@/app/forms/table/form";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
 import { notifyError } from "@/app/utils/notifications";
+import { useModal } from "@/app/context/modal/context";
+import { FaEdit } from "react-icons/fa";
+import ButtonIconText from "@/app/components/button/button-icon-text";
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -220,7 +223,7 @@ const DragAndDropGrid = () => {
 
     return (
         <>
-            <PageTitle title="Configuração de Mesas" tooltip="Arraste as mesas para configurar o layout do salão." />
+            <PageTitle title="Configuração de Ambientes e Mesas" tooltip="Arraste as mesas para configurar o layout do salão." />
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="flex justify-around mb-4">
                     <div className="mr-4">
@@ -230,6 +233,16 @@ const DragAndDropGrid = () => {
                                 <ButtonIconTextFloat title="Novo Ambiente" modalName="new-place" position="bottom-right">
                                     <PlaceForm />
                                 </ButtonIconTextFloat>
+                                {placeSelectedID && (
+                                    <ButtonIconText
+                                        icon={FaEdit}
+                                        modalName={`edit-place-${placeSelectedID}`}
+                                        title="Editar Ambiente"
+                                        color="yellow"
+                                    >
+                                        <PlaceForm item={places.find(p => p.id === placeSelectedID)!} isUpdate />
+                                    </ButtonIconText>
+                                )}
                                 <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
                             </div>
                         </div>
@@ -392,6 +405,7 @@ const DraggablePlaceToTable = ({ id, table }: { id: string; table: PlaceTable })
 
 const DraggableUnusedTable = ({ id, table }: { id: string; table: Table }) => {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({ id, data: table });
+    const modalHandler = useModal();
 
     const style = {
         transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
@@ -408,15 +422,34 @@ const DraggableUnusedTable = ({ id, table }: { id: string; table: Table }) => {
         justifyContent: "center",
     };
 
+    const handleEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        modalHandler.showModal(
+            `edit-table-${table.id}`,
+            `Editar Mesa ${table.name}`,
+            <TableForm item={table} isUpdate />, 
+            'md', 
+            () => modalHandler.hideModal(`edit-table-${table.id}`)
+        );
+    };
+
     return (
         <div
-            className="mb-2 min-h-[60px]"
+            className="mb-2 min-h-[60px] relative"
             ref={setNodeRef}
             {...listeners}
             {...attributes}
             style={{ ...style }}
         >
-            {table?.name || "Sem Nome"}
+            <span>{table?.name || "Sem Nome"}</span>
+            <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={handleEdit}
+                className="absolute top-1 right-1 p-1 bg-white bg-opacity-75 rounded hover:bg-opacity-100"
+                style={{ zIndex: 3000 }}
+            >
+                <FaEdit size={12} />
+            </button>
         </div>
     );
 };

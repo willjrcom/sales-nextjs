@@ -28,7 +28,7 @@ const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children 
     return (
         <>
             {/* Modal background */}
-            <div className={backgroundClasses + " flex items-center justify-center"} style={{ zIndex: 1000 }}>
+            <div className={backgroundClasses + " flex items-center justify-center"} style={{ zIndex: 10000 }}>
 
                 {/* Modal */}
                 <div
