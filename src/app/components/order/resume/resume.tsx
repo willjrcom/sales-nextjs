@@ -72,12 +72,11 @@ export const OrderPaymentsResume = () => {
 
         try {
             await PendingOrder(order.id, data)
-            contextCurrentOrder.fetchData(order.id);
 
             for (let i = 0; i < order.group_items.length; i++) {
                 const groupItem = order.group_items[i];
 
-                if (groupItem.need_print) {
+                if (groupItem.need_print && groupItem.status == "Staging") {
                     await printGroupItem({
                         groupItemID: groupItem.id,
                         printerName: groupItem.printer_name,
@@ -85,6 +84,9 @@ export const OrderPaymentsResume = () => {
                     })
                 }
             }
+
+            // Must be after printGroupItem
+            contextCurrentOrder.fetchData(order.id);
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao lançar pedido");
         }
