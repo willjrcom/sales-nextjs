@@ -1,3 +1,4 @@
+ 'use client';
 import React, { useEffect, useState } from 'react';
 import { IconType } from 'react-icons';
 import { FaUserTie, FaPlus, FaSignOutAlt, FaRedo, FaUserLock, FaTh, FaSlidersH, FaTools } from 'react-icons/fa';

@@ -1,3 +1,4 @@
+"use client";
 import Sidebar from '../sidebar/sidebar';
 import AdminSidebar from '../sidebar/admin-sidebar';
 import Topbar from '../topbar/topbar';

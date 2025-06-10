@@ -1,3 +1,4 @@
+"use client";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import { FormatRefreshTime } from "../components/crud/refresh";

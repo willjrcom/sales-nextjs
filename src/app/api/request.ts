@@ -71,7 +71,18 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin }: Reque
         throw error;
     }
 
-    const parsedBody = (await response.json());
+    const ct = response.headers.get("content-type") || "";
+    if (ct.includes("application/octet-stream")) {
+        // Blob para dados brutos
+        const blob = await response.blob();
+        return {
+            data: blob as unknown as TR,
+            headers: response.headers
+        } as Response<TR>;
+    }
+    
+    // caso não seja binário, parseia JSON normalmente
+    const parsedBody = await response.json();
     return { data: parsedBody.data, headers: response.headers } as Response<TR>;
 };
 

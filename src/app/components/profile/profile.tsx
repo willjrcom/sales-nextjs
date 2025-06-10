@@ -1,3 +1,4 @@
+ 'use client';
 import { useModal } from "@/app/context/modal/context";
 import User from "@/app/entities/user/user";
 import UserForm from "@/app/forms/user/form-profile";

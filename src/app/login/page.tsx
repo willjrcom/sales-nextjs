@@ -21,6 +21,16 @@ const LoginForm = () => {
 
   useEffect(() => {
     setIsMounted(true);
+    // Se estiver em Electron, tenta carregar credenciais salvas
+    if (typeof window !== 'undefined' && window.electronAPI?.getCredentials) {
+      window.electronAPI.getCredentials().then((creds) => {
+        if (creds?.email) {
+          setEmail(creds.email);
+          setPassword(creds.password);
+          setRemember(true);
+        }
+      });
+    }
   }, []);
   
   if (!isMounted) {
@@ -42,6 +52,14 @@ const LoginForm = () => {
       if (res?.error) {
         notifyError(res.error);
       } else if (res?.ok) {
+        // Salva ou limpa credenciais conforme opção
+        if (typeof window !== 'undefined' && window.electronAPI) {
+          if (remember && window.electronAPI.saveCredentials) {
+            window.electronAPI.saveCredentials(email, password);
+          } else if (!remember && window.electronAPI.clearCredentials) {
+            window.electronAPI.clearCredentials();
+          }
+        }
         router.push('/access/company-selection');
       }
 

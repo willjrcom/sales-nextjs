@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const waitOn = require('wait-on');
@@ -50,13 +51,60 @@ async function waitForFrontendAndCreateWindow(port) {
     }
 }
 
+// IPC handler para obter lista de impressoras disponíveis
+// IPC handler para obter lista de impressoras disponíveis
+ipcMain.handle('get-printers', async (_event) => {
+    const win = BrowserWindow.getAllWindows()[0];
+    if (!win) return [];
+    const wc = win.webContents;
+    if (typeof wc.getPrinters === 'function') {
+        return wc.getPrinters();
+    }
+    if (typeof wc.getPrintersAsync === 'function') {
+        return await wc.getPrintersAsync();
+    }
+    return [];
+});
+
 // IPC handler para imprimir pedidos via processo principal
-ipcMain.handle('printer', async (_event, { html, options }) => {
+ipcMain.handle('printer', async (_event, { html, options, printerName }) => {
     const printWin = new BrowserWindow({ show: false });
     await printWin.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
     await new Promise((resolve) => printWin.webContents.once('did-finish-load', resolve));
-    printWin.webContents.print(options);
-    printWin.close();
+    const printOptions = { ...options };
+    if (printerName) printOptions.deviceName = printerName;
+    printWin.webContents.print(printOptions, (success, failureReason) => {
+        if (!success) console.error('Falha ao imprimir:', failureReason);
+        printWin.close();
+    });
+});
+
+// IPC handlers para lembrar credenciais de login
+const credsFile = path.join(app.getPath('userData'), 'credentials.json');
+ipcMain.handle('get-credentials', () => {
+    try {
+        const data = fs.readFileSync(credsFile, 'utf8');
+        return JSON.parse(data);
+    } catch {
+        return null;
+    }
+});
+ipcMain.handle('save-credentials', (_event, { email, password }) => {
+    try {
+        fs.writeFileSync(credsFile, JSON.stringify({ email, password }), 'utf8');
+        return true;
+    } catch (err) {
+        console.error('Erro ao salvar credenciais:', err);
+        return false;
+    }
+});
+ipcMain.handle('clear-credentials', () => {
+    try {
+        fs.unlinkSync(credsFile);
+        return true;
+    } catch {
+        return false;
+    }
 });
 
 app.whenReady().then(() => {

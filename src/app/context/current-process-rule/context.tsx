@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useContext, ReactNode, useState, useCallback} from 'react';
 import { useSession } from 'next-auth/react';
 import RequestError from '@/app/utils/error';
