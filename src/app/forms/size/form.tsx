@@ -15,6 +15,9 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import Category from '@/app/entities/category/category';
 import { notifySuccess } from '@/app/utils/notifications';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import { updateCategory } from '@/redux/slices/categories';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
     category: Category
@@ -23,6 +26,7 @@ interface SizeFormProps extends CreateFormsProps<Size> {
 const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
+    const dispatch = useDispatch<AppDispatch>();
     const [size, setSize] = useState<Size>(item || new Size());
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -53,6 +57,8 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
                 category.sizes.push(size);
                 notifySuccess(`Tamanho ${size.name} criado com sucesso`);
             }
+            // Atualiza o Redux com a lista de tamanhos atualizada
+            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...(category.sizes ?? [])] } } }));
 
             modalHandler.hideModal(modalName);
 
@@ -66,7 +72,9 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
         await DeleteSize(size.id, data);
 
         if (category) {
-            category.sizes = category.sizes.filter(q => q.id !== size.id);
+            const newSizes = category.sizes.filter(q => q.id !== size.id);
+            // Atualiza o Redux com a lista de tamanhos atualizada
+            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...(newSizes ?? [])] } } }));
         }
 
         modalHandler.hideModal(modalName);
