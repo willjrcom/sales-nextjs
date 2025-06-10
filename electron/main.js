@@ -27,6 +27,7 @@ async function createWindow(port) {
 
     win.loadURL(`http://localhost:${port}/login`);
 
+    win.webContents.openDevTools({ mode: 'undocked' });
     win.webContents.on('did-fail-load', () => {
         console.error('Falha ao carregar a URL:', `http://localhost:${port}/login`);
     });
@@ -68,14 +69,34 @@ ipcMain.handle('get-printers', async (_event) => {
 
 // IPC handler para imprimir pedidos via processo principal
 ipcMain.handle('printer', async (_event, { html, options, printerName }) => {
+    console.log('Impressora chamada:', printerName);
+    if (!printerName) {
+        return { success: false, error: 'Nenhuma impressora selecionada' };
+    }
+    
     const printWin = new BrowserWindow({ show: false });
-    await printWin.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
-    await new Promise((resolve) => printWin.webContents.once('did-finish-load', resolve));
-    const printOptions = { ...options };
-    if (printerName) printOptions.deviceName = printerName;
-    printWin.webContents.print(printOptions, (success, failureReason) => {
-        if (!success) console.error('Falha ao imprimir:', failureReason);
+    try {
+        await printWin.loadURL(
+            'data:text/html;charset=utf-8,' + encodeURIComponent(html)
+        );
+    } catch (err) {
         printWin.close();
+        return { success: false, error: err.message || String(err) };
+    }
+
+    const printOptions = { ...options, deviceName: printerName };
+    console.log('printOptions', printOptions);
+    return new Promise((resolve) => {
+        printWin.webContents.print(printOptions, (success, failureReason) => {
+            printWin.close();
+            if (success) {
+                console.log('Impressão concluída com sucesso');
+                resolve({ success: true });
+            } else {
+                console.error('Falha ao imprimir:', failureReason);
+                resolve({ success: false, error: failureReason || 'Falha desconhecida ao imprimir' });
+            }
+        });
     });
 });
 

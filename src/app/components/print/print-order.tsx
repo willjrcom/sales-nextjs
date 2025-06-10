@@ -1,5 +1,6 @@
 "use client";
 import GerOrderPrintByID from "@/app/api/print/print-order"
+import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
 
 interface PrintOrderProps {
@@ -28,7 +29,13 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
             }
         }
 
-        await window.electronAPI.printer(html, printerName, { silent: true, printBackground: true });
+        console.log('printerName', printerName);
+        try {
+            await window.electronAPI.printer(html, printerName, { silent: true, printBackground: true });
+            notifySuccess(`Impressão enviada para ${printerName}`);
+        } catch (err: any) {
+            notifyError(`Erro ao chamar a impressora: ${err?.message || err}`);
+        }
     } else {
         const w = window.open('', '_blank', 'width=800,height=600');
         if (!w) return;
