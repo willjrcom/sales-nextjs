@@ -30,10 +30,11 @@ const OrderProcess = () => {
         initialFetched.current = true;
         fetch();
     }, [data]);
+
     // Polling every 60 seconds
     useEffect(() => {
         if (!data) return;
-        const interval = setInterval(() => fetch(), 60000);
+        const interval = setInterval(() => fetch(), 30000);
         return () => clearInterval(interval);
     }, [data]);
 

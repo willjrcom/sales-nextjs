@@ -47,19 +47,11 @@ const Component = () => {
         if (!data) return;
         dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
 
-        const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
-            }
-        }, 10000); // Atualiza a cada 60 segundos
-
         const processRule = processRules.find((p) => p.id === currentProcessRuleID)
         if (processRule) {
             setProcessRule(processRule)
             updateParam(processRule.id)
         }
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.access_token, dispatch, currentProcessRuleID]);
 
     useEffect(() => {

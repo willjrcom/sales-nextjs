@@ -47,7 +47,7 @@ const DeliveryOrderToFinish = () => {
             if (data) {
                 dispatch(fetchDeliveryOrders({ session: data }));
             }
-        }, 10000); // Atualiza a cada 30 segundos
+        }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.access_token, dispatch]);

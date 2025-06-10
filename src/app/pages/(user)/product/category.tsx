@@ -24,14 +24,6 @@ const PageCategories = () => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
             dispatch(fetchCategories({ session: data }));
         }
-    
-        const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchCategories({ session: data }));
-            }
-        }, 60000); // Atualiza a cada 60 segundos
-    
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
     }, [data?.user.access_token, dispatch]);
 
     if (categoriesSlice.loading) {

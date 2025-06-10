@@ -63,7 +63,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteSize(size.id, data);
+        await DeleteSize(size.id, data);
 
         if (category) {
             category.sizes = category.sizes.filter(q => q.id !== size.id);
