@@ -4,7 +4,7 @@
   "private": true,
   "main": "electron/main.js",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
+    "dev": "cross-env NODE_OPTIONS='--inspect' next dev  --turbopack",
     "prod": "cross-env NODE_OPTIONS='--inspect' next build && next start",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000/login && npm run start_electron\"",
     "build": "next build",
@@ -64,6 +64,7 @@
     "cross-env": "^7.0.3",
     "electron": "^36.4.0",
     "electron-builder": "^26.0.12",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",

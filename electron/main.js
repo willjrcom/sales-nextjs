@@ -18,6 +18,9 @@ async function createWindow(port) {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        darkTheme: true,
+        fullscreen: true,
+        icon: path.join(__dirname, 'icon.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -27,7 +30,7 @@ async function createWindow(port) {
 
     win.loadURL(`http://localhost:${port}/login`);
 
-    win.webContents.openDevTools({ mode: 'undocked' });
+    // win.webContents.openDevTools({ mode: 'undocked' });
     win.webContents.on('did-fail-load', () => {
         console.error('Falha ao carregar a URL:', `http://localhost:${port}/login`);
     });
@@ -67,37 +70,60 @@ ipcMain.handle('get-printers', async (_event) => {
     return [];
 });
 
-// IPC handler para imprimir pedidos via processo principal
-ipcMain.handle('printer', async (_event, { html, options, printerName }) => {
-    console.log('Impressora chamada:', printerName);
+// IPC handler para imprimir ESC/POS raw em múltiplas plataformas
+ipcMain.handle('printer', async (_event, { html, printerName }) => {
+    console.log('Iniciando impressão raw. Impressora:', printerName, 'Plataforma:', process.platform);
     if (!printerName) {
         return { success: false, error: 'Nenhuma impressora selecionada' };
     }
-    
-    const printWin = new BrowserWindow({ show: false });
-    try {
-        await printWin.loadURL(
-            'data:text/html;charset=utf-8,' + encodeURIComponent(html)
-        );
-    } catch (err) {
-        printWin.close();
-        return { success: false, error: err.message || String(err) };
-    }
-
-    const printOptions = { ...options, deviceName: printerName };
-    console.log('printOptions', printOptions);
-    return new Promise((resolve) => {
-        printWin.webContents.print(printOptions, (success, failureReason) => {
-            printWin.close();
-            if (success) {
-                console.log('Impressão concluída com sucesso');
-                resolve({ success: true });
-            } else {
-                console.error('Falha ao imprimir:', failureReason);
-                resolve({ success: false, error: failureReason || 'Falha desconhecida ao imprimir' });
-            }
+    const dataBuffer = Buffer.from(html, 'binary');
+    // macOS / Linux: usar CUPS via lp
+    if (process.platform === 'darwin' || process.platform === 'linux') {
+        return await new Promise((resolve) => {
+            const lp = spawn('lp', ['-d', printerName, '-o', 'raw']);
+            let stderr = '';
+            lp.stdin.write(dataBuffer);
+            lp.stdin.end();
+            lp.stderr.on('data', chunk => { stderr += chunk.toString(); });
+            lp.on('close', code => {
+                if (code === 0) {
+                    console.log('lp -> impressora OK');
+                    resolve({ success: true });
+                } else {
+                    console.error('lp -> erro code', code, stderr);
+                    resolve({ success: false, error: stderr || `lp exit code ${code}` });
+                }
+            });
         });
-    });
+    }
+    // Windows: usar comando print (envia arquivo temporário)
+    if (process.platform === 'win32') {
+        try {
+            const os = require('os');
+            const tmpPath = path.join(os.tmpdir(), `receipt_${Date.now()}.bin`);
+            fs.writeFileSync(tmpPath, dataBuffer);
+            return await new Promise((resolve) => {
+                const pr = spawn('cmd.exe', ['/c', 'print', `/D:${printerName}`, tmpPath]);
+                let stderr = '';
+                pr.stderr.on('data', chunk => { stderr += chunk.toString(); });
+                pr.on('close', code => {
+                    fs.unlinkSync(tmpPath);
+                    if (code === 0) {
+                        console.log('print -> impressora OK');
+                        resolve({ success: true });
+                    } else {
+                        console.error('print -> erro code', code, stderr);
+                        resolve({ success: false, error: stderr || `print exit code ${code}` });
+                    }
+                });
+            });
+        } catch (err) {
+            console.error('Erro imprimindo no Windows:', err);
+            return { success: false, error: err.message || String(err) };
+        }
+    }
+    // plataforma não suportada
+    return { success: false, error: `Plataforma ${process.platform} não suportada para impressão raw` };
 });
 
 // IPC handlers para lembrar credenciais de login

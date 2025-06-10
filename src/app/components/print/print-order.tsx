@@ -29,9 +29,8 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
             }
         }
 
-        console.log('printerName', printerName);
         try {
-            await window.electronAPI.printer(html, printerName, { silent: true, printBackground: true });
+            await window.electronAPI.printer(html, printerName, { silent: false, printBackground: true });
             notifySuccess(`Impressão enviada para ${printerName}`);
         } catch (err: any) {
             notifyError(`Erro ao chamar a impressora: ${err?.message || err}`);
