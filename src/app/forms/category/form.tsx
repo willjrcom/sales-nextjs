@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
+import { TextField, HiddenField, CheckboxField, SelectField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -31,6 +31,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const [selectedType, setSelectedType] = useState<TypeCategory>("Normal");
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
@@ -56,6 +57,19 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             dispatch(fetchCategories({ session: data }));
         }
     }, [data?.user.access_token, dispatch]);
+    useEffect(() => {
+        if (category.need_print && typeof window !== 'undefined' && window.electronAPI?.getPrinters) {
+            (async () => {
+                try {
+                    if (!window.electronAPI) return;
+                    const list = await window.electronAPI.getPrinters();
+                    setPrinters(list.map((p: any) => ({ id: p.name, name: p.name })));
+                } catch (err) {
+                    console.error('Error loading printers', err);
+                }
+            })();
+        }
+    }, [category.need_print]);
 
     const handleInputChange = (field: keyof Category, value: any) => {
         setCategory(prev => ({ ...prev, [field]: value }));
@@ -127,6 +141,16 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 value={category.need_print}
                 optional
             />
+            {category.need_print && (
+                <SelectField
+                    friendlyName="Impressora"
+                    name="printer_name"
+                    values={printers}
+                    selectedValue={category.printer_name}
+                    setSelectedValue={(value) => handleInputChange('printer_name', value)}
+                    optional
+                />
+            )}
             <CheckboxField
                 friendlyName="Deseja produzir com processos?"
                 name="use_process_rule"
