@@ -73,6 +73,13 @@ export const OrderPaymentsResume = () => {
         try {
             await PendingOrder(order.id, data)
 
+            if (data.user.current_company?.preferences.enable_print_order) {
+                await printOrder({
+                    orderID: order.id,
+                    session: data
+                })
+            }
+
             for (let i = 0; i < order.group_items.length; i++) {
                 const groupItem = order.group_items[i];
 

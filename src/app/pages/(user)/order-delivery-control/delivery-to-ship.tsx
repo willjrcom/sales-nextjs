@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { FaMotorcycle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { notifyError } from "@/app/utils/notifications";
+import printOrder from "@/app/components/print/print-order";
 
 const DeliveryOrderToShip = () => {
     const ordersSlice = useSelector((state: RootState) => state.deliveryOrders);
@@ -30,6 +31,7 @@ const DeliveryOrderToShip = () => {
     const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
+    const [selectedOrderIDs, setSelectedOrderIDs] = useState<string[]>([]);
     const { data } = useSession();
 
     useEffect(() => {
@@ -76,6 +78,7 @@ const DeliveryOrderToShip = () => {
     useEffect(() => {
         const newPoints: Point[] = [];
         const deliveryIDs: string[] = []
+        const orderIDs: string[] = []
         const newSelectedPoints: Point[] = [];
 
         for (let order of orders) {
@@ -90,12 +93,14 @@ const DeliveryOrderToShip = () => {
             if (selectedRows.has(order.id)) {
                 newSelectedPoints.push(point);
                 deliveryIDs.push(order.delivery?.id || "");
+                orderIDs.push(order.id || "");
             } else {
                 newPoints.push(point);
             }
         }
 
         setSelectedDeliveryIDs(deliveryIDs);
+        setSelectedOrderIDs(orderIDs);
         setSelectedPoints(newSelectedPoints);
         setPoints(newPoints);
 
@@ -117,9 +122,9 @@ const DeliveryOrderToShip = () => {
                     <Map mapId="delivery-to-ship" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>
-            
+
             {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaMotorcycle} title="Enviar entrega" position="bottom-right">
-                <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} />
+                <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} orderIDs={selectedOrderIDs} />
             </ButtonIconTextFloat>}
         </>
     )
@@ -127,9 +132,10 @@ const DeliveryOrderToShip = () => {
 
 interface ModalData {
     deliveryIDs: string[];
+    orderIDs: string[];
 }
 
-const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
+const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const dispatch = useDispatch<AppDispatch>();
     const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
@@ -171,6 +177,16 @@ const SelectDeliveryDriver = ({ deliveryIDs }: ModalData) => {
         const deliveryOrderIds = Array.from(deliveryIDs);
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
+
+            if (data.user.current_company?.preferences.enable_print_delivery) {
+                for (let i = 0; i < orderIDs.length; i++) {
+                    await printOrder({
+                        orderID: orderIDs[i],
+                        session: data
+                    })
+                }
+            }
+
             dispatch(fetchDeliveryOrders({ session: data }));
             modalHandler.hideModal("ship-delivery");
         } catch (error: RequestError | any) {
