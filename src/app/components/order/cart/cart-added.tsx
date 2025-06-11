@@ -34,26 +34,32 @@ export const CartAdded = () => {
         <div className="box-border bg-white h-full flex flex-col overflow-x-hidden">
             <div className="mb-2">
                 <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
-                <div onClick={() => contextGroupItem.resetGroupItem()}>
-                    <ButtonIconTextFloat size="xl"
-                        position="bottom-right"
-                        title="Novo grupo de itens"
-                        modalName="edit-group-item"
-                        onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
-                        <EditGroupItem />
-                    </ButtonIconTextFloat>
-                </div>
+                {order.status !== "Canceled" &&
+                    <div onClick={() => contextGroupItem.resetGroupItem()}>
+                        <ButtonIconTextFloat size="xl"
+                            position="bottom-right"
+                            title="Novo grupo de itens"
+                            modalName="edit-group-item"
+                            onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
+                            <EditGroupItem />
+                        </ButtonIconTextFloat>
+                    </div>
+                }
             </div>
 
             <div className="flex-1 overflow-y-auto">
-            {Object.entries(groupedItems).map(([key, groupItems]) => {
-                if (Object.values(categoriesSlice.entities).length === 0) return
-                const category = categoriesSlice.entities[key]
-                if (!category) return
-                return (
-                    <CategoryOrder key={key} category={category} groupItems={groupItems} />
-                )
-            })}
+                {Object.entries(groupedItems).length === 0 ? (
+                    <p className="p-4 text-gray-500">Nenhum item no carrinho</p>
+                ) : (
+                    Object.entries(groupedItems).map(([key, groupItems]) => {
+                        if (Object.values(categoriesSlice.entities).length === 0) return null;
+                        const category = categoriesSlice.entities[key];
+                        if (!category) return null;
+                        return (
+                            <CategoryOrder key={key} category={category} groupItems={groupItems} />
+                        );
+                    })
+                )}
             </div>
         </div>
     )

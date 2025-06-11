@@ -88,10 +88,13 @@ const Component = () => {
     const body = (
         <>
             <p>Tempo ideal de produção: {processRule.ideal_time}</p>
-            {
-                orderProcesses?.sort((a, b) => a.status === "Started" ? -1 : 1)
+            {(!orderProcesses || orderProcesses.length === 0) ? (
+                <p className="text-gray-500 mt-4">Nenhum processo na fila</p>
+            ) : (
+                orderProcesses
+                    .sort((a, b) => a.status === "Started" ? -1 : 1)
                     .map((process) => <OrderProcessCard key={process.id} orderProcess={process} />)
-            }
+            )}
         </>
     )
 
