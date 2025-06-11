@@ -1,7 +1,10 @@
 "use client";
 
 import { useGroupItem } from "@/app/context/group-item/context";
+import { useSession } from 'next-auth/react';
+import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
 import { useEffect, useState } from "react";
+import { notifyError } from '@/app/utils/notifications';
 import ItemCard from "../item/card-item";
 import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
 import GroupItemForm from "@/app/forms/group-item/form";
@@ -59,6 +62,7 @@ const ShowGroupItem = ({ isOpened }: ShowGroupItemProps) => {
 
 const GroupItemCard = () => {
     const contextGroupItem = useGroupItem();
+    const { data } = useSession();
     const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
     const [complementItem, setComplementItem] = useState<Item | null>();
 
@@ -74,7 +78,7 @@ const GroupItemCard = () => {
 
     const containItems = groupItem?.items && groupItem?.items.length > 0
     const isGroupItemStaging = groupItem?.status === "Staging"
-
+    
     return (
         <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
             <div className="flex justify-between items-center">
@@ -114,9 +118,28 @@ const GroupItemCard = () => {
             </div>
 
             <hr className="my-4" />
-            {groupItem?.status == "Staging" as StatusGroupItem &&
+            {groupItem?.status === "Staging" && (
                 <GroupItemForm item={groupItem} />
-            }
+            )}
+            {/* Botão para cancelar grupo de itens se não estiver em Staging */}
+            {groupItem && groupItem.status !== "Staging" && groupItem.status !== "Canceled" && (
+                <div className="mt-4">
+                    <button
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                        onClick={async () => {
+                            if (!data || !groupItem) return;
+                            try {
+                                await CancelGroupItem(groupItem, data);
+                                contextGroupItem.fetchData(groupItem.id);
+                            } catch (error: any) {
+                                notifyError(error.message || 'Erro ao cancelar grupo de itens');
+                            }
+                        }}
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

@@ -4,9 +4,9 @@ import GetCategoriesWithOrderProcess from '@/app/api/category/all/with-order-pro
 import Carousel from '@/app/components/carousel/carousel';
 import Category from '@/app/entities/category/category';
 import ProcessRule from '@/app/entities/process-rule/process-rule';
-import { fetchCategories } from '@/redux/slices/categories';
 import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
+import { HiOutlineRefresh } from 'react-icons/hi';
 import Link from 'next/link';
 import React, { useEffect, useState, useRef } from 'react';
 import PageTitle from '@/app/components/PageTitle';
@@ -43,7 +43,16 @@ const OrderProcess = () => {
 
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
-            <PageTitle title="Processos" tooltip="Exibe as regras de processamento de pedidos, agrupadas por categoria, com indicadores de atraso e fila." />
+            <div className="flex items-center justify-between mb-4">
+                <PageTitle title="Processos" tooltip="Exibe as regras de processamento de pedidos, agrupadas por categoria, com indicadores de atraso e fila." />
+                <button
+                    onClick={fetch}
+                    className="p-2 bg-gray-200 hover:bg-gray-300 rounded"
+                    aria-label="Atualizar"
+                >
+                    <HiOutlineRefresh className="h-5 w-5 text-gray-800" />
+                </button>
+            </div>
             <div className="mb-6">
                 <h2 className="text-sm font-semibold text-gray-700 mb-2">Categorias principais sem regra de processo</h2>
                 <div className="flex flex-wrap gap-2">
