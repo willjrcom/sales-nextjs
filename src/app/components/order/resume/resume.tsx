@@ -14,9 +14,11 @@ import UpdateChangeOrderDelivery from "@/app/api/order-delivery/update/change/or
 import { SelectField } from "../../modal/field"
 import { payMethodsWithId } from "@/app/entities/order/order-payment"
 import Decimal from 'decimal.js';
-import { notifyError } from "@/app/utils/notifications";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import printOrder from "../../print/print-order";
 import printGroupItem from "../../print/print-group-item";
+import AddTableTax from "@/app/api/order-table/update/add-tax/order-table";
+import RemoveTableTax from "@/app/api/order-table/update/remove-tax/order-table";
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
@@ -110,14 +112,38 @@ export const OrderPaymentsResume = () => {
         }
     }
 
+    // adiciona taxa usando endpoint order-table
+    const handleAddTax = async () => {
+        if (!order || !order.table || !data) return;
+        try {
+            await AddTableTax(order.table.id, data);
+            notifySuccess("Taxa adicionada com sucesso");
+            contextCurrentOrder.fetchData(order.id);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao adicionar taxa");
+        }
+    };
+    // remove taxa usando endpoint order-table
+    const handleRemoveTax = async () => {
+        if (!order || !order.table || !data) return;
+        try {
+            await RemoveTableTax(order.table.id, data);
+            notifySuccess("Taxa removida com sucesso");
+            contextCurrentOrder.fetchData(order.id);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao remover taxa");
+        }
+    };
+
     const isStatusStagingOrPendingOrReady = order?.status == "Staging" || order?.status == "Pending" || order?.status == "Ready"
     const haveGroups = order && order?.group_items?.length > 0
     const isAnyGroupsStaging = haveGroups && order?.group_items?.some((group) => group.status == "Staging")
     const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging;
     const totalPayableDecimal = new Decimal(order?.total_payable || "0");
     const deliveryTaxDecimal = new Decimal((order?.delivery?.delivery_tax || "0"))
+    const tableTaxDecimal = new Decimal((order?.table?.tax_rate || "0"))
     const subTotalDecimal = totalPayableDecimal.minus(deliveryTaxDecimal);
-
+    console.log(order?.table)
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
@@ -137,6 +163,15 @@ export const OrderPaymentsResume = () => {
                 </div>
             }
 
+            {order?.table &&
+
+                <div className="flex items-center gap-2 mb-2">
+                    {tableTaxDecimal.gt(0)
+                        ? <button className="text-red-500" onClick={handleRemoveTax}>Remover Taxa</button>
+                        : <button className="text-green-500" onClick={handleAddTax}>Adicionar Taxa</button>
+                    }
+                </div>
+            }
             <hr className="my-2" />
             <p><strong>Subtotal:</strong> R$ {subTotalDecimal.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {deliveryTaxDecimal.toFixed(2)}</p>}
