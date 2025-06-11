@@ -75,7 +75,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id}/>
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={place} name="Local" onSubmit={submit} deleteItem={onDelete} />
         </>
     );

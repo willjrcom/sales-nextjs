@@ -93,7 +93,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             {isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />}
             {!isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />}
         </>

@@ -81,7 +81,7 @@ const Topbar = () => {
           {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
         </div>
       </header>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" containerClassName='z-50' />
     </>
   )
 };

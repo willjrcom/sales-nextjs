@@ -142,8 +142,7 @@ export const OrderPaymentsResume = () => {
     const totalPayableDecimal = new Decimal(order?.total_payable || "0");
     const deliveryTaxDecimal = new Decimal((order?.delivery?.delivery_tax || "0"))
     const tableTaxDecimal = new Decimal((order?.table?.tax_rate || "0"))
-    const subTotalDecimal = totalPayableDecimal.minus(deliveryTaxDecimal);
-    console.log(order?.table)
+    
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
@@ -156,8 +155,8 @@ export const OrderPaymentsResume = () => {
                     <hr className="my-2" />
                     <PriceField friendlyName="Troco" name="change" value={change} setValue={setChange} optional />
                     <SelectField friendlyName="Forma de pagamento" name="payment_method" values={payMethodsWithId} selectedValue={paymentMethod} setSelectedValue={setPaymentMethod} optional />
-
-                    {(change !== order.delivery.change || paymentMethod !== order.delivery.payment_method) &&
+                    
+                    {(change.toNumber() !== (new Decimal(order.delivery.change || "0").toNumber() || 0) || paymentMethod !== order.delivery.payment_method) &&
                         <button className="ml-4 text-red-500" onClick={updateChange}>Alterar troco</button>
                     }
                 </div>
@@ -166,14 +165,14 @@ export const OrderPaymentsResume = () => {
             {order?.table &&
 
                 <div className="flex items-center gap-2 mb-2">
+                    <p><strong>Taxa da mesa:</strong> {tableTaxDecimal.toFixed(2)} %</p>
                     {tableTaxDecimal.gt(0)
-                        ? <button className="text-red-500" onClick={handleRemoveTax}>Remover Taxa</button>
-                        : <button className="text-green-500" onClick={handleAddTax}>Adicionar Taxa</button>
+                        ? <button className="text-red-500" onClick={handleRemoveTax}>Remover</button>
+                        : <button className="text-green-500" onClick={handleAddTax}>Adicionar</button>
                     }
                 </div>
             }
             <hr className="my-2" />
-            <p><strong>Subtotal:</strong> R$ {subTotalDecimal.toFixed(2)}</p>
             {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {deliveryTaxDecimal.toFixed(2)}</p>}
 
             {/* <p>Desconto: R$ 5,00</p> */}

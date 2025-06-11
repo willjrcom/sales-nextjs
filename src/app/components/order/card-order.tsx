@@ -280,63 +280,64 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
             {/* Resumo Financeiro */}
             <hr className="my-4" />
-            <div className="mb-4">
-                <h3 className="text-xl font-bold mb-2 text-gray-800">Resumo Financeiro</h3>
-                <div className="space-y-2 text-gray-700">
-                    {/* Total a Pagar */}
-                    <p>
-                        <span className="font-semibold">Total a Pagar:</span>{" "}
-                        <span className="text-red-600">R$ {totalPayableDecimal.toFixed(2)}</span>
-                    </p>
-
-                    {/* Total Pago */}
-                    <p>
-                        <span className="font-semibold">Total Pago:</span>{" "}
-                        <span className="text-green-600">R$ {totalPaidDecimal.toFixed(2)}</span>
-                    </p>
-
-                    {totalRestDecimal.gt(0) && (
-                        <p>
-                            <span className="font-semibold">Total Restante:</span>{" "}
-                            <span className="text-gray-600">R$ {totalRestDecimal.toFixed(2)}</span>
-                        </p>
-                    )}
-
-                    {/* Troco */}
-                    {totalChangeDecimal.gt(0) && (
-                        <p>
-                            <span className="font-semibold">Troco:</span>{" "}
-                            <span className="text-gray-600">R$ {totalChangeDecimal.toFixed(2)}</span>
-                        </p>
+            <div className="flex justify-between items-center mb-4 mr-4">
+                {/* Detalhes do Pagamento */}
+                <div className="mb-6">
+                    <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos: {order.payments?.length || 0}</h3>
+                    {order.payments && order.payments.length > 0 ? (
+                        <ul className="space-y-4">
+                            <Carousel items={order.payments}>
+                                {(payment) => (
+                                    <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
+                                        <div className="text-center">
+                                            <p className="text-gray-700">
+                                                <strong>Método:</strong> {payment.method}
+                                            </p>
+                                            <p className="text-gray-700">
+                                                <strong>Valor:</strong> R$ {new Decimal(payment.total_paid).toFixed(2)}
+                                            </p>
+                                        </div>
+                                    </li>
+                                )}
+                            </Carousel>
+                        </ul>
+                    ) : (
+                        <p className="text-gray-700">Nenhum pagamento registrado.</p>
                     )}
                 </div>
-            </div>
 
-            {/* Detalhes do Pagamento */}
-            <div className="mb-6">
-                <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos: {order.payments?.length || 0}</h3>
-                {order.payments && order.payments.length > 0 ? (
-                    <ul className="space-y-4">
-                        <Carousel items={order.payments}>
-                            {(payment) => (
-                                <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                                    <div className="text-center">
-                                        <p className="text-gray-700">
-                                            <strong>Método:</strong> {payment.method}
-                                        </p>
-                                        <p className="text-gray-700">
-                                            <strong>Valor:</strong> R$ {new Decimal(payment.total_paid).toFixed(2)}
-                                        </p>
-                                    </div>
-                                </li>
-                            )}
-                        </Carousel>
-                    </ul>
-                ) : (
-                    <p className="text-gray-700">Nenhum pagamento registrado.</p>
-                )}
-            </div>
+                <div className="mb-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-800">Resumo Financeiro</h3>
+                    <div className="space-y-2 text-gray-700">
+                        {/* Total a Pagar */}
+                        <p>
+                            <span className="font-semibold">Total a Pagar:</span>{" "}
+                            <span className="text-red-600">R$ {totalPayableDecimal.toFixed(2)}</span>
+                        </p>
 
+                        {/* Total Pago */}
+                        <p>
+                            <span className="font-semibold">Total Pago:</span>{" "}
+                            <span className="text-green-600">R$ {totalPaidDecimal.toFixed(2)}</span>
+                        </p>
+
+                        {totalRestDecimal.gt(0) && (
+                            <p>
+                                <span className="font-semibold">Total Restante:</span>{" "}
+                                <span className="text-gray-600">R$ {totalRestDecimal.toFixed(2)}</span>
+                            </p>
+                        )}
+
+                        {/* Troco */}
+                        {totalChangeDecimal.gt(0) && (
+                            <p>
+                                <span className="font-semibold">Troco:</span>{" "}
+                                <span className="text-gray-600">R$ {totalChangeDecimal.toFixed(2)}</span>
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
 
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
@@ -380,13 +381,15 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                             </button>
                         </ButtonIconText>}
                     {/* Botão de impressão */}
-                    <button
-                        onClick={() => data && printOrder({ orderID: order.id, session: data })}
-                        className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
-                    >
-                        <FaPrint />
-                        <span>Imprimir</span>
-                    </button>
+                    {!isOrderStatusCanceled &&
+                        <button
+                            onClick={() => data && printOrder({ orderID: order.id, session: data })}
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
+                        >
+                            <FaPrint />
+                            <span>Imprimir</span>
+                        </button>
+                    }
                 </div>
             </div>
         </div>

@@ -74,7 +74,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     return (
         <>
             <PersonForm person={person} setPerson={setPerson} />
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal
                 item={client}
                 name="Cliente"

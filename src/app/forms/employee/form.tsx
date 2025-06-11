@@ -129,7 +129,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
                 setValue={(value) => handleInputChange("user_id", value)}
                 value={employee.user_id}
             />
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
 
             {/* Botões de Ação */}
             <div className="mt-6">

@@ -78,11 +78,10 @@ const RegisterForm = () => {
                 <h2 className="text-2xl mb-6">Cadastro</h2>
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto flex-1">
                     <div className="flex flex-col">
-                        <ErrorForms errors={errors} />
+                        <ErrorForms errors={errors} setErrors={setErrors} />
                         <PersonForm person={user} setPerson={setUser} isEmployee />
                         <TextField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
                         <TextField friendlyName='Confirmar Senha' name='confirmPassword' placeholder='Confirme sua senha' setValue={setConfirmPassword} value={confirmPassword} />
-                        <ErrorForms errors={errors} />
                     </div>
                 </div>
                 <div className="w-full max-w-md px-8 py-4 bg-white">

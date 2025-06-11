@@ -96,7 +96,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             {!isUpdate && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" onSubmit={submit} />}
             {isUpdate && isDefaultCategory && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" deleteItem={onDelete} />}
         </>

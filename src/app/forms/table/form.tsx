@@ -69,7 +69,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name}/>
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={table} name="Table" onSubmit={submit} deleteItem={onDelete} />
         </>
     );

@@ -51,7 +51,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
     return (
         <>
             <PersonForm person={person} setPerson={setPerson} isEmployee />
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={user} name="Usuário" onSubmit={submit} />
         </>
     );

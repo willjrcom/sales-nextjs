@@ -83,7 +83,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
             <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={processRule.description} optional />
 
-            <NumberField friendlyName='Ordem' name='order' setValue={value => handleInputChange('order', value)} value={processRule.order} />
+            <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={value => handleInputChange('order', value)} value={processRule.order} />
 
             <TextField friendlyName='Caminho da imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={processRule.image_path || ""} optional />
 
@@ -94,7 +94,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} deleteItem={onDelete} />
         </>
     );

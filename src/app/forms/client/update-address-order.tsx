@@ -50,7 +50,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
     return (
         <>
             <AddressForm addressParent={client.address} setAddressParent={setAddress} />
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal
                 item={client}
                 name='Editar endereço'

@@ -256,7 +256,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             {!isUpdate && <ButtonsModal
                 item={company}
                 name="Empresa"

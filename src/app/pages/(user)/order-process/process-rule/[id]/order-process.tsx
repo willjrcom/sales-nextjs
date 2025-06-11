@@ -9,11 +9,11 @@ import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
 import { useDispatch } from 'react-redux';
-import ItemOrderProcess from './item';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
-import { ToUtcTimeWithSeconds } from '@/app/utils/date';
+import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
+import StatusComponent from '@/app/components/button/show-status';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -61,18 +61,21 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         )
     }
 
-    const now = new Date();
-    const startAt = new Date(orderProcess.started_at ? orderProcess.started_at : now);
-    const duration = new Date(now.getTime() - startAt.getTime());
+    // atualiza o timer a cada segundo para mostrar duração dinâmica
+    const [now, setNow] = useState(new Date());
+    React.useEffect(() => {
+        if (orderProcess.status === "Started") {
+            const timer = setInterval(() => setNow(new Date()), 1000);
+            return () => clearInterval(timer);
+        }
+    }, [orderProcess.status]);
     
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-6">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                    <span className="text-gray-600 font-semibold">#{groupItem.id}</span>
-                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${orderProcess.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}`}>
-                        {orderProcess.status}
-                    </span>
+                    <span className="text-gray-600 font-semibold">Pedido #{orderProcess.order_number} - {orderProcess.order_type}</span>
+                    <StatusComponent status={orderProcess?.status} />
                 </div>
                 <button
                     onClick={() => openGroupItemDetails(groupItem)}
@@ -125,7 +128,14 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                     </div>
                     {orderProcess.status === "Started" && (
                         <p className="mt-2 text-sm text-gray-500">
-                            Duração: {ToUtcTimeWithSeconds(duration.toISOString())}
+                            Duração: {(() => {
+                                const startAt = orderProcess.started_at
+                                    ? new Date(orderProcess.started_at)
+                                    : new Date();
+                                const diffMs = now.getTime() - startAt.getTime();
+                                const durationDate = new Date(diffMs);
+                                return ToUtcMinutesSeconds(durationDate.toISOString());
+                            })()}
                         </p>
                     )}
                 </div>

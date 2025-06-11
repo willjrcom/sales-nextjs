@@ -8,11 +8,13 @@ interface NumberFieldProps {
     value?: number
     setValue: Dispatch<SetStateAction<number>>
     optional?: boolean;
+    min?: number;
+    max?: number
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
-const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue, optional}: NumberFieldProps) => {
+const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue, optional, min, max}: NumberFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
@@ -25,6 +27,8 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
                 type="number"
                 placeholder={placeholder}
                 disabled={disabled}
+                min={min}
+                max={max}
                 value={value === undefined || value === null || isNaN(value) ? '' : value}
                 onChange={e => setValue(e.target.valueAsNumber)}
             />

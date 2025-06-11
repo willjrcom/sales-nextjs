@@ -4,12 +4,15 @@ import ProcessRule from "../process-rule/process-rule";
 import Product from "../product/product";
 
 type StatusProcess = "Pending" | "Started" | "Finished" | "Paused" | "Continued" | "Canceled";
+type orderType = "Delivery" | "Pickup" | "Table";
 
 export default class OrderProcess {
     id: string = "";
+    order_number: number = 0;
+    order_type: orderType = "Delivery";
     employee_id?: string = "";
     group_item_id: string = "";
-    group_item?: GroupItem = new GroupItem();
+    group_item?: GroupItem;
     process_rule_id: string = "";
     process_rule?: ProcessRule = new ProcessRule();
     queue?: OrderQueue = new OrderQueue();
@@ -27,6 +30,8 @@ export default class OrderProcess {
 
     constructor(
         id: string = "",
+        order_number: number = 0,
+        order_type: orderType = "Delivery",
         employee_id?: string,
         group_item_id: string = "",
         process_rule_id: string = "",
@@ -46,6 +51,8 @@ export default class OrderProcess {
         queue?: OrderQueue
     ) {
         this.id = id;
+        this.order_number = order_number;
+        this.order_type = order_type;
         this.employee_id = employee_id;
         this.group_item_id = group_item_id;
         this.process_rule_id = process_rule_id;

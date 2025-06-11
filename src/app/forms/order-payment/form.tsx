@@ -58,7 +58,7 @@ const PaymentForm = ({ item, isUpdate,  }: PaymentFormProps) => {
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={payment.id}/>
             <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={order?.id}/>
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={payment} name="Tamanho" onSubmit={submit} isAddItem />
         </>
     );

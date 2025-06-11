@@ -227,7 +227,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id} />
 
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={product} name='produto' onSubmit={submit} deleteItem={onDelete} />
         </>
     );

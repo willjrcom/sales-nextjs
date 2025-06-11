@@ -196,7 +196,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             />
 
             {/* Exibição de Erros */}
-            <ErrorForms errors={errors} />
+            <ErrorForms errors={errors} setErrors={setErrors}/>
 
             <hr className="my-6" />
 

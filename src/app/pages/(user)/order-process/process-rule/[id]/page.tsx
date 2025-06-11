@@ -44,7 +44,7 @@ const Component = () => {
     }, [id]);
 
     useEffect(() => {
-        if (!data) return;
+        if (!data || !currentProcessRuleID) return;
         dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
 
         const processRule = processRules.find((p) => p.id === currentProcessRuleID)
