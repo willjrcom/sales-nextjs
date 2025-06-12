@@ -1,5 +1,7 @@
 import { parseISO, format } from 'date-fns';
 import { toZonedTime, format as formatUTC } from 'date-fns-tz';
+// Time zone for São Paulo, Brasil
+const TIME_ZONE = 'America/Sao_Paulo';
 
 const ToIsoDate = (dateString: string) => {
     // Função para formatar a data
@@ -17,10 +19,10 @@ const ToUtcDate = (dateString?: string) => {
     if (!dateString) return "--/--/--"
 
     const date = new Date(dateString);
-    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+    const zonedDate = toZonedTime(date, TIME_ZONE); // Ajusta para fuso de São Paulo
 
     // Formata a data corretamente
-    const formattedDate = formatUTC(zonedDate, "dd/MM/yyyy", { timeZone: "UTC" });
+    const formattedDate = formatUTC(zonedDate, "dd/MM/yyyy", { timeZone: TIME_ZONE });
 
     return formattedDate;
 }
@@ -29,10 +31,10 @@ const ToUtcDatetime = (dateString?: string) => {
     if (!dateString) return "--/--/-- --:--"
 
     const date = new Date(dateString);
-    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+    const zonedDate = toZonedTime(date, TIME_ZONE); // Ajusta para fuso de São Paulo
 
     // Formata a data corretamente
-    const formattedDate = formatUTC(zonedDate, "dd/MM/yyyy HH:mm", { timeZone: "UTC" });
+    const formattedDate = formatUTC(zonedDate, "dd/MM/yyyy HH:mm", { timeZone: TIME_ZONE });
 
     return formattedDate;
 }
@@ -41,10 +43,10 @@ const ToUtcTimeWithSeconds = (dateString?: string) => {
     if (!dateString) return "--:--:--"
 
     const date = new Date(dateString);
-    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+    const zonedDate = toZonedTime(date, TIME_ZONE); // Ajusta para fuso de São Paulo
 
     // Formata a data corretamente
-    const formattedDate = formatUTC(zonedDate, "HH:mm:ss", { timeZone: "UTC" });
+    const formattedDate = formatUTC(zonedDate, "HH:mm:ss", { timeZone: TIME_ZONE });
 
     return formattedDate;
 }
@@ -53,10 +55,10 @@ const ToUtcHoursMinutes = (dateString?: string) => {
     if (!dateString) return "--:--"
 
     const date = new Date(dateString);
-    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+    const zonedDate = toZonedTime(date, TIME_ZONE); // Ajusta para fuso de São Paulo
 
     // Formata a data corretamente
-    const formattedDate = formatUTC(zonedDate, "HH:mm", { timeZone: "UTC" });
+    const formattedDate = formatUTC(zonedDate, "HH:mm", { timeZone: TIME_ZONE });
 
     return formattedDate;
 }
@@ -65,10 +67,10 @@ const ToUtcMinutesSeconds = (dateString?: string) => {
     if (!dateString) return "--:--"
 
     const date = new Date(dateString);
-    const zonedDate = toZonedTime(date, "UTC"); // Usa UTC para evitar problemas de fuso horário
+    const zonedDate = toZonedTime(date, TIME_ZONE); // Ajusta para fuso de São Paulo
 
     // Formata a data corretamente
-    const formattedDate = formatUTC(zonedDate, "mm:ss", { timeZone: "UTC" });
+    const formattedDate = formatUTC(zonedDate, "mm:ss", { timeZone: TIME_ZONE });
 
     return formattedDate;
 }
