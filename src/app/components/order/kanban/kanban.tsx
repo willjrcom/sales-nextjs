@@ -1,5 +1,5 @@
 import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Order, { StatusOrder } from "@/app/entities/order/order";
 import Droppable from "./droppable";
 import { useModal } from "@/app/context/modal/context";
@@ -19,8 +19,16 @@ interface OrderKanbanProps {
 }
 
 function OrderKanban({ slice }: OrderKanbanProps) {
-    const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
-    const [readyOrders, setReadyOrders] = useState<Order[]>([]);
+    // Derive lists via useMemo to avoid extra state and reduce renders
+    const allOrders = useMemo(() => Object.values(slice.entities), [slice.entities]);
+    const pendingOrders = useMemo(
+        () => allOrders.filter(order => order.status === "Pending"),
+        [allOrders]
+    );
+    const readyOrders = useMemo(
+        () => allOrders.filter(order => order.status === "Ready"),
+        [allOrders]
+    );
     const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
     const modalHandler = useModal();
@@ -32,14 +40,9 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         setPreventDrag(false); // Ativa a flag para prevenir o arrasto
     }, [preventDrag]);
 
-    // Atualiza as listas com base no contexto
-    useEffect(() => {
-        setPendingOrders(Object.values(slice.entities).filter(order => order.status === "Pending"));
-        setReadyOrders(Object.values(slice.entities).filter(order => order.status === "Ready"));
-    }, [slice.entities]);
 
     const handleDragStart = (event: { active: any }) => {
-        setActiveId(event.active.id); // Atualiza o ID do item ativo
+        setActiveId(event.active.id as string);
     };
 
     const handleDragEnd = async (event: { active: any; over: any }) => {
@@ -52,27 +55,12 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         const draggedOrderId = active.data.current?.id;
         if (!draggedOrderId) return;
 
-        const moveOrder = (source: Order[], status: StatusOrder) => {
-            const draggedOrder = source.find(order => order.id === draggedOrderId);
-            if (!draggedOrder) return;
-
-            const updatedOrder: Order = { ...draggedOrder, status };
-
-            // Atualiza as listas de forma imutável
-            setPendingOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
-            setReadyOrders(prev => prev.filter(order => order.id !== draggedOrder.id));
-
-            if (over.id === "Pending") setPendingOrders(prev => [...prev, updatedOrder]);
-            if (over.id === "Ready") setReadyOrders(prev => [...prev, updatedOrder]);
-        };
 
         const indexId = activeId?.indexOf("-");
         const orderId = activeId?.substring(indexId ? indexId + 1 : 0);
 
         // Decide para qual lista mover com base no ID do droppable
         if (over.id === "Ready" && active.id.startsWith("Pending-")) {
-            moveOrder(pendingOrders, "Ready");
-
             if (!orderId || !data) return;
             try {
                 await ReadyOrder(orderId, data);
@@ -81,10 +69,8 @@ function OrderKanban({ slice }: OrderKanbanProps) {
 
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
             if (!orderId || !data) return;
-
             try {
                 await FinishOrder(orderId, data);
-                moveOrder(readyOrders, "Finished");
                 dispatch(fetchOrders({ session: data }));
             } catch (error) {
                 OpenOrder(orderId, error as RequestError);

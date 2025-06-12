@@ -40,7 +40,7 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
     return (
         <div ref={setNodeRef} style={style} className="flex flex-col items-center">
             {children}
-            <div className="mt-4 flex flex-col w-full">
+            <div className="mt-4 flex flex-col w-full flex-1 overflow-y-auto">
                 {orders?.map(order => (
                     <Draggable key={order.id} order={order}>
                         <OrderItemList order={order} />
@@ -48,7 +48,6 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
                 ))}
             </div>
         </div>
-
     );
 }
 

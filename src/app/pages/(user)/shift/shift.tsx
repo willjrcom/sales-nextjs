@@ -76,7 +76,7 @@ const SalesSummary = () => {
 const ShiftDashboard = () => {
     const [shift, setShift] = useState<Shift | null>();
     const { data } = useSession();
-    
+
     const fetchCurrentShift = async () => {
         if (!data) return;
 
@@ -97,7 +97,8 @@ const ShiftDashboard = () => {
     const totalOrders = shift?.orders?.length || 0;
     const totalFinishedOrders = shift?.orders?.filter(order => order.status === 'Finished').length || 0;
     const totalCanceledOrders = shift?.orders?.filter(order => order.status === 'Canceled').length || 0;
-    const totalSales = shift?.orders?.reduce((total: Decimal, order) => new Decimal(total).plus(new Decimal(order.total_payable)), new Decimal(0)) || 0;
+    const totalSales = shift?.orders?.filter(order => order.status === 'Finished')
+        .reduce((total: Decimal, order) => new Decimal(total).plus(new Decimal(order.total_payable)), new Decimal(0)) || 0;
 
     return (
         <div className="p-8 bg-gray-100 h-[80vh] overflow-y-auto">
