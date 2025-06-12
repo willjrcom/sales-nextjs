@@ -81,7 +81,10 @@ const Topbar = () => {
           {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
         </div>
       </header>
-      <Toaster position="top-right" containerClassName='z-50' />
+      <Toaster
+        position="top-right"
+        containerStyle={{ zIndex: 20000 }}
+      />
     </>
   )
 };
