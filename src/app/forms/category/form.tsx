@@ -50,6 +50,11 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
         }
 
         setType[selectedType]()
+
+        if (selectedType === "Adicional" || selectedType === "Complemento") {
+            handleInputChange('use_process_rule', false);
+            handleInputChange('need_print', false);
+        }
     }, [selectedType])
 
     useEffect(() => {
@@ -134,34 +139,40 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 value={category.image_path}
                 optional
             />
-            <CheckboxField
-                friendlyName="Deseja imprimir ao lançar o pedido?"
-                name="need_print"
-                setValue={value => handleInputChange('need_print', value)}
-                value={category.need_print}
-                optional
-            />
-            {category.need_print && (
-                <SelectField
-                    friendlyName="Impressora"
-                    name="printer_name"
-                    values={printers}
-                    selectedValue={category.printer_name}
-                    setSelectedValue={(value) => handleInputChange('printer_name', value)}
-                    optional
-                />
-            )}
-            <CheckboxField
-                friendlyName="Deseja produzir com processos?"
-                name="use_process_rule"
-                setValue={value => handleInputChange('use_process_rule', value)}
-                value={category.use_process_rule}
-                optional
-            />
 
-            {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
-            {selectedType === "Normal" && (
+            {/* Bloco de Tipo de Categoria */}
+            {!isUpdate && (
+                <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
+            )}
+
+            {selectedType === "Normal" &&
                 <>
+                    <CheckboxField
+                        friendlyName="Deseja imprimir ao lançar o pedido?"
+                        name="need_print"
+                        setValue={value => handleInputChange('need_print', value)}
+                        value={category.need_print}
+                        optional
+                    />
+                    {category.need_print && (
+                        <SelectField
+                            friendlyName="Impressora"
+                            name="printer_name"
+                            values={printers}
+                            selectedValue={category.printer_name}
+                            setSelectedValue={(value) => handleInputChange('printer_name', value)}
+                            optional
+                        />
+                    )}
+                    <CheckboxField
+                        friendlyName="Deseja produzir com processos?"
+                        name="use_process_rule"
+                        setValue={value => handleInputChange('use_process_rule', value)}
+                        value={category.use_process_rule}
+                        optional
+                    />
+
+                    {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
                     <hr className="my-4" />
                     <AdditionalCategorySelector
                         additionalCategories={Object.values(categoriesSlice.entities)}
@@ -175,18 +186,12 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                         selectedCategory={category}
                         setSelectedCategory={setCategory}
                     />
+
+                    {/* Bloco de Ingredientes Removíveis */}
+                    <hr className="my-4" />
+                    <RemovableItensComponent item={category} setItem={setCategory} />
                 </>
-            )}
-
-
-            {/* Bloco de Ingredientes Removíveis */}
-            <hr className="my-4" />
-            <RemovableItensComponent item={category} setItem={setCategory} />
-
-            {/* Bloco de Tipo de Categoria */}
-            {!isUpdate && (
-                <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
-            )}
+            }
 
             {/* Campo Oculto para ID */}
             <HiddenField
@@ -196,7 +201,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             />
 
             {/* Exibição de Erros */}
-            <ErrorForms errors={errors} setErrors={setErrors}/>
+            <ErrorForms errors={errors} setErrors={setErrors} />
 
             <hr className="my-6" />
 

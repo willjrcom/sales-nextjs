@@ -34,7 +34,7 @@ const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
     return (
         <>
             <PriceField friendlyName='Troco final' name='end_change' value={endChange} setValue={setEndChange} />
-            <ButtonsModal item={{ id: "", name: "Fechar turno" }} onSubmit={() => handleCloseShift(endChange)} name={'Turno: ' + ToUtcDatetime(openedAt)} />
+            <ButtonsModal item={{ id: "", name: "Fechar turno" }} onSubmit={() => handleCloseShift(endChange)} name={'Turno: ' + ToUtcDatetime(openedAt)} isAddItem={true} />
         </>
     )
 }

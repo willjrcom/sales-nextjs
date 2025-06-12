@@ -2,7 +2,6 @@
 
 import RequestError from '@/app/utils/error';
 import GetCurrentShift from '@/app/api/shift/current/shift';
-import { useModal } from '@/app/context/modal/context';
 import Shift from '@/app/entities/shift/shift';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -85,7 +84,6 @@ const ShiftDashboard = () => {
             setShift(currentShift);
 
         } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao buscar turno atual");
             setShift(null)
         }
     }
