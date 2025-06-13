@@ -49,7 +49,8 @@ const Redeems = ({ shift }: RedeemsProps) => {
     return (
         <div className="bg-white p-4 shadow-md rounded-lg">
             <h3 className="text-lg font-semibold mb-4">Resgates</h3>
-            <table className="w-full text-left">
+            <div className="max-h-64 overflow-y-auto">
+                <table className="w-full text-left">
                 <thead>
                     <tr>
                         <th className="pb-2">Motivo</th>
@@ -57,14 +58,20 @@ const Redeems = ({ shift }: RedeemsProps) => {
                     </tr>
                 </thead>
                 <tbody>
+                    {!shift?.redeems?.length && (
+                        <tr>
+                            <td colSpan={2} className="py-2 text-center">Nenhum resgate encontrado</td>
+                        </tr>
+                    )}
                     {shift?.redeems?.map((redeem, index) => (
                         <tr key={index} className="border-t">
                             <td className="py-2">{redeem.name}</td>
-                            <td className="py-2">{new Decimal(redeem.value).toFixed(2)}</td>
+                            <td className="py-2">R$ {new Decimal(redeem.value).toFixed(2)}</td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     )
 }

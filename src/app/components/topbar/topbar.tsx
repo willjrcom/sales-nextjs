@@ -67,6 +67,7 @@ const Topbar = () => {
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />
         <TopbarItem label="Entregas" href="/pages/order-delivery-control" />
+        <TopbarItem label="Retiradas" href="/pages/order-pickup-control" />
         {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
       </div>
 

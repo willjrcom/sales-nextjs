@@ -90,7 +90,7 @@ const ShiftDashboard = () => {
 
     useEffect(() => {
         fetchCurrentShift()
-    }, [data?.user])
+    }, [data?.user.access_token])
 
     const totalOrders = shift?.orders?.length || 0;
     const totalFinishedOrders = shift?.orders?.filter(order => order.status === 'Finished').length || 0;
@@ -104,11 +104,6 @@ const ShiftDashboard = () => {
 
             {shift &&
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                    <SalesCard
-                        title="Pedidos Cancelados"
-                        value={totalCanceledOrders.toString()}
-                        icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
-                    />
                     <SalesCard
                         title="Vendas Hoje"
                         value={"R$ " + new Decimal(totalSales).toFixed(2)}
@@ -124,13 +119,18 @@ const ShiftDashboard = () => {
                         value={totalFinishedOrders.toString()}
                         icon={<FaClipboardCheck size={30} className="text-gray-800" />}
                     />
+                    <SalesCard
+                        title="Pedidos Cancelados"
+                        value={totalCanceledOrders.toString()}
+                        icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
+                    />
                 </div>
             }
 
             {shift &&
                 <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                    <ShiftResume shift={shift} />
-                    <SalesSummary />
+                    {/* <ShiftResume shift={shift} /> */}
+                    {/* <SalesSummary /> */}
                     <Redeems shift={shift} />
                 </div>
             }

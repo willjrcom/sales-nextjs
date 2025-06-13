@@ -1,7 +1,7 @@
 "use client";
 import GetCompany from "@/app/api/company/company";
 import RequestError from "@/app/utils/error";
-import ShipOrderDelivery from "@/app/api/order-delivery/update/ship/order-delivery";
+import ShipOrderDelivery from "@/app/api/order-delivery/status/ship/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Carousel from "@/app/components/carousel/carousel";
 import Refresh from "@/app/components/crud/refresh";

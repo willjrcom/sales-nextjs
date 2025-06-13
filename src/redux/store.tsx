@@ -8,6 +8,7 @@ import employeesReducer from './slices/employees';
 import placesReducer from './slices/places';
 import unusedTablesReducer from './slices/unused-tables';
 import deliveryDriversReducer from './slices/delivery-drivers';
+import pickupOrdersReducer from './slices/pickup-orders';
 import categoryReducer from './slices/categories';
 import orderProcessesReducer from './slices/order-processes';
 import usersReducer from './slices/users';
@@ -24,6 +25,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
     orders: ordersReducer,
     deliveryOrders: deliveryOrdersReducer,
+    pickupOrders: pickupOrdersReducer,
     tableOrders: tableOrdersReducer,
     clients: clientsReducer,
     employees: employeesReducer,

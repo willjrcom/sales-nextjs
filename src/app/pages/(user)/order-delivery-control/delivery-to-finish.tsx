@@ -1,6 +1,6 @@
 "use client";
 import RequestError from "@/app/utils/error";
-import DeliveryOrderDelivery from "@/app/api/order-delivery/update/delivery/order-delivery";
+import DeliveryOrderDelivery from "@/app/api/order-delivery/status/delivery/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";

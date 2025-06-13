@@ -16,7 +16,7 @@ import { useModal } from "@/app/context/modal/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import Link from "next/link";
 import Carousel from "../carousel/carousel";
-import CloseTable from "@/app/api/order-table/status/finish/order-table";
+import CloseTable from "@/app/api/order-table/status/close/order-table";
 import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
