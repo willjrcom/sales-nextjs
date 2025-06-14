@@ -37,6 +37,36 @@ export default class Shift {
         this.opened_at = opened_at;
         this.closed_at = closed_at;
     }
+
+
+    /**
+     * Total de pedidos no turno
+     */
+    getTotalOrders(): number {
+        return this.orders?.length || 0;
+    }
+    /**
+     * Total de pedidos finalizados
+     */
+    getTotalFinishedOrders(): number {
+        return this.orders?.filter(order => order.status === 'Finished').length || 0;
+    }
+    /**
+     * Total de pedidos cancelados
+     */
+    getTotalCanceledOrders(): number {
+        return this.orders?.filter(order => order.status === 'Canceled').length || 0;
+    }
+    /**
+     * Soma total de vendas de pedidos finalizados
+     */
+    getTotalSales(): Decimal {
+        return this.orders
+            ?.filter(order => order.status === 'Finished')
+            .reduce((sum, order) => sum.plus(order.total_payable), new Decimal(0))
+            || new Decimal(0);
+    }
+
 }
 
 export class Redeem {

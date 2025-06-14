@@ -17,7 +17,7 @@ interface ShiftProps {
     fetchShift: () => void;
 }
 
-const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
+const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
     const { data } = useSession();
     const [user, setUser] = useState<User>(new User());
     const [startChange, setStartChange] = useState<Decimal>(new Decimal(shift?.start_change || 0));
@@ -96,4 +96,4 @@ const ShiftCard = ({ shift, fetchShift }: ShiftProps) => {
     )
 }
 
-export default ShiftCard
+export default ShiftManager
