@@ -1,0 +1,60 @@
+/* Container principal */
+.container {
+    padding: 16px;
+    background-color: #f9fafb;
+    font-family: Arial, sans-serif;
+}
+
+/* Título */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a202c;
+    margin-bottom: 16px;
+}
+
+/* Container das abas */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #f1f5f9;
+    padding: 8px;
+}
+
+/* Estilo base para os botões */
+.tab {
+    width: 100%;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5568;
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Botão ativo */
+.tab.active {
+    background-color: white;
+    color: #1a202c;
+    border-bottom: none;
+}
+
+/* Estilo ao passar o mouse */
+.tab:hover {
+    background-color: white;
+    color: #1a202c;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Conteúdo principal */
+.content {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+}

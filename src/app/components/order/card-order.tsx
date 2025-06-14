@@ -23,6 +23,7 @@ import { AppDispatch } from "@/redux/store";
 import { notifyError } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import { FaPrint } from "react-icons/fa";
+import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -145,7 +146,7 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
             );
         }
         if (order.table) {
-            const finishTable = async () => {
+            const closeTable = async () => {
                 if (!order.table?.id || !data) return
 
                 try {
@@ -172,14 +173,27 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                             <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>
                             <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>
                         </ul>
-                        {!order.table.closed_at && <button onClick={finishTable}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Fechar Mesa</button>}
+                        {!order.table.closed_at && <button onClick={closeTable}
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Fechar Mesa</button>
+                        }
                     </div>
                 </div>
             );
         }
 
         if (order.pickup) {
+            const deliveryPickup = async () => {
+                if (!order.pickup?.id || !data) return
+
+                try {
+                    await DeliveryPickup(order.pickup?.id, data);
+                    dispatch(fetchTableOrders({ session: data }));
+                    fetchOrder();
+                } catch (error) {
+                    const err = error as RequestError;
+                    notifyError(err.message || "Erro ao entregar retirada");
+                }
+            }
             return (
                 <div className="mb-4">
                     <div className="flex justify-between items-center mb-4">
@@ -193,6 +207,10 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
                             <li>Pendente em: {ToUtcDatetime(order.pickup.pending_at)}</li>
                             <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>
                         </ul>
+
+                        {order.pickup.ready_at && !order.pickup.delivered_at && <button onClick={deliveryPickup}
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Entregar pedido</button>
+                        }
                     </div>
                 </div>
             );

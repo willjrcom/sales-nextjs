@@ -9,10 +9,11 @@ const PickupOrderColumns = (): ColumnDef<Order>[] => [
   },
   {
     id: 'Nome',
-    accessorKey: 'order_number',
-    header: 'Comanda',
+    accessorKey: 'name',
+    header: 'Nome',
     accessorFn: row => {
       const name = row.pickup?.name
+      console.log(row)
       if (!name) return 'Sem cliente'
 
       return name.substring(0, 15);

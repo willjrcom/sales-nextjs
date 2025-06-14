@@ -20,6 +20,7 @@ export default class OrderDelivery {
     driver?: DeliveryDriver;
     order_id: string = "";
     pending_at?: string = "";
+    ready_at?: string = "";
     shipped_at?: string = "";
     delivered_at?: string = "";
 
@@ -34,6 +35,7 @@ export default class OrderDelivery {
         driver_id = "",
         order_id = "",
         pending_at = "",
+        ready_at = "",
         shipped_at = "",
         delivered_at = ""
     ) {
@@ -47,6 +49,7 @@ export default class OrderDelivery {
         this.driver_id = driver_id;
         this.order_id = order_id;
         this.pending_at = pending_at;
+        this.ready_at = ready_at;
         this.shipped_at = shipped_at;
         this.delivered_at = delivered_at;
     }

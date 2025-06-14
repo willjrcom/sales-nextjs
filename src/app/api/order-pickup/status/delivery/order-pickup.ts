@@ -1,9 +1,9 @@
 import RequestApi, { AddAccessToken } from "@/app/api/request";
 import { Session } from "next-auth";
 
-const CloseTable = async (table_id: string, session: Session): Promise<string> => {
+const DeliveryPickup = async (pickup_id: string, session: Session): Promise<string> => {
     const response = await RequestApi<null, string>({
-        path: "/order-pickup/update/close/" + table_id, 
+        path: "/order-pickup/update/delivery/" + pickup_id, 
         method: "POST",
         headers: await AddAccessToken(session),
     });
@@ -11,4 +11,4 @@ const CloseTable = async (table_id: string, session: Session): Promise<string> =
     return response.data
 };
 
-export default CloseTable
+export default DeliveryPickup
