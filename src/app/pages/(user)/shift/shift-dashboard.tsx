@@ -12,6 +12,7 @@ interface SalesDashboardProps {
 const ShiftDashboard = ({ shift }: SalesDashboardProps) => {
     if (!shift) return 
     
+    shift = Object.assign(new Shift(), shift);
     return (
         <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">

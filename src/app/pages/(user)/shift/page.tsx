@@ -8,6 +8,9 @@ import { useSession } from "next-auth/react";
 import GetCurrentShift from "@/app/api/shift/current/shift";
 import RequestError from "@/app/utils/error";
 import ShiftManager from "./shift-manager";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import ListShift from "./list-shift";
+import { FaList } from "react-icons/fa";
 
 const PageShift = () => {
     const [shift, setShift] = useState<Shift | null>();
@@ -39,6 +42,10 @@ const PageShift = () => {
                 <ShiftManager shift={shift} fetchShift={fetchCurrentShift} />
                 <ShiftDashboard shift={shift} />
             </div>
+
+            <ButtonIconTextFloat modalName="list-shift" title="Turnos anteriores" position="bottom-right" icon={FaList}>
+                <ListShift />
+            </ButtonIconTextFloat>
         </>
     )
 }

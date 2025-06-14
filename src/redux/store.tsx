@@ -13,6 +13,7 @@ import categoryReducer from './slices/categories';
 import orderProcessesReducer from './slices/order-processes';
 import usersReducer from './slices/users';
 import userCompaniesReducer from './slices/user-companies';
+import shiftsReducer from './slices/shifts';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
     orderProcesses: orderProcessesReducer,
     users: usersReducer,
     userCompanies: userCompaniesReducer,
+    shifts: shiftsReducer,
 });
 
 // Aplica o persistReducer para o rootReducer

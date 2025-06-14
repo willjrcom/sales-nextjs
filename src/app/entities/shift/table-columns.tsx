@@ -28,11 +28,12 @@ const ShiftColumns = (): ColumnDef<Shift>[] => [
     accessorKey: 'id',
     header: 'Ver',
     cell: ({ row }) => {
+      const shiftInstance = Object.assign(new Shift(), row.original);
       return (
-        <ButtonIcon modalName={"show-shift-" + row.original.id}
+        <ButtonIcon modalName={"show-shift-" + row.original.id} size="xl"
           title={"Ver dia: " + new Date(row.original.opened_at).toLocaleDateString('pt-BR')}>
           <ShiftDashboard
-            shift={row.original} />
+            shift={shiftInstance} />
         </ButtonIcon>
       )
     },
