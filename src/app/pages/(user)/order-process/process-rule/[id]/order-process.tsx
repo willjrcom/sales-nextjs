@@ -6,7 +6,7 @@ import OrderProcess from '@/app/entities/order-process/order-process';
 import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-processes';
 import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
 import { useDispatch } from 'react-redux';
 import GroupItem from '@/app/entities/order/group-item';
@@ -24,6 +24,15 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const { data } = useSession();
     const modalHandler = useModal();
 
+    // atualiza o timer a cada segundo para mostrar duração dinâmica
+    const [now, setNow] = useState(new Date());
+    useEffect(() => {
+        if (orderProcess.status === "Started") {
+            const timer = setInterval(() => setNow(new Date()), 1000);
+            return () => clearInterval(timer);
+        }
+    }, [orderProcess.status]);
+    
     const groupItem = orderProcess.group_item;
     if (!groupItem) return null;
     
@@ -60,15 +69,6 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             onClose
         )
     }
-
-    // atualiza o timer a cada segundo para mostrar duração dinâmica
-    const [now, setNow] = useState(new Date());
-    React.useEffect(() => {
-        if (orderProcess.status === "Started") {
-            const timer = setInterval(() => setNow(new Date()), 1000);
-            return () => clearInterval(timer);
-        }
-    }, [orderProcess.status]);
     
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-6">

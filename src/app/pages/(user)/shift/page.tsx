@@ -14,10 +14,10 @@ import { FaList } from "react-icons/fa";
 
 const PageShift = () => {
     const [shift, setShift] = useState<Shift | null>();
-    const { data } = useSession();
+    const { data, status } = useSession();
 
     const fetchCurrentShift = async () => {
-        if (!data) return;
+        if (status !== "authenticated") return
 
         try {
             const currentShift = await GetCurrentShift(data);
@@ -33,7 +33,7 @@ const PageShift = () => {
 
     useEffect(() => {
         fetchCurrentShift()
-    }, [data?.user.access_token])
+    }, [status])
 
     return (
         <>
