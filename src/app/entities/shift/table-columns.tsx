@@ -33,7 +33,9 @@ const ShiftColumns = (): ColumnDef<Shift>[] => [
         <ButtonIcon modalName={"show-shift-" + row.original.id} size="xl"
           title={"Ver dia: " + new Date(row.original.opened_at).toLocaleDateString('pt-BR')}>
           <ShiftDashboard
-            shift={shiftInstance} />
+            shift={shiftInstance} 
+            isUpdate={true}
+            />
         </ButtonIcon>
       )
     },

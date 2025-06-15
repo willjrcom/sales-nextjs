@@ -14,6 +14,14 @@ export default class Shift {
     opened_at: string = "";
     closed_at: string = "";
 
+	total_orders_finished: number = 0;
+	total_orders_canceled: number = 0;
+	total_sales: Decimal = new Decimal(0);
+	sales_by_category: Record<string,Decimal> = {};
+	products_sold_by_category: Record<string,number> = {};
+	total_items_sold: number = 0;
+	average_order_value: Decimal = new Decimal(0);
+
     constructor(
         id: string = "",
         current_order_number: number = 0,
@@ -38,30 +46,23 @@ export default class Shift {
         this.closed_at = closed_at;
     }
 
-
-    /**
-     * Total de pedidos no turno
-     */
-    getTotalOrders(): number {
-        return this.orders?.length || 0;
-    }
     /**
      * Total de pedidos finalizados
      */
     getTotalFinishedOrders(): number {
-        return this.orders?.filter(order => order.status === 'Finished').length || 0;
+        return this.total_orders_finished || this.orders?.filter(order => order.status === 'Finished').length || 0;
     }
     /**
      * Total de pedidos cancelados
      */
     getTotalCanceledOrders(): number {
-        return this.orders?.filter(order => order.status === 'Canceled').length || 0;
+        return this.total_orders_canceled || this.orders?.filter(order => order.status === 'Canceled').length || 0;
     }
     /**
      * Soma total de vendas de pedidos finalizados
      */
     getTotalSales(): Decimal {
-        return this.orders
+        return this.total_sales || this.orders
             ?.filter(order => order.status === 'Finished')
             .reduce((sum, order) => sum.plus(order.total_payable), new Decimal(0))
             || new Decimal(0);

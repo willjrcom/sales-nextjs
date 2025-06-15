@@ -23,6 +23,7 @@ const PageShift = () => {
             const currentShift = await GetCurrentShift(data);
             // Converte objeto plano em instância de Shift para ter acesso aos métodos
             const shiftInstance = Object.assign(new Shift(), currentShift);
+            console.log(shiftInstance)
             setShift(shiftInstance);
 
         } catch (error: RequestError | any) {

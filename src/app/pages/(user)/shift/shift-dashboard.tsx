@@ -1,17 +1,20 @@
 'use client';
 
 import Shift from '@/app/entities/shift/shift';
-import { FaShoppingCart, FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangle } from 'react-icons/fa';
 import { Redeems } from './redeem';
 import Decimal from 'decimal.js';
+import FinishedOrderCard from './finished-order';
+import CategorySummary from './category-summary';
 
 interface SalesDashboardProps {
     shift?: Shift | null
+    isUpdate?: boolean
 }
 
-const ShiftDashboard = ({ shift }: SalesDashboardProps) => {
-    if (!shift) return 
-    
+const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
+    if (!shift) return
+
     shift = Object.assign(new Shift(), shift);
     return (
         <div>
@@ -20,11 +23,6 @@ const ShiftDashboard = ({ shift }: SalesDashboardProps) => {
                     title="Vendas Hoje"
                     value={"R$ " + new Decimal(shift.getTotalSales()).toFixed(2)}
                     icon={<FaMoneyBillWave size={30} className="text-gray-800" />}
-                />
-                <SalesCard
-                    title="Total de Pedidos"
-                    value={shift.getTotalOrders().toString()}
-                    icon={<FaShoppingCart size={30} className="text-gray-800" />}
                 />
                 <SalesCard
                     title="Pedidos Finalizados"
@@ -36,12 +34,27 @@ const ShiftDashboard = ({ shift }: SalesDashboardProps) => {
                     value={shift.getTotalCanceledOrders().toString()}
                     icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
                 />
+                {isUpdate &&
+                    <SalesCard
+                        title="Itens Vendidos"
+                        value={shift.total_items_sold.toString()}
+                        icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
+                    />
+                }
+                {isUpdate &&
+                    <SalesCard
+                        title="Media de vendas"
+                        value={"R$ " + new Decimal(shift.average_order_value).toFixed(2)}
+                        icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
+                    />
+                }
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <Redeems shift={shift} />
+                <FinishedOrderCard shift={shift} />
+                <CategorySummary shift={shift} />
             </div>
-
         </div>
     )
 }
