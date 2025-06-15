@@ -261,7 +261,7 @@ const Pagination = <T,>({ table }: PaginationProps<T>) => {
                     onChange={(e) => table.setPageSize(Number(e.target.value))}
                     className="inline-flex items-center px-3 py-1.5 border border-gray-300 bg-white text-sm rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                    {[10, 20, 30, 40, 50].map(size => (
+                    {[2, 10, 20, 30, 40, 50].map(size => (
                         <option key={size} value={size}>
                             Exibir {size}
                         </option>

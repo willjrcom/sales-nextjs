@@ -39,7 +39,7 @@ const PageShift = () => {
         <>
             <PageTitle title="Turno" tooltip="Painel do turno atual, exibindo vendas, cancelamentos e status." />
 
-            <div className="p-8 bg-gray-100 h-[80vh] overflow-y-auto">
+            <div className="p-8 bg-gray-100 overflow-y-auto">
                 <ShiftManager shift={shift} fetchShift={fetchCurrentShift} />
                 <ShiftDashboard shift={shift} />
             </div>

@@ -4,6 +4,7 @@ import Shift from '@/app/entities/shift/shift';
 import { FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangle } from 'react-icons/fa';
 import { Redeems } from './redeem';
 import Decimal from 'decimal.js';
+import ListPayment from './list-payment';
 import FinishedOrderCard from './finished-order';
 import CategorySummary from './category-summary';
 
@@ -54,6 +55,7 @@ const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
                 <Redeems shift={shift} />
                 <FinishedOrderCard shift={shift} />
                 <CategorySummary shift={shift} />
+                <ListPayment shift={shift} />
             </div>
         </div>
     )

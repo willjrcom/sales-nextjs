@@ -1,6 +1,7 @@
 import Employee from "../employee/employee";
 import Decimal from 'decimal.js';
 import Order from "../order/order";
+import { PaymentOrder } from "../order/order-payment";
 
 export default class Shift {
     id: string = "";
@@ -21,6 +22,7 @@ export default class Shift {
 	products_sold_by_category: Record<string,number> = {};
 	total_items_sold: number = 0;
 	average_order_value: Decimal = new Decimal(0);
+    payments: PaymentOrder[] = [];
 
     constructor(
         id: string = "",
@@ -32,7 +34,15 @@ export default class Shift {
         attendant_id: string = "",
         attendant: Employee = new Employee(),
         opened_at: string = "",
-        closed_at: string = ""
+        closed_at: string = "",
+        total_orders_finished: number = 0,
+        total_orders_canceled: number = 0,
+        total_sales: Decimal = new Decimal(0),
+        sales_by_category: Record<string,Decimal> = {},
+        products_sold_by_category: Record<string,number> = {},
+        total_items_sold: number = 0,
+        average_order_value: Decimal = new Decimal(0),
+        payments: PaymentOrder[] = []
     ) {
         this.id = id;
         this.current_order_number = current_order_number;
@@ -44,6 +54,14 @@ export default class Shift {
         this.attendant = attendant;
         this.opened_at = opened_at;
         this.closed_at = closed_at;
+        this.total_orders_finished = total_orders_finished;
+        this.total_orders_canceled = total_orders_canceled;
+        this.total_sales = total_sales;
+        this.sales_by_category = sales_by_category;
+        this.products_sold_by_category = products_sold_by_category;
+        this.total_items_sold = total_items_sold;
+        this.average_order_value = average_order_value;
+        this.payments = payments;
     }
 
     /**

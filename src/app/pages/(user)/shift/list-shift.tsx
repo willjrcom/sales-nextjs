@@ -41,7 +41,7 @@ const ListShift = () => {
 
     return (
         <>
-            <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
+            <CrudLayout title={<PageTitle title="Turnos" tooltip="listagem de turnos anteriores." />}
                 searchButtonChildren={<></>}
                 filterButtonChildren={<></>}
                 plusButtonChildren={<></>}
