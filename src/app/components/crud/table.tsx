@@ -1,3 +1,4 @@
+"use client";
 import { ColumnDef, Table, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel } from "@tanstack/react-table";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";

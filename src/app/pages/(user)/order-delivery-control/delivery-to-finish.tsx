@@ -4,7 +4,9 @@ import DeliveryOrderDelivery from "@/app/api/order-delivery/status/delivery/orde
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
-import Map, { Point } from "@/app/components/map/map";
+import dynamic from 'next/dynamic';
+import type { Point } from "@/app/components/map/map";
+const Map = dynamic(() => import("@/app/components/map/map"), { ssr: false });
 import { SelectField } from "@/app/components/modal/field";
 import CardOrder from "@/app/components/order/card-order";
 import { useModal } from "@/app/context/modal/context";
