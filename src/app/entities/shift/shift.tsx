@@ -63,29 +63,6 @@ export default class Shift {
         this.average_order_value = average_order_value;
         this.payments = payments;
     }
-
-    /**
-     * Total de pedidos finalizados
-     */
-    getTotalFinishedOrders(): number {
-        return this.total_orders_finished || this.orders?.filter(order => order.status === 'Finished').length || 0;
-    }
-    /**
-     * Total de pedidos cancelados
-     */
-    getTotalCanceledOrders(): number {
-        return this.total_orders_canceled || this.orders?.filter(order => order.status === 'Canceled').length || 0;
-    }
-    /**
-     * Soma total de vendas de pedidos finalizados
-     */
-    getTotalSales(): Decimal {
-        return this.total_sales || this.orders
-            ?.filter(order => order.status === 'Finished')
-            .reduce((sum, order) => sum.plus(order.total_payable), new Decimal(0))
-            || new Decimal(0);
-    }
-
 }
 
 export class Redeem {

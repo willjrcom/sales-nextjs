@@ -1,16 +1,19 @@
 import Decimal from 'decimal.js';
 import Shift from "@/app/entities/shift/shift";
+import { StatusOrder } from '@/app/entities/order/order';
 
-interface FinishedOrderProps {
+interface ListOrderProps {
     shift: Shift;
+    status?: StatusOrder;
+    title: string;
 }
 
-const FinishedOrderCard = ({ shift }: FinishedOrderProps) => {
-    const finishedOrders = shift?.orders?.filter(order => order.status === 'Finished');
+const ListOrderCard = ({ shift, status, title }: ListOrderProps) => {
+    const finishedOrders = shift?.orders?.filter(order => order.status === status);
 
     return (
         <div className="bg-white p-4 shadow-md rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Pedidos Finalizados</h3>
+            <h3 className="text-lg font-semibold mb-4">{title}</h3>
             <div className="max-h-64 overflow-y-auto">
                 <table className="w-full text-left">
                     <thead>
@@ -38,4 +41,4 @@ const FinishedOrderCard = ({ shift }: FinishedOrderProps) => {
     )
 }
 
-export default FinishedOrderCard
+export default ListOrderCard

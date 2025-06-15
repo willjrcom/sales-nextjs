@@ -5,7 +5,7 @@ import { FaMoneyBillWave, FaClipboardCheck, FaExclamationTriangle } from 'react-
 import { Redeems } from './redeem';
 import Decimal from 'decimal.js';
 import ListPayment from './list-payment';
-import FinishedOrderCard from './finished-order';
+import ListOrderCard from './finished-order';
 import CategorySummary from './category-summary';
 
 interface SalesDashboardProps {
@@ -22,17 +22,17 @@ const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                 <SalesCard
                     title="Vendas Hoje"
-                    value={"R$ " + new Decimal(shift.getTotalSales()).toFixed(2)}
+                    value={"R$ " + new Decimal(shift.total_sales).toFixed(2)}
                     icon={<FaMoneyBillWave size={30} className="text-gray-800" />}
                 />
                 <SalesCard
                     title="Pedidos Finalizados"
-                    value={shift.getTotalFinishedOrders().toString()}
+                    value={shift.total_orders_finished.toString()}
                     icon={<FaClipboardCheck size={30} className="text-gray-800" />}
                 />
                 <SalesCard
                     title="Pedidos Cancelados"
-                    value={shift.getTotalCanceledOrders().toString()}
+                    value={shift.total_orders_canceled.toString()}
                     icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
                 />
                 {isUpdate &&
@@ -53,7 +53,8 @@ const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <Redeems shift={shift} />
-                <FinishedOrderCard shift={shift} />
+                <ListOrderCard shift={shift} status='Finished' title="Pedidos Finalizados" />
+                <ListOrderCard shift={shift} status='Canceled' title="Pedidos Cancelados" />
                 <CategorySummary shift={shift} />
                 <ListPayment shift={shift} />
             </div>
