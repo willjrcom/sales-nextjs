@@ -128,16 +128,18 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     };
 
     const handleDecrement = async (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 0 || !data) return notifyError("Minimo de 5 itens adicionais")
+        if (clickedItem.quantity === 0 || !data) return notifyError("Quantidade mínima atingida")
 
+        // Decrementa quantidade localmente
         clickedItem.quantity -= 1
 
-        // Update quantity
+        // Se ainda restar quantidade, apenas atualiza
         if (clickedItem.quantity !== 0) {
             updateAdditionalItem(clickedItem)
 
-            // Update additional item from Item
+            // Atualiza lista de adicionais no item, mantendo a nova quantidade
             const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
+            newAdditionalItems.push({ ...clickedItem, id: clickedItem.additional_item_id } as Item);
 
             setItem((prev) => ({
                 ...prev,
