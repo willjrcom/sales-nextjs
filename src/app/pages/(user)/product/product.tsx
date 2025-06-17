@@ -49,6 +49,8 @@ const PageProducts = () => {
         )
     }
 
+    const validProducts = products.filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name));
+
     return (
         <>
             <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
@@ -73,7 +75,7 @@ const PageProducts = () => {
                 tableChildren={
                     <CrudTable
                         columns={ProductColumns()}
-                        data={products.filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name))}>
+                        data={validProducts}>
                     </CrudTable>
                 }
             />

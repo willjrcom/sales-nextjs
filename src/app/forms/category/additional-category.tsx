@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Category from "@/app/entities/category/category";
 import Carousel from "@/app/components/carousel/carousel";
+import { FaTags } from 'react-icons/fa';
 import Image from "next/image";
 
 interface CategorySelectorProps {
@@ -48,22 +49,26 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
             <Carousel items={filteredCategories}>
                 {(category) => {
                     const isSelected = selectedCategories?.some(cat => cat.id === category.id);
-
                     return (
                         <div
                             key={category.id}
-                            className={`border p-3 rounded-lg cursor-pointer ${isSelected ? 'bg-blue-100' : 'bg-white'}`}
+                            className={`flex flex-col items-center p-4 border rounded-lg shadow-md cursor-pointer transition-transform transform ${isSelected ? 'bg-blue-50 border-blue-500' : 'bg-white border-gray-200'} hover:shadow-lg hover:scale-105`}
                             onClick={() => handleCategorySelection(category)}
                         >
-                            {category.image_path &&
+                            {category.image_path ? (
                                 <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />
-                            }
-                            
-                            <h3 className="text-md font-bold text-center">{category.name}</h3>
-                            {isSelected && <p className="text-sm text-blue-600 text-right">Adicionado</p>}
-                            {!isSelected && <p className="text-sm text-gray-500 text-right">&nbsp;</p>}
+                            ) : (
+                                <FaTags className="text-4xl text-gray-300 mb-4" />
+                            )}
+                            <h3 className="text-md font-semibold text-center mb-1">{category.name}</h3>
+                            <span className="text-sm text-gray-500">Categoria Adicional</span>
+                            {isSelected ? (
+                                <span className="mt-2 text-xs font-medium text-blue-600">Selecionado</span>
+                            ) : (
+                                <span className="mt-2 text-xs text-gray-400">&nbsp;</span>
+                            )}
                         </div>
-                    )
+                    );
                 }}
             </Carousel>
             {filteredCategories.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria adicional encontrada.</p>}

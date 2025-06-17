@@ -44,8 +44,8 @@ const DeliveryOrderFinished = () => {
     }, [data?.user.access_token, dispatch]);
 
     useEffect(() => {
-        const deliveredOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Delivered')
-        const ordersNotFinished = Object.values(deliveryOrdersSlice.entities).filter((order) => (order?.status === 'Ready' || order?.status === 'Pending') && order.delivery?.status === 'Delivered');
+        const deliveredOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Delivered');
+        const ordersNotFinished = Object.values(deliveryOrdersSlice.entities).filter((order) => order?.status === 'Ready' && order.delivery?.status === 'Delivered');
 
         if (!selectedDriverId) {
             setOrdersNotFinished(ordersNotFinished);

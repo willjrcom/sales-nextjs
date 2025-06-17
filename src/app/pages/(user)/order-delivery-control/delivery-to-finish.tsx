@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import type { Point } from "@/app/components/map/map";
 const Map = dynamic(() => import("@/app/components/map/map"), { ssr: false });
 import { SelectField } from "@/app/components/modal/field";
+import Decimal from 'decimal.js';
 import CardOrder from "@/app/components/order/card-order";
 import { useModal } from "@/app/context/modal/context";
 import Address from "@/app/entities/address/address";
@@ -32,7 +33,7 @@ const DeliveryOrderToFinish = () => {
     const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [points, setPoints] = useState<Point[]>([]);
     const [orderID, setSelectedOrderID] = useState<string>("");
-    const [selectedDeliveryID, setSelectedDeliveryID] = useState<string>("");
+    const [selectedOrder, setOrder] = useState<Order | null>(null);
     const [selectedDriverId, setSelectedDriverId] = useState<string>();
     const { data } = useSession();
 
@@ -55,7 +56,7 @@ const DeliveryOrderToFinish = () => {
     }, [data?.user.access_token, dispatch]);
 
     useEffect(() => {
-        const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped' && order.status === 'Ready')
+        const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped');
 
         if (!selectedDriverId) {
             setDeliveryOrders(shippedOrders);
@@ -67,9 +68,9 @@ const DeliveryOrderToFinish = () => {
 
     useEffect(() => {
         const order = deliveryOrdersSlice.entities[orderID]
-        if (!order) return
+        if (!order) return setOrder(null)
 
-        setSelectedDeliveryID(order.delivery?.id || "");
+        setOrder(order);
     }, [orderID]);
 
     useEffect(() => {
@@ -130,21 +131,21 @@ const DeliveryOrderToFinish = () => {
                 </div>
             </div>
             {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
-                <FinishDelivery deliveryID={selectedDeliveryID} orderID={orderID} />
+                <FinishDelivery order={selectedOrder} />
             </ButtonIconTextFloat>}
         </>
     )
 }
 
-interface ModalData {
-    deliveryID: string;
-    orderID: string;
+interface FinishDeliveryProps {
+    order: Order | null;
 }
-
-const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
+const FinishDelivery = ({ order }: FinishDeliveryProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
+
+    if (!order) return <></>
 
     const showOrder = (orderId: string, error?: RequestError | null) => {
         const onClose = () => {
@@ -153,18 +154,18 @@ const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
         modalHandler.showModal(
             "show-order-" + orderId,
             "Ver Pedido",
-            <CardOrder orderId={orderId} errorRequest={error} />,
+            <CardOrder orderId={orderId} />,
             "xl",
             onClose
         );
     };
 
     const submit = async () => {
-        if (!data) return
-
+        if (!data) return;
+        const deliveryID = order.delivery?.id;
         if (!deliveryID) {
-            notifyError('Selecione uma entrega');
-            return
+            notifyError('ID da entrega inválido');
+            return;
         }
 
 
@@ -172,21 +173,31 @@ const FinishDelivery = ({ deliveryID, orderID }: ModalData) => {
             await DeliveryOrderDelivery(deliveryID, data);
             dispatch(fetchDeliveryOrders({ session: data }));
             modalHandler.hideModal("finish-delivery");
-            showOrder(orderID)
+            showOrder(order.id);
         } catch (error: RequestError | any) {
             notifyError(error);
         }
     }
 
+    const paymentMethod = order.delivery?.payment_method || 'N/A';
+    const change = order.delivery?.change ? new Decimal(order.delivery.change).toFixed(2) : '0.00';
+    const total = new Decimal(order.total_payable).toFixed(2);
     return (
-        <>
-            <div className="items-center mb-4">
-                <p className="text-sm text-gray-600">Confirma que a entrega foi finalizada?</p>
+        <div>
+            <div className="space-y-2 mb-4">
+                <p className="text-sm text-gray-700">Confirma finalização da entrega?</p>
+                <p className="text-sm"><strong>Método de pagamento:</strong> {paymentMethod}</p>
+                <p className="text-sm"><strong>Troco (R$):</strong> {change}</p>
+                <p className="text-sm"><strong>Valor total (R$):</strong> {total}</p>
             </div>
-            
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Confirmar entrega</button>
-        </>
-    )
-}
+            <button
+                className="w-full inline-flex justify-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded"
+                onClick={submit}
+            >
+                Confirmar entrega
+            </button>
+        </div>
+    );
+};
 
 export default DeliveryOrderToFinish

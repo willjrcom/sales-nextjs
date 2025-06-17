@@ -4,6 +4,7 @@ import RequestError from "@/app/utils/error";
 import ShipOrderDelivery from "@/app/api/order-delivery/status/ship/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Carousel from "@/app/components/carousel/carousel";
+import { FaUserCircle } from 'react-icons/fa';
 import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import dynamic from 'next/dynamic';
@@ -34,7 +35,7 @@ const DeliveryOrderToShip = () => {
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
     const [selectedOrderIDs, setSelectedOrderIDs] = useState<string[]>([]);
-    const { data } = useSession();
+    const { data, status } = useSession();
 
     useEffect(() => {
         if (data && Object.keys(ordersSlice.entities).length === 0) {
@@ -48,10 +49,12 @@ const DeliveryOrderToShip = () => {
         }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch]);
+    }, [status]);
 
     useEffect(() => {
-        setOrders(Object.values(ordersSlice.entities).filter((order) => order.delivery?.status === 'Pending' && order.status === 'Ready'));
+        console.log(Object.values(ordersSlice.entities))
+        const orders = Object.values(ordersSlice.entities).filter((order) => order.delivery?.status === 'Ready')
+        setOrders(orders);
     }, [ordersSlice.entities]);
 
     useEffect(() => {
@@ -75,7 +78,7 @@ const DeliveryOrderToShip = () => {
 
     useEffect(() => {
         getCenterPoint();
-    }, [data?.user.access_token])
+    }, [status])
 
     useEffect(() => {
         const newPoints: Point[] = [];
@@ -125,9 +128,11 @@ const DeliveryOrderToShip = () => {
                 </div>
             </div>
 
-            {selectedRows.size > 0 && <ButtonIconTextFloat modalName="ship-delivery" icon={FaMotorcycle} title="Enviar entrega" position="bottom-right">
-                <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} orderIDs={selectedOrderIDs} />
-            </ButtonIconTextFloat>}
+            {selectedRows.size > 0 &&
+                <ButtonIconTextFloat modalName="ship-delivery" icon={FaMotorcycle} title="Enviar entrega" position="bottom-right">
+                    <SelectDeliveryDriver deliveryIDs={selectedDeliveryIDs} orderIDs={selectedOrderIDs} />
+                </ButtonIconTextFloat>
+            }
         </>
     )
 }
@@ -199,27 +204,38 @@ const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     return (
         <>
             <div className="items-center mb-4">
+                <h3 className="text-lg font-semibold mb-2">Selecione um entregador:</h3>
+                {deliveryDrivers.length === 0 && <p className="text-gray-500">Nenhum entregador cadastrado</p>}
+
                 <Carousel items={deliveryDrivers}>
                     {(driver) => {
-                        const isSelected = selectedDriver?.id === driver.id
-
+                        const isSelected = selectedDriver?.id === driver.id;
                         return (
-                            <li key={driver.id} className={`shadow-md border p-3 rounded-lg cursor-pointer ${isSelected ? 'bg-blue-100' : 'bg-white'}`}
-                                onClick={() => setSelectedDriver(driver)}>
-                                <div className="text-center">
-                                    <p className="text-gray-700">
-                                        {driver.employee.name}
-                                    </p>
-                                    {isSelected && <p className="text-gray-500 text-right">Selecionado</p>}
-                                    {!isSelected && <p className="text-gray-500">&nbsp;</p>}
-                                </div>
-                            </li>
-                        )
+                            <div
+                                key={driver.id}
+                                className={`flex flex-col items-center p-4 border rounded-lg shadow cursor-pointer transition-transform transform hover:scale-105 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'
+                                    }`}
+                                onClick={() => setSelectedDriver(driver)}
+                            >
+                                <FaUserCircle className="text-4xl text-gray-400 mb-2" />
+                                <p className="font-semibold text-gray-700 text-center">
+                                    {driver.employee.name}
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    {driver.order_deliveries?.length || 0} entrega{driver.order_deliveries?.length === 1 ? '' : 's'}
+                                </p>
+                                {isSelected && (
+                                    <span className="mt-2 text-xs font-medium text-blue-600">
+                                        Selecionado
+                                    </span>
+                                )}
+                            </div>
+                        );
                     }}
                 </Carousel>
             </div>
 
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>
+            {deliveryDrivers.length > 0 && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>}
         </>
     )
 }

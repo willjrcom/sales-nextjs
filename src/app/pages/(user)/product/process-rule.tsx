@@ -40,12 +40,15 @@ export default function PageProcessRules() {
         )
     }
 
+    const validCategories = Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement);
+    const validProcessRules = processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.order - b.order);
+
     return (
         <>
             <CrudLayout title={<PageTitle title="Processos" tooltip="Defina as etapas de processamento para produtos, com ordem e tempo ideal." />}
                 searchButtonChildren={
                     <SelectField
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement)} optional />
+                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={validCategories} optional />
                 }
                 filterButtonChildren={
                     <h1>Filtro</h1>
@@ -64,7 +67,7 @@ export default function PageProcessRules() {
                 tableChildren={
                     <CrudTable
                         columns={ProcessRuleColumns()}
-                        data={processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.order - b.order)}>
+                        data={validProcessRules}>
                     </CrudTable>
                 }
             />

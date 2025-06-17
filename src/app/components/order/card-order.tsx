@@ -11,26 +11,48 @@ import FinishOrder from "@/app/api/order/status/finish/order";
 import CancelOrder from "@/app/api/order/status/cancel/order";
 import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
-import { FaCheck, FaClipboardCheck, FaEdit, FaTimes } from "react-icons/fa";
+import {
+    FaCheck, FaClipboardCheck, FaEdit, FaTimes, FaMoneyBillWave, FaCreditCard, FaTicketAlt, FaDollarSign, FaPrint,
+    FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
+    FaHourglassHalf
+} from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import Link from "next/link";
 import Carousel from "../carousel/carousel";
+import type { IconType } from 'react-icons';
+
+// Ícones para métodos de pagamento
+const paymentIcons: Record<string, IconType> = {
+    Dinheiro: FaMoneyBillWave,
+    Visa: FaCcVisa,
+    MasterCard: FaCcMastercard,
+    Ticket: FaTicketAlt,
+    VR: FaDollarSign,
+    "American Express": FaCcAmex,
+    Elo: FaCreditCard,
+    "Diners Club": FaCcDinersClub,
+    Hipercard: FaCreditCard,
+    "Visa Electron": FaCcVisa,
+    Maestro: FaCcMastercard,
+    Alelo: FaCreditCard,
+    PayPal: FaCcPaypal,
+    Outros: FaDollarSign,
+};
+const DefaultPaymentIcon = FaDollarSign;
 import CloseTable from "@/app/api/order-table/status/close/order-table";
 import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { notifyError } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
-import { FaPrint } from "react-icons/fa";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
 
 interface CardOrderProps {
     orderId: string | null;
-    errorRequest?: RequestError | null;
 }
 
-const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
+const CardOrder = ({ orderId }: CardOrderProps) => {
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const dispatch = useDispatch<AppDispatch>();
@@ -298,65 +320,88 @@ const CardOrder = ({ orderId, errorRequest }: CardOrderProps) => {
 
             {/* Resumo Financeiro */}
             <hr className="my-4" />
-            <div className="flex justify-between items-center mb-4 mr-4">
-                {/* Detalhes do Pagamento */}
-                <div className="mb-6">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">Pagamentos: {order.payments?.length || 0}</h3>
-                    {order.payments && order.payments.length > 0 ? (
-                        <ul className="space-y-4">
-                            <Carousel items={order.payments}>
-                                {(payment) => (
-                                    <li key={payment.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                                        <div className="text-center">
-                                            <p className="text-gray-700">
-                                                <strong>Método:</strong> {payment.method}
-                                            </p>
-                                            <p className="text-gray-700">
-                                                <strong>Valor:</strong> R$ {new Decimal(payment.total_paid).toFixed(2)}
-                                            </p>
-                                        </div>
-                                    </li>
-                                )}
-                            </Carousel>
-                        </ul>
-                    ) : (
-                        <p className="text-gray-700">Nenhum pagamento registrado.</p>
-                    )}
-                </div>
-
-                <div className="mb-4">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">Resumo Financeiro</h3>
-                    <div className="space-y-2 text-gray-700">
-                        {/* Total a Pagar */}
-                        <p>
-                            <span className="font-semibold">Total a Pagar:</span>{" "}
-                            <span className="text-red-600">R$ {totalPayableDecimal.toFixed(2)}</span>
-                        </p>
-
-                        {/* Total Pago */}
-                        <p>
-                            <span className="font-semibold">Total Pago:</span>{" "}
-                            <span className="text-green-600">R$ {totalPaidDecimal.toFixed(2)}</span>
-                        </p>
-
-                        {totalRestDecimal.gt(0) && (
-                            <p>
-                                <span className="font-semibold">Total Restante:</span>{" "}
-                                <span className="text-gray-600">R$ {totalRestDecimal.toFixed(2)}</span>
-                            </p>
-                        )}
-
-                        {/* Troco */}
-                        {totalChangeDecimal.gt(0) && (
-                            <p>
-                                <span className="font-semibold">Troco:</span>{" "}
-                                <span className="text-gray-600">R$ {totalChangeDecimal.toFixed(2)}</span>
-                            </p>
-                        )}
+            <div className="mb-6">
+                <h3 className="text-xl font-bold mb-4 text-gray-800">Resumo Financeiro</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
+                        <FaMoneyBillWave className="text-2xl text-red-500 mr-3" />
+                        <div>
+                            <p className="text-sm text-gray-500">Total a Pagar</p>
+                            <p className="text-lg font-semibold text-red-600">R$ {totalPayableDecimal.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
+                        <FaCreditCard className="text-2xl text-green-500 mr-3" />
+                        <div>
+                            <p className="text-sm text-gray-500">Total Pago</p>
+                            <p className="text-lg font-semibold text-green-600">R$ {totalPaidDecimal.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
+                        <FaHourglassHalf className="text-2xl text-yellow-500 mr-3" />
+                        <div>
+                            <p className="text-sm text-gray-500">Total Restante</p>
+                            <p className="text-lg font-semibold text-yellow-600">R$ {totalRestDecimal.gt(0) ? totalRestDecimal.toFixed(2) : '0.00'}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
+                        <FaDollarSign className="text-2xl text-blue-500 mr-3" />
+                        <div>
+                            <p className="text-sm text-gray-500">Troco</p>
+                            <p className="text-lg font-semibold text-blue-600">R$ {totalChangeDecimal.gt(0) ? totalChangeDecimal.toFixed(2) : '0.00'}</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {/* Detalhes dos Pagamentos */}
+            {/* Detalhes dos Pagamentos em tabela */}
+            {order.payments && order.payments.length > 0 && (
+                <div className="mt-6">
+                    <h4 className="text-lg font-semibold mb-2 text-gray-800">Detalhes dos Pagamentos</h4>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left bg-white rounded-lg shadow">
+                            <thead>
+                                <tr>
+                                    <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Método</th>
+                                    <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Valor Pago (R$)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {order.payments.map((payment) => (
+                                    <tr key={payment.id} className="border-t">
+                                        <td className="px-4 py-2 text-gray-700">{payment.method}</td>
+                                        <td className="px-4 py-2 text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+            {/* Recapitulando via Carousel */}
+            {order.payments && order.payments.length > 0 && (
+                <div className="mt-6">
+                    <h4 className="text-lg font-semibold mb-2 text-gray-800">Visualização Rápida</h4>
+                    <Carousel items={order.payments}>
+                        {(payment) => {
+                            const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
+                            return (
+                                <div
+                                    key={payment.id}
+                                    className="flex flex-col items-center p-4 border rounded-lg bg-gray-50 shadow-sm hover:shadow-md transition mx-2"
+                                >
+                                    <Icon className="text-3xl text-gray-600 mb-2" />
+                                    <p className="font-semibold text-gray-700 mb-1">{payment.method}</p>
+                                    <p className="text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</p>
+                                </div>
+                            );
+                        }}
+                    </Carousel>
+                </div>
+            )}
+
+            <hr className="my-4" />
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
                 {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >

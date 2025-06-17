@@ -34,7 +34,6 @@ const PageOrder = () => {
 
     const stagingOrders = Object.values(ordersSlice.entities).map((order) => order.status === "Staging"? order : null).filter((order) => order !== null);
 
-    
     const openStagingOrders = () => {
         const onClose = () => {
             modalHandler.hideModal("show-staging-orders")
