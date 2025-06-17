@@ -84,7 +84,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         modalHandler.showModal(
             "show-order-" + orderId,
             "Ver Pedido",
-            <CardOrder orderId={orderId} errorRequest={error} />,
+            <CardOrder orderId={orderId} />,
             "xl",
             onClose
         );

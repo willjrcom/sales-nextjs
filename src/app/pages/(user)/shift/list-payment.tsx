@@ -9,6 +9,7 @@ interface ListPaymentProps {
 
 const ListPayment = ({ shift }: ListPaymentProps) => {
   const payments = shift.payments || [];
+
   // Agrupar pagamentos por método e somar valores
   const summary: Record<string, Decimal> = {};
   payments.forEach((payment) => {
@@ -16,9 +17,17 @@ const ListPayment = ({ shift }: ListPaymentProps) => {
     const amount = new Decimal(payment.total_paid);
     summary[method] = summary[method]?.plus(amount) || amount;
   });
+
+  // Mapear order_id para order_number sem mutar objetos de pagamento
+  const ordersMap: Record<string, number> = {};
+  (shift.orders || []).forEach((order) => {
+    ordersMap[order.id] = order.order_number;
+  });
+  
   const methods = Object.keys(summary);
+
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg">
+    <div>
       <h3 className="text-lg font-semibold mb-4">Pagamentos</h3>
       {/* Resumo de pagamentos por método */}
       <div className="mb-4">
@@ -50,6 +59,7 @@ const ListPayment = ({ shift }: ListPaymentProps) => {
         <table className="w-full text-left">
           <thead>
             <tr>
+              <th className="pb-2">Comanda</th>
               <th className="pb-2">Método</th>
               <th className="pb-2">Valor Pago (R$)</th>
             </tr>
@@ -57,15 +67,19 @@ const ListPayment = ({ shift }: ListPaymentProps) => {
           <tbody>
             {payments.length === 0 && (
               <tr>
-                <td colSpan={2} className="py-2 text-center">Nenhum pagamento encontrado</td>
+                <td colSpan={3} className="py-2 text-center">Nenhum pagamento encontrado</td>
               </tr>
             )}
-            {payments.map((payment, index) => (
-              <tr key={payment.id || index} className="border-t">
-                <td className="py-2">{payment.method}</td>
-                <td className="py-2">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
-              </tr>
-            ))}
+            {payments.map((payment, index) => {
+              const orderNumber = ordersMap[payment.order_id];
+              return (
+                <tr key={payment.id || index} className="border-t">
+                  <td className="py-2">{orderNumber ?? ''}</td>
+                  <td className="py-2">{payment.method}</td>
+                  <td className="py-2">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

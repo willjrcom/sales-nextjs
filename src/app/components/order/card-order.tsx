@@ -55,6 +55,7 @@ interface CardOrderProps {
 const CardOrder = ({ orderId }: CardOrderProps) => {
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+    const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
@@ -354,50 +355,64 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                 </div>
             </div>
 
-            {/* Detalhes dos Pagamentos */}
-            {/* Detalhes dos Pagamentos em tabela */}
+            {/* Pagamentos: escolha de layout */}
             {order.payments && order.payments.length > 0 && (
                 <div className="mt-6">
-                    <h4 className="text-lg font-semibold mb-2 text-gray-800">Detalhes dos Pagamentos</h4>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left bg-white rounded-lg shadow">
-                            <thead>
-                                <tr>
-                                    <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Método</th>
-                                    <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Valor Pago (R$)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {order.payments.map((payment) => (
-                                    <tr key={payment.id} className="border-t">
-                                        <td className="px-4 py-2 text-gray-700">{payment.method}</td>
-                                        <td className="px-4 py-2 text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <h4 className="text-lg font-semibold mb-2 text-gray-800">
+                        {paymentView === 'table' ? 'Detalhes dos Pagamentos' : 'Visualização Rápida'}
+                    </h4>
+                    <div className="flex items-center mb-4 space-x-2">
+                        <button
+                            onClick={() => setPaymentView('table')}
+                            className={`px-3 py-1 rounded ${paymentView === 'table' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                        >
+                            Tabela
+                        </button>
+                        <button
+                            onClick={() => setPaymentView('carousel')}
+                            className={`px-3 py-1 rounded ${paymentView === 'carousel' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                        >
+                            Carrossel
+                        </button>
                     </div>
-                </div>
-            )}
-            {/* Recapitulando via Carousel */}
-            {order.payments && order.payments.length > 0 && (
-                <div className="mt-6">
-                    <h4 className="text-lg font-semibold mb-2 text-gray-800">Visualização Rápida</h4>
-                    <Carousel items={order.payments}>
-                        {(payment) => {
-                            const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
-                            return (
-                                <div
-                                    key={payment.id}
-                                    className="flex flex-col items-center p-4 border rounded-lg bg-gray-50 shadow-sm hover:shadow-md transition mx-2"
-                                >
-                                    <Icon className="text-3xl text-gray-600 mb-2" />
-                                    <p className="font-semibold text-gray-700 mb-1">{payment.method}</p>
-                                    <p className="text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</p>
-                                </div>
-                            );
-                        }}
-                    </Carousel>
+                    {paymentView === 'table' ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left bg-white rounded-lg shadow">
+                                <thead>
+                                    <tr>
+                                        <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Método</th>
+                                        <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Valor Pago (R$)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {order.payments.map((payment) => (
+                                        <tr key={payment.id} className="border-t">
+                                            <td className="px-4 py-2 text-gray-700">{payment.method}</td>
+                                            <td className="px-4 py-2 text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <Carousel items={order.payments}>
+                                {(payment) => {
+                                    const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
+                                    return (
+                                        <div
+                                            key={payment.id}
+                                            className="flex flex-col items-center p-4 border rounded-lg bg-gray-50 shadow-sm hover:shadow-md transition mx-2"
+                                        >
+                                            <Icon className="text-3xl text-gray-600 mb-2" />
+                                            <p className="font-semibold text-gray-700 mb-1">{payment.method}</p>
+                                            <p className="text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</p>
+                                        </div>
+                                    );
+                                }}
+                            </Carousel>
+                        </div>
+                    )}
                 </div>
             )}
 

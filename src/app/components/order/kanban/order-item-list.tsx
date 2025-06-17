@@ -20,7 +20,7 @@ const OrderItemList = ({ order, error }: OrderItemListProps) => {
         modalHandler.showModal(
             "show-order-" + order.id,
             "Ver Pedido",
-            <CardOrder orderId={order.id} errorRequest={error} />,
+            <CardOrder orderId={order.id} />,
             "xl",
             onClose
         );
