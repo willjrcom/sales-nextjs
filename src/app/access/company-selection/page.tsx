@@ -97,11 +97,11 @@ function CompanySelection() {
                 },
             })
 
-            dispatch(fetchClients({ session: data } as FetchItemsArgs))
-            dispatch(fetchCategories({ session: data, page: 1, perPage: 1000 } as FetchItemsArgs))
+            dispatch(fetchClients({ session: data, page: 1, perPage: 10 } as FetchItemsArgs))
+            dispatch(fetchEmployees({ session: data, page: 1, perPage: 10 } as FetchItemsArgs))
+            dispatch(fetchCategories({ session: data } as FetchItemsArgs))
             dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs))
-            dispatch(fetchEmployees({ session: data } as FetchItemsArgs))
-            dispatch(fetchPlaces({ session: data, page: 1, perPage: 100 } as FetchItemsArgs))
+            dispatch(fetchPlaces({ session: data } as FetchItemsArgs))
 
             router.push('/pages/new-order');
             setSelecting(false);
