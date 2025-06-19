@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { notifyError } from "@/app/utils/notifications";
+import { fetchOrders } from "@/redux/slices/orders";
 
 const DeliveryOrderToFinish = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -140,14 +141,14 @@ const DeliveryOrderToFinish = () => {
 interface FinishDeliveryProps {
     order: Order | null;
 }
-const FinishDelivery = ({ order }: FinishDeliveryProps) => {
+export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
 
     if (!order) return <></>
 
-    const showOrder = (orderId: string, error?: RequestError | null) => {
+    const showOrder = (orderId: string) => {
         const onClose = () => {
             modalHandler.hideModal("show-order-" + orderId)
         }
@@ -172,6 +173,7 @@ const FinishDelivery = ({ order }: FinishDeliveryProps) => {
         try {
             await DeliveryOrderDelivery(deliveryID, data);
             dispatch(fetchDeliveryOrders({ session: data }));
+            dispatch(fetchOrders({ session: data }));
             modalHandler.hideModal("finish-delivery");
             showOrder(order.id);
         } catch (error: RequestError | any) {

@@ -27,7 +27,7 @@ const ListPayment = ({ shift }: ListPaymentProps) => {
   const methods = Object.keys(summary);
 
   return (
-    <div>
+    <div className="bg-white p-4 shadow-md rounded-lg">
       <h3 className="text-lg font-semibold mb-4">Pagamentos</h3>
       {/* Resumo de pagamentos por método */}
       <div className="mb-4">

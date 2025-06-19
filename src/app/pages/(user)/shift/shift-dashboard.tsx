@@ -7,6 +7,7 @@ import Decimal from 'decimal.js';
 import ListPayment from './list-payment';
 import ListOrderCard from './finished-order';
 import CategorySummary from './category-summary';
+import ListDeliveryDriversTax from './delivery-drivers-tax';
 
 interface SalesDashboardProps {
     shift?: Shift | null
@@ -57,6 +58,7 @@ const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
                 <ListOrderCard shift={shift} status='Canceled' title="Pedidos Cancelados" />
                 <CategorySummary shift={shift} />
                 <ListPayment shift={shift} />
+                <ListDeliveryDriversTax shift={shift} />
             </div>
         </div>
     )

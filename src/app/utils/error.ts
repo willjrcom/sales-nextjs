@@ -33,6 +33,7 @@ const translateError = (errorMessage: string): string => {
 };
 
 const errorTranslations: Record<string, string> = {
+    "must open a new shift": "Um novo turno deve ser aberto",
     "sql: no rows in result set": "Nenhum resultado encontrado",
     "order paid less than total": "O total pago deve ser maior que o total do pedido",
     "group item not staging": "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens.",

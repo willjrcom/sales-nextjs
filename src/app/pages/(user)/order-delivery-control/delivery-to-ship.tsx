@@ -24,6 +24,7 @@ import { FaMotorcycle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { notifyError } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
+import { fetchOrders } from "@/redux/slices/orders";
 
 const DeliveryOrderToShip = () => {
     const ordersSlice = useSelector((state: RootState) => state.deliveryOrders);
@@ -142,7 +143,7 @@ interface ModalData {
     orderIDs: string[];
 }
 
-const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
+export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
     const dispatch = useDispatch<AppDispatch>();
     const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
@@ -195,6 +196,7 @@ const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
             }
 
             dispatch(fetchDeliveryOrders({ session: data }));
+            dispatch(fetchOrders({ session: data }));
             modalHandler.hideModal("ship-delivery");
         } catch (error: RequestError | any) {
             notifyError(error);

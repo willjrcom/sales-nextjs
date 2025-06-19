@@ -2,6 +2,8 @@ import Employee from "../employee/employee";
 import Decimal from 'decimal.js';
 import Order from "../order/order";
 import { PaymentOrder } from "../order/order-payment";
+import DeliveryDriverTax from "./delivery-driver-tax";
+import Redeem from "./redeem";
 
 export default class Shift {
     id: string = "";
@@ -23,6 +25,7 @@ export default class Shift {
 	total_items_sold: number = 0;
 	average_order_value: Decimal = new Decimal(0);
     payments: PaymentOrder[] = [];
+    delivery_drivers: DeliveryDriverTax[] = [];
 
     constructor(
         id: string = "",
@@ -42,7 +45,8 @@ export default class Shift {
         products_sold_by_category: Record<string,number> = {},
         total_items_sold: number = 0,
         average_order_value: Decimal = new Decimal(0),
-        payments: PaymentOrder[] = []
+        payments: PaymentOrder[] = [],
+        delivery_drivers: DeliveryDriverTax[] = []
     ) {
         this.id = id;
         this.current_order_number = current_order_number;
@@ -62,10 +66,6 @@ export default class Shift {
         this.total_items_sold = total_items_sold;
         this.average_order_value = average_order_value;
         this.payments = payments;
+        this.delivery_drivers = delivery_drivers;
     }
-}
-
-export class Redeem {
-    name: string = "";
-    value: Decimal = new Decimal(0);
 }

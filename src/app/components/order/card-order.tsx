@@ -47,6 +47,8 @@ import { AppDispatch } from "@/redux/store";
 import { notifyError } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
+import { SelectDeliveryDriver } from "@/app/pages/(user)/order-delivery-control/delivery-to-ship";
+import { FinishDelivery } from "@/app/pages/(user)/order-delivery-control/delivery-to-finish";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -137,6 +139,30 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         if (order.delivery) {
             const deliveryTaxDecimal = new Decimal(order.delivery.delivery_tax || "0");
 
+            const shipDelivery = () => {
+                const onClose = () => {
+                    modalHandler.hideModal('ship-delivery');
+                }
+                modalHandler.showModal(
+                    'ship-delivery', 'Enviar entrega', 
+                    <SelectDeliveryDriver deliveryIDs={[order.delivery!.id]} orderIDs={[order.id]} />,
+                    'md',
+                    onClose,
+                )
+            }
+
+            const finishDelivery = () => {
+                const onClose = () => {
+                    modalHandler.hideModal('finish-delivery');
+                }
+                modalHandler.showModal(
+                    'finish-delivery', 'Finalizar entrega', 
+                    <FinishDelivery order={order} />,
+                    'md',
+                    onClose,
+                )
+            }
+
             return (
                 <div className="text-gray-700">
                     <div className="flex justify-between items-center mb-4">
@@ -164,6 +190,14 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <li>Enviado em: {ToUtcDatetime(order.delivery.shipped_at)}</li>
                             <li>Entregue em: {ToUtcDatetime(order.delivery.delivered_at)}</li>
                         </ul>
+
+                        {!order.delivery.shipped_at && <button onClick={shipDelivery}
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Enviar entrega</button>
+                        }
+
+                        {order.delivery.shipped_at && !order.delivery.delivered_at && <button onClick={finishDelivery}
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Receber entrega</button>
+                        }
                     </div>
                 </div>
             );
