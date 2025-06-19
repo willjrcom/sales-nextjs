@@ -67,13 +67,12 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const onDelete = async () => {
         if (!data) return;
         try {
-            DeleteProcessRule(processRule.id, data);
+            await DeleteProcessRule(processRule.id, data);
             dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { process_rules: category.process_rules.filter(rule => rule.id !== processRule.id) ?? [] } } }));
             notifySuccess(`Regra de processo ${processRule.name} removida com sucesso`);
             modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || `Erro ao remover regra de processo ${processRule.name}`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || `Erro ao remover regra de processo ${processRule.name}`);
         }
     }
 

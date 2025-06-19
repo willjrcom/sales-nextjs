@@ -69,18 +69,23 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
     const onDelete = async () => {
         if (!data) return;
-        await DeleteSize(size.id, data);
 
-        if (category) {
-            const newSizes = category.sizes.filter(q => q.id !== size.id);
-            // Atualiza o Redux com a lista de tamanhos atualizada
-            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...(newSizes ?? [])] } } }));
+        try {
+            await DeleteSize(size.id, data);
+
+            if (category) {
+                const newSizes = category.sizes.filter(q => q.id !== size.id);
+                // Atualiza o Redux com a lista de tamanhos atualizada
+                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...(newSizes ?? [])] } } }));
+            }
+
+            modalHandler.hideModal(modalName);
+            notifySuccess(`Tamanho ${size.name} removido com sucesso`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao remover tamanho');
         }
-
-        modalHandler.hideModal(modalName);
-        notifySuccess(`Tamanho ${size.name} removido com sucesso`);
     }
-
+    
     const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (

@@ -24,7 +24,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const dispatch = useDispatch<AppDispatch>();
-    
+
     const handleInputChange = (field: keyof Table, value: any) => {
         setTable(prev => ({ ...prev, [field]: value }));
     };
@@ -41,10 +41,10 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             if (!isUpdate) {
                 table.id = response
                 dispatch(addTable(table));
-            notifySuccess(`Mesa ${table.name} criada com sucesso`);
+                notifySuccess(`Mesa ${table.name} criada com sucesso`);
             } else {
                 dispatch(updateTable({ type: "UPDATE", payload: { id: table.id, changes: table } }));
-            notifySuccess(`Mesa ${table.name} atualizada com sucesso`);
+                notifySuccess(`Mesa ${table.name} atualizada com sucesso`);
             }
 
             modalHandler.hideModal(modalName);
@@ -55,19 +55,24 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteTable(table.id, data);
-        dispatch(removeTable(table.id));
-        modalHandler.hideModal(modalName);
-        notifySuccess(`Mesa ${table.name} removida com sucesso`);
+
+        try {
+            await DeleteTable(table.id, data);
+            dispatch(removeTable(table.id));
+            modalHandler.hideModal(modalName);
+            notifySuccess(`Mesa ${table.name} removida com sucesso`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao remover mesa');
+        }
     }
 
     return (
         <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name}/>
+            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
 
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_available', value)} value={table.is_available}/>
-                
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name}/>
+            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
+
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={table} name="Table" onSubmit={submit} deleteItem={onDelete} />

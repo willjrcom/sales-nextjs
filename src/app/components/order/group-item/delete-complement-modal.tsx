@@ -26,7 +26,7 @@ const DeleteComplementItemModal = ({ item }: DeleteComplementItemModalProps) => 
 
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {
-            notifyError(error)
+            notifyError(error.message || "Erro ao excluir complemento")
         }
     }
 

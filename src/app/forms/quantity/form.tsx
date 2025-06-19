@@ -80,9 +80,8 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
             
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover quantidade');
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao remover quantidade');
         }
     }
 

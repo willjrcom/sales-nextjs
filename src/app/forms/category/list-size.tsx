@@ -19,7 +19,7 @@ const ListSize = ({ category }: ListSizeProps) => {
 
     const onEdit = (size: Size) => {
         const modalName = "edit-size-" + size.id;
-        const title = "Editar quantidade: " + size.name;
+        const title = "Editar tamanho: " + size.name;
         const elem = <SizeForm category={category} isUpdate={true} item={size} />
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(size.id))
     }

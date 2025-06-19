@@ -57,13 +57,12 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const onDelete = async () => {
         if (!data) return;
         try {
-            DeletePlace(place.id, data);
+            await DeletePlace(place.id, data);
             dispatch(removePlace(place.id));
             notifySuccess(`Local ${place.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || `Erro ao remover local ${place.name}`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || `Erro ao remover local ${place.name}`);
         }
     }
 

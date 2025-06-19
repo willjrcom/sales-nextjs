@@ -114,9 +114,8 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
             
             notifySuccess('Funcionário removido com sucesso');
             modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || `Erro ao remover funcionário ${employee.name}`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || `Erro ao remover funcionário ${employee.name}`);
         }
     }
 

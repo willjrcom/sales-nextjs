@@ -127,18 +127,23 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteProduct(product.id, data);
-        dispatch(updateCategory({
-            type: "UPDATE",
-            payload: {
-                id: category.id,
-                changes: {
-                    products: (category.products ?? []).filter(p => p.id !== product.id)
+
+        try {
+            await DeleteProduct(product.id, data);
+            dispatch(updateCategory({
+                type: "UPDATE",
+                payload: {
+                    id: category.id,
+                    changes: {
+                        products: (category.products ?? []).filter(p => p.id !== product.id)
+                    }
                 }
-            }
-        }));
-        modalHandler.hideModal(modalName);
-        notifySuccess(`Produto ${product.name} removido com sucesso`);
+            }));
+            modalHandler.hideModal(modalName);
+            notifySuccess(`Produto ${product.name} removido com sucesso`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao remover produto');
+        }
     }
 
     useEffect(() => {

@@ -65,9 +65,8 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             dispatch(removeClient(client.id));
             notifySuccess(`Cliente ${client.name} removido com sucesso`);
             modalHandler.hideModal(modalName)
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || `Erro ao remover cliente ${client.name}`);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || `Erro ao remover cliente ${client.name}`);
         }
     }
 

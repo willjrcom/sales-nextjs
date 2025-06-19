@@ -20,8 +20,8 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     accessorKey: 'price',
     header: 'Preço',
     cell: info => {
-      const value = info.getValue() as any;
-      return `R$${typeof value === 'object' && value.toFixed ? new Decimal(value).toFixed(2) : value}`;
+      const value = new Decimal(info.getValue() as any);
+      return `R$ ${typeof value === 'object' && value.toFixed ? value.toFixed(2) : value}`;
     },
   },
   {

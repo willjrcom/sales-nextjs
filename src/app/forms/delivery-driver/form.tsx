@@ -64,13 +64,12 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const onDelete = async () => {
         if (!data) return;
         try {
-            DeleteDeliveryDriver(deliveryDriver.id, data);
+            await DeleteDeliveryDriver(deliveryDriver.id, data);
             dispatch(removeDeliveryDriver(deliveryDriver.id));
             notifySuccess(`Motoboy ${deliveryDriver.employee.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover motoboy');
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao remover motoboy');
         }
     }
     

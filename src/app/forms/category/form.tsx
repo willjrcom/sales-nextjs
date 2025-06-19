@@ -108,15 +108,21 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
     const onDelete = async () => {
         if (!data) return;
-        DeleteCategory(category.id, data);
-        dispatch(removeCategory(category.id));
 
-        if (!isUpdate) {
-            modalHandler.hideModal(modalName);
-            notifySuccess(`Categoria ${category.name} removida com sucesso`);
-        } else {
-            router.back();
-            notifySuccess(`Categoria ${category.name} removida com sucesso`);
+        try {
+            await DeleteCategory(category.id, data);
+            dispatch(removeCategory(category.id));
+
+            if (!isUpdate) {
+                modalHandler.hideModal(modalName);
+                notifySuccess(`Categoria ${category.name} removida com sucesso`);
+            } else {
+                router.back();
+                notifySuccess(`Categoria ${category.name} removida com sucesso`);
+            }
+
+        } catch (error: RequestError | any) {
+            notifyError(error.message || 'Erro ao remover categoria');
         }
     }
 

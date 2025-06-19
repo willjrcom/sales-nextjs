@@ -30,7 +30,7 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
 
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {
-            notifyError(error)
+            notifyError(error.message || "Erro ao excluir item")
         }
     }
 

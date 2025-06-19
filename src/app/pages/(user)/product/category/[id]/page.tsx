@@ -11,6 +11,8 @@ import ListSize from "../../../../../forms/category/list-size";
 import ListQuantity from "../../../../../forms/category/list-quantity";
 import CategoryForm from "@/app/forms/category/form";
 import { notifyError } from "@/app/utils/notifications";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import { FaEdit } from "react-icons/fa";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
@@ -42,13 +44,10 @@ const PageCategoryEdit = () => {
         <div >
             <CategoryForm isUpdate={true} item={category} setItem={setCategory} />
 
-            <hr className="my-4" />
-
-            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h2 className="text-lg font-semibold mb-4">Cadastros relacionados</h2>
+            <ButtonIconTextFloat title="Tamanhos e quantidades" modalName="edit-size-and-quantity" size="xl" icon={FaEdit} position="bottom-right">
                 <ListSize category={category} />
                 <ListQuantity category={category} />
-            </div>
+            </ButtonIconTextFloat>
         </div>
     );
 }

@@ -51,7 +51,7 @@ export default function PageProcessRules() {
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={validCategories} optional />
                 }
                 filterButtonChildren={
-                    <h1>Filtro</h1>
+                    <></>
                 }
                 plusButtonChildren={
                     <ButtonIconTextFloat modalName="new-process-rule" title="Novo processo" position="bottom-right">
