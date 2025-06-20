@@ -2,6 +2,7 @@ import { useModal } from "@/app/context/modal/context";
 import OrderProcess from "@/app/entities/order-process/order-process";
 import { ToUtcTimeWithSeconds } from "@/app/utils/date";
 import CancelOrderProcess from "./cancel-process-order";
+import ItemDetails from "./item-details";
 
 interface OrderProcessDetailsProps {
     orderProcess: OrderProcess;
@@ -30,17 +31,6 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
 
     return (
         <div>
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <div>&nbsp;</div>
-                <div className="text-gray-700 text-lg">
-                    Quantidade total: <span className="font-bold">{groupItem?.quantity}</span>
-                </div>
-                <button className="text-gray-500 hover:text-gray-700 focus:outline-none absolute right-4 top-4">
-                    ✖
-                </button>
-            </div>
-
             {/* Itens do grupo */}
             {groupItem?.items && groupItem.items.length > 0 && (
                 <div className="mb-6 space-y-4">
@@ -50,6 +40,14 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                     })}
                 </div>
             )}
+
+            <div className="flex justify-between items-center mb-6">
+                <div>&nbsp;</div>
+                <div className="text-gray-700 text-lg">
+                    Quantidade total: <span className="font-bold">{groupItem?.quantity}</span>
+                </div>
+            </div>
+
             {/* Content */}
             <div className="grid grid-cols-2 gap-6">
                 {/* Tempo de Processo */}
@@ -72,7 +70,7 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                     </ul>
                 </div>
             </div>
-
+            
             {/* Footer - Botões alinhados abaixo */}
             <div className="flex justify-between items-end mt-8">
                 <button className="flex items-center justify-center gap-2 bg-gray-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-gray-700"
@@ -84,30 +82,5 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
     );
 };
 
-interface ItemDetailsProps {
-    item: any;
-    product?: any;
-}
-
-const ItemDetails = ({ item, product }: ItemDetailsProps) => {
-    return (
-        <div key={item.id} className="flex items-start space-x-4 bg-gray-50 rounded-lg shadow p-4">
-            {product?.image_path && (
-                <img src={product.image_path} alt={product.name}
-                    className="w-16 h-16 object-cover rounded" />
-            )}
-            <div>
-                <p className="font-semibold text-gray-800">
-                    {item.quantity} x {item.name}
-                </p>
-                {product?.description && (
-                    <p className="text-gray-500 text-sm mt-1">
-                        {product.description}
-                    </p>
-                )}
-            </div>
-        </div>
-    );
-}
 
 export default OrderProcessDetails;

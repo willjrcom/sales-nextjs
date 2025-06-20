@@ -49,6 +49,11 @@ import printOrder from "@/app/components/print/print-order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
 import { SelectDeliveryDriver } from "@/app/pages/(user)/order-delivery-control/delivery-to-ship";
 import { FinishDelivery } from "@/app/pages/(user)/order-delivery-control/delivery-to-finish";
+import ObservationCard from "./observation";
+import GroupItem from "@/app/entities/order/group-item";
+import AdditionalItem from "@/app/components/order/additional-item";
+import RemovedItem from "@/app/components/order/removed-item";
+import Item from "@/app/entities/order/item";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -144,7 +149,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                     modalHandler.hideModal('ship-delivery');
                 }
                 modalHandler.showModal(
-                    'ship-delivery', 'Enviar entrega', 
+                    'ship-delivery', 'Enviar entrega',
                     <SelectDeliveryDriver deliveryIDs={[order.delivery!.id]} orderIDs={[order.id]} />,
                     'md',
                     onClose,
@@ -156,7 +161,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                     modalHandler.hideModal('finish-delivery');
                 }
                 modalHandler.showModal(
-                    'finish-delivery', 'Finalizar entrega', 
+                    'finish-delivery', 'Finalizar entrega',
                     <FinishDelivery order={order} />,
                     'md',
                     onClose,
@@ -319,33 +324,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                         {order.group_items
                             .sort((a, b) => a.category_id.localeCompare(b.category_id))
                             .map((group) => (
-                                <li key={group.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <p className="text-gray-700 font-semibold">
-                                            <span className="ml-2">
-                                                <StatusComponent status={group?.status} />
-                                            </span>
-                                        </p>
-                                        <div className="flex space-x-2">
-                                            <RoundComponent>Qtd: {group.quantity}</RoundComponent>
-                                            <RoundComponent>
-                                                Total: R$ {new Decimal(group.total_price).toFixed(2)}
-                                            </RoundComponent>
-                                        </div>
-                                    </div>
-                                    {group.items?.map((item) => (
-                                        <div key={item.id} className="text-gray-700 ml-4">
-                                            <p className="font-semibold">
-                                                {item.quantity} x {item.name}
-                                            </p>
-                                            {item.observation && (
-                                                <p className="italic text-sm">
-                                                    Observação: {item.observation}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </li>
+                                <GroupItemCard group={group} key={group.id} />
                             ))}
                     </ul>
                 ) : (
@@ -508,4 +487,55 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
     );
 };
 
+
+interface GroupItemProps {
+    group: GroupItem;
+}
+
+const GroupItemCard = ({ group }: GroupItemProps) => {
+    return (
+        <li key={group.id} className="bg-gray-50 p-4 rounded-lg shadow-md mb-4">
+            <div className="flex justify-between items-center mb-2">
+                <p className="text-gray-700 font-semibold">
+                    <span className="ml-2">
+                        <StatusComponent status={group?.status} />
+                    </span>
+                </p>
+                <div className="flex space-x-2">
+                    <RoundComponent>Qtd: {group.quantity}</RoundComponent>
+                    <RoundComponent>
+                        Total: R$ {new Decimal(group.total_price).toFixed(2)}
+                    </RoundComponent>
+                </div>
+            </div>
+
+            {group.items?.map((item) => <ItemCard item={item} key={item.id} />)}
+        </li>
+    )
+}
+
+interface ItemCardProps {
+    item: Item;
+}
+
+const ItemCard = ({ item }: ItemCardProps) => {
+    return (
+        <div key={item.id} className="text-gray-700 ml-4 py-2 border shadow rounded-md p-2 m-2">
+            <div className="flex space-x-2 items-center justify-between">
+                <p className="font-semibold">{item.quantity} x {item.name}</p>
+                <RoundComponent>
+                    Total: R$ {new Decimal(item.total_price).toFixed(2)}
+                </RoundComponent>
+            </div>
+
+            {item.observation && <ObservationCard observation={item.observation} />}
+            {item.additional_items?.map((add) => (
+                <AdditionalItem item={add} key={add.id} />
+            ))}
+            {item.removed_items?.map((rem) => (
+                <RemovedItem item={rem} key={rem} />
+            ))}
+        </div>
+    )
+}
 export default CardOrder;

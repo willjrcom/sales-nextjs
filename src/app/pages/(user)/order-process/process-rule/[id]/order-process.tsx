@@ -17,8 +17,8 @@ import { notifyError } from '@/app/utils/notifications';
 import StatusComponent from '@/app/components/button/show-status';
 import Item from '@/app/entities/order/item';
 import ObservationCard from '@/app/components/order/observation';
-import AdditionalItem from './additional-item';
-import RemovedItem from './removed-item';
+import AdditionalItem from '../../../../../components/order/additional-item';
+import RemovedItem from '../../../../../components/order/removed-item';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -68,7 +68,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             modalHandler.hideModal("group-item-details-" + groupItem.id)
         }
 
-        modalHandler.showModal("group-item-details-" + groupItem.id, "# " + groupItem.id,
+        modalHandler.showModal("group-item-details-" + groupItem.id, groupItem.category?.name || "Detalhes do pedido",
             <OrderProcessDetails orderProcess={orderProcess} />,
             'lg',
             onClose
@@ -76,11 +76,12 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     }
 
     return (
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-6">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
+        <div className="bg-white border shadow rounded-lg overflow-hidden mt-6">
+            <div className="px-6 border-b border-gray-200 flex items-center justify-between">
+                <div className="flex items-center space-x-2 py-2">
                     <span className="text-gray-600 font-semibold">Pedido #{orderProcess.order_number} - {orderProcess.order_type}</span>
                     <StatusComponent status={orderProcess?.status} />
+                    {groupItem.observation && <ObservationCard observation={groupItem.observation} />}
                 </div>
                 <button
                     onClick={() => openGroupItemDetails(groupItem)}
@@ -91,11 +92,10 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-4">
-                    {groupItem.observation && <ObservationCard observation={groupItem.observation} />}
                     <ul className="space-y-2">
                         {groupItem.items.map((item) => {
                             const product = orderProcess.products.find(p => p.id === item.product_id);
-                            return <ItemProcessCard item={item} product={product} key={item.id} />;
+                            return <ItemProcessCard item={item} key={item.id} />;
                         })}
                     </ul>
                 </div>
@@ -142,12 +142,11 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
 interface ItemProcessProps {
     item: Item;
-    product?: any;
 }
 
-const ItemProcessCard = ({ item, product }: ItemProcessProps) => {
+const ItemProcessCard = ({ item }: ItemProcessProps) => {
     return (
-        <li key={item.id} className="flex bg-white rounded-lg shadow-sm p-3 items-center">
+        <li key={item.id} className="flex bg-white rounded-lg shadow border-2 border-gray-200 p-3 items-center">
             {/* Right: item details */}
             <div className="flex-1">
                 <div className="flex justify-between">
