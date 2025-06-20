@@ -8,4 +8,14 @@ export async function getEmployeePayments(employeeId: string, session: Session) 
         headers: await AddAccessToken(session),
     });
     return response.data;
+}
+
+export async function createEmployeePayment(employeeId: string, data: any, session: Session) {
+    const response = await RequestApi<any, any>({
+        path: `/employee/${employeeId}/payments`,
+        method: "POST",
+        body: data,
+        headers: await AddAccessToken(session),
+    });
+    return response.data;
 } 

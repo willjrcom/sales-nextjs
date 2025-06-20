@@ -19,6 +19,8 @@ import { getEmployeePayments } from "@/app/api/employee/payments";
 import EmployeeSalaryHistoryList from "./EmployeeSalaryHistoryList";
 import EmployeePaymentsList from "./EmployeePaymentsList";
 import { EmployeePayment, EmployeeSalaryHistory } from "@/app/entities/employee/employee-payment";
+import SalaryHistoryModal from "./SalaryHistoryModal";
+import PaymentModal from "./PaymentModal";
 
 interface EmployeeCardProps {
     item: Employee;
@@ -41,6 +43,8 @@ function EmployeeCard({ item }: EmployeeCardProps) {
     const [salaryHistory, setSalaryHistory] = useState<EmployeeSalaryHistory[]>([]);
     const [payments, setPayments] = useState<EmployeePayment[]>([]);
     const [tab, setTab] = useState<'info' | 'salary' | 'payments'>('info');
+    const [showSalaryModal, setShowSalaryModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     useEffect(() => {
         if (item.id && data) {
@@ -64,6 +68,16 @@ function EmployeeCard({ item }: EmployeeCardProps) {
             notifyError(error.message || `Erro ao remover funcionário ${item.name}`);
         }
     }
+
+    const handleSalaryHistorySuccess = (newHistory: any) => {
+        setSalaryHistory([new EmployeeSalaryHistory(newHistory), ...salaryHistory]);
+        setShowSalaryModal(false);
+    };
+
+    const handlePaymentSuccess = (newPayment: any) => {
+        setPayments([new EmployeePayment(newPayment), ...payments]);
+        setShowPaymentModal(false);
+    };
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 mx-auto flex flex-col gap-6 max-w-2xl">
@@ -132,10 +146,44 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                 </>
             )}
             {tab === 'salary' && (
-                <EmployeeSalaryHistoryList history={salaryHistory} />
+                <>
+                    <div className="flex justify-end mb-4">
+                        <button
+                            className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition"
+                            onClick={() => setShowSalaryModal(true)}
+                        >
+                            Alterar Salário
+                        </button>
+                    </div>
+                    <EmployeeSalaryHistoryList history={salaryHistory} />
+                    {showSalaryModal && (
+                        <SalaryHistoryModal
+                            employeeId={item.id}
+                            onClose={() => setShowSalaryModal(false)}
+                            onSuccess={handleSalaryHistorySuccess}
+                        />
+                    )}
+                </>
             )}
             {tab === 'payments' && (
-                <EmployeePaymentsList payments={payments} />
+                <>
+                    <div className="flex justify-end mb-4">
+                        <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+                            onClick={() => setShowPaymentModal(true)}
+                        >
+                            Novo Pagamento
+                        </button>
+                    </div>
+                    <EmployeePaymentsList payments={payments} />
+                    {showPaymentModal && (
+                        <PaymentModal
+                            employeeId={item.id}
+                            onClose={() => setShowPaymentModal(false)}
+                            onSuccess={handlePaymentSuccess}
+                        />
+                    )}
+                </>
             )}
         </div>
     );

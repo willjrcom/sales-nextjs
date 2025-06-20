@@ -1,16 +1,9 @@
 import React from "react";
 import { Decimal } from "decimal.js";
+import { EmployeePayment } from "@/app/entities/employee/employee-payment";
 
-interface Payment {
-    id: string;
-    amount: string;
-    payment_date: string;
-    payment_type: string;
-    reference_month: string;
-    salary_history_id?: string;
-}
 
-const EmployeePaymentsList = ({ payments }: { payments: Payment[] }) => (
+const EmployeePaymentsList = ({ payments }: { payments: EmployeePayment[] }) => (
     <div className="bg-gray-50 rounded-lg p-4 shadow border mb-4">
         <h3 className="font-bold mb-4 text-lg text-blue-900">Pagamentos</h3>
         <div className="overflow-x-auto">

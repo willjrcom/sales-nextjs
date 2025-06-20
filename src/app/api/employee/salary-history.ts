@@ -8,4 +8,14 @@ export async function getEmployeeSalaryHistory(employeeId: string, session: Sess
         headers: await AddAccessToken(session),
     });
     return response.data;
+}
+
+export async function createEmployeeSalaryHistory(employeeId: string, data: any, session: Session) {
+    const response = await RequestApi<any, any>({
+        path: `/employee/${employeeId}/salary-history`,
+        method: "POST",
+        body: data,
+        headers: await AddAccessToken(session),
+    });
+    return response.data;
 } 
