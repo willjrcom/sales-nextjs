@@ -82,12 +82,14 @@ export const CartToAdd = () => {
             <div>
                 {categories?.map((category) => {
                     if (!category.products) return null;
+                    const availableProductsFirst = category.products.sort((a, b) => Number(b.is_available) - Number(a.is_available));
+
                     return (
                         <div key={category.id} className="mb-6">
                             <span className="text-lg font-semibold">{category.name}</span>
                             <hr className="mb-2" />
                             {/* Ajuste o tamanho do Carousel com responsividade */}
-                            <Carousel items={category.products}>
+                            <Carousel items={availableProductsFirst}>
                                 {(product) => <ProductCard key={product.id} product={product} />}
                             </Carousel>
                         </div>

@@ -60,7 +60,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 )}
 
                 {/* Botão para adicionar */}
-                <ButtonIconText modalName={`add-item-${product.id}`}>
+                <ButtonIconText modalName={`add-item-${product.id}`} isDisabled={!product.is_available}>
                     <AddProductCard product={product} />
                 </ButtonIconText>
             </div>

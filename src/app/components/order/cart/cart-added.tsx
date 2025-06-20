@@ -10,6 +10,7 @@ import { RootState } from "@/redux/store";
 import { useGroupItem } from "@/app/context/group-item/context";
 import GroupItem from "@/app/entities/order/group-item";
 import CategoryOrder from "../category/category";
+import { FaSearch } from 'react-icons/fa';
 
 export const CartAdded = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
@@ -49,7 +50,10 @@ export const CartAdded = () => {
 
             <div className="flex-1 overflow-y-auto">
                 {Object.entries(groupedItems).length === 0 ? (
-                    <p className="p-4 text-gray-500">Nenhum item no carrinho</p>
+                    <div className="flex flex-col items-center justify-center h-full p-4 text-gray-500">
+                        <FaSearch className="text-4xl mb-2" />
+                        <h2>Nenhum item adicionado no carrinho</h2>
+                    </div>
                 ) : (
                     Object.entries(groupedItems).map(([key, groupItems]) => {
                         if (Object.values(categoriesSlice.entities).length === 0) return null;

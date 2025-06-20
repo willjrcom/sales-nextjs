@@ -11,9 +11,10 @@ interface NewButtonProps {
     color?: string;
     onCloseModal?: () => void;
     children: React.ReactNode;
+    isDisabled?: boolean;
 }
 
-const ButtonIconText = ({ icon: Icon = FaPlus, size = 'md', modalName, title = "", color = 'blue', onCloseModal, children }: NewButtonProps) => {
+const ButtonIconText = ({ icon: Icon = FaPlus, size = 'md', modalName, title = "", color = 'blue', onCloseModal, children, isDisabled }: NewButtonProps) => {
     const modalHandler = useModal();
 
     const onClose = () => {
@@ -21,6 +22,13 @@ const ButtonIconText = ({ icon: Icon = FaPlus, size = 'md', modalName, title = "
         modalHandler.hideModal(modalName)
     }
 
+    if (isDisabled) {
+        return (
+            <button disabled className={`flex items-center space-x-2 p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 w-max`}>
+                Indisponível
+            </button>
+        )
+    }
     return (
         <button onClick={() => modalHandler.showModal(modalName, title, children, size, onClose)} className={`flex items-center space-x-2 p-2 bg-${color}-500 text-white rounded-md hover:bg-${color}-600 w-max`}>
             <Icon /> {title && <span>{title}</span>}
