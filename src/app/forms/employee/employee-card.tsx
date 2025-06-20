@@ -20,7 +20,7 @@ function EmployeeCard({ item }: EmployeeCardProps) {
     const address = item.address as Address;
 
     return (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 max-w-lg mx-auto flex flex-col gap-6">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 mx-auto flex flex-col gap-6">
             <div className="flex items-center gap-4 border-b pb-4">
                 <div className="bg-blue-100 text-blue-600 rounded-full p-3">
                     <HiOutlineUser size={32} />

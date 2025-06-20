@@ -21,14 +21,13 @@ const PageEmployee = () => {
     const employeesSlice = useSelector((state: RootState) => state.employees);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const [pageIndex, setPageIndex] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     useEffect(() => {
         if (data && Object.keys(employeesSlice.entities).length === 0) {
-            dispatch(fetchEmployees({ session: data, page: pageIndex, perPage: pageSize }));
+            dispatch(fetchEmployees({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, dispatch]);
 
     if (employeesSlice.loading) {
         return (
@@ -51,27 +50,27 @@ const PageEmployee = () => {
                     </ButtonIconTextFloat>
                 }
                 plusButtonChildren={
-                    <>
-                        <ButtonIconTextFloat modalName="new-employee" position="bottom-right" size="xl"
-                            title="Novo funcionario">
-                            <EmployeeForm />
-                        </ButtonIconTextFloat>
-                        <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right-1" size="xl"
-                            title="Adicionar existente">
-                            <AddEmployeeAlreadyCreated />
-                        </ButtonIconTextFloat>
-                    </>
+                    <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right" size="xl"
+                        title="Novo funcionário">
+                        <AddEmployeeAlreadyCreated />
+                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh
                         slice={employeesSlice}
                         fetchItems={fetchEmployees}
+                        page={pagination.pageIndex}
+                        perPage={pagination.pageSize}
                     />
                 }
                 tableChildren={
                     <CrudTable
                         columns={EmployeeColumns()}
-                        data={filteredEmployees} />
+                        data={filteredEmployees} 
+                        totalCount={employeesSlice.totalCount}
+                        onPageChange={(pageIndex, pageSize) => {
+                            setPagination({ pageIndex, pageSize });
+                        }}/>
                 }
             />
         </>
