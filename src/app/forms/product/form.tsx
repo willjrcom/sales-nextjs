@@ -28,7 +28,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [product, setProduct] = useState<Product>(item || new Product());
     const [categories, setCategories] = useState<Category[]>([]);
     const [category, setCategory] = useState<Category>(new Category());
-    const [size, setSize] = useState<Size>(new Size());
+    const [size, setSize] = useState<Size>(item?.size || new Size());
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
     const { data } = useSession();
@@ -89,29 +89,43 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         try {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
-
-            product.category = category;
-            product.size = size;
+            
+            // prepare plain product data without mutating state entities
+            const plainProduct = {
+                id: isUpdate ? product.id : response,
+                code: product.code,
+                image_path: product.image_path,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                cost: product.cost,
+                category_id: product.category_id,
+                category: category,
+                size_id: product.size_id,
+                size: size,
+                is_available: product.is_available,
+            } as Product;
 
             if (!isUpdate) {
-                product.id = response
+                // add new product to category
                 dispatch(updateCategory({
                     type: "UPDATE",
                     payload: {
                         id: category.id,
                         changes: {
-                            products: [...(category.products ?? []), product]
+                            products: [...(category.products ?? []), plainProduct]
                         }
                     }
                 }));
                 notifySuccess(`Produto ${product.name} criado com sucesso`);
             } else {
+                // update existing product in category
                 dispatch(updateCategory({
                     type: "UPDATE",
                     payload: {
                         id: category.id,
                         changes: {
-                            products: (category.products ?? []).map(p => p.id === product.id ? product : p)
+                            products: (category.products ?? []).map(p => p.id === product.id ? plainProduct : p)
                         }
                     }
                 }));

@@ -22,7 +22,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     contextGroupItem.updateGroupItem(groupItem);
   }
 
-    return (
+  return (
     <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200 max-h-[40vh] overflow-y-auto">
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -50,14 +50,21 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         <FaClock />&nbsp;Agendado para: {ToUtcDatetime(groupItem.start_at)}
       </p>}
 
+      {/* Observação */}
+      {groupItem.observation && <p className="text-sm text-gray-600"><strong className="text-red-500">OBS:</strong> {groupItem.observation}</p>}
+
       {/* Itens */}
       <div className="space-y-3">
         <h3 className="text-md font-semibold border-b pb-2">Itens</h3>
+
         {groupItem.items.map((item) => (
           <div className="bg-gray-50 p-3 rounded shadow-sm" key={item.id}>
             <div className="flex justify-between">
               <p className="font-bold">{item.quantity} x {item.name}</p>
             </div>
+
+            {item.observation && <p className="text-sm text-gray-600"><strong className="text-red-500">OBS:</strong> {item.observation}</p>}
+
             <p className="text-sm font-semibold">R$ {new Decimal(item.price).toFixed(2)}</p>
             {item.additional_items && (
               <ul className="mt-2 pl-4 list-disc text-sm text-gray-600">
@@ -66,6 +73,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
                     {add.name} - R$ {new Decimal(add.price).toFixed(2)}
                   </li>
                 ))}
+
                 {item.removed_items?.map((rem) => (
                   <li className="text-red-500" key={rem}>
                     {rem}

@@ -53,7 +53,7 @@ export const CartToAdd = () => {
             const onClose = () => {
                 modalHandler.hideModal(modalName);
             }
-            
+
             modalHandler.showModal(modalName, "", <AddProductCard product={product} />, "md", onClose)
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao buscar produto por codigo: " + searchCode);
@@ -82,8 +82,15 @@ export const CartToAdd = () => {
             <div>
                 {categories?.map((category) => {
                     if (!category.products) return null;
-                    const availableProductsFirst = category.products.sort((a, b) => Number(b.is_available) - Number(a.is_available));
+                    let availableProductsFirst = [...(category.products ?? [])].sort(
+                        (a, b) => Number(b.is_available) - Number(a.is_available)
+                    );
 
+                    if (contextGroupItem.groupItem?.size) {
+                        availableProductsFirst = availableProductsFirst.filter((product) =>
+                            product.size?.name === contextGroupItem.groupItem?.size
+                        );
+                    }
                     return (
                         <div key={category.id} className="mb-6">
                             <span className="text-lg font-semibold">{category.name}</span>

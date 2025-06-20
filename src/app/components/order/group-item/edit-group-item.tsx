@@ -78,7 +78,7 @@ const GroupItemCard = () => {
 
     const containItems = groupItem?.items && groupItem?.items.length > 0
     const isGroupItemStaging = groupItem?.status === "Staging"
-    
+    console.log(groupItem)
     return (
         <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
             <div className="flex justify-between items-center">
@@ -103,7 +103,7 @@ const GroupItemCard = () => {
                     <p className="text-lg font-semibold">Complemento</p>
                 </>
             )}
-            {containItems && !complementItem && isGroupItemStaging && <ButtonIconText size="md" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
+            {containItems && !complementItem && isGroupItemStaging && <ButtonIconText size="xl" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
                 <ComplementItemList groupItem={groupItem} />
             </ButtonIconText>}
 
