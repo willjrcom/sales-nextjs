@@ -1,9 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Employee  from "./employee";
 import ButtonIcon from "@/app/components/button/button-icon";
-import EmployeeForm from "@/app/forms/employee/form";
 import Contact from "../contact/contact";
 import Address from "../address/address";
+import React from "react";
+import EmployeeCard from "@/app/forms/employee/employee-card";
 
 
 const EmployeeColumns = (): ColumnDef<Employee>[] => [
@@ -40,17 +41,14 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     },
   },
   {
-    id: 'Editar',
+    id: 'Visualizar',
     accessorKey: 'id',
-    header: 'Editar',
+    header: 'Visualizar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-employee-" + row.original.id }
-          title={"Editar " + row.original.name}>
-          <EmployeeForm
-            item={row.original}
-            isUpdate={true}
-            isDisabledPerson />
+        <ButtonIcon modalName={"view-employee-" + row.original.id }
+          title={"Visualizar " + row.original.name}>
+          <EmployeeCard item={row.original} />
         </ButtonIcon>
       )
     },
