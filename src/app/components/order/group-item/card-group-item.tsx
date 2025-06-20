@@ -8,6 +8,7 @@ import { ToUtcDatetime } from "@/app/utils/date";
 import { FaClock } from "react-icons/fa";
 import StatusComponent from "../../button/show-status";
 import Decimal from "decimal.js";
+import ObservationCard from "../observation";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -16,6 +17,14 @@ interface GroupItemCardProps {
 const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   const contextGroupItem = useGroupItem();
   const contextCurrentOrder = useCurrentOrder();
+  // Map status to border color
+  const statusStyles: Record<string, string> = {
+    Staging: 'border-yellow-400',
+    Pending: 'border-blue-400',
+    Ready: 'border-green-400',
+    Finished: 'border-gray-400',
+    Canceled: 'border-red-400',
+  };
 
   const setGroupItem = (groupItem: GroupItem) => {
     if (!contextGroupItem || !groupItem) return;
@@ -23,64 +32,75 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md space-y-4 border border-gray-200 max-h-[40vh] overflow-y-auto">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div className={`bg-white rounded-lg shadow-sm border-l-4 ${statusStyles[groupItem.status] || 'border-gray-200'} p-4 space-y-4 max-h-[50vh] overflow-y-auto`}>
+      {/* Header: Group title and actions */}
+      <div className="flex items-center justify-between">
         <StatusComponent status={groupItem.status} />
-
         <div onClick={() => setGroupItem(groupItem)}>
-          <ButtonIcon title="Carrinho" modalName={"edit-group-item-" + groupItem.id} size={groupItem.status === "Staging" ? "xl" : "md"} onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}>
+          <ButtonIcon
+            title="Editar grupo"
+            modalName={`edit-group-item-${groupItem.id}`}
+            size={groupItem.status === 'Staging' ? 'xl' : 'md'}
+            onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}
+          >
             <EditGroupItem key={groupItem.id} />
           </ButtonIcon>
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <p className="text-sm">
-          <strong>Quantidade total:</strong> {groupItem.quantity}
-        </p>
-        <p className="text-sm font-bold text-gray-800">
-          R$ {new Decimal(groupItem.total_price).toFixed(2)}
-        </p>
-
-      </div>
+      {/* Summary */}
+      <dl className="grid grid-cols-2 gap-2 text-gray-700">
+        <div>
+          <dt className="font-medium">Quantidade total</dt>
+          <dd className="mt-1">{groupItem.quantity}</dd>
+        </div>
+        <div>
+          <dt className="font-medium">Total</dt>
+          <dd className="mt-1 font-semibold">R$ {new Decimal(groupItem.total_price).toFixed(2)}</dd>
+        </div>
+      </dl>
 
       {/* Schedule */}
-      {groupItem.start_at && <p className="text-sm font-bold text-gray-800 flex items-center">
-        <FaClock />&nbsp;Agendado para: {ToUtcDatetime(groupItem.start_at)}
-      </p>}
+      {groupItem.start_at && (
+        <p className="flex items-center text-sm text-gray-600">
+          <FaClock className="mr-2 text-gray-500" />
+          Agendado para: <span className="font-medium ml-1">{ToUtcDatetime(groupItem.start_at)}</span>
+        </p>
+      )}
 
-      {/* Observação */}
-      {groupItem.observation && <p className="text-sm text-gray-600"><strong className="text-red-500">OBS:</strong> {groupItem.observation}</p>}
+      {/* Observation */}
+      {groupItem.observation && (
+        <ObservationCard observation={groupItem.observation} className="p-2 text-sm mb-2" />
+      )}
 
-      {/* Itens */}
-      <div className="space-y-3">
-        <h3 className="text-md font-semibold border-b pb-2">Itens</h3>
-
+      {/* Items List */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-1">Itens</h3>
         {groupItem.items.map((item) => (
-          <div className="bg-gray-50 p-3 rounded shadow-sm" key={item.id}>
-            <div className="flex justify-between">
-              <p className="font-bold">{item.quantity} x {item.name}</p>
+          <div key={item.id} className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow-inner">
+            <div className="col-span-2">
+              <p className="font-medium">{item.quantity} x {item.name}</p>
+              {item.observation && (
+                <ObservationCard observation={item.observation} />
+              )}
+              {item.additional_items && item.additional_items?.length > 0 && (
+                <ul className="mt-2 list-disc list-inside text-sm text-green-700">
+                  {item.additional_items.map(add => (
+                    <li key={add.id}>{add.quantity} x {add.name} (+R$ {new Decimal(add.price).toFixed(2)})</li>
+                  ))}
+                </ul>
+              )}
+              {item.removed_items && item.removed_items?.length > 0 && (
+                <ul className="mt-1 list-disc list-inside text-sm text-red-600">
+                  {item.removed_items.map(rem => (
+                    <li key={rem}>- {rem}</li>
+                  ))}
+                </ul>
+              )}
             </div>
-
-            {item.observation && <p className="text-sm text-gray-600"><strong className="text-red-500">OBS:</strong> {item.observation}</p>}
-
-            <p className="text-sm font-semibold">R$ {new Decimal(item.price).toFixed(2)}</p>
-            {item.additional_items && (
-              <ul className="mt-2 pl-4 list-disc text-sm text-gray-600">
-                {item.additional_items.map((add) => (
-                  <li className="text-green-600" key={add.id}>
-                    {add.quantity} x {add.name} - R$ {new Decimal(add.price).toFixed(2)}
-                  </li>
-                ))}
-
-                {item.removed_items?.map((rem) => (
-                  <li className="text-red-500" key={rem}>
-                    Sem {rem}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="col-span-1 flex items-center justify-end">
+              <p className="font-semibold text-gray-800">R$ {new Decimal(item.price).toFixed(2)}</p>
+            </div>
           </div>
         ))}
       </div>
