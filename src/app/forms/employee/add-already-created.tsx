@@ -14,6 +14,7 @@ import { useState } from "react";
 import { FaCheck, FaSearch, FaUserPlus, FaExclamationCircle } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import EmployeeForm from "@/app/forms/employee/form";
+import AddUserToCompany from "@/app/api/company/add/company";
 
 const AddEmployeeAlreadyCreated = () => {
     const [userFound, setUserFound] = useState<User | null>();
@@ -102,13 +103,14 @@ const CardUser = ({ user }: CardUserProps) => {
 
         const employee = new Employee(undefined, user.id, user);
         try {
+            await AddUserToCompany(user.email, data)
             const response = await NewEmployee(user.id, data);
 
             employee.id = response
             dispatch(addEmployee(employee));
 
             modalHandler.hideModal('new-already-created-employee');
-            
+
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao criar funcionário');
         }

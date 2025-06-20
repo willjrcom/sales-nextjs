@@ -103,22 +103,6 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         }
     }
 
-    const onDelete = async () => {
-        if (!data) return;
-        try {
-            await DeleteEmployee(employee.id, data);
-            dispatch(removeEmployee(employee.id));
-            
-            await RemoveUserFromCompany(employee.email, data)
-            dispatch(removeUser(employee.user_id))
-            
-            notifySuccess('Funcionário removido com sucesso');
-            modalHandler.hideModal(modalName);
-        } catch (error: RequestError | any) {
-            notifyError(error.message || `Erro ao remover funcionário ${employee.name}`);
-        }
-    }
-
     return (
         <div className="w-full min-w-[30vw] bg-white shadow-md rounded-md p-8">
             <PersonForm person={person} setPerson={setPerson} isEmployee isHidden={isDisabledPerson} />
@@ -136,7 +120,6 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
                     item={employee}
                     name="Funcionário"
                     onSubmit={submitEmployee}
-                    deleteItem={onDelete}
                 />
             </div>
         </div>

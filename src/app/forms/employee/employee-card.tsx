@@ -3,6 +3,17 @@ import Employee from "@/app/entities/employee/employee";
 import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
 import { HiOutlineUser, HiOutlinePhone, HiOutlineHome, HiOutlineIdentification, HiOutlineMail, HiOutlineCalendar } from "react-icons/hi";
+import ButtonsModal from "@/app/components/modal/buttons-modal";
+import DeleteEmployee from "@/app/api/employee/delete/employee";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { removeEmployee } from "@/redux/slices/employees";
+import RemoveUserFromCompany from "@/app/api/company/remove/company";
+import { removeUser } from "@/redux/slices/users";
+import { useSession } from "next-auth/react";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { useModal } from "@/app/context/modal/context";
+import RequestError from "@/app/utils/error";
 
 interface EmployeeCardProps {
     item: Employee;
@@ -16,8 +27,28 @@ function formatDate(dateString?: string) {
 }
 
 function EmployeeCard({ item }: EmployeeCardProps) {
+    const modalName = "view-employee-" + item.id;
     const contact = item.contact as Contact;
     const address = item.address as Address;
+    const dispatch = useDispatch<AppDispatch>();
+    const { data } = useSession();
+    const modalHandler = useModal();
+
+    const onDelete = async () => {
+        if (!data) return;
+        try {
+            await DeleteEmployee(item.id, data);
+            dispatch(removeEmployee(item.id));
+            
+            await RemoveUserFromCompany(item.email, data)
+            dispatch(removeUser(item.user_id))
+            
+            notifySuccess('Funcionário removido com sucesso');
+            modalHandler.hideModal(modalName);
+        } catch (error: RequestError | any) {
+            notifyError(error.message || `Erro ao remover funcionário ${item.name}`);
+        }
+    }
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 mx-auto flex flex-col gap-6">
@@ -64,6 +95,15 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="mt-6">
+                <ButtonsModal
+                    item={item}
+                    name="Funcionário"
+                    deleteItem={onDelete}
+                    deleteLabel="Demitir"
+                />
             </div>
         </div>
     );
