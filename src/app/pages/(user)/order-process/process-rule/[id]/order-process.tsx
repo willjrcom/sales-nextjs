@@ -8,12 +8,17 @@ import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
+import { FaRegImage } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
 import StatusComponent from '@/app/components/button/show-status';
+import Item from '@/app/entities/order/item';
+import ObservationCard from '@/app/components/order/observation';
+import AdditionalItem from './additional-item';
+import RemovedItem from './removed-item';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -32,10 +37,10 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             return () => clearInterval(timer);
         }
     }, [orderProcess.status]);
-    
+
     const groupItem = orderProcess.group_item;
     if (!groupItem) return null;
-    
+
     const startProcess = async (id: string) => {
         if (!data) return
 
@@ -69,7 +74,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             onClose
         )
     }
-    
+
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-6">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -86,22 +91,13 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-4">
+                    {groupItem.observation && <ObservationCard observation={groupItem.observation} />}
                     <ul className="space-y-2">
-                        {groupItem.items.map((item) => (
-                            <li
-                                key={item.id}
-                                className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded"
-                            >
-                                <span className="text-gray-800">{item.quantity} x {item.name}</span>
-                                {/* additional details can go here */}
-                            </li>
-                        ))}
+                        {groupItem.items.map((item) => {
+                            const product = orderProcess.products.find(p => p.id === item.product_id);
+                            return <ItemProcessCard item={item} product={product} key={item.id} />;
+                        })}
                     </ul>
-                    {groupItem.observation && (
-                        <p className="mt-4 text-sm text-gray-600">
-                            <span className="font-semibold text-red-600">OBS:</span> {groupItem.observation}
-                        </p>
-                    )}
                 </div>
                 <div className="flex flex-col justify-between items-center md:items-end">
                     <div className="text-center">
@@ -141,6 +137,35 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                 </div>
             </div>
         </div>
+    );
+};
+
+interface ItemProcessProps {
+    item: Item;
+    product?: any;
+}
+
+const ItemProcessCard = ({ item, product }: ItemProcessProps) => {
+    return (
+        <li key={item.id} className="flex bg-white rounded-lg shadow-sm p-3 items-center">
+            {/* Right: item details */}
+            <div className="flex-1">
+                <div className="flex justify-between">
+                    <span className="text-gray-800 font-medium">{item.quantity} x {item.name}</span>
+                </div>
+                {item.observation && (
+                    <ObservationCard observation={item.observation} />
+                )}
+                <div className="flex flex-wrap mt-2 space-x-2">
+                    {item.additional_items?.map(add => (
+                        <AdditionalItem item={add} key={add.id} />
+                    ))}
+                    {item.removed_items?.map(rem => (
+                        <RemovedItem item={rem} key={rem} />
+                    ))}
+                </div>
+            </div>
+        </li>
     );
 };
 

@@ -3,6 +3,7 @@ import React from 'react';
 import AdditionalItem from './additional-item';
 import RemovedItem from './removed-item';
 import Product from '@/app/entities/product/product';
+import { FaRegImage } from 'react-icons/fa';
 
 interface ItemDetailsProps {
     item: Item;
@@ -10,55 +11,53 @@ interface ItemDetailsProps {
 }
 
 const ItemDetails = ({ item, product }: ItemDetailsProps) => {
+    console.log(product?.image_path)
     return (
-        <div className="">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <p className="text-gray-500 text-sm"># {item.id}</p>
-                </div>
-                <div className="text-gray-700 text-lg">
-                    Quantidade: <span className="font-bold">{item.quantity}</span>
-                </div>
+        <div className="flex bg-white rounded-lg shadow mb-4 p-4">
+            {/* Left: Product Thumbnail */}
+            <div className="w-24 h-24 flex-shrink-0 mr-4">
+                {product?.image_path ? (
+                    <img src={product.image_path} alt={product.name}
+                        className="w-full h-full object-cover rounded" />
+                ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded">
+                        <FaRegImage className="text-gray-400 text-2xl" />
+                    </div>
+                )}
             </div>
-
-            {/* Content */}
-            <div className="grid grid-cols-2 gap-4">
-                {/* Ingredientes */}
-                <div className="bg-gray-50 rounded-lg shadow p-4">
-                    <h2 className="font-semibold text-lg mb-4">Descrição</h2>
-                    <ul className="space-y-2">
-                        <li>{product?.description}</li>
-                    </ul>
+            {/* Right: Details */}
+            <div className="flex-1 space-y-4">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                    <p className="text-gray-500 text-sm"># {item.id}</p>
+                    <p className="text-gray-700 text-lg">Quantidade: <span className="font-bold">{item.quantity}</span></p>
                 </div>
-
-                {/* Adicionais */}
-                <div className="bg-gray-50 rounded-lg shadow p-4">
-                    <h2 className="font-semibold text-lg mb-4">Adicionais</h2>
-
-                    <div className="mt-2 flex flex-wrap gap-2">
-                        {item.additional_items?.map((additional) => (
-                            <AdditionalItem key={additional.id} item={additional} />
-                        ))}
+                {/* Content Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Description */}
+                    <div className="bg-gray-50 rounded-lg shadow p-3">
+                        <h3 className="font-semibold text-md mb-2">Descrição</h3>
+                        <p className="text-gray-600 text-sm">{product?.description || 'Sem descrição'}</p>
                     </div>
-                </div>
-
-                {/* Remover */}
-                <div className="bg-gray-50 rounded-lg shadow p-4">
-                    <h2 className="font-semibold text-lg mb-4">Remover</h2>
-
-                    <div className='mt-2 flex flex-wrap gap-2'>
-                        {item.removed_items?.map((removedItem) => (
-                            <RemovedItem key={removedItem} item={removedItem} />
-                        ))}
+                    {/* Additional Items */}
+                    <div className="bg-gray-50 rounded-lg shadow p-3">
+                        <h3 className="font-semibold text-md mb-2">Adicionais</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {item.additional_items?.map(add => <AdditionalItem key={add.id} item={add} />) || <p className="text-gray-500 text-sm">Nenhum adicional</p>}
+                        </div>
                     </div>
-                </div>
-
-                {/* Observações */}
-                <div className="bg-gray-50 rounded-lg shadow p-4">
-                    <h2 className="font-semibold text-lg mb-4">Observações</h2>
-                    {item.observation && <p className="text-red-500">{item.observation}</p>}
-                    {!item.observation && <p className="text-gray-500">Nenhuma observação</p>}
+                    {/* Removed Items */}
+                    <div className="bg-gray-50 rounded-lg shadow p-3">
+                        <h3 className="font-semibold text-md mb-2">Remover</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {item.removed_items?.map(rem => <RemovedItem key={rem} item={rem} />) || <p className="text-gray-500 text-sm">Nenhum item removido</p>}
+                        </div>
+                    </div>
+                    {/* Observation */}
+                    <div className="bg-gray-50 rounded-lg shadow p-3">
+                        <h3 className="font-semibold text-md mb-2">Observações</h3>
+                        {item.observation ? <p className="text-red-500 text-sm">{item.observation}</p> : <p className="text-gray-500 text-sm">Nenhuma observação</p>}
+                    </div>
                 </div>
             </div>
         </div>

@@ -70,7 +70,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
 
       {/* Observation */}
       {groupItem.observation && (
-        <ObservationCard observation={groupItem.observation} className="p-2 text-sm mb-2" />
+        <ObservationCard observation={groupItem.observation} />
       )}
 
       {/* Items List */}
