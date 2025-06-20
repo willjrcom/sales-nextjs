@@ -8,7 +8,7 @@ export class EmployeeSalaryHistory {
     salary_type: string = '';
     base_salary: Decimal = new Decimal(0);
     hourly_rate: Decimal = new Decimal(0);
-    commission: Decimal = new Decimal(0);
+    commission: number = 0;
     created_at: string = '';
     method: string = '';
     notes: string = '';
@@ -23,7 +23,6 @@ export class EmployeePayment {
     amount: Decimal = new Decimal(0);
     payment_date: string = '';
     payment_type: string = '';
-    reference_month: string = '';
     salary_history_id?: string;
     created_at: string = '';
     method: string = '';

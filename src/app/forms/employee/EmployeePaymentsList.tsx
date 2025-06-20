@@ -13,7 +13,7 @@ const EmployeePaymentsList = ({ payments }: { payments: EmployeePayment[] }) => 
                         <th className="px-3 py-2">Data</th>
                         <th className="px-3 py-2">Valor</th>
                         <th className="px-3 py-2">Tipo</th>
-                        <th className="px-3 py-2">Referência</th>
+                        <th className="px-3 py-2">Observação</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,7 +22,7 @@ const EmployeePaymentsList = ({ payments }: { payments: EmployeePayment[] }) => 
                             <td className="px-3 py-2">{new Date(p.payment_date).toLocaleDateString()}</td>
                             <td className="px-3 py-2">R$ {new Decimal(p.amount).toFixed(2)}</td>
                             <td className="px-3 py-2">{p.payment_type}</td>
-                            <td className="px-3 py-2">{p.reference_month}</td>
+                            <td className="px-3 py-2">{p.notes}</td>
                         </tr>
                     ))}
                 </tbody>
