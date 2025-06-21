@@ -101,7 +101,7 @@ const DragAndDropGrid = () => {
 
     useEffect(() => {
         setPlaces(Object.values(placesSlice.entities));
-
+        
         const firstPlace = Object.values(placesSlice.entities)[0];
         if (!firstPlace) return
         if (placeSelectedID === "") setPlaceSelectedID(firstPlace.id)

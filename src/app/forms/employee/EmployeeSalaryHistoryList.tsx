@@ -1,6 +1,7 @@
 import React from "react";
 import { Decimal } from "decimal.js";
 import { EmployeeSalaryHistory } from "@/app/entities/employee/employee-payment";
+import { ToUtcDatetime, ToUtcHoursMinutes } from "@/app/utils/date";
 
 
 const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSalaryHistory[] }) => (
@@ -21,8 +22,8 @@ const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSa
                 <tbody>
                     {histories.map(h => (
                         <tr key={h.id} className="border-b hover:bg-blue-50">
-                            <td className="px-3 py-2">{new Date(h.start_date).toLocaleDateString()}</td>
-                            <td className="px-3 py-2">{h.end_date ? new Date(h.end_date).toLocaleDateString() : "-"}</td>
+                            <td className="px-3 py-2">{ToUtcDatetime(h.start_date)}</td>
+                            <td className="px-3 py-2">{h.end_date ? ToUtcDatetime(h.end_date) : "-"}</td>
                             <td className="px-3 py-2">{h.salary_type}</td>
                             <td className="px-3 py-2">R$ {new Decimal(h.base_salary).toFixed(2)}</td>
                             <td className="px-3 py-2">R$ {new Decimal(h.hourly_rate).toFixed(2)}</td>

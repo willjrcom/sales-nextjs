@@ -31,6 +31,8 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
             id = order?.id;
         }
 
+        if (!id) return;
+
         try {
             const orderFound = await GetOrderByID(id as string, data);
             setOrder(orderFound);
@@ -40,7 +42,7 @@ export const CurrentOrderProvider = ({ children }: { children: ReactNode }) => {
 
         setLoading(false);
 
-    }, [data?.user.access_token]);
+    }, [data?.user.access_token, order?.id]);
 
     const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
 

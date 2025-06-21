@@ -2,7 +2,7 @@ import RequestApi, { AddAccessToken } from "../../../request";
 import { Session } from "next-auth";
 
 interface ChangeTableProps {
-    table_id: string;
+    table_id: string; // UUID como string
     force_update: boolean
 }
 const ChangeTable = async (orderTableId: string, tableID: string, session: Session): Promise<string> => {
@@ -13,7 +13,7 @@ const ChangeTable = async (orderTableId: string, tableID: string, session: Sessi
 
     const response = await RequestApi<ChangeTableProps, string>({
         path: "/order-table/update/change-table/" + orderTableId, 
-        method: "PATCH",
+        method: "POST",
         body: changeTable,
         headers: await AddAccessToken(session),
     });
