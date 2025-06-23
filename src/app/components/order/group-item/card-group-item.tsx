@@ -99,7 +99,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
               )}
             </div>
             <div className="col-span-1 flex items-center justify-end">
-              <p className="font-semibold text-gray-800">R$ {new Decimal(item.price).toFixed(2)}</p>
+              <p className="font-semibold text-gray-800">R$ {new Decimal(item.total_price).toFixed(2)}</p>
             </div>
           </div>
         ))}

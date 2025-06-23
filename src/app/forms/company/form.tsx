@@ -59,7 +59,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             ...prev,
             preferences: {
                 ...prev.preferences,
-                [key]: String(value),
+                [key]: value instanceof Decimal ? value.toFixed(2) : String(value),
             },
         }));
     };
