@@ -198,12 +198,22 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 />
             </div>
 
-            <CheckboxField
-                friendlyName="Habilitar valor mínimo para entrega gratuita"
-                name="enable_min_order_value_for_free_delivery"
-                value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
-                setValue={value => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
-            />
+            <div className='flex justify-between'>
+                <CheckboxField
+                    friendlyName="Habilitar valor mínimo para entrega gratuita"
+                    name="enable_min_order_value_for_free_delivery"
+                    value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
+                    setValue={value => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
+                />
+
+                <PriceField
+                    friendlyName="Valor mínimo para entrega gratuita"
+                    name="min_order_value_for_free_delivery"
+                    value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
+                    setValue={value => handlePreferenceChange('min_order_value_for_free_delivery', value)}
+                    disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
+                />
+            </div>
 
             {/* Taxas */}
             <div className='flex justify-between'>
@@ -214,6 +224,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                     setValue={value => handlePreferenceChange('table_tax_rate', value)}
                     disabled={company.preferences.enable_table !== 'true'}
                 />
+
                 <PriceField
                     friendlyName="Taxa mínima de entrega"
                     name="min_delivery_tax"
@@ -221,14 +232,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                     setValue={value => handlePreferenceChange('min_delivery_tax', value)}
                 />
             </div>
-
-            <PriceField
-                friendlyName="Valor mínimo para entrega gratuita"
-                name="min_order_value_for_free_delivery"
-                value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
-                setValue={value => handlePreferenceChange('min_order_value_for_free_delivery', value)}
-                disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
-            />
 
             {/* Impressora para pedido */}
             <div className='flex justify-between'>
