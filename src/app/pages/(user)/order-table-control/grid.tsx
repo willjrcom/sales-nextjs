@@ -13,7 +13,7 @@ import { useModal } from "@/app/context/modal/context";
 import CardOrder from "@/app/components/order/card-order";
 import OrderTable from "@/app/entities/order/order-table";
 import { fetchTableOrders } from "@/redux/slices/table-orders";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaList } from "react-icons/fa";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import { useRouter } from "next/navigation";
 import { notifyError } from "@/app/utils/notifications";
@@ -97,11 +97,12 @@ const DragAndDropGrid = () => {
 
     useEffect(() => {
         setTableOrders(Object.values(tableOrdersSlice.entities));
+        console.log(Object.values(tableOrdersSlice.entities))
     }, [tableOrdersSlice.entities])
 
     useEffect(() => {
         setPlaces(Object.values(placesSlice.entities));
-        
+
         const firstPlace = Object.values(placesSlice.entities)[0];
         if (!firstPlace) return
         if (placeSelectedID === "") setPlaceSelectedID(firstPlace.id)
@@ -162,9 +163,20 @@ const DragAndDropGrid = () => {
                     {grid.map((cell) => (
                         <Cell key={`${cell.x}-${cell.y}`}>
                             {droppedTables?.filter((item) => item.column === cell.x && item.row === cell.y)
-                                .map((item) => (
-                                    <TableItem key={`${item.table_id}-${item.row}-${item.column}`} placeTable={item} order={tableOrders?.find((order) => order.table_id === item.table_id && order.status !== "Closed")} />
-                                ))}
+                                .map((placeTable) => {
+                                    // Buscar todos os pedidos abertos para esta mesa
+                                    const ordersForTable = tableOrders.filter(
+                                        (order) => order.table_id === placeTable.table_id && order.status !== "Closed"
+                                    );
+                                    
+                                    return (
+                                        <TableItem
+                                            key={`${placeTable.table_id}-${placeTable.row}-${placeTable.column}`}
+                                            placeTable={placeTable}
+                                            ordersForTable={ordersForTable}
+                                        />
+                                    );
+                                })}
                         </Cell>
                     ))}
                 </div>
@@ -174,7 +186,7 @@ const DragAndDropGrid = () => {
     );
 };
 
-const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: OrderTable }) => {
+const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ordersForTable: OrderTable[] }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const router = useRouter();
@@ -186,9 +198,8 @@ const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: Orde
     };
 
     const openModal = () => {
-        // New order
-        if (!order) {
-
+        // Se não há pedidos, criar novo pedido
+        if (ordersForTable.length === 0) {
             const onClose = () => {
                 modalHandler.hideModal("new-table")
             }
@@ -220,6 +231,51 @@ const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: Orde
             return
         }
 
+        // Se há múltiplos pedidos, mostrar lista de seleção
+        if (ordersForTable.length > 1) {
+            const onClose = () => {
+                modalHandler.hideModal("select-order-" + placeTable.table_id)
+            }
+
+            const selectOrder = (order: OrderTable) => {
+                const onCloseOrder = () => {
+                    modalHandler.hideModal("show-order-" + order.order_id)
+                }
+                modalHandler.showModal("show-order-" + order.order_id, "Editar mesa", <CardOrder orderId={order.order_id} />, "xl", onCloseOrder);
+                onClose();
+            }
+
+            const orderList = () => (
+                <div className="w-full max-w-md bg-white p-6 rounded-md shadow space-y-4">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Mesa: {placeTable.table.name}</h2>
+                    <p className="text-gray-600 mb-4">Existem {ordersForTable.length} pedidos abertos nesta mesa. Escolha qual deseja visualizar:</p>
+                    
+                    <div className="space-y-2">
+                        {ordersForTable.map((order) => (
+                            <button
+                                key={order.order_id}
+                                onClick={() => selectOrder(order)}
+                                className="w-full p-3 text-left border border-gray-300 rounded-md hover:bg-gray-50 hover:border-blue-500 transition-colors"
+                            >
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className="font-semibold">Pedido #{order.order_number || order.order_id.slice(0, 8)}</p>
+                                        <p className="text-sm text-gray-600">Criado em: {new Date(order.created_at).toLocaleString()}</p>
+                                    </div>
+                                    <FaList className="text-gray-400" />
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )
+
+            modalHandler.showModal("select-order-" + placeTable.table_id, "Selecionar Pedido", orderList(), "md", onClose);
+            return
+        }
+
+        // Se há apenas um pedido, abrir diretamente
+        const order = ordersForTable[0];
         const onClose = () => {
             modalHandler.hideModal("show-order-" + order.order_id)
         }
@@ -227,21 +283,30 @@ const TableItem = ({ placeTable, order }: { placeTable: PlaceTable, order?: Orde
         modalHandler.showModal("show-order-" + order.order_id, "Editar mesa", <CardOrder orderId={order.order_id} />, "xl", onClose);
     }
 
+    const hasOrders = ordersForTable.length > 0;
+    const hasMultipleOrders = ordersForTable.length > 1;
+
     return (
         <div
             onClick={openModal}
             style={{
                 ...style,
-                backgroundColor: (order && order.status !== "Closed") ? "lightgreen" : "lightblue",
+                backgroundColor: hasOrders ? "lightgreen" : "lightblue",
                 border: "1px solid #ccc",
                 borderRadius: "4px",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                position: "relative",
             }}
         >
             <p className="text-sm">{placeTable?.table.name || "Sem Nome"}</p>
+            {hasMultipleOrders && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {ordersForTable.length}
+                </div>
+            )}
         </div>
     );
 };

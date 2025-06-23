@@ -19,10 +19,12 @@ export default class OrderDelivery {
     driver_id?: string = "";
     driver?: DeliveryDriver;
     order_id: string = "";
+    order_number: number = 0;
     pending_at?: string = "";
     ready_at?: string = "";
     shipped_at?: string = "";
     delivered_at?: string = "";
+    canceled_at?: string = "";
 
     constructor(
         id = "",
@@ -34,10 +36,12 @@ export default class OrderDelivery {
         address_id = "",
         driver_id = "",
         order_id = "",
+        order_number = 0,
         pending_at = "",
         ready_at = "",
         shipped_at = "",
-        delivered_at = ""
+        delivered_at = "",
+        canceled_at = ""
     ) {
         this.id = id;
         this.status = status;
@@ -48,9 +52,11 @@ export default class OrderDelivery {
         this.address_id = address_id;
         this.driver_id = driver_id;
         this.order_id = order_id;
+        this.order_number = order_number;
         this.pending_at = pending_at;
         this.ready_at = ready_at;
         this.shipped_at = shipped_at;
         this.delivered_at = delivered_at;
+        this.canceled_at = canceled_at;
     }
 }

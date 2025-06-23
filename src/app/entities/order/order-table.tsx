@@ -15,8 +15,10 @@ export default class OrderTable {
   created_at: string = "";
   pending_at?: string = "";
   closed_at?: string = "";
+  order_number: number = 0;
+  canceled_at?: string = "";
 
-  constructor(id = "", name = "", contact = "", status: StatusOrderTable = "Staging", tax_rate: Decimal = new Decimal(0), order_id = "", table_id = "", table: Table = new Table(), created_at = "", pending_at = "", closed_at = "") {
+  constructor(id = "", name = "", contact = "", status: StatusOrderTable = "Staging", tax_rate: Decimal = new Decimal(0), order_id = "", table_id = "", table: Table = new Table(), created_at = "", pending_at = "", closed_at = "", orderNumber = 0, canceled_at = "") {
     this.id = id;
     this.name = name;
     this.contact = contact;
@@ -28,5 +30,7 @@ export default class OrderTable {
     this.created_at = created_at;
     this.pending_at = pending_at;
     this.closed_at = closed_at;
+    this.order_number = orderNumber;
+    this.canceled_at = canceled_at;
   }
 }
