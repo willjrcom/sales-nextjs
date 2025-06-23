@@ -8,7 +8,6 @@ import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
-import { FaRegImage } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
@@ -19,6 +18,7 @@ import Item from '@/app/entities/order/item';
 import ObservationCard from '@/app/components/order/observation';
 import AdditionalItem from '../../../../../components/order/additional-item';
 import RemovedItem from '../../../../../components/order/removed-item';
+import printGroupItem from '@/app/components/print/print-group-item';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -56,7 +56,13 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         if (!data) return
 
         try {
-            await FinishOrderProcess(id, data)
+            const nextProcessID = await FinishOrderProcess(id, data)
+
+            if (!nextProcessID && data.user.current_company?.preferences?.["enable_print_items_on_finish_process"]) {
+
+                await printGroupItem({groupItemID: groupItem.id,printerName: groupItem.printer_name, session: data})
+            }
+
             dispatch(removeOrderProcess(id))
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');

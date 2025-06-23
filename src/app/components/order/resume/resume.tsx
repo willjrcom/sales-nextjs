@@ -75,7 +75,7 @@ export const OrderPaymentsResume = () => {
         try {
             await PendingOrder(order.id, data)
 
-            if (data.user.current_company?.preferences.enable_print_order) {
+            if (data.user.current_company?.preferences.enable_print_order_on_pend_order) {
                 await printOrder({
                     orderID: order.id,
                     session: data

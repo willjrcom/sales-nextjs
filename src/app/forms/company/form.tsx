@@ -63,16 +63,16 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             },
         }));
         // Notificar mudança de preferência
-        const labels: Record<string,string> = {
+        const labels: Record<string, string> = {
             enable_delivery: 'Entrega disponível',
-            enable_tables: 'Mesas disponíveis',
+            enable_table: 'Mesas disponíveis',
             enable_min_order_value_for_free_delivery: 'Exigir valor mínimo para entrega gratuita',
             table_tax_rate: 'Taxa de mesa (%)',
             min_order_value_for_free_delivery: 'Valor mínimo para entrega gratuita',
             min_delivery_tax: 'Taxa mínima de entrega',
         };
         const label = labels[key] || key;
-        const isToggle = ['enable_delivery','enable_tables','enable_min_order_value_for_free_delivery'].includes(key);
+        const isToggle = ['enable_delivery', 'enable_table', 'enable_min_order_value_for_free_delivery'].includes(key);
         if (isToggle) {
             notifySuccess(`${label} ${value ? 'ativada' : 'desativada'}`);
         } else {
@@ -102,11 +102,11 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
         const validationErrors = ValidateCompanyForm(company);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
-        
+
         try {
             const responseNewCompany = await NewCompany(company, data);
             company.id = responseNewCompany.company_id;
-            
+
             const response = await Access({ schema: responseNewCompany.schema }, data);
 
             await update({
@@ -143,7 +143,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-        await UpdateCompany(company, data);
+            await UpdateCompany(company, data);
             const currentCompany = await GetCompany(data);
 
             await update({
@@ -182,31 +182,46 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             <hr className="my-4" />
             {/* Preferences */}
             <h3 className="text-md font-medium mb-2">Preferências</h3>
+
+            <div className='flex justify-between'>
+                <CheckboxField
+                    friendlyName="Entregas disponível"
+                    name="enable_delivery"
+                    value={company.preferences.enable_delivery === 'true'}
+                    setValue={value => handlePreferenceChange('enable_delivery', value)}
+                />
+                <CheckboxField
+                    friendlyName="Mesas disponíveis"
+                    name="enable_table"
+                    value={company.preferences.enable_table === 'true'}
+                    setValue={value => handlePreferenceChange('enable_table', value)}
+                />
+            </div>
+
             <CheckboxField
-                friendlyName="Entrega disponível"
-                name="enable_delivery"
-                value={company.preferences.enable_delivery === 'true'}
-                setValue={value => handlePreferenceChange('enable_delivery', value)}
-            />
-            <CheckboxField
-                friendlyName="Mesas disponíveis"
-                name="enable_tables"
-                value={company.preferences.enable_tables === 'true'}
-                setValue={value => handlePreferenceChange('enable_tables', value)}
-            />
-            <CheckboxField
-                friendlyName="Exigir valor mínimo para entrega gratuita"
+                friendlyName="Habilitar valor mínimo para entrega gratuita"
                 name="enable_min_order_value_for_free_delivery"
                 value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
                 setValue={value => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
             />
-            <NumberField
-                friendlyName="Taxa de mesa (%)"
-                name="table_tax_rate"
-                value={parseFloat(company.preferences.table_tax_rate || '0')}
-                setValue={value => handlePreferenceChange('table_tax_rate', value)}
-                disabled={company.preferences.enable_tables !== 'true'}
-            />
+
+            {/* Taxas */}
+            <div className='flex justify-between'>
+                <NumberField
+                    friendlyName="Taxa de mesa (%)"
+                    name="table_tax_rate"
+                    value={parseFloat(company.preferences.table_tax_rate || '0')}
+                    setValue={value => handlePreferenceChange('table_tax_rate', value)}
+                    disabled={company.preferences.enable_table !== 'true'}
+                />
+                <PriceField
+                    friendlyName="Taxa mínima de entrega"
+                    name="min_delivery_tax"
+                    value={new Decimal(company.preferences.min_delivery_tax || '0')}
+                    setValue={value => handlePreferenceChange('min_delivery_tax', value)}
+                />
+            </div>
+
             <PriceField
                 friendlyName="Valor mínimo para entrega gratuita"
                 name="min_order_value_for_free_delivery"
@@ -214,45 +229,52 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 setValue={value => handlePreferenceChange('min_order_value_for_free_delivery', value)}
                 disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
             />
-            <PriceField
-                friendlyName="Taxa mínima de entrega"
-                name="min_delivery_tax"
-                value={new Decimal(company.preferences.min_delivery_tax || '0')}
-                setValue={value => handlePreferenceChange('min_delivery_tax', value)}
-            />
-            {/* Impressora de pedido */}
+
+            {/* Impressora para pedido */}
+            <div className='flex justify-between'>
+                <CheckboxField
+                    friendlyName="Deseja imprimir ao lançar o pedido?"
+                    name="enable_print_order_on_pend_order"
+                    value={company.preferences.enable_print_order_on_pend_order === 'true'}
+                    setValue={value => handlePreferenceChange('enable_print_order_on_pend_order', value)}
+                />
+                <SelectField
+                    friendlyName="Impressora de pedido"
+                    name="printer_order_on_pend_order"
+                    values={printers}
+                    selectedValue={company.preferences.printer_order_on_pend_order || ''}
+                    setSelectedValue={value => handlePreferenceChange('printer_order_on_pend_order', value)}
+                    optional
+                    disabled={company.preferences.enable_print_order_on_pend_order === 'false'}
+                />
+            </div>
+
+            {/* Impressora para finalizar processo */}
             <CheckboxField
-                friendlyName="Deseja imprimir ao lançar o pedido?"
-                name="enable_print_order"
-                value={company.preferences.enable_print_order === 'true'}
-                setValue={value => handlePreferenceChange('enable_print_order', value)}
-            />
-            <SelectField
-                friendlyName="Impressora de pedido"
-                name="printer_order"
-                values={printers}
-                selectedValue={company.preferences.printer_order || ''}
-                setSelectedValue={value => handlePreferenceChange('printer_order', value)}
-                optional
-                disabled={company.preferences.enable_print_order === 'false'}
+                friendlyName="Deseja imprimir ao finalizar o processo?"
+                name="enable_print_items_on_finish_process"
+                value={company.preferences.enable_print_items_on_finish_process === 'true'}
+                setValue={value => handlePreferenceChange('enable_print_items_on_finish_process', value)}
             />
 
-            {/* Impressora de pedido */}
-            <CheckboxField
-                friendlyName="Deseja imprimir ao lançar a entrega?"
-                name="enable_print_delivery"
-                value={company.preferences.enable_print_delivery === 'true'}
-                setValue={value => handlePreferenceChange('enable_print_delivery', value)}
-            />
-            <SelectField
-                friendlyName="Impressora de entrega"
-                name="printer_delivery"
-                values={printers}
-                selectedValue={company.preferences.printer_delivery || ''}
-                setSelectedValue={value => handlePreferenceChange('printer_delivery', value)}
-                optional
-                disabled={company.preferences.enable_print_delivery === 'false'}
-            />
+            {/* Impressora para entrega */}
+            <div className='flex justify-between'>
+                <CheckboxField
+                    friendlyName="Deseja imprimir ao lançar a entrega?"
+                    name="enable_print_order_on_ship_delivery"
+                    value={company.preferences.enable_print_order_on_ship_delivery === 'true'}
+                    setValue={value => handlePreferenceChange('enable_print_order_on_ship_delivery', value)}
+                />
+                <SelectField
+                    friendlyName="Impressora de entrega"
+                    name="printer_delivery_on_ship_delivery"
+                    values={printers}
+                    selectedValue={company.preferences.printer_delivery_on_ship_delivery || ''}
+                    setSelectedValue={value => handlePreferenceChange('printer_delivery_on_ship_delivery', value)}
+                    optional
+                    disabled={company.preferences.enable_print_order_on_ship_delivery === 'false'}
+                />
+            </div>
 
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
