@@ -10,6 +10,7 @@ export default class OrderDelivery {
     id: string = "";
     status: StatusOrderDelivery = "Staging";
     delivery_tax?: Decimal = new Decimal(0);
+    is_delivery_free: boolean = false;
     change?: Decimal = new Decimal(0);
     payment_method?: string = "";
     client_id: string = "";
@@ -30,6 +31,7 @@ export default class OrderDelivery {
         id = "",
         status: StatusOrderDelivery = "Staging",
         delivery_tax: Decimal = new Decimal(0),
+        is_delivery_free: false,
         change: Decimal = new Decimal(0),
         payment_method = "",
         client_id = "",
@@ -46,6 +48,7 @@ export default class OrderDelivery {
         this.id = id;
         this.status = status;
         this.delivery_tax = delivery_tax;
+        this.is_delivery_free = is_delivery_free;
         this.change = change;
         this.payment_method = payment_method;
         this.client_id = client_id;

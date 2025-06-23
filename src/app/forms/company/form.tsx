@@ -62,23 +62,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 [key]: String(value),
             },
         }));
-        // Notificar mudança de preferência
-        const labels: Record<string, string> = {
-            enable_delivery: 'Entrega disponível',
-            enable_table: 'Mesas disponíveis',
-            enable_min_order_value_for_free_delivery: 'Exigir valor mínimo para entrega gratuita',
-            table_tax_rate: 'Taxa de mesa (%)',
-            min_order_value_for_free_delivery: 'Valor mínimo para entrega gratuita',
-            min_delivery_tax: 'Taxa mínima de entrega',
-        };
-        const label = labels[key] || key;
-        const isToggle = ['enable_delivery', 'enable_table', 'enable_min_order_value_for_free_delivery'].includes(key);
-        if (isToggle) {
-            notifySuccess(`${label} ${value ? 'ativada' : 'desativada'}`);
-        } else {
-            notifySuccess(`${label} alterada para ${value}`);
-        }
     };
+
     // Carrega impressoras disponíveis via Electron
     const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
     useEffect(() => {
@@ -179,9 +164,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 onChange={handleContactChange}
             />
 
-            <hr className="my-4" />
             {/* Preferences */}
-            <h3 className="text-md font-medium mb-2">Preferências</h3>
+            <hr className="my-4" />
+            <h2 className="text-md font-medium mb-2">Preferências</h2>
 
             <div className='flex justify-between'>
                 <CheckboxField
@@ -252,14 +237,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 />
             </div>
 
-            {/* Impressora para finalizar processo */}
-            <CheckboxField
-                friendlyName="Deseja imprimir ao finalizar o processo?"
-                name="enable_print_items_on_finish_process"
-                value={company.preferences.enable_print_items_on_finish_process === 'true'}
-                setValue={value => handlePreferenceChange('enable_print_items_on_finish_process', value)}
-            />
-
             {/* Impressora para entrega */}
             <div className='flex justify-between'>
                 <CheckboxField
@@ -279,6 +256,14 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 />
             </div>
 
+            {/* Impressora para finalizar processo */}
+            <CheckboxField
+                friendlyName="Deseja imprimir ao finalizar o processo?"
+                name="enable_print_items_on_finish_process"
+                value={company.preferences.enable_print_items_on_finish_process === 'true'}
+                setValue={value => handlePreferenceChange('enable_print_items_on_finish_process', value)}
+            />
+            
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />

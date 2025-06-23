@@ -173,7 +173,14 @@ export const OrderPaymentsResume = () => {
                 </div>
             }
             <hr className="my-2" />
-            {order?.delivery?.delivery_tax && <p><strong>Taxa de entrega:</strong> R$ {deliveryTaxDecimal.toFixed(2)}</p>}
+            {order?.delivery?.delivery_tax && !order?.delivery?.is_delivery_free && (
+                <p><strong>Taxa de entrega:</strong> R$ {deliveryTaxDecimal.toFixed(2)}</p>
+            )}
+            {order?.delivery?.is_delivery_free && (
+                <p>
+                    <strong>Taxa de entrega:</strong> <span style={{ textDecoration: 'line-through', color: '#888' }}>R$ {deliveryTaxDecimal.toFixed(2)}</span> <span className="text-green-600 font-bold">Parabéns, você tem entrega grátis!</span>
+                </p>
+            )}
 
             {/* <p>Desconto: R$ 5,00</p> */}
             <hr className="my-2" />
