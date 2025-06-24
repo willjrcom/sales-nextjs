@@ -20,11 +20,11 @@ export default class Order {
     quantity_items: number = 0;
     observation: string = "";
     attendant_id: string = "";
-    attendant?: Employee = new Employee();
+    attendant?: Employee;
     shift_id?: string = "";
-    delivery?: OrderDelivery = new OrderDelivery();
-    table?: OrderTable = new OrderTable();
-    pickup?: OrderPickup = new OrderPickup();
+    delivery?: OrderDelivery;
+    table?: OrderTable;
+    pickup?: OrderPickup;
     pending_at?: Date;
     finished_at?: Date;
     canceled_at?: Date;

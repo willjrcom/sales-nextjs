@@ -7,10 +7,11 @@ import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-pro
 import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
+import { HiEye, HiPlay, HiCheckCircle, HiX } from 'react-icons/hi';
 import { useDispatch } from 'react-redux';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
+import CancelOrderProcess from './cancel-process-order';
 import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
 import StatusComponent from '@/app/components/button/show-status';
@@ -81,6 +82,18 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         )
     }
 
+    const openCancelOrderProcess = (orderProcess: OrderProcess) => {
+        const onClose = () => {
+            modalHandler.hideModal("order-process-cancel-" + orderProcess.id)
+        }
+
+        modalHandler.showModal("order-process-cancel-" + orderProcess.id, "Cancelar Processo",
+            <CancelOrderProcess orderProcess={orderProcess} />,
+            'lg',
+            onClose
+        )
+    }
+
     return (
         <div className="bg-white border shadow rounded-lg overflow-hidden mt-6">
             <div className="px-6 border-b border-gray-200 flex items-center justify-between">
@@ -89,12 +102,14 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                     <StatusComponent status={orderProcess?.status} />
                     {groupItem.observation && <ObservationCard observation={groupItem.observation} />}
                 </div>
-                <button
-                    onClick={() => openGroupItemDetails(groupItem)}
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                    <HiEye className="mr-1" /> Ver detalhes
-                </button>
+                <div className="flex items-center space-x-2">
+                    <button
+                        onClick={() => openGroupItemDetails(groupItem)}
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                        <HiEye className="mr-1" /> Ver detalhes
+                    </button>
+                </div>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-4">
