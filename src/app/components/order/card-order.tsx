@@ -196,11 +196,11 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <li>Entregue em: {ToUtcDatetime(order.delivery.delivered_at)}</li>
                         </ul>
 
-                        {!order.delivery.shipped_at && <button onClick={shipDelivery}
+                        {!order.delivery.shipped_at && !order.delivery.canceled_at && <button onClick={shipDelivery}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Enviar entrega</button>
                         }
 
-                        {order.delivery.shipped_at && !order.delivery.delivered_at && <button onClick={finishDelivery}
+                        {order.delivery.shipped_at && !order.delivery.delivered_at&& !order.delivery.canceled_at && <button onClick={finishDelivery}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Receber entrega</button>
                         }
                     </div>
@@ -235,7 +235,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>
                             <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>
                         </ul>
-                        {!order.table.closed_at && <button onClick={closeTable}
+                        {!order.table.closed_at && !order.table.canceled_at && <button onClick={closeTable}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Fechar Mesa</button>
                         }
                     </div>
@@ -270,7 +270,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>
                         </ul>
 
-                        {order.pickup.ready_at && !order.pickup.delivered_at && <button onClick={deliveryPickup}
+                        {order.pickup.ready_at && !order.pickup.delivered_at && !order.pickup.canceled_at && <button onClick={deliveryPickup}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Entregar pedido</button>
                         }
                     </div>

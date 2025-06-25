@@ -8,6 +8,7 @@ import ListPayment from './list-payment';
 import ListOrderCard from './finished-order';
 import CategorySummary from './category-summary';
 import ListDeliveryDriversTax from './delivery-drivers-tax';
+import ProductionAnalyticsCard from '@/app/components/report/production-analytics-card';
 
 interface SalesDashboardProps {
     shift?: Shift | null
@@ -59,6 +60,7 @@ const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
                 <CategorySummary shift={shift} />
                 <ListPayment shift={shift} />
                 <ListDeliveryDriversTax shift={shift} />
+                <ProductionAnalyticsCard shift={shift} />
             </div>
         </div>
     )

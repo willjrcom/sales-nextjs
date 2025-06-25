@@ -9,6 +9,7 @@ export default class OrderPickup {
     pending_at?: string = "";
     ready_at?: string = "";
     delivered_at?: string = "";
+    canceled_at?: string = "";
 
     constructor(id = "", name = "", status: StatusOrderPickup = "Staging", orderId = "", orderNumber = 0, pending_at = "", ready_at = "", delivered_at = "") {
         this.id = id;

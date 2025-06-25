@@ -99,7 +99,6 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             <div className="px-6 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center space-x-2 py-2">
                     <span className="text-gray-600 font-semibold">Pedido #{orderProcess.order_number} - {orderProcess.order_type}</span>
-                    <StatusComponent status={orderProcess?.status} />
                     {groupItem.observation && <ObservationCard observation={groupItem.observation} />}
                 </div>
                 <div className="flex items-center space-x-2">

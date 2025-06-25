@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import { Buffer } from 'buffer';
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -6,6 +6,7 @@ import Login from "../../user/login/login";
 import Company from "@/app/entities/company/company";
 import { NextAuthOptions } from "next-auth";
 import UserBackend from "@/app/entities/user/user";
+import RefreshAccessToken from '@/app/api/user/refresh-access-token/user';
 
 /**
  * Helper to decode a JWT and return its payload
@@ -20,15 +21,10 @@ function decodeJwt(jwt: string) {
     }
 }
 
-/**
- * Refreshes the access token (access_token) using backend endpoint
- */
-import RefreshAccessToken from '@/app/api/user/refresh-access-token/user';
-
 async function refreshAccessToken(token: any) {
     try {
         // Construct a fake session to reuse RefreshAccessToken helper
-        const session = { user: { access_token: token.access_token } } as unknown as import('next-auth').Session;
+        const session = { user: { access_token: token.access_token } } as Session;
         const newToken = await RefreshAccessToken(session);
         const decoded = decodeJwt(newToken);
         return {
@@ -117,12 +113,13 @@ const authOptions: NextAuthOptions = {
             }
             // If token has sufficient time remaining, return it
             const now = Math.floor(Date.now() / 1000);
-            
+
             // Renew when less than 10 minutes (600 seconds) remain
-            if (token.exp && now < (token.exp as number) - 600) {
+            const totalTimeLeft = 60 * 30;
+            if (token.exp && now < (token.exp as number) - totalTimeLeft) {
                 return token;
             }
-            
+
             // Token expired or about to expire, refresh it
             return await refreshAccessToken(token);
         },
@@ -134,7 +131,7 @@ const authOptions: NextAuthOptions = {
             if (token.access_token) session.user.access_token = token.access_token;
             if (token.user) session.user.user = token.user;
             if (token.current_company) session.user.current_company = token.current_company;
-        
+
             return session
         },
     },
