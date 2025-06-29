@@ -1,11 +1,16 @@
 import RequestApi, { AddAccessToken } from "../request";
 import { Session } from "next-auth";
 
-const UploadImage = async (file: File, session: Session): Promise<string> => {
+interface UploadResponse {
+    key: string;
+    public_url: string;
+}
+
+const UploadImage = async (file: File, session: Session): Promise<UploadResponse> => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await RequestApi<FormData, { url: string }>({
+    const response = await RequestApi<FormData, UploadResponse>({
         path: "/s3/upload",
         method: "POST",
         body: formData,
@@ -13,7 +18,7 @@ const UploadImage = async (file: File, session: Session): Promise<string> => {
         isFormData: true,
     });
 
-    return response.data.url;
+    return response.data;
 };
 
 export default UploadImage; 

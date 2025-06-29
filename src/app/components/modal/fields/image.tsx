@@ -65,11 +65,11 @@ const ImageField = ({
 
         try {
             // Pegue o schema_name da sessão se necessário
-            const publicUrl = await UploadImage(file, session);
+            const { public_url } = await UploadImage(file, session);
 
-            setValue(publicUrl);
+            setValue(public_url);
             setImgError(false);
-            onUploadComplete?.(publicUrl);
+            onUploadComplete?.(public_url);
         } catch (error: any) {
             console.error('Error uploading image:', error);
             
