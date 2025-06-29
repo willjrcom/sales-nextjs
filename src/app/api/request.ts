@@ -10,7 +10,8 @@ interface RequestApiProps<T> {
     body?: T;
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     headers?: any;
-    isLogin?: boolean
+    isLogin?: boolean;
+    isFormData?: boolean;
 }
 
 interface Response<T> {
@@ -39,21 +40,30 @@ const AddIDToken = async (session: Session) => {
     return { "id-token": session.user.id }
 }
 
-const RequestApi = async <T, TR>({ path, body, method, headers, isLogin }: RequestApiProps<T>): Promise<Response<TR>> => {
+const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormData }: RequestApiProps<T>): Promise<Response<TR>> => {
     if (!path.startsWith("/")) {
         throw new Error(`path: ${path} must start with /`);
     }
 
     const fullPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`;
 
+    let fetchHeaders = { ...headers };
+    let fetchBody: any = undefined;
+
+    if (isFormData && body instanceof FormData) {
+        // NÃO definir Content-Type, o browser faz isso automaticamente
+        fetchBody = body;
+    } else if (body) {
+        fetchHeaders = { ...jsonHeaders, ...headers };
+        fetchBody = JSON.stringify(body);
+    } else {
+        fetchHeaders = { ...jsonHeaders, ...headers };
+    }
+
     const response = await fetch(fullPath, {
         method,
-        body: body ? JSON.stringify(body) : undefined,
-        headers: {
-            ...jsonHeaders,
-            ...headers,
-        },
-        signal: AbortSignal.timeout(5000)
+        body: fetchBody,
+        headers: fetchHeaders,
     });
 
     if (!response.ok) {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import GetPresignedUrl from '@/app/api/s3/presign';
+import UploadImage from '@/app/api/s3/uploadImage';
 
 interface ImageFieldProps {
     friendlyName?: string;
@@ -64,31 +64,12 @@ const ImageField = ({
         onUploadStart?.();
 
         try {
-            // Sanitize filename to avoid issues
-            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-            
-            // 1. Solicite a presigned URL ao backend
-            const { url, public_url } = await GetPresignedUrl(sanitizedName, file.type, session);
-            
-            console.log('Presigned URL:', url);
-            console.log('public_url:', public_url);
+            // Pegue o schema_name da sessão se necessário
+            const publicUrl = await UploadImage(file, session);
 
-            // 2. Faça upload do arquivo para a presigned URL
-            const uploadRes = await fetch(url, {
-                method: 'PUT',
-                body: file,
-                headers: { 'Content-Type': file.type }
-            });
-            
-            if (!uploadRes.ok) {
-                const errorText = await uploadRes.text();
-                console.error('Upload response:', uploadRes.status, errorText);
-                throw new Error(`Erro ao enviar imagem para o S3: ${uploadRes.status} - ${errorText}`);
-            }
-
-            setValue(public_url);
+            setValue(publicUrl);
             setImgError(false);
-            onUploadComplete?.(public_url);
+            onUploadComplete?.(publicUrl);
         } catch (error: any) {
             console.error('Error uploading image:', error);
             
