@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField } from '../../components/modal/field';
+import { TextField, HiddenField, ImageField } from '../../components/modal/field';
 import Place, { ValidatePlaceForm } from '@/app/entities/place/place';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -70,7 +70,14 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
         <>
             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={place.name}/>
                 
-            <TextField friendlyName='Imagem' name='image_path' setValue={value => handleInputChange('image_path', value)} value={place.image_path} optional/>
+            <ImageField 
+                friendlyName='Imagem' 
+                name='image_path' 
+                setValue={value => handleInputChange('image_path', value)} 
+                value={place.image_path} 
+                optional
+                onUploadError={(error) => notifyError(error)}
+            />
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id}/>
 

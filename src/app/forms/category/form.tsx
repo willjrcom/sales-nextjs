@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { TextField, HiddenField, CheckboxField, SelectField } from '../../components/modal/field';
+import { TextField, CheckboxField, SelectField, HiddenField, ImageField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -13,13 +13,13 @@ import UpdateCategory from '@/app/api/category/update/category';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import RemovableItensComponent from './removable-ingredients';
-import AdditionalCategorySelector from './additional-category';
-import ComplementCategorySelector from './complement-category';
-import { useRouter } from 'next/navigation';
-import { addCategory, fetchCategories, removeCategory, updateCategory } from '@/redux/slices/categories';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
+import { fetchCategories, removeCategory, updateCategory } from '@/redux/slices/categories';
+import AdditionalCategorySelector from './additional-category';
+import ComplementCategorySelector from './complement-category';
+import RemovableItensComponent from './removable-ingredients';
+import { useRouter } from 'next/navigation';
 
 interface CategoryFormProps extends CreateFormsProps<Category> {
     setItem?: (item: Category) => void
@@ -28,7 +28,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
     const [category, setCategory] = useState<Category>(item || new Category());
-    const [selectedType, setSelectedType] = useState<TypeCategory>("Normal");
+    const [selectedType, setSelectedType] = useState<"Normal" | "Adicional" | "Complemento">("Normal");
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
@@ -43,7 +43,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     }, [item])
 
     useEffect(() => {
-        const setType: Record<TypeCategory, () => void> = {
+        const setType: Record<"Normal" | "Adicional" | "Complemento", () => void> = {
             "Normal": () => setCategory(prev => ({ ...prev, is_complement: false, is_additional: false })),
             "Complemento": () => setCategory(prev => ({ ...prev, is_complement: true, is_additional: false })),
             "Adicional": () => setCategory(prev => ({ ...prev, is_complement: false, is_additional: true }))
@@ -138,12 +138,13 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                 setValue={value => handleInputChange('name', value)}
                 value={category.name}
             />
-            <TextField
+            <ImageField
                 friendlyName="Imagem"
                 name="image_path"
                 setValue={value => handleInputChange('image_path', value)}
                 value={category.image_path}
                 optional
+                onUploadError={(error) => notifyError(error)}
             />
 
             {/* Bloco de Tipo de Categoria */}

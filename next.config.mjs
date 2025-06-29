@@ -5,12 +5,8 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'www.google.com',
-            },
-            {
-                protocol: 'https',
-                hostname: 'github.com',
-            },
+                hostname: '**.amazonaws.com'
+            }
         ],
     },
 };

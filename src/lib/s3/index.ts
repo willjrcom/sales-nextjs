@@ -5,8 +5,8 @@ import {
     ListObjectsV2Command,
 } from '@aws-sdk/client-s3';
 
-const REGION = process.env.AWS_REGION!;
-const BUCKET = process.env.S3_BUCKET_NAME!;
+const REGION = process.env.NEXT_PUBLIC_AWS_REGION!;
+const BUCKET = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
 
 export interface UploadParams {
     key: string;
