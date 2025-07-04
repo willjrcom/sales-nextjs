@@ -7,12 +7,8 @@ export default class Contact {
     type: ContactType = ContactType.Client;
     object_id?: string = '';
 
-    constructor(id?: string, ddd = '', number = '', type = ContactType.Client, object_id = '') { 
-        this.id = id; 
-        this.ddd = ddd; 
-        this.number = number; 
-        this.type = type; 
-        this.object_id = object_id; 
+    constructor(data: Partial<Contact> = {}) {
+        Object.assign(this, data);
     }
 };
 

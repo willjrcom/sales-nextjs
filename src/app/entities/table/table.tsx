@@ -5,10 +5,8 @@ export default class Table {
     name: string = "";
     is_available: boolean = true;
     
-    constructor(id = "", name = "", is_available = true) {
-        this.id = id;
-        this.name = name;
-        this.is_available = is_available;
+    constructor(data: Partial<Table> = {}) {
+        Object.assign(this, data);
     }
 }
 

@@ -3,9 +3,11 @@ import Person, { ValidatePersonForm } from "../person/person";
 
 export default class Client extends Person {
     id: string = '';
-    constructor(id: string = '', person: Person = new Person()) {
-        super(person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
-        this.id = id;
+    constructor(data: Partial<Client> = {}) {
+        super();
+
+        if (data.address) data.address.isClient = true;
+        Object.assign(this, data);
     }
 };
 

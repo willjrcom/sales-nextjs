@@ -53,38 +53,9 @@ export default class Address {
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
-constructor(
-    id?: string,
-    object_id = '',
-    street = '',
-    number = '',
-    complement = '',
-    reference = '',
-    neighborhood = '',
-    city = '',
-    uf = '',
-    cep = '',
-    delivery_tax: Decimal = new Decimal(0),
-    adress_type = '',
-    isClient: boolean = false,
-    coordinates?: Coordinates
-) {
-        this.id = id
-        this.object_id = object_id
-        this.street = street
-        this.number = number
-        this.complement = complement
-        this.reference = reference
-        this.neighborhood = neighborhood
-        this.city = city
-        this.uf = uf
-        this.cep = cep
-        this.delivery_tax = delivery_tax
-        this.isClient = isClient
-        this.coordinates = coordinates || new Coordinates()
-        this.address_type = adress_type
+    constructor(data: Partial<Address> = {}) {
+        Object.assign(this, data);
     }
-
     public getSmallAddress() {
         const parts = [
             this.street,
@@ -123,9 +94,8 @@ export class Coordinates {
     latitude: number = 0;
     longitude: number = 0;
 
-    constructor(latitude = 0, longitude = 0) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    constructor(data: Partial<Coordinates> = {}) {
+        Object.assign(this, data);
     }
 }
 

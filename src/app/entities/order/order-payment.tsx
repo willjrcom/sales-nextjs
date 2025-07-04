@@ -33,12 +33,9 @@ export class PaymentOrder {
     order_id: string = "";
     order_number: number = 0;
 
-    constructor(id = "", total_paid: Decimal = new Decimal(0), method: PayMethod = "Dinheiro", order_id = "", order_number = 0) {
-        this.id = id;
-        this.total_paid = total_paid;
-        this.method = method;
-        this.order_id = order_id;
-        this.order_number = order_number;
+    
+    constructor(data: Partial<PaymentOrder> = {}) {
+        Object.assign(this, data);
     }
 }
 

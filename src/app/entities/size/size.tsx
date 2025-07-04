@@ -6,12 +6,9 @@ export default class Size {
   is_active: boolean = true;
   category_id: string = "";
 
-  constructor(id = "", name = "", is_active = true, category_id = "") {
-    this.id = id;
-    this.name = name;
-    this.is_active = is_active;
-    this.category_id = category_id;
-  }
+  constructor(data: Partial<Size> = {}) {
+    Object.assign(this, data);
+}
 }
 
 const SchemaSize = z.object({

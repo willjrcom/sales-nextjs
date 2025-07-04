@@ -4,11 +4,19 @@ import User, { ValidateUserForm } from "../user/user";
 export default class Employee extends User {
     id: string = '';
     user_id: string = '';
+    permissions: Record<string, boolean> = {};
 
-    constructor(id: string = '', user_id: string = '', user: User = new User()) {
-        super(user_id, user);
-        this.id = id;
-        this.user_id = user_id;
+    constructor(data: Partial<Employee> = {}) {
+        super();
+        Object.assign(this, data);
+    }
+
+    setPermission(key: string, value: boolean) {
+        this.permissions[key] = value;
+    }
+
+    getPermission(key: string): boolean {
+        return !!this.permissions[key];
     }
 };
 

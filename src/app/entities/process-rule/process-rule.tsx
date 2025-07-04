@@ -11,14 +11,8 @@ export default class ProcessRule {
     total_order_process_late: number = 0;
     total_order_queue: number = 0;
 
-    constructor(id = "", name = "", order = 0, description = "", image_path = "", ideal_time = "", category_id = "") {
-        this.id = id;
-        this.name = name;
-        this.order = order;
-        this.description = description;
-        this.image_path = image_path;
-        this.ideal_time = ideal_time;
-        this.category_id = category_id;
+    constructor(data: Partial<ProcessRule> = {}) {
+        Object.assign(this, data);
     }
 }
 

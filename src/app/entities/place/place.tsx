@@ -9,11 +9,8 @@ export default class Place {
     is_available: boolean = true;
     tables: PlaceTable[] = [];
     
-    constructor(id = "", name = "", image_path = "", is_available = true) {
-        this.id = id;
-        this.name = name;
-        this.image_path = image_path;
-        this.is_available = is_available;
+    constructor(data: Partial<Place> = {}) {
+        Object.assign(this, data);
     }
 }
 

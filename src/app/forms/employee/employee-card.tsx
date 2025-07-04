@@ -7,7 +7,7 @@ import ButtonsModal from "@/app/components/modal/buttons-modal";
 import DeleteEmployee from "@/app/api/employee/delete/employee";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { removeEmployee } from "@/redux/slices/employees";
+import { removeEmployee, updateEmployee } from "@/redux/slices/employees";
 import RemoveUserFromCompany from "@/app/api/company/remove/company";
 import { removeUser } from "@/redux/slices/users";
 import { useSession } from "next-auth/react";
@@ -21,6 +21,8 @@ import EmployeePaymentsList from "./EmployeePaymentsList";
 import { EmployeePayment, EmployeeSalaryHistory } from "@/app/entities/employee/employee-payment";
 import SalaryHistoryModal from "./SalaryHistoryModal";
 import PaymentModal from "./PaymentModal";
+import CheckboxField from "@/app/components/modal/fields/checkbox";
+import UpdateEmployee from "@/app/api/employee/update/employee";
 
 interface EmployeeCardProps {
     item: Employee;
@@ -42,9 +44,17 @@ function EmployeeCard({ item }: EmployeeCardProps) {
     const modalHandler = useModal();
     const [salaryHistory, setSalaryHistory] = useState<EmployeeSalaryHistory[]>([]);
     const [payments, setPayments] = useState<EmployeePayment[]>([]);
-    const [tab, setTab] = useState<'info' | 'salary' | 'payments'>('info');
+    const [tab, setTab] = useState<'info' | 'salary' | 'payments' | 'permissions'>('info');
     const [showSalaryModal, setShowSalaryModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [permissions, setPermissions] = useState<Record<string, boolean>>(item.permissions);
+
+    // Lista de permissões disponíveis (deve ser igual ao backend)
+    const availablePermissions = [
+        { key: 'view_orders', label: 'Visualizar Pedidos' },
+        { key: 'edit_orders', label: 'Editar Pedidos' },
+        { key: 'manage_users', label: 'Gerenciar Usuários' },
+    ];
 
     useEffect(() => {
         if (item.id && data) {
@@ -53,15 +63,31 @@ function EmployeeCard({ item }: EmployeeCardProps) {
         }
     }, [item.id, data]);
 
+    useEffect(() => {
+        updatePermissions()
+    }, [permissions, data, item])
+
+    const updatePermissions = async () => {
+        if (!data) return
+
+        try {
+            const employeeWithPermissions = { ...item, permissions } as Employee
+            await UpdateEmployee(employeeWithPermissions, data)
+            dispatch(updateEmployee({ type: "UPDATE", payload: {id: employeeWithPermissions.id, changes: employeeWithPermissions}}));
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao atualizar permissões");
+        }
+    }
+
     const onDelete = async () => {
         if (!data) return;
         try {
             await DeleteEmployee(item.id, data);
             dispatch(removeEmployee(item.id));
-            
+
             await RemoveUserFromCompany(item.email, data)
             dispatch(removeUser(item.user_id))
-            
+
             notifySuccess('Funcionário removido com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
@@ -86,6 +112,7 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                 <button className={`px-4 py-2 rounded-t-lg font-semibold border-b-2 transition-colors ${tab === 'info' ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-blue-50'}`} onClick={() => setTab('info')}>Informações</button>
                 <button className={`px-4 py-2 rounded-t-lg font-semibold border-b-2 transition-colors ${tab === 'salary' ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-blue-50'}`} onClick={() => setTab('salary')}>Histórico Salarial</button>
                 <button className={`px-4 py-2 rounded-t-lg font-semibold border-b-2 transition-colors ${tab === 'payments' ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-blue-50'}`} onClick={() => setTab('payments')}>Pagamentos</button>
+                <button className={`px-4 py-2 rounded-t-lg font-semibold border-b-2 transition-colors ${tab === 'permissions' ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-blue-50'}`} onClick={() => setTab('permissions')}>Permissões</button>
             </div>
 
             {/* Tab content */}
@@ -184,6 +211,22 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                         />
                     )}
                 </>
+            )}
+            {tab === 'permissions' && (
+                <div className="flex flex-col gap-4">
+                    {availablePermissions.map((perm) => (
+                        <CheckboxField
+                            key={perm.key}
+                            friendlyName={perm.label}
+                            name={perm.key}
+                            value={permissions[perm.key] || false}
+                            setValue={(val) => {
+                                const boolVal = typeof val === 'function' ? val(permissions[perm.key] || false) : val;
+                                setPermissions(prev => ({ ...prev, [perm.key]: boolVal }));
+                            }}
+                        />
+                    ))}
+                </div>
             )}
         </div>
     );

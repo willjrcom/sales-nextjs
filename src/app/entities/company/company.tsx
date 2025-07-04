@@ -12,26 +12,8 @@ export default class Company {
     address: Address = new Address();
     preferences: Record<string, string> = {};
 
-    constructor(
-        id = "",
-        schema_name = "",
-        business_name = "",
-        email = "",
-        trade_name = "",
-        cnpj = "",
-        contacts = [""],
-        address = new Address(),
-        preferences: Record<string, string> = {}
-    ) {
-        this.id = id;
-        this.schema_name = schema_name;
-        this.business_name = business_name;
-        this.email = email;
-        this.trade_name = trade_name;
-        this.cnpj = cnpj;
-        this.contacts = contacts;
-        this.address = address;
-        this.preferences = preferences;
+    constructor(data: Partial<Company> = {}) {
+        Object.assign(this, data);
     }
 }
 
@@ -49,6 +31,6 @@ export const ValidateCompanyForm = (company: Company) => {
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return validatedFields.error.flatten().fieldErrors;
-    } 
+    }
     return {}
 };

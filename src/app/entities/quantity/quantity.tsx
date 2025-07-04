@@ -5,11 +5,9 @@ export default class Quantity {
   quantity: number = 0;
   category_id: string = "";
 
-  constructor(id = "", quantity = 0, category_id = "") {
-    this.id = id;
-    this.quantity = quantity;
-    this.category_id = category_id;
-  }
+  constructor(data: Partial<Quantity> = {}) {
+    Object.assign(this, data);
+}
 }
 
 const SchemaQuantity = z.object({

@@ -21,21 +21,8 @@ export default class Category {
     additional_categories: Category[] = [];
     complement_categories: Category[] = [];
     
-    constructor(id = "", name = "", image_path = "", need_print = false, use_process_rule = false, removable_ingredients: string[] = [], sizes: Size[] = [], products: Product[] = [], quantities: Quantity[] = [], process_rules: ProcessRule[] = [], is_additional = false, is_complement = false, additional_categories: Category[] = [], complement_categories: Category[] = []) {
-        this.id = id;
-        this.name = name;
-        this.image_path = image_path;
-        this.need_print = need_print;
-        use_process_rule = use_process_rule;
-        this.sizes = sizes;
-        this.removable_ingredients = removable_ingredients;
-        this.products = products;
-        this.quantities = quantities;
-        this.process_rules = process_rules;
-        this.is_additional = is_additional;
-        this.is_complement = is_complement;
-        this.additional_categories = additional_categories;
-        this.complement_categories = complement_categories;
+    constructor(data: Partial<Category> = {}) {
+        Object.assign(this, data);
     }
 }
 

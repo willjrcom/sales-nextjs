@@ -17,28 +17,9 @@ export default class Product {
     size: Size = new Size();
     is_available: boolean = true;
 
-    constructor(
-        id = "",
-        code = "",
-        image_path = "",
-        name = "",
-        description = "",
-        price: Decimal = new Decimal(0),
-        cost: Decimal = new Decimal(0),
-        category_id = "",
-        size_id = "",
-        is_available = true
-    ) {
-        this.id = id;
-        this.code = code;
-        this.image_path = image_path;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.cost = cost;
-        this.category_id = category_id;
-        this.size_id = size_id;
-        this.is_available = is_available;
+    
+    constructor(data: Partial<Product> = {}) {
+        Object.assign(this, data);
     }
 }
 

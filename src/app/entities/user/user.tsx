@@ -6,10 +6,9 @@ export default class User extends Person {
     id: string = '';
     companies: Company [] = [];
 
-    constructor(id: string = '', person: Person = new Person(), companies = []) {
-        super(person.image_path, person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
-        this.id = id;
-        this.companies = companies;
+    constructor(data: Partial<User> = {}) {
+        super();
+        Object.assign(this, data);
     }
 };
 
