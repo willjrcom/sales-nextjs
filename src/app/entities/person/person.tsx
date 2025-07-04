@@ -3,6 +3,7 @@ import Address, { SchemaAddress } from "../address/address";
 import Contact, { SchemaContact } from "../contact/contact";
 
 export default class Person {
+    image_path: string = "";
     name: string = "";
     email: string = "";
     cpf: string = "";
@@ -10,7 +11,8 @@ export default class Person {
     contact: Contact = new Contact();
     address: Address = new Address();
 
-    constructor(name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), isClient: boolean = false) {
+    constructor(image_path: string = "", name: string = "", email: string = "", cpf: string = "", birthday: string = "", contact: Contact = new Contact(), address: Address = new Address(), isClient: boolean = false) {
+        this.image_path = image_path;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
@@ -41,6 +43,6 @@ export const ValidatePersonForm = (person: Person) => {
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return validatedFields.error.flatten().fieldErrors;
-    } 
+    }
     return {}
 };

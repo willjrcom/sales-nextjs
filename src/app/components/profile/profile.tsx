@@ -1,7 +1,8 @@
- 'use client';
+'use client';
 import { useModal } from "@/app/context/modal/context";
 import User from "@/app/entities/user/user";
 import UserForm from "@/app/forms/user/form-profile";
+import Image from "next/image";
 import React from "react";
 
 type EmployeeUserProfileProps = {
@@ -17,17 +18,19 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
         const onClose = () => {
             modalHandler.hideModal("show-user")
         }
-        
+
         modalHandler.showModal(
             "show-user",
             "Dados Pessoais",
             <>
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
                     {photoUrl ? (
-                        <img
-                            src={photoUrl}
+                        <Image
+                            src={user.image_path}
                             alt={`${user.name}'s profile`}
                             className="w-full h-full object-cover"
+                            width={100}
+                            height={100}
                         />
                     ) : (
                         <span className="text-lg font-bold text-gray-600">{getInitial(user.name)}</span>

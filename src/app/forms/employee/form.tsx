@@ -6,21 +6,18 @@ import Employee, { ValidateEmployeeForm } from '@/app/entities/employee/employee
 import { useSession } from 'next-auth/react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import CreateFormsProps from '../create-forms-props';
-import DeleteEmployee from '@/app/api/employee/delete/employee';
 import NewEmployee from '@/app/api/employee/new/employee';
 import UpdateEmployee from '@/app/api/employee/update/employee';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { ToIsoDate } from '@/app/utils/date';
-import { addEmployee, removeEmployee, updateEmployee } from '@/redux/slices/employees';
+import { addEmployee, updateEmployee } from '@/redux/slices/employees';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import { HiddenField } from '@/app/components/modal/field';
 import User from '@/app/entities/user/user';
 import NewUser from '@/app/api/user/new/user';
-import RemoveUserFromCompany from '@/app/api/company/remove/company';
-import { removeUser } from '@/redux/slices/users';
 import AddUserToCompany from '@/app/api/company/add/company';
 
 interface EmployeeFormProps extends CreateFormsProps<Employee> {

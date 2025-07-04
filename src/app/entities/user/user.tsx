@@ -7,7 +7,7 @@ export default class User extends Person {
     companies: Company [] = [];
 
     constructor(id: string = '', person: Person = new Person(), companies = []) {
-        super(person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
+        super(person.image_path, person.name, person.email, person.cpf, person.birthday, person.contact, person.address, true);
         this.id = id;
         this.companies = companies;
     }
