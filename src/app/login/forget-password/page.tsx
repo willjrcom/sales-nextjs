@@ -7,21 +7,62 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { notifyError } from '@/app/utils/notifications';
+import { notifyError, notifySuccess } from '@/app/utils/notifications';
+import { HiOutlineMail, HiOutlineCheckCircle } from "react-icons/hi";
 
 const RegisterForm = () => {
     const [email, setEmail] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
     const router = useRouter();
 
     const submit = async () => {
         try {
             await ForgetUserPassword(email);
-            setEmail('');
-            router.push('/login');
+            setIsSuccess(true);
+            notifySuccess('Email de redefinição enviado com sucesso!');
 
         } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao alterar senha");
+            notifyError(error.message || "Erro ao enviar email de redefinição");
         }
+    }
+
+    if (isSuccess) {
+        return (
+            <div className="flex h-screen">
+                <div className="w-1/2 bg-yellow-500 relative">
+                    <Image src="/img_login.jpg" alt="Register" fill style={{ objectFit: 'cover' }} />
+                    <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
+                        <h2 className="text-2xl mb-2">GazalTech</h2>
+                        <p>Verifique sua caixa de entrada.</p>
+                    </div>
+                </div>
+                <div className="w-1/2 flex flex-col items-center justify-center bg-white">
+                    <div className="text-center max-w-md px-8">
+                        <div className="bg-green-100 text-green-600 rounded-full p-4 mb-6 mx-auto w-20 h-20 flex items-center justify-center">
+                            <HiOutlineCheckCircle size={40} />
+                        </div>
+                        <h2 className="text-2xl mb-4 font-bold text-gray-800">Email Enviado!</h2>
+                        <p className="text-gray-600 mb-6">
+                            Enviamos um email para <strong>{email}</strong> com instruções para redefinir sua senha.
+                        </p>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <HiOutlineMail className="text-blue-600" size={20} />
+                                <p className="text-blue-800 text-sm">
+                                    Verifique sua caixa de entrada e também a pasta de spam
+                                </p>
+                            </div>
+                        </div>
+                        <Link 
+                            href="/login" 
+                            className="inline-block w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                        >
+                            Voltar ao Login
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -30,7 +71,7 @@ const RegisterForm = () => {
                 <Image src="/img_login.jpg" alt="Register" fill style={{ objectFit: 'cover' }} />
                 <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
                     <h2 className="text-2xl mb-2">GazalTech</h2>
-                    <p>Crie sua conta agora mesmo.</p>
+                    <p>Redefina sua senha.</p>
                 </div>
             </div>
             <div className="w-1/2 flex flex-col items-center bg-white pt-10">
