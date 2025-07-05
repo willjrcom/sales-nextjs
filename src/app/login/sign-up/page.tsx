@@ -4,6 +4,7 @@ import RequestError from '@/app/utils/error';
 import NewUser from '@/app/api/user/new/user';
 import ErrorForms from '@/app/components/modal/error-forms';
 import { TextField } from '@/app/components/modal/field';
+import PasswordField from '@/app/components/modal/fields/password';
 import Person from '@/app/entities/person/person';
 import User, { ValidateUserForm } from '@/app/entities/user/user';
 import PersonForm from '@/app/forms/person/form';
@@ -12,7 +13,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { notifyError } from '@/app/utils/notifications';
+import { notifyError, notifySuccess } from '@/app/utils/notifications';
 
 const RegisterForm = () => {
     const [password, setPassword] = useState('');
@@ -29,9 +30,10 @@ const RegisterForm = () => {
     if (!isMounted) {
         return null; // Evita renderizar HTML até o componente estar pronto
     }
+    
     const submit = async () => {
         if (password !== confirmPassword && password.length > 0) {
-            notifyError('As senhas nao conferem');
+            notifyError('As senhas não conferem');
             return
         } else if (password.length < 8) {
             notifyError('A senha deve ter pelo menos 8 caracteres');
@@ -52,10 +54,11 @@ const RegisterForm = () => {
         try {
             await NewUser({ ...user } as User, password);
             setUser(new Person());
+            notifySuccess('Usuário cadastrado com sucesso!');
             router.push('/login');
 
         } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao cadastrar usuario");
+            notifyError(error.message || "Erro ao cadastrar usuário");
         }
     }
 
@@ -80,8 +83,21 @@ const RegisterForm = () => {
                     <div className="flex flex-col">
                         <ErrorForms errors={errors} setErrors={setErrors} />
                         <PersonForm person={user} setPerson={setUser} isEmployee />
-                        <TextField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
-                        <TextField friendlyName='Confirmar Senha' name='confirmPassword' placeholder='Confirme sua senha' setValue={setConfirmPassword} value={confirmPassword} />
+                        <PasswordField 
+                            friendlyName='Senha' 
+                            name='password' 
+                            placeholder='Digite sua senha' 
+                            setValue={setPassword} 
+                            value={password}
+                            showStrengthIndicator={true}
+                        />
+                        <PasswordField 
+                            friendlyName='Confirmar Senha' 
+                            name='confirmPassword' 
+                            placeholder='Confirme sua senha' 
+                            setValue={setConfirmPassword} 
+                            value={confirmPassword}
+                        />
                     </div>
                 </div>
                 <div className="w-full max-w-md px-8 py-4 bg-white">
