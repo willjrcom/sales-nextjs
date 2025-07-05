@@ -29,11 +29,35 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
         setLoading(true);
         try {
             const { id, ...payload } = form;
+            
+            // Converte a data para formato ISO se fornecida
+            if (payload.start_date) {
+                const date = new Date(payload.start_date);
+                payload.start_date = date.toISOString();
+            }
+
             const newHistory = await createEmployeeSalaryHistory(employeeId, payload, data);
             notifySuccess("Histórico salarial lançado!");
             onSuccess(newHistory);
         } catch (err: any) {
-            notifyError(err?.message || "Erro ao lançar histórico salarial");
+            console.error('Erro detalhado:', err);
+            
+            // Extrai a mensagem de erro de forma mais robusta
+            let errorMessage = "Erro ao lançar histórico salarial";
+            
+            if (err && typeof err === 'object') {
+                if (err.message) {
+                    errorMessage = err.message;
+                } else if (err.error) {
+                    errorMessage = err.error;
+                } else if (err.toString) {
+                    errorMessage = err.toString();
+                }
+            } else if (typeof err === 'string') {
+                errorMessage = err;
+            }
+            
+            notifyError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -52,23 +76,23 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
                 <SelectField
                     name="salary_type"
                     friendlyName="Tipo"
-                    selectedValue={form.salary_type || "Fixed"}
+                    selectedValue={form.salary_type}
                     setSelectedValue={value => handleInputChange('salary_type', value)}
                     values={[
-                        { id: "Fixed", name: "Salário Fixo" },
-                        { id: "Variable", name: "Salário Variável" },
-                        { id: "Mixed", name: "Salário Fixo + Variável" },
+                        { id: "Fixo", name: "Salário Fixo" },
+                        { id: "Variavel", name: "Salário Variável" },
+                        { id: "F + V", name: "Salário Fixo + Variável" },
                     ]}
                 />
                 <PriceField name="baseSalary" friendlyName="Base salarial" placeholder="Salário Base" value={form.base_salary || 0} setValue={value => handleInputChange('base_salary', value)} />
                 <PriceField name="hourlyRate" friendlyName="Valor por hora adicional" placeholder="Valor Hora" value={form.hourly_rate || 0} setValue={value => handleInputChange('hourly_rate', value)} />
-                <NumberField
+                {/* <NumberField
                     name="commission"
                     friendlyName="Comissão"
                     placeholder="Comissão"
                     value={typeof form.commission === "number" ? form.commission : Number(form.commission) || 0}
                     setValue={value => handleInputChange('commission', value)}
-                />
+                /> */}
                 <div className="flex justify-end gap-2 mt-4">
                     <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
                     <button type="submit" disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded">{loading ? "Salvando..." : "Salvar"}</button>

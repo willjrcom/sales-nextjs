@@ -22,7 +22,7 @@ const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSa
                         <th className="px-4 py-3 text-left font-semibold text-gray-700">Tipo</th>
                         <th className="px-4 py-3 text-left font-semibold text-gray-700">Salário Base</th>
                         <th className="px-4 py-3 text-left font-semibold text-gray-700">Hora</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">Comissão</th>
+                        {/* <th className="px-4 py-3 text-left font-semibold text-gray-700">Comissão</th> */}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -50,11 +50,11 @@ const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSa
                                 </td>
                                 <td className="px-4 py-3 font-medium text-gray-900">R$ {new Decimal(h.base_salary).toFixed(2)}</td>
                                 <td className="px-4 py-3 font-medium text-gray-900">R$ {new Decimal(h.hourly_rate).toFixed(2)}</td>
-                                <td className="px-4 py-3">
+                                {/* <td className="px-4 py-3">
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         {new Decimal(h.commission).mul(100).toFixed(2)}%
                                     </span>
-                                </td>
+                                </td> */}
                             </tr>
                         ))
                     )}

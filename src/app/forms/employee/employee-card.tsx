@@ -58,24 +58,52 @@ function EmployeeCard({ item }: EmployeeCardProps) {
 
     useEffect(() => {
         if (item.id && data) {
-            getEmployeeSalaryHistory(item.id, data).then((history) => setSalaryHistory(history.map((h: any) => new EmployeeSalaryHistory(h))));
-            getEmployeePayments(item.id, data).then((payments) => setPayments(payments.map((p: any) => new EmployeePayment(p))));
+            getEmployeeSalaryHistory(item.id, data)
+                .then((history) => setSalaryHistory(history.map((h: any) => new EmployeeSalaryHistory(h))))
+                .catch((error) => {
+                    notifyError('Erro ao carregar histórico salarial');
+                });
+            
+            getEmployeePayments(item.id, data)
+                .then((payments) => setPayments(payments.map((p: any) => new EmployeePayment(p))))
+                .catch((error) => {
+                    notifyError('Erro ao carregar pagamentos');
+                });
         }
     }, [item.id, data]);
 
     useEffect(() => {
-        updatePermissions()
-    }, [permissions, data, item])
+        if (permissions && Object.keys(permissions).length > 0) {
+            updatePermissions();
+        }
+    }, [permissions, data, item]);
 
     const updatePermissions = async () => {
-        if (!data) return
+        if (!data) return;
 
         try {
-            const employeeWithPermissions = { ...item, permissions } as Employee
-            await UpdateEmployee(employeeWithPermissions, data)
+            const employeeWithPermissions = { ...item, permissions } as Employee;
+            await UpdateEmployee(employeeWithPermissions, data);
             dispatch(updateEmployee({ type: "UPDATE", payload: {id: employeeWithPermissions.id, changes: employeeWithPermissions}}));
         } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao atualizar permissões");
+            console.error('Erro ao atualizar permissões:', error);
+            
+            // Extrai a mensagem de erro de forma mais robusta
+            let errorMessage = "Erro ao atualizar permissões";
+            
+            if (error && typeof error === 'object') {
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.error) {
+                    errorMessage = error.error;
+                } else if (error.toString) {
+                    errorMessage = error.toString();
+                }
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            
+            notifyError(errorMessage);
         }
     }
 

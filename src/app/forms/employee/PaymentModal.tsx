@@ -29,7 +29,14 @@ export default function PaymentModal({ employeeId, onClose, onSuccess }: Payment
         setLoading(true);
 
         try {
-            const newPayment = await createEmployeePayment(employeeId, form, data);
+            // Converte a data para formato ISO se fornecida
+            const paymentData = { ...form };
+            if (paymentData.payment_date) {
+                const date = new Date(paymentData.payment_date);
+                paymentData.payment_date = date.toISOString();
+            }
+
+            const newPayment = await createEmployeePayment(employeeId, paymentData, data);
             notifySuccess("Pagamento lançado!");
             onSuccess(newPayment);
         } catch (err: any) {
