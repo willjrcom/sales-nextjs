@@ -63,7 +63,7 @@ const PageEmployee = () => {
                     }}
                     onClick={() => setShowDeleted(v => !v)}
                 >
-                    {showDeleted ? 'Mostrar Ativos' : 'Mostrar Deletados'}
+                    {showDeleted ? 'Mostrar Ativos' : 'Mostrar Demitidos'}
                 </button>
             </div>
             <CrudLayout

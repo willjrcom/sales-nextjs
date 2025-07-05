@@ -34,13 +34,16 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     const { data } = useSession();
 
     useEffect(() => {
-        setEmployee(prev => ({ ...prev, user: person as User }));
+        const newEmployee = new Employee();
+        Object.assign(newEmployee, { ...employee, user: person as User });
+        setEmployee(newEmployee);
     }, [person]);
 
     const handleInputChange = (field: keyof Employee, value: any) => {
-        setEmployee(prev => ({ ...prev, [field]: value }));
+        const newEmployee = new Employee();
+        Object.assign(newEmployee, { ...employee, [field]: value });
+        setEmployee(newEmployee);
     };
-
 
     const submitEmployee = async () => {
         if (isUpdate) {
@@ -52,7 +55,8 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
 
     const updateUserEmployee = async () => {
         if (!data) return;
-        let newEmployee: Employee = { ...employee, ...person };
+        const newEmployee = new Employee();
+        Object.assign(newEmployee, { ...employee, ...person });
 
         if (newEmployee.birthday) {
             newEmployee.birthday = ToIsoDate(newEmployee.birthday)
@@ -75,7 +79,8 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
 
     const createUserAndEmployee = async () => {
         if (!data) return;
-        let newEmployee: Employee = { ...employee, ...person };
+        const newEmployee = new Employee();
+        Object.assign(newEmployee, { ...employee, ...person });
 
         if (newEmployee.birthday) {
             newEmployee.birthday = ToIsoDate(newEmployee.birthday)
