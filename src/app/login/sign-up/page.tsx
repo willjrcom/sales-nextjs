@@ -77,7 +77,7 @@ const RegisterForm = () => {
                     <p>Crie sua conta agora mesmo.</p>
                 </div>
             </div>
-            <div className="w-1/2 h-5/6 flex flex-col items-center bg-white pt-10">
+            <div className="w-1/2 h-screen flex flex-col items-center bg-white pt-10">
                 <h2 className="text-2xl mb-6">Cadastro</h2>
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto flex-1">
                     <div className="flex flex-col">
