@@ -37,7 +37,8 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
             await update({
                 ...data,
                 user: {
-                    person: newUser
+                    ...data.user,
+                    user: newUser
                 },
             })
             notifySuccess('Perfil atualizado com sucesso');
