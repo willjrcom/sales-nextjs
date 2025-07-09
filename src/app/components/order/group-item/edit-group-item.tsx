@@ -78,7 +78,7 @@ const GroupItemCard = () => {
 
     const containItems = groupItem?.items && groupItem?.items.length > 0
     const isGroupItemStaging = groupItem?.status === "Staging"
-    console.log(groupItem)
+    
     return (
         <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
             <div className="flex justify-between items-center">

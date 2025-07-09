@@ -1,15 +1,18 @@
-import RequestApi from "../../../request";
+import RequestApi, { AddAccessToken } from "../../../request";
+import { Session } from "next-auth";
 
 interface UpdateUserProps {
     email: string;
-    password: string;
+    current_password: string;
+    new_password: string;
 }
 
-const UpdateUserPassword = async (body: UpdateUserProps): Promise<string> => {
+const UpdateUserPassword = async (body: UpdateUserProps, session: Session): Promise<string> => {
     const response = await RequestApi<UpdateUserProps, string>({
         path: "/user/update/password",
         method: "PATCH",
         body: body,
+        headers: await AddAccessToken(session),
     });
     return response.data
 };

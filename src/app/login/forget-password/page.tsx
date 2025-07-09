@@ -75,7 +75,6 @@ const RegisterForm = () => {
                                 onClick={async () => {
                                     setJwtResult(null);
                                     try {
-                                        console.log("validate")
                                         const res = await ValidatePasswordResetToken(jwtToken);
                                         setJwtResult(res);
                                     } catch (err: any) {

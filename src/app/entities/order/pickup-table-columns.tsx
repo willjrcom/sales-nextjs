@@ -13,7 +13,6 @@ const PickupOrderColumns = (): ColumnDef<Order>[] => [
     header: 'Nome',
     accessorFn: row => {
       const name = row.pickup?.name
-      console.log(row)
       if (!name) return 'Sem cliente'
 
       return name.substring(0, 15);

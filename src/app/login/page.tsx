@@ -49,10 +49,8 @@ const LoginForm = () => {
         remember,
       });
 
-      console.log('Resposta do signIn:', res); // Debug
 
       if (res?.error) {
-        console.log('Erro recebido:', res.error); // Debug
         notifyError(res.error);
       } else if (res?.ok) {
         // Salva ou limpa credenciais conforme opção
@@ -72,7 +70,6 @@ const LoginForm = () => {
       }
 
     } catch (err) {
-      console.log('Erro capturado no catch:', err); // Debug
       notifyError('Algo deu errado: ' + err);
     } finally {
       setLoading(false);

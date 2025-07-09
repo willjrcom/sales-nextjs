@@ -123,7 +123,12 @@ function CompanySelection() {
 
     return (
         <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100 text-black">
-            <div className="absolute top-4 right-4 z-10">
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-4">
+                <div className="text-right">
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                        Bem-vindo, {data?.user?.user?.name?.split(' ')[0] || 'Usuário'}
+                    </h1>
+                </div>
                 {data?.user && <EmployeeUserProfile user={data?.user.user} />}
             </div>
             {loadingCompanies && (

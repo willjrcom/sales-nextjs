@@ -53,7 +53,6 @@ const DeliveryOrderToShip = () => {
     }, [status]);
 
     useEffect(() => {
-        console.log(Object.values(ordersSlice.entities))
         const orders = Object.values(ordersSlice.entities).filter((order) => order.delivery?.status === 'Ready')
         setOrders(orders);
     }, [ordersSlice.entities]);

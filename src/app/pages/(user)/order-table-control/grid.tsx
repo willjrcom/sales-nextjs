@@ -97,7 +97,6 @@ const DragAndDropGrid = () => {
 
     useEffect(() => {
         setTableOrders(Object.values(tableOrdersSlice.entities));
-        console.log(Object.values(tableOrdersSlice.entities))
     }, [tableOrdersSlice.entities])
 
     useEffect(() => {
