@@ -7,10 +7,9 @@ import React from "react";
 
 type EmployeeUserProfileProps = {
     user: User;
-    photoUrl?: string;
 };
 
-const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
+const EmployeeUserProfile = ({ user }: EmployeeUserProfileProps) => {
     const getInitial = (name?: string) => name?.charAt(0).toUpperCase(); // Pega a primeira letra do nome
     const modalHandler = useModal();
 
@@ -23,8 +22,8 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
             "show-user",
             "Dados Pessoais",
             <>
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
-                    {photoUrl ? (
+                <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
+                    {user.image_path ? (
                         <Image
                             src={user.image_path}
                             alt={`${user.name}'s profile`}
@@ -49,9 +48,9 @@ const EmployeeUserProfile = ({ user, photoUrl }: EmployeeUserProfileProps) => {
                 className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md cursor-pointer"
                 title={user.name}
             >
-                {photoUrl ? (
+                {user.image_path ? (
                     <img
-                        src={photoUrl}
+                        src={user.image_path}
                         alt={`${user.name}'s profile`}
                         className="w-full h-full object-cover"
                     />

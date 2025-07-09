@@ -23,6 +23,7 @@ import Company from '@/app/entities/company/company';
 import Refresh from '@/app/components/crud/refresh';
 import { FetchItemsArgs } from '@/redux/slices/generics';
 import { notifyError } from '@/app/utils/notifications';
+import EmployeeUserProfile from '@/app/components/profile/profile';
 
 export default function Page() {
     return (
@@ -122,6 +123,9 @@ function CompanySelection() {
 
     return (
         <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100 text-black">
+            <div className="absolute top-4 right-4 z-10">
+                {data?.user && <EmployeeUserProfile user={data?.user.user} />}
+            </div>
             {loadingCompanies && (
                 <div className="flex justify-center items-center h-64 mb-10">
                     <Loading />
@@ -169,11 +173,12 @@ function CompanySelection() {
                 </div>
             </button>
 
-            <div className="text-blue-500 mt-4 underline hover:text-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            <button 
                 onClick={() => signOut({ callbackUrl: '/login', redirect: true })}
+                className="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
             >
                 Voltar ao login
-            </div>
+            </button>
         </div>
     );
 }

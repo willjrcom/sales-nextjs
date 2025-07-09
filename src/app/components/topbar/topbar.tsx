@@ -62,7 +62,7 @@ const Topbar = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center bg-gray-800 text-white h-16 w-full px-4 shadow-sm">
+      <header className="flex justify-between items-center bg-gray-800 text-white h-16 w-full px-4 shadow-sm relative">
       <div className="flex space-x-4">
         <TopbarItem label="Pedidos" href="/pages/order-control" />
         <TopbarItem label="Mesas" href="/pages/order-table-control" />
@@ -71,7 +71,7 @@ const Topbar = () => {
         {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
       </div>
 
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <TopbarItem label="Turno" href="/pages/shift" color='green'/>
           <button
             onClick={handleNotifications}
@@ -79,7 +79,9 @@ const Topbar = () => {
           >
             <IoIosNotifications className="text-xl text-gray-300" />
           </button>
-          {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
+          <div className="absolute top-4 right-4">
+            {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
+          </div>
         </div>
       </header>
       <Toaster
