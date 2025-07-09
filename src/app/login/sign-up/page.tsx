@@ -90,6 +90,8 @@ const RegisterForm = () => {
                             setValue={setPassword} 
                             value={password}
                             showStrengthIndicator={true}
+                            confirmPassword={confirmPassword}
+                            showConfirmValidation={true}
                         />
                         <PasswordField 
                             friendlyName='Confirmar Senha' 
@@ -97,6 +99,8 @@ const RegisterForm = () => {
                             placeholder='Confirme sua senha' 
                             setValue={setConfirmPassword} 
                             value={confirmPassword}
+                            confirmPassword={password}
+                            showConfirmValidation={false}
                         />
                     </div>
                 </div>

@@ -11,6 +11,8 @@ interface TextFieldProps {
     pattern?: string;
     optional?: boolean;
     showStrengthIndicator?: boolean;
+    confirmPassword?: string;
+    showConfirmValidation?: boolean;
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -44,7 +46,9 @@ const PasswordField = ({
     setValue, 
     pattern, 
     optional,
-    showStrengthIndicator = false
+    showStrengthIndicator = false,
+    confirmPassword,
+    showConfirmValidation = false
 }: TextFieldProps) => {
     const [showPassword, setShowPassword] = useState(false);
     const { score, checks } = calculatePasswordStrength(value);
@@ -136,6 +140,29 @@ const PasswordField = ({
                             {checks.symbols ? <HiOutlineCheck size={12} /> : <HiOutlineX size={12} />}
                             Caractere especial
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Validação de confirmação de senha */}
+            {showConfirmValidation && confirmPassword !== undefined && (
+                <div className="mt-2">
+                    <div className={`flex items-center gap-1 text-xs ${
+                        value === confirmPassword && value.length > 0 
+                            ? 'text-green-600' 
+                            : value.length > 0 
+                                ? 'text-red-600' 
+                                : 'text-gray-400'
+                    }`}>
+                        {value === confirmPassword && value.length > 0 ? (
+                            <HiOutlineCheck size={12} />
+                        ) : value.length > 0 ? (
+                            <HiOutlineX size={12} />
+                        ) : null}
+                        {value.length > 0 
+                            ? (value === confirmPassword ? 'Senhas conferem' : 'Senhas não conferem')
+                            : 'Digite a senha para confirmar'
+                        }
                     </div>
                 </div>
             )}

@@ -136,6 +136,8 @@ const RegisterForm = () => {
                                         setValue={setNewPassword}
                                         value={newPassword}
                                         showStrengthIndicator={true}
+                                        confirmPassword={confirmPassword}
+                                        showConfirmValidation={true}
                                     />
                                     <PasswordField
                                         friendlyName="Confirmar Nova Senha"
@@ -143,6 +145,8 @@ const RegisterForm = () => {
                                         placeholder="Confirme a nova senha"
                                         setValue={setConfirmPassword}
                                         value={confirmPassword}
+                                        confirmPassword={newPassword}
+                                        showConfirmValidation={false}
                                     />
                                     <div className="flex justify-end gap-2 mt-4">
                                         <button type="button" onClick={() => setShowPasswordModal(false)} className="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
