@@ -90,6 +90,7 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
       <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
       <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
+      <SidebarLinkItem icon={FaTh} label="Estoque" href="/pages/stock" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <div className="mt-auto flex flex-col">
         {onToggleAdmin && (

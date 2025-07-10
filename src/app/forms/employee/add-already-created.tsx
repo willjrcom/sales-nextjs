@@ -80,7 +80,7 @@ const AddEmployeeAlreadyCreated = () => {
                             <span className="text-yellow-700 font-semibold">Usuário não encontrado. Cadastre um novo funcionário:</span>
                         </div>
                         <div className="bg-white border border-gray-100 rounded-lg p-4">
-                            <EmployeeForm item={new Employee(undefined, undefined, new User('', new Person('', '', cpfToSearch)))} />
+                            <EmployeeForm item={new Employee({ cpf: cpfToSearch })} />
                         </div>
                     </div>
                 )}
@@ -101,7 +101,7 @@ const CardUser = ({ user }: CardUserProps) => {
     const newEmployee = async (user: User) => {
         if (!data) return;
 
-        const employee = new Employee(undefined, user.id, user);
+        const employee = new Employee({ user_id: user.id, ...user });
         try {
             await AddUserToCompany(user.email, data)
             const response = await NewEmployee(user.id, data);
