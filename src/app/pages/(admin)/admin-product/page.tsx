@@ -9,6 +9,11 @@ export default function ProductAdminPage() {
     'sales-by-category',
     'sales-by-size',
     'additional-items-sold',
+    // Profitability reports
+    'product-profitability',
+    'category-profitability',
+    'low-profit-products',
+    'overall-profitability',
   ];
   return <ShowReports name='Produtos' reportIds={reportIds} />;
 }

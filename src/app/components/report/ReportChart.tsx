@@ -65,18 +65,40 @@ export default function ReportChart({
         } else {
           reqBody = { schema, ...(body || {}) };
         }
-        const response = await RequestApi<Record<string, any>, any[]>({
+        const response = await RequestApi<Record<string, any>, any[] | any>({
           path,
           method,
           body: reqBody,
           headers,
         });
         const data = response.data;
-        const newLabels = data.map((item) => {
-          const v = item[labelKey];
-          return v instanceof Date ? v.toISOString() : String(v);
-        });
-        const newValues = data.map((item) => Number(item[dataKey]));
+        
+        // Handle both array and single object responses
+        let newLabels: string[] = [];
+        let newValues: number[] = [];
+        
+        if (Array.isArray(data)) {
+          // Array response (most reports)
+          newLabels = data.map((item) => {
+            const v = item[labelKey];
+            return v instanceof Date ? v.toISOString() : String(v);
+          });
+          newValues = data.map((item) => {
+            const value = item[dataKey];
+            // Handle null/undefined values for profitability reports
+            if (value === null || value === undefined) {
+              return 0;
+            }
+            return Number(value);
+          });
+        } else {
+          // Single object response (like overall-profitability)
+          const value = data[dataKey];
+          const label = data[labelKey];
+          newLabels = [label instanceof Date ? label.toISOString() : String(label)];
+          newValues = [value === null || value === undefined ? 0 : Number(value)];
+        }
+        
         setLabels(newLabels);
         setValues(newValues);
       } catch (err: RequestError | any) {

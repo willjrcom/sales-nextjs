@@ -10,7 +10,6 @@ import { FilterDateProps } from './filter';
 interface ReportProps {
     name: string;
     reportIds: string[];
-
 }
 
 const ShowReports = ({ name, reportIds }: ReportProps) => {
@@ -23,7 +22,15 @@ const ShowReports = ({ name, reportIds }: ReportProps) => {
         <div className="p-4 ml-52">
             <PageTitle title={name} tooltip={"Relatórios de " + name} />
             {reportIds.length == 0 && <p>Nenhum relatório disponível</p>}
-            {reports.map((config) => <ReportCard config={config} date={date} setDate={setDate} key={config.id} />)}
+
+            {/* Grid responsivo: 1 coluna em mobile, 2 colunas em desktop */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {reports.map((config) => (
+                    <div key={config.id} className="w-full">
+                        <ReportCard config={config} date={date} setDate={setDate} />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
