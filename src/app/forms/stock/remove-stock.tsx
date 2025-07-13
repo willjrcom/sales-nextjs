@@ -107,7 +107,7 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
             <TextField
                 friendlyName="Quantidade"
                 name="quantity"
-                setValue={(value) => handleInputChange('quantity', new Decimal(value))}
+                setValue={(value) => handleInputChange('quantity', new Decimal(value || 0))}
                 value={movement.quantity.toString()}
             />
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { TextField, CheckboxField, NumberField } from '../../components/modal/field';
+import { TextField, CheckboxField } from '../../components/modal/field';
 import Stock, { ValidateStockForm } from '@/app/entities/stock/stock';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -18,6 +18,7 @@ import { updateCategory } from '@/redux/slices/categories';
 import { SelectField } from '@/app/components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Decimal from 'decimal.js';
+import { addStock, updateStock } from '@/redux/slices/stock';
 
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
@@ -42,9 +43,11 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
         try {
             if (isUpdate) {
                 await UpdateStock(stock, data);
+                dispatch(updateStock({ type: "UPDATE", payload: {id: stock.id, changes: stock}}));
                 notifySuccess(`Estoque atualizado com sucesso`);
             } else {
                 await NewStock(stock, data);
+                dispatch(addStock({...stock}));
                 notifySuccess(`Controle de estoque criado com sucesso`);
             }
             
@@ -105,21 +108,21 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             <TextField
                 friendlyName="Estoque Atual"
                 name="current_stock"
-                setValue={(value) => handleInputChange('current_stock', new Decimal(value))}
+                setValue={(value) => handleInputChange('current_stock', new Decimal(value || 0))}
                 value={stock.current_stock.toString()}
             />
 
             <TextField
                 friendlyName="Estoque Mínimo"
                 name="min_stock"
-                setValue={(value) => handleInputChange('min_stock', new Decimal(value))}
+                setValue={(value) => handleInputChange('min_stock', new Decimal(value || 0))}
                 value={stock.min_stock.toString()}
             />
 
             <TextField
                 friendlyName="Estoque Máximo"
                 name="max_stock"
-                setValue={(value) => handleInputChange('max_stock', new Decimal(value))}
+                setValue={(value) => handleInputChange('max_stock', new Decimal(value || 0))}
                 value={stock.max_stock.toString()}
             />
 

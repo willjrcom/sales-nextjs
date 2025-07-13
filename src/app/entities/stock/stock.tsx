@@ -8,7 +8,7 @@ export default class Stock {
     current_stock: Decimal = new Decimal(0);
     min_stock: Decimal = new Decimal(0);
     max_stock: Decimal = new Decimal(1000);
-    unit: string = "unidades";
+    unit: string = "";
     is_active: boolean = true;
     created_at: string = "";
     updated_at: string = "";

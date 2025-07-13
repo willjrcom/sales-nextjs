@@ -107,7 +107,7 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
             <TextField
                 friendlyName="Quantidade"
                 name="quantity"
-                setValue={(value) => handleInputChange('quantity', new Decimal(value))}
+                setValue={(value) => handleInputChange('quantity', new Decimal(value || 0))}
                 value={movement.quantity.toString()}
             />
 
@@ -122,7 +122,7 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
             <TextField
                 friendlyName="Custo Unitário"
                 name="unit_cost"
-                setValue={(value) => handleInputChange('unit_cost', new Decimal(value))}
+                setValue={(value) => handleInputChange('unit_cost', new Decimal(value || 0))}
                 value={movement.unit_cost.toString()}
             />
 

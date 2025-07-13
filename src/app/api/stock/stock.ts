@@ -1,10 +1,11 @@
 import Stock from "@/app/entities/stock/stock";
-import RequestApi, { AddAccessToken } from "../request";
+import { StockReportComplete } from "@/app/entities/stock/stock-report";
+import RequestApi, { AddAccessToken, GetAllResponse } from "../request";
 import { Session } from "next-auth";
 
-const GetAllStocks = async (session: Session): Promise<Stock[]> => {
-    const response = await RequestApi<null, Stock[]>({
-        path: "/stock/all", 
+const GetAllStocks = async (session: Session): Promise<GetAllResponse<Stock>> => {
+    const response = await RequestApi<null, GetAllResponse<Stock>>({
+        path: "/stock/all",
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -12,9 +13,9 @@ const GetAllStocks = async (session: Session): Promise<Stock[]> => {
     return response.data
 };
 
-const GetAllStocksWithProduct = async (session: Session): Promise<Stock[]> => {
-    const response = await RequestApi<null, Stock[]>({
-        path: "/stock/all/with-product", 
+const GetAllStocksWithProduct = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Stock>> => {
+    const response = await RequestApi<null, GetAllResponse<Stock>>({
+        path: "/stock/all/with-product",
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -24,7 +25,7 @@ const GetAllStocksWithProduct = async (session: Session): Promise<Stock[]> => {
 
 const GetStockByID = async (id: string, session: Session): Promise<Stock> => {
     const response = await RequestApi<null, Stock>({
-        path: `/stock/${id}`, 
+        path: `/stock/${id}`,
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -34,7 +35,7 @@ const GetStockByID = async (id: string, session: Session): Promise<Stock> => {
 
 const GetStockWithProduct = async (id: string, session: Session): Promise<Stock> => {
     const response = await RequestApi<null, Stock>({
-        path: `/stock/${id}/with-product`, 
+        path: `/stock/${id}/with-product`,
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -44,7 +45,7 @@ const GetStockWithProduct = async (id: string, session: Session): Promise<Stock>
 
 const GetStockByProductID = async (productID: string, session: Session): Promise<Stock> => {
     const response = await RequestApi<null, Stock>({
-        path: `/stock/product/${productID}`, 
+        path: `/stock/product/${productID}`,
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -52,9 +53,9 @@ const GetStockByProductID = async (productID: string, session: Session): Promise
     return response.data
 };
 
-const GetLowStockProducts = async (session: Session): Promise<Stock[]> => {
-    const response = await RequestApi<null, Stock[]>({
-        path: "/stock/low-stock", 
+const GetLowStockProducts = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Stock>> => {
+    const response = await RequestApi<null, GetAllResponse<Stock>>({
+        path: "/stock/low-stock",
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -62,9 +63,9 @@ const GetLowStockProducts = async (session: Session): Promise<Stock[]> => {
     return response.data
 };
 
-const GetOutOfStockProducts = async (session: Session): Promise<Stock[]> => {
-    const response = await RequestApi<null, Stock[]>({
-        path: "/stock/out-of-stock", 
+const GetOutOfStockProducts = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Stock>> => {
+    const response = await RequestApi<null, GetAllResponse<Stock>>({
+        path: "/stock/out-of-stock",
         method: "GET",
         headers: await AddAccessToken(session),
     });
@@ -72,9 +73,9 @@ const GetOutOfStockProducts = async (session: Session): Promise<Stock[]> => {
     return response.data
 };
 
-const GetStockReport = async (session: Session): Promise<any> => {
-    const response = await RequestApi<null, any>({
-        path: "/stock/report", 
+const GetStockReport = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<StockReportComplete>> => {
+    const response = await RequestApi<null, GetAllResponse<StockReportComplete>>({
+        path: "/stock/report",
         method: "GET",
         headers: await AddAccessToken(session),
     });

@@ -6,7 +6,7 @@ import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import StockColumns from "@/app/entities/stock/table-columns";
 import Refresh from "@/app/components/crud/refresh";
-import { FaFilter, FaPlus, FaChartBar, FaExclamationTriangle, FaBoxes, FaMinus } from "react-icons/fa";
+import { FaChartBar, FaExclamationTriangle } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { SelectField } from "@/app/components/modal/field";
 import { useEffect, useState } from "react";
@@ -14,8 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { fetchCategories } from "@/redux/slices/categories";
-import { fetchStocks, fetchLowStock, fetchOutOfStock, fetchStockReport } from "@/redux/slices/stock";
-import Stock from "@/app/entities/stock/stock";
+import { fetchStocks, fetchLowStocks, fetchOutOfStocks, fetchReportStocks } from "@/redux/slices/stock";
 import AddStockForm from "@/app/forms/stock/add-stock";
 import RemoveStockForm from "@/app/forms/stock/remove-stock";
 import StockReport from "@/app/components/stock/stock-report";
@@ -25,7 +24,8 @@ const PageStock = () => {
     const [productID, setProductID] = useState("");
     const [stockFilter, setStockFilter] = useState("all"); // all, low, out
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const stockSlice = useSelector((state: RootState) => state.stock);
+    const stockSlice = useSelector((state: RootState) => state.stocks);
+    const reportStockSlice = useSelector((state: RootState) => state.reportStocks);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
@@ -39,11 +39,15 @@ const PageStock = () => {
     useEffect(() => {
         if (data) {
             dispatch(fetchStocks({ session: data }));
-            dispatch(fetchLowStock({ session: data }));
-            dispatch(fetchOutOfStock({ session: data }));
-            dispatch(fetchStockReport({ session: data }));
+            dispatch(fetchLowStocks({ session: data }));
+            dispatch(fetchOutOfStocks({ session: data }));
+            dispatch(fetchReportStocks({ session: data }));
         }
     }, [data?.user.access_token, dispatch]);
+
+    useEffect(() => {
+    }, [reportStockSlice]);
+
 
     if (stockSlice.loading) {
         return (
@@ -118,9 +122,9 @@ const PageStock = () => {
                         <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar}>
                             <h1>Relatório</h1>
                         </ButtonIconTextFloat>
-                        {stockSlice.report?.summary?.total_active_alerts > 0 && (
+                        {reportStockSlice?.entities.summary.summary.total_active_alerts && reportStockSlice.entities.summary.summary.total_active_alerts > 0 && (
                             <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle}>
-                                <h1>Alertas ({stockSlice.report.summary.total_active_alerts})</h1>
+                                <h1>Alertas ({reportStockSlice.entities.summary.summary.total_active_alerts})</h1>
                             </ButtonIconTextFloat>
                         )}
                     </div>
@@ -155,7 +159,7 @@ const PageStock = () => {
             {/* Modal de Relatório */}
             <div id="stock-report" className="modal">
                 <div className="modal-content max-w-4xl">
-                    <StockReport />
+                    <StockReport reportStock={reportStockSlice.entities} />
                 </div>
             </div>
 

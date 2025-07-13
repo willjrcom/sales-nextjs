@@ -1,9 +1,7 @@
 import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useEffect, useState, useMemo } from "react";
-import Order, { StatusOrder } from "@/app/entities/order/order";
+import Order from "@/app/entities/order/order";
 import Droppable from "./droppable";
-import { useModal } from "@/app/context/modal/context";
-import CardOrder from "../card-order";
 import ReadyOrder from "@/app/api/order/status/ready/order";
 import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/order";
@@ -13,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { fetchOrders } from "@/redux/slices/orders";
 import DroppableFinish from "./droppable-finish";
+import { notifyError } from "@/app/utils/notifications";
 
 interface OrderKanbanProps {
     slice: EntityState<Order, string>;
@@ -31,7 +30,6 @@ function OrderKanban({ slice }: OrderKanbanProps) {
     );
     const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
     const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
-    const modalHandler = useModal();
     const dispatch = useDispatch<AppDispatch>();
 
     const { data } = useSession();
@@ -65,29 +63,19 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             try {
                 await ReadyOrder(orderId, data);
                 dispatch(fetchOrders({ session: data }));
-            } catch (error) { }
+            } catch (error: RequestError | any) { 
+                notifyError(error.message || 'erro ao deixar pedido pronto')
+            }
 
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
             if (!orderId || !data) return;
             try {
                 await FinishOrder(orderId, data);
                 dispatch(fetchOrders({ session: data }));
-            } catch (error) {
-                OpenOrder(orderId, error as RequestError);
+            } catch (error: RequestError | any) {
+                notifyError(error.message || 'erro ao finalizar pedido')
             }
         }
-    };
-    const OpenOrder = (orderId: string, error: RequestError) => {
-        const onClose = () => {
-            modalHandler.hideModal("show-order-" + orderId)
-        }
-        modalHandler.showModal(
-            "show-order-" + orderId,
-            "Ver Pedido",
-            <CardOrder orderId={orderId} />,
-            "xl",
-            onClose
-        );
     };
 
     const sensors = useSensors(

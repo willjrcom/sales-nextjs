@@ -54,6 +54,7 @@ import GroupItem from "@/app/entities/order/group-item";
 import AdditionalItem from "@/app/components/order/additional-item";
 import RemovedItem from "@/app/components/order/removed-item";
 import Item from "@/app/entities/order/item";
+import { fetchPickupOrders } from "@/redux/slices/pickup-orders";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -249,7 +250,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
-                    dispatch(fetchTableOrders({ session: data }));
+                    dispatch(fetchPickupOrders({ session: data }));
                     fetchOrder();
                 } catch (error) {
                     const err = error as RequestError;
