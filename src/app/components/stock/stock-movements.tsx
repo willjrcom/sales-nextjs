@@ -97,28 +97,13 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
                                             <span className="font-medium">Quantidade:</span>
                                             <span className="ml-2">{new Decimal(movement.quantity).toFixed(2)}</span>
                                         </div>
-                                        {movement.unit_cost.greaterThan(0) && (
+                                        {movement.price?.greaterThan(0) && (
                                             <div>
                                                 <span className="font-medium">Custo Unitário:</span>
-                                                <span className="ml-2">R$ {new Decimal(movement.unit_cost).toFixed(2)}</span>
-                                            </div>
-                                        )}
-                                        {movement.order_number && (
-                                            <div>
-                                                <span className="font-medium">Pedido:</span>
-                                                <span className="ml-2">#{movement.order_number}</span>
-                                            </div>
-                                        )}
-                                        {movement.employee_name && (
-                                            <div>
-                                                <span className="font-medium">Funcionário:</span>
-                                                <span className="ml-2">{movement.employee_name}</span>
+                                                <span className="ml-2">R$ {new Decimal(movement.price).toFixed(2)}</span>
                                             </div>
                                         )}
                                     </div>
-                                    {movement.notes && (
-                                        <p className="text-gray-600 mt-2 text-sm">{movement.notes}</p>
-                                    )}
                                 </div>
                             </div>
                         </div>
@@ -128,5 +113,6 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
         </div>
     );
 };
+
 
 export default StockMovements; 

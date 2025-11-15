@@ -2,34 +2,32 @@
 
 import React, { useEffect, useState } from 'react';
 import { TextField } from '../../components/modal/field';
-import StockMovement, { ValidateStockMovementForm } from '@/app/entities/stock/stock-movement';
+import StockMovement from '@/app/entities/stock/stock-movement';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import Stock from '@/app/entities/stock/stock';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
-import { SelectField } from '@/app/components/modal/field';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import AddStock from '@/app/api/stock/movement/add';
+import AddStock, { AddStockRequest } from '@/app/api/stock/movement/add';
 import Decimal from 'decimal.js';
+import PriceField from '@/app/components/modal/fields/price';
+import { fetchReportStocks } from '@/redux/slices/stock';
 
 interface AddStockFormProps {
     stock?: Stock;
 }
 
 const AddStockForm = ({ stock }: AddStockFormProps) => {
-    const modalName = 'add-stock'
+    const modalName = 'add-stock-' + stock?.id;
     const modalHandler = useModal();
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const stockSlice = useSelector((state: RootState) => state.stock);
-    const [movement, setMovement] = useState<StockMovement>(new StockMovement());
-    const [stocks, setStocks] = useState<Stock[]>([]);
-    const [recordStocks, setRecordStocks] = useState<{ id: string; name: string; }[]>([]);
+    const [movement, setMovement] = useState<AddStockRequest>({} as AddStockRequest);
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         if (stock) {
@@ -46,17 +44,12 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
     };
 
     const submit = async () => {
-        if (!data) return;
-        
-        // Configurar movimento como entrada
-        movement.type = 'in';
-        
-        const validationErrors = ValidateStockMovementForm(movement);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
+        if (!data || !stock?.id) return;
 
         try {
-            await AddStock(movement, data);
+            await AddStock(stock?.id, movement, data);
             notifySuccess(`Estoque adicionado com sucesso`);
+            dispatch(fetchReportStocks({ session: data }));
             modalHandler.hideModal(modalName);
 
         } catch (error) {
@@ -65,73 +58,35 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
         }
     }
 
-    useEffect(() => {
-        const LoadStocks = async () => {
-            if (!data) return;
-
-            try {
-                // Buscar estoques do Redux store
-                const allStocks = Object.values(stockSlice.entities);
-                setStocks(allStocks);
-
-                let records: { id: string; name: string; }[] = [];
-
-                if (allStocks.length === 0) {
-                    setRecordStocks([]);
-                    return;
-                }
-
-                for (const stock of allStocks) {
-                    records.push({ id: stock.product_id, name: stock.product?.name || 'Produto não encontrado' })
-                }
-                setRecordStocks(records);
-
-            } catch (error: RequestError | any) {
-                notifyError(error);
-            }
-        }
-
-        LoadStocks();
-    }, [data?.user.access_token, stockSlice.entities]);
-
     return (
         <>
-            <SelectField
-                friendlyName="Produto"
-                name="product_id"
-                selectedValue={movement.product_id}
-                setSelectedValue={(value) => handleInputChange('product_id', value)}
-                values={recordStocks}
-            />
-
             <TextField
                 friendlyName="Quantidade"
                 name="quantity"
                 setValue={(value) => handleInputChange('quantity', new Decimal(value || 0))}
-                value={movement.quantity.toString()}
+                value={new Decimal(movement.quantity || 0).toString()}
             />
 
             <TextField
                 friendlyName="Motivo"
                 name="reason"
                 setValue={(value) => handleInputChange('reason', value)}
-                value={movement.reason}
+                value={movement.reason || ""}
                 placeholder="ex: Compra, Ajuste de inventário"
             />
 
-            <TextField
+            <PriceField
                 friendlyName="Custo Unitário"
-                name="unit_cost"
-                setValue={(value) => handleInputChange('unit_cost', new Decimal(value || 0))}
-                value={movement.unit_cost.toString()}
+                name="price"
+                setValue={(value) => handleInputChange('price', new Decimal(value || 0))}
+                value={new Decimal(movement.price || 0).toString()}
             />
 
-            <TextField
-                friendlyName="Observações"
-                name="notes"
-                setValue={(value) => handleInputChange('notes', value)}
-                value={movement.notes}
-                optional
+            <PriceField
+                friendlyName="Custo Total"
+                name="total_price"
+                setValue={(value) => handleInputChange('total_price', new Decimal(value || 0))}
+                value={new Decimal(movement.total_price || 0).toString()}
             />
 
             <ErrorForms errors={errors} setErrors={setErrors} />

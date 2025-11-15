@@ -14,11 +14,10 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { updateCategory } from '@/redux/slices/categories';
 import { SelectField } from '@/app/components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Decimal from 'decimal.js';
-import { addStock, updateStock } from '@/redux/slices/stock';
+import { addStock, fetchReportStocks, updateStock } from '@/redux/slices/stock';
 
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
@@ -44,10 +43,12 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             if (isUpdate) {
                 await UpdateStock(stock, data);
                 dispatch(updateStock({ type: "UPDATE", payload: {id: stock.id, changes: stock}}));
+                dispatch(fetchReportStocks({ session: data }))
                 notifySuccess(`Estoque atualizado com sucesso`);
             } else {
                 await NewStock(stock, data);
                 dispatch(addStock({...stock}));
+                dispatch(fetchReportStocks({ session: data }))
                 notifySuccess(`Controle de estoque criado com sucesso`);
             }
             

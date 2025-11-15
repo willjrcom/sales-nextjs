@@ -4,7 +4,10 @@ import ButtonIcon from "@/app/components/button/button-icon";
 import StockForm from "@/app/forms/stock/form";
 import StockMovements from "@/app/components/stock/stock-movements";
 import Decimal from "decimal.js";
-import { FaHistory } from "react-icons/fa";
+import { FaEdit, FaMinus, FaPlus, FaSearch } from "react-icons/fa";
+import AddStockForm from "@/app/forms/stock/add-stock";
+import RemoveStockForm from "@/app/forms/stock/remove-stock";
+import AdjustStockForm from "@/app/forms/stock/adjust-stock";
 
 const StockColumns = (): ColumnDef<Stock>[] => [
   {
@@ -19,7 +22,7 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     header: 'Estoque Atual',
     cell: info => {
       const value = new Decimal(info.getValue() as any);
-      return `${value.toFixed(2)} ${info.row.original.unit}`;
+      return value.toFixed(2);
     },
   },
   {
@@ -28,7 +31,7 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     header: 'Estoque Mínimo',
     cell: info => {
       const value = new Decimal(info.getValue() as any);
-      return `${value.toFixed(2)} ${info.row.original.unit}`;
+      return value.toFixed(2);
     },
   },
   {
@@ -37,7 +40,7 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     header: 'Estoque Máximo',
     cell: info => {
       const value = new Decimal(info.getValue() as any);
-      return `${value.toFixed(2)} ${info.row.original.unit}`;
+      return value.toFixed(2);
     },
   },
   {
@@ -54,7 +57,7 @@ const StockColumns = (): ColumnDef<Stock>[] => [
       const current = new Decimal(stock.current_stock);
       const min = new Decimal(stock.min_stock);
       const max = new Decimal(stock.max_stock);
-      
+
       if (!stock.is_active) return 'Inativo';
       if (current.lessThanOrEqualTo(0)) return 'Sem Estoque';
       if (current.lessThanOrEqualTo(min)) return 'Estoque Baixo';
@@ -68,10 +71,27 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     header: 'Histórico',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"stock-movements-" + row.original.id }
-          title={"Histórico de movimentos de " + (row.original.product?.name || "produto")}>
-          <StockMovements stockID={row.original.id} />
-        </ButtonIcon>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <ButtonIcon icon={FaSearch} modalName={"stock-movements-" + row.original.id}
+            title={"Histórico de movimentos de " + (row.original.product?.name || "estoque")}>
+            <StockMovements stockID={row.original.id} />
+          </ButtonIcon>
+
+          <ButtonIcon icon={FaPlus} modalName={"add-stock-" + row.original.id}
+            title={"Adicionar estoque " + (row.original.product?.name || "")}>
+            <AddStockForm key={"add:"+ row.original.id} stock={row.original} />
+          </ButtonIcon>
+
+          <ButtonIcon icon={FaMinus} modalName={"remove-stock-" + row.original.id}
+            title={"Remover estoque " + (row.original.product?.name || "")}>
+            <RemoveStockForm  key={"remove:"+ row.original.id} stock={row.original}/>
+          </ButtonIcon >
+
+          <ButtonIcon icon={FaEdit} modalName={"adjust-stock-" + row.original.id}
+            title={"Ajustar estoque " + (row.original.product?.name || "")}>
+            <AdjustStockForm  key={"adjust:"+ row.original.id} stock={row.original}/>
+          </ButtonIcon >
+        </div>
       )
     },
   },
@@ -81,11 +101,11 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-stock-" + row.original.id }
+        <ButtonIcon modalName={"edit-stock-" + row.original.id}
           title={"Editar estoque de " + (row.original.product?.name || "produto")}>
           <StockForm
-            item={row.original} 
-            isUpdate={true}/>
+            item={row.original}
+            isUpdate={true} />
         </ButtonIcon>
       )
     },

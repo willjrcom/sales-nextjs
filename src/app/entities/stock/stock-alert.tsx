@@ -1,10 +1,8 @@
-import { z } from "zod";
 import Product from "../product/product";
 
 export default class StockAlert {
     id: string = "";
     stock_id: string = "";
-    product_id: string = "";
     type: string = ""; // 'low_stock', 'out_of_stock', 'over_stock'
     message: string = "";
     is_resolved: boolean = false;

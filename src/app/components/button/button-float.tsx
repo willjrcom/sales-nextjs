@@ -11,7 +11,7 @@ interface NewButtonProps {
     color?: string;
     onCloseModal?: () => void;
     children: React.ReactNode;
-    position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'bottom-right-1' | 'bottom-right-2';
+    position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-left-1' | 'bottom-right' | 'bottom-right-1' | 'bottom-right-2';
 }
 
 const ButtonIconTextFloat = ({
@@ -42,6 +42,9 @@ const ButtonIconTextFloat = ({
             break;
         case 'bottom-left':
             positionClasses = 'bottom-5 left-20';
+            break
+        case 'bottom-left-1':
+            positionClasses = 'bottom-5 left-22';
             break;
         case 'bottom-right':
             positionClasses = 'bottom-5 right-5';

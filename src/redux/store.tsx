@@ -14,7 +14,7 @@ import orderProcessesReducer from './slices/order-processes';
 import usersReducer from './slices/users';
 import userCompaniesReducer from './slices/user-companies';
 import shiftsReducer from './slices/shifts';
-import {stocksReducer, lowStocksReducer, outOfStocksReducer, ReportStocksReducer } from './slices/stock';
+import {stocksReducer, lowStocksReducer, outOfStocksReducer, reportStocksReducer } from './slices/stock';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -43,7 +43,7 @@ const rootReducer = combineReducers({
     stocks: stocksReducer,
     lowStocks: lowStocksReducer,
     outOfStocks: outOfStocksReducer,
-    reportStocks: ReportStocksReducer,
+    reportStocks: reportStocksReducer,
 });
 
 // Aplica o persistReducer para o rootReducer

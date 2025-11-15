@@ -14,17 +14,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { fetchCategories } from "@/redux/slices/categories";
-import { fetchStocks, fetchLowStocks, fetchOutOfStocks, fetchReportStocks } from "@/redux/slices/stock";
-import AddStockForm from "@/app/forms/stock/add-stock";
-import RemoveStockForm from "@/app/forms/stock/remove-stock";
+import { fetchReportStocks } from "@/redux/slices/stock";
 import StockReport from "@/app/components/stock/stock-report";
 import StockAlerts from "@/app/components/stock/stock-alerts";
+import Stock from "@/app/entities/stock/stock";
+import { StockReportComplete } from "@/app/entities/stock/stock-report";
+import Decimal from "decimal.js";
 
 const PageStock = () => {
     const [productID, setProductID] = useState("");
     const [stockFilter, setStockFilter] = useState("all"); // all, low, out
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const stockSlice = useSelector((state: RootState) => state.stocks);
     const reportStockSlice = useSelector((state: RootState) => state.reportStocks);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
@@ -38,43 +38,42 @@ const PageStock = () => {
     // Carregar dados de estoque
     useEffect(() => {
         if (data) {
-            dispatch(fetchStocks({ session: data }));
-            dispatch(fetchLowStocks({ session: data }));
-            dispatch(fetchOutOfStocks({ session: data }));
             dispatch(fetchReportStocks({ session: data }));
         }
     }, [data?.user.access_token, dispatch]);
 
-    useEffect(() => {
-    }, [reportStockSlice]);
-
-
-    if (stockSlice.loading) {
+    if (reportStockSlice.loading) {
         return (
             <h1>Carregando página...</h1>
         )
     }
 
     // Filtrar estoques baseado nos filtros
-    let filteredStocks = Object.values(stockSlice.entities);
-    
-    if (productID) {
-        filteredStocks = filteredStocks.filter(stock => stock.product_id === productID);
+    let reports = Object.values(reportStockSlice.entities);
+    let report: StockReportComplete = {} as StockReportComplete;
+    let filteredStocks: Stock[] = [];
+
+    if (reports?.length > 0) {
+        report = reports[0]
+        filteredStocks = report.all_stocks;
     }
-    
+    if (productID) {
+        filteredStocks = report?.all_stocks?.filter(stock => stock.product_id === productID);
+    }
+
     if (stockFilter === "low") {
-        filteredStocks = filteredStocks.filter(stock => 
-            stock.current_stock.lessThanOrEqualTo(stock.min_stock) && 
-            stock.current_stock.greaterThan(0)
+        filteredStocks = [...filteredStocks].filter(stock =>
+            new Decimal(stock?.current_stock || 0).lessThanOrEqualTo(stock.min_stock) &&
+            new Decimal(stock?.current_stock || 0).greaterThan(0)
         );
     } else if (stockFilter === "out") {
-        filteredStocks = filteredStocks.filter(stock => 
-            stock.current_stock.lessThanOrEqualTo(0)
+        filteredStocks = [...filteredStocks].filter(stock =>
+            new Decimal(stock?.current_stock || 0).lessThanOrEqualTo(0)
         );
     }
 
     // Ordenar por nome do produto
-    filteredStocks = filteredStocks.sort((a, b) => 
+    filteredStocks = [...filteredStocks].sort((a, b) =>
         (a.product?.name || '').localeCompare(b.product?.name || '')
     );
 
@@ -89,86 +88,66 @@ const PageStock = () => {
 
     return (
         <>
-            <CrudLayout 
+            <CrudLayout
                 title={
-                    <PageTitle 
-                        title="Controle de Estoque" 
-                        tooltip="Gerencie o estoque de produtos, visualize alertas e movimentações." 
+                    <PageTitle
+                        title="Controle de Estoque"
+                        tooltip="Gerencie o estoque de produtos, visualize alertas e movimentações."
                     />
                 }
                 searchButtonChildren={
                     <SelectField
-                        friendlyName="Produto" 
-                        name="produto" 
-                        selectedValue={productID} 
-                        setSelectedValue={setProductID} 
-                        values={products} 
-                        optional 
+                        friendlyName="Produto"
+                        name="produto"
+                        selectedValue={productID}
+                        setSelectedValue={setProductID}
+                        values={products}
+                        optional
                     />
                 }
                 filterButtonChildren={
                     <div className="flex gap-2">
                         <SelectField
-                            friendlyName="Status" 
-                            name="status" 
-                            selectedValue={stockFilter} 
-                            setSelectedValue={setStockFilter} 
+                            friendlyName="Status"
+                            name="status"
+                            selectedValue={stockFilter}
+                            setSelectedValue={setStockFilter}
                             values={[
                                 { id: "all", name: "Todos" },
                                 { id: "low", name: "Estoque Baixo" },
                                 { id: "out", name: "Sem Estoque" }
-                            ]} 
+                            ]}
                         />
-                        <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar}>
-                            <h1>Relatório</h1>
+                        <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
+                            <StockReport reportStock={report} />
                         </ButtonIconTextFloat>
-                        {reportStockSlice?.entities.summary.summary.total_active_alerts && reportStockSlice.entities.summary.summary.total_active_alerts > 0 && (
-                            <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle}>
-                                <h1>Alertas ({reportStockSlice.entities.summary.summary.total_active_alerts})</h1>
+                        {report?.summary?.total_active_alerts && report?.summary?.total_active_alerts > 0 && (
+                            <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
+                                <StockAlerts />
                             </ButtonIconTextFloat>
                         )}
                     </div>
                 }
                 plusButtonChildren={
                     <div className="flex gap-2">
-                        <ButtonIconTextFloat modalName="add-stock" title="Adicionar Estoque" position="bottom-right">
-                            <AddStockForm />
-                        </ButtonIconTextFloat>
-                        <ButtonIconTextFloat modalName="remove-stock" title="Remover Estoque" position="bottom-right-1">
-                            <RemoveStockForm />
-                        </ButtonIconTextFloat>
-                        <ButtonIconTextFloat modalName="new-stock" title="Novo Controle" position="bottom-right-2">
+                        <ButtonIconTextFloat modalName="new-stock" title="Novo Controle de estoque" position="bottom-right">
                             <StockForm />
                         </ButtonIconTextFloat>
                     </div>
                 }
                 refreshButton={
                     <Refresh
-                        slice={categoriesSlice}
-                        fetchItems={fetchCategories}
+                        slice={reportStockSlice}
+                        fetchItems={fetchReportStocks}
                     />
                 }
                 tableChildren={
                     <CrudTable
                         columns={StockColumns()}
-                        data={filteredStocks}>
+                        data={filteredStocks || []}>
                     </CrudTable>
                 }
             />
-
-            {/* Modal de Relatório */}
-            <div id="stock-report" className="modal">
-                <div className="modal-content max-w-4xl">
-                    <StockReport reportStock={reportStockSlice.entities} />
-                </div>
-            </div>
-
-            {/* Modal de Alertas */}
-            <div id="stock-alerts" className="modal">
-                <div className="modal-content max-w-4xl">
-                    <StockAlerts />
-                </div>
-            </div>
         </>
     )
 }

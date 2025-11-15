@@ -16,6 +16,7 @@ export interface GenericsProps<T> {
     name: string;
     getItems?: (session: Session, page?: number, perPage?: number) => Promise<GetAllResponse<T>>;
     getItemsByID?: (id: string, session: Session) => Promise<GetAllResponse<T>>;
+    getItem?: (session: Session) => Promise<T>;
 }
 
 export interface FetchItemsArgs {
@@ -24,8 +25,13 @@ export interface FetchItemsArgs {
     perPage?: number;
 }
 
+interface DefaultEntity {
+    name?: any; 
+    id: string;
+}
+
 // Configuração genérica do slice
-const createGenericSlice = <T extends { name?: any; id: string }>({ name, getItems }: GenericsProps<T>) => {
+const createGenericSlice = <T extends DefaultEntity>({ name, getItems }: GenericsProps<T>) => {
     const adapter = createEntityAdapter<T, string>({
         // Assume IDs are stored in a field other than `t.id`
         selectId: (t: T) => t.id,
@@ -44,7 +50,11 @@ const createGenericSlice = <T extends { name?: any; id: string }>({ name, getIte
     const fetchItems = createAsyncThunk(`${name}/fetch`, async ({session, page, perPage}: FetchItemsArgs, { rejectWithValue }) => {
         try {
             const response = await getItems!(session, page, perPage);
-            return {payload: response.items, totalCount: Number(response.headers.get("X-Total-Count"))};
+            const xTotalCount = response.headers.get("X-Total-Count")
+            return { 
+                payload: response.items, 
+                totalCount: Number(xTotalCount),
+            };
         } catch (error) {
             return rejectWithValue(error);
         }

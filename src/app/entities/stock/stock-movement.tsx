@@ -5,17 +5,13 @@ import Product from "../product/product";
 export default class StockMovement {
     id: string = "";
     stock_id: string = "";
-    product_id: string = "";
-    type: string = ""; // 'in', 'out', 'adjust'
+    type: string = ""; // 'in', 'out', 'adjust_in', 'adjust_out'
     quantity: Decimal = new Decimal(0);
     reason: string = "";
     order_id?: string;
-    order_number?: number;
     employee_id?: string;
-    employee_name?: string;
-    unit_cost: Decimal = new Decimal(0);
-    total_cost: Decimal = new Decimal(0);
-    notes: string = "";
+    price: Decimal = new Decimal(0);
+    total_price: Decimal = new Decimal(0);
     created_at: string = "";
     product?: Product;
 
@@ -37,12 +33,10 @@ const SchemaStockMovement = z.object({
 export const ValidateStockMovementForm = (movement: StockMovement) => {
     const validatedFields = SchemaStockMovement.safeParse({
         stock_id: movement.stock_id,
-        product_id: movement.product_id,
         type: movement.type,
         quantity: new Decimal(movement.quantity).toNumber(),
         reason: movement.reason,
-        unit_cost: new Decimal(movement.unit_cost).toNumber(),
-        notes: movement.notes
+        unit_cost: new Decimal(movement.price).toNumber(),
     });
 
     if (!validatedFields.success) {

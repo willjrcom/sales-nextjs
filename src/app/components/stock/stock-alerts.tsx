@@ -6,7 +6,6 @@ import { GetAllAlerts, ResolveAlert, DeleteAlert } from '@/app/api/stock/alerts'
 import StockAlert from '@/app/entities/stock/stock-alert';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import RequestError from '@/app/utils/error';
-import ButtonIcon from '@/app/components/button/button-icon';
 import { FaCheck, FaTrash } from 'react-icons/fa';
 
 const StockAlerts = () => {

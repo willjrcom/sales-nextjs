@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { TextField } from '../../components/modal/field';
-import StockMovement from '@/app/entities/stock/stock-movement';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import Stock from '@/app/entities/stock/stock';
@@ -12,19 +11,18 @@ import RequestError from '@/app/utils/error';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import RemoveStock from '@/app/api/stock/movement/remove';
+import AdjustStock, { AdjustStockRequest } from '@/app/api/stock/movement/adjust';
 import Decimal from 'decimal.js';
-import { RemoveStockRequest } from '@/app/api/stock/movement/remove';
 import { fetchReportStocks } from '@/redux/slices/stock';
 
-interface RemoveStockFormProps {
+interface AdjustStockFormProps {
     stock?: Stock;
 }
 
-const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
-    const modalName = 'remove-stock-'+stock?.id;
+const AdjustStockForm = ({ stock }: AdjustStockFormProps) => {
+    const modalName = 'adjust-stock-'+ stock?.id;
     const modalHandler = useModal();
-    const [movement, setMovement] = useState<RemoveStockRequest>({} as RemoveStockRequest);
+    const [movement, setMovement] = useState<AdjustStockRequest>({} as AdjustStockRequest);
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const dispatch = useDispatch<AppDispatch>();
@@ -39,15 +37,15 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
         }
     }, [stock]);
 
-    const handleInputChange = (field: keyof StockMovement, value: any) => {
+    const handleInputChange = (field: keyof AdjustStockRequest, value: any) => {
         setMovement(prev => ({ ...prev, [field]: value }));
     };
 
     const submit = async () => {
         if (!data || !stock?.id) return;
-        
+
         try {
-            await RemoveStock(stock.id, movement, data);
+            await AdjustStock(stock.id, movement, data);
             notifySuccess(`Estoque removido com sucesso`);
             dispatch(fetchReportStocks({ session: data }));
             modalHandler.hideModal(modalName);
@@ -61,10 +59,10 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
     return (
         <>
             <TextField
-                friendlyName="Quantidade"
-                name="quantity"
-                setValue={(value) => handleInputChange('quantity', new Decimal(value || 0))}
-                value={new Decimal(movement.quantity || 0).toString()}
+                friendlyName="Novo estoque"
+                name="new_stock"
+                setValue={(value) => handleInputChange('new_stock', new Decimal(value || 0))}
+                value={new Decimal(movement.new_stock || 0).toString()}
             />
 
             <TextField
@@ -86,4 +84,4 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
     )
 }
 
-export default RemoveStockForm 
+export default AdjustStockForm 

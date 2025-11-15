@@ -40,19 +40,19 @@ const StockReport = ({ reportStock }: StockReportCompleteProps) => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-blue-100 p-4 rounded-lg">
                     <h3 className="font-semibold text-blue-800">Total de Produtos</h3>
-                    <p className="text-2xl font-bold text-blue-900">{summary.total_products}</p>
+                    <p className="text-2xl font-bold text-blue-900">{summary?.total_products || 0}</p>
                 </div>
                 <div className="bg-yellow-100 p-4 rounded-lg">
                     <h3 className="font-semibold text-yellow-800">Estoque Baixo</h3>
-                    <p className="text-2xl font-bold text-yellow-900">{summary.total_low_stock}</p>
+                    <p className="text-2xl font-bold text-yellow-900">{summary?.total_low_stock || 0}</p>
                 </div>
                 <div className="bg-red-100 p-4 rounded-lg">
                     <h3 className="font-semibold text-red-800">Sem Estoque</h3>
-                    <p className="text-2xl font-bold text-red-900">{summary.total_out_of_stock}</p>
+                    <p className="text-2xl font-bold text-red-900">{summary?.total_out_of_stock || 0}</p>
                 </div>
                 <div className="bg-orange-100 p-4 rounded-lg">
                     <h3 className="font-semibold text-orange-800">Alertas Ativos</h3>
-                    <p className="text-2xl font-bold text-orange-900">{summary.total_active_alerts}</p>
+                    <p className="text-2xl font-bold text-orange-900">{summary?.total_active_alerts || 0}</p>
                 </div>
             </div>
 
