@@ -1,4 +1,5 @@
 "use client";
+import GetCompany from "@/app/api/company/company";
 import GetOrderPrintByID from "@/app/api/print/print-order"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
@@ -20,7 +21,8 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
         html = String(result);
     }
     if (window.electronAPI?.printer) {
-        let printerName = session.user.current_company?.preferences["printer_order_on_pend_order"] || "default";
+        const company = await GetCompany(session);
+        let printerName = company.preferences["printer_order_on_pend_order"] || "default";
 
         if (printerName === "default") {
             const printers = await window.electronAPI.getPrinters();

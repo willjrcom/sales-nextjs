@@ -185,7 +185,8 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
 
-            if (data.user.current_company?.preferences.enable_print_order_on_ship_delivery) {
+            const company = await GetCompany(data);
+            if (company.preferences.enable_print_order_on_ship_delivery) {
                 for (let i = 0; i < orderIDs.length; i++) {
                     await printOrder({
                         orderID: orderIDs[i],

@@ -73,13 +73,13 @@ const authOptions: NextAuthOptions = {
                     throw new Error("Credenciais inválidas");
                 } catch (error) {
                     console.error("Erro na autenticação:", error);
-                    
+
                     // Extrai mensagem de erro mais amigável para o usuário
                     let errorMessage = "Erro desconhecido";
-                    
+
                     if (error && typeof error === 'object' && 'message' in error) {
                         const message = (error as { message?: string }).message || '';
-                        
+
                         // Verifica se é erro de coluna inexistente no banco
                         if (message.includes('column u.image_path does not exist')) {
                             errorMessage = "Erro no banco de dados: campo de imagem não encontrado. Entre em contato com o suporte.";
@@ -89,7 +89,7 @@ const authOptions: NextAuthOptions = {
                             errorMessage = message;
                         }
                     }
-                    
+
                     throw new Error(errorMessage);
                 }
             },
@@ -109,9 +109,6 @@ const authOptions: NextAuthOptions = {
             if (trigger === "update") {
                 if (session.user.access_token) {
                     token.access_token = session.user.access_token;
-                }
-                if (session.user.current_company) {
-                    token.current_company = session.user.current_company;
                 }
                 if (session.user.user) {
                     token.user = session.user.user;
@@ -147,7 +144,6 @@ const authOptions: NextAuthOptions = {
             if (token.sub) session.user.id = token.sub;
             if (token.access_token) session.user.access_token = token.access_token;
             if (token.user) session.user.user = token.user;
-            if (token.current_company) session.user.current_company = token.current_company;
 
             return session
         },
@@ -166,7 +162,6 @@ declare module "next-auth/jwt" {
         access_token?: string;
         exp?: number;
         error?: string;
-        current_company?: Company;
     }
 }
 
@@ -178,7 +173,6 @@ declare module "next-auth" {
     interface User {
         user: UserBackend;
         access_token?: string;
-        current_company?: Company;
     }
 }
 

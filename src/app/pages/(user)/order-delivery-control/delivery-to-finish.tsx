@@ -23,6 +23,7 @@ import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { notifyError } from "@/app/utils/notifications";
 import { fetchOrders } from "@/redux/slices/orders";
+import GetCompany from "@/app/api/company/company";
 
 const DeliveryOrderToFinish = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -75,13 +76,20 @@ const DeliveryOrderToFinish = () => {
     }, [orderID]);
 
     useEffect(() => {
-        if (!data || !data?.user?.current_company?.address) return
-        const company = data?.user?.current_company;
+        setCentralCoordinates()
+    }, [data?.user.access_token])
+
+    const setCentralCoordinates = async () => {
+        if (!data) return
+        
+        const company = await GetCompany(data);
+        if (!data || !company.address) return
+        
         const coordinates = company.address.coordinates
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
-    }, [data?.user.access_token])
+    }
 
     useEffect(() => {
         const newPoints: Point[] = [];

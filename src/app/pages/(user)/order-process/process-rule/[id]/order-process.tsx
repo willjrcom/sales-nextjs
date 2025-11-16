@@ -20,6 +20,7 @@ import ObservationCard from '@/app/components/order/observation';
 import AdditionalItem from '../../../../../components/order/additional-item';
 import RemovedItem from '../../../../../components/order/removed-item';
 import printGroupItem from '@/app/components/print/print-group-item';
+import GetCompany from '@/app/api/company/company';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -59,7 +60,8 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         try {
             const nextProcessID = await FinishOrderProcess(id, data)
 
-            if (!nextProcessID && data.user.current_company?.preferences?.["enable_print_items_on_finish_process"]) {
+            const company = await GetCompany(data);
+            if (!nextProcessID && company.preferences?.["enable_print_items_on_finish_process"]) {
 
                 await printGroupItem({groupItemID: groupItem.id,printerName: groupItem.printer_name, session: data})
             }

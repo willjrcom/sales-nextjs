@@ -88,13 +88,11 @@ function CompanySelection() {
             });
 
             data.user.access_token = response;
-            const company = await GetCompany(data);
 
             await update({
                 ...data,
                 user: {
                     ...data.user,
-                    current_company: company,
                 },
             })
 

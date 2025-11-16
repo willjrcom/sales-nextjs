@@ -6,6 +6,7 @@ import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
 import { FaSearch } from 'react-icons/fa';
+import GetCompany from '@/app/api/company/company';
 
 interface AddressFormProps {
     addressParent: Address;
@@ -18,16 +19,20 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
     const { data } = useSession();
 
     useEffect(() => {
-        if (address.uf) return;
+        getUfFromCompany()
+    }, [data?.user.access_token]);
 
-        const company = data?.user.current_company;
+    const getUfFromCompany = async() => {
+        if (address.uf || !data) return;
+
+        const company = await GetCompany(data)
         if (!company) return;
 
         const companyAddress = company.address;
         if (!companyAddress) return;
 
         handleInputChange('uf', companyAddress.uf);
-    }, [data?.user.current_company]);
+    }
 
     const handleInputChange = (field: keyof Address, value: any) => {
         const newAddress = Object.assign({}, { ...address, [field]: value }) as Address; 

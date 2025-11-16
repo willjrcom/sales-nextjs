@@ -19,6 +19,7 @@ import printOrder from "../../print/print-order";
 import printGroupItem from "../../print/print-group-item";
 import AddTableTax from "@/app/api/order-table/update/add-tax/order-table";
 import RemoveTableTax from "@/app/api/order-table/update/remove-tax/order-table";
+import GetCompany from "@/app/api/company/company";
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
@@ -75,7 +76,9 @@ export const OrderPaymentsResume = () => {
         try {
             await PendingOrder(order.id, data)
 
-            if (data.user.current_company?.preferences.enable_print_order_on_pend_order) {
+            const company = await GetCompany(data);
+
+            if (company.preferences.enable_print_order_on_pend_order) {
                 await printOrder({
                     orderID: order.id,
                     session: data

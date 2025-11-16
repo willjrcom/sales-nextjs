@@ -22,6 +22,7 @@ import { signOut, useSession } from 'next-auth/react';
 import Company from '@/app/entities/company/company';
 import { useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
+import GetCompany from '@/app/api/company/company';
 
 interface SidebarLinkItemProps {
   href?: string;
@@ -64,9 +65,15 @@ const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
   const [company, setCompany] = useState<Company>(new Company());
 
   useEffect(() => {
-    if (!data?.user.current_company) return;
-    setCompany(data.user.current_company as Company);
-  }, [data?.user]);
+    getCurrentCompany()
+  }, [data?.user.access_token]);
+
+  const getCurrentCompany = async() => {
+    if (!data) return;
+
+    const companyFound = await GetCompany(data)
+    setCompany(companyFound);
+  }
 
   const handleCompanyModal = () => {
     const onClose = () => {

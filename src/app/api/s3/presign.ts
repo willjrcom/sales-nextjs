@@ -15,7 +15,7 @@ interface PresignResponse {
 
 const GetPresignedUrl = async (filename: string, contentType: string, session: Session): Promise<PresignResponse> => {
     // Extrair o schema_name da empresa atual da sessão
-    const schemaName = session.user?.current_company?.schema_name;
+    const schemaName = "";
     
     const response = await RequestApi<PresignRequest, PresignResponse>({
         path: "/s3/presign",

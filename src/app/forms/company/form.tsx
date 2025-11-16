@@ -101,13 +101,10 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 },
             });
 
-            const currentCompany = await GetCompany(data, response);
-
             await update({
                 ...data,
                 user: {
                     ...data.user,
-                    current_company: currentCompany,
                 },
             })
 
@@ -129,13 +126,11 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
         try {
             await UpdateCompany(company, data);
-            const currentCompany = await GetCompany(data);
 
             await update({
                 ...data,
                 user: {
                     ...data.user,
-                    current_company: currentCompany,
                 },
             })
 
