@@ -128,7 +128,7 @@ const ProductionAnalyticsCard = ({ shift }: ProductionAnalyticsCardProps) => {
                                     .sort((a, b) => b.efficiency_score - a.efficiency_score)
                                     .slice(0, 2)
                                     .map((employee, index) => (
-                                        <div key={employee.employee_id} className="flex items-center justify-between text-sm">
+                                        <div key={"analytics-card-"+employee.employee_id} className="flex items-center justify-between text-sm">
                                             <div className="flex items-center">
                                                 <span className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center mr-2">
                                                     <span className="text-blue-600 text-xs font-semibold">{index + 1}</span>

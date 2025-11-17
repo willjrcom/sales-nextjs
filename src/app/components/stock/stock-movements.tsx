@@ -44,6 +44,10 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
                 return 'Saída';
             case 'adjust':
                 return 'Ajuste';
+            case 'adjust_in':
+                return 'Ajuste de Entrada';
+            case 'adjust_out':
+                return 'Ajuste de Saída';
             default:
                 return type;
         }

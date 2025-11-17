@@ -49,8 +49,8 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
             </div>
 
             {/* Content */}
-            <div className="grid grid-cols-2 gap-6">
-                {/* Tempo de Processo */}
+            {/* <div className="grid grid-cols-2 gap-6"> */}
+                {/* Tempo de Processo
                 <div className="bg-gray-50 rounded-lg shadow p-4">
                     <h2 className="font-semibold text-lg mb-4">Tempo de processo</h2>
                     <ul className="space-y-2">
@@ -58,18 +58,18 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                         <li>Pausado às: {orderProcess.paused_at ? ToUtcTimeWithSeconds(orderProcess.paused_at) : "--:--:--"}</li>
                         <li>Continuado às: {orderProcess.continued_at ? ToUtcTimeWithSeconds(orderProcess.continued_at) : "--:--:--"}</li>
                     </ul>
-                </div>
+                </div> */}
 
                 {/* Fila Anterior */}
-                <div className="bg-gray-50 rounded-lg shadow p-4">
+                {/* <div className="bg-gray-50 rounded-lg shadow p-4">
                     <h2 className="font-semibold text-lg mb-4">Fila anterior</h2>
                     <ul className="space-y-2">
                         <li>Entrou na fila às: {queue?.joined_at ? ToUtcTimeWithSeconds(queue.joined_at) : "--:--:--"}</li>
                         <li>Saiu da fila às: {queue?.left_at ? ToUtcTimeWithSeconds(queue.left_at) : "--:--:--"}</li>
                         <li className="font-bold">Tempo total: {ToUtcTimeWithSeconds(queueTotalTime.toISOString())}</li>
                     </ul>
-                </div>
-            </div>
+                </div> */}
+            {/* </div> */}
             
             {/* Footer - Botões alinhados abaixo */}
             <div className="flex justify-between items-end mt-8">

@@ -178,7 +178,7 @@ const ProductionAnalyticsDashboard: React.FC<ProductionAnalyticsDashboardProps> 
                 <h3 className="text-xl font-semibold mb-4">Top Funcionários</h3>
                 <div className="space-y-3">
                     {topEmployees.map((employee, index) => (
-                        <div key={employee.employee_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={"analytics-dashboard-"+employee.employee_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div className="flex items-center">
                                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                                     <span className="text-blue-600 font-semibold">{index + 1}</span>
