@@ -32,7 +32,8 @@ const PageProducts = () => {
         if (Object.keys(categoriesSlice.entities).length === 0) return;
         const productsByCategories = Object.values(categoriesSlice.entities)
             .map((category) => {
-                return category.products?.map(product => {;
+                return category.products?.map(product => {
+                    ;
                     return {
                         ...product,
                         category: category,
@@ -53,18 +54,16 @@ const PageProducts = () => {
 
     return (
         <>
+            <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
+
+            <ButtonIconTextFloat modalName="new-product" title="Novo produto" position="bottom-right">
+                <ProductForm />
+            </ButtonIconTextFloat>
+
             <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
                 searchButtonChildren={
                     <SelectField
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={Object.values(categoriesSlice.entities)} optional />
-                }
-                filterButtonChildren={
-                    <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
-                }
-                plusButtonChildren={
-                    <ButtonIconTextFloat modalName="new-product" title="Novo produto" position="bottom-right">
-                        <ProductForm />
-                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh

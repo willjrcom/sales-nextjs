@@ -88,6 +88,34 @@ const PageStock = () => {
 
     return (
         <>
+
+            <div className="flex gap-2">
+                <SelectField
+                    friendlyName="Status"
+                    name="status"
+                    selectedValue={stockFilter}
+                    setSelectedValue={setStockFilter}
+                    values={[
+                        { id: "all", name: "Todos" },
+                        { id: "low", name: "Estoque Baixo" },
+                        { id: "out", name: "Sem Estoque" }
+                    ]}
+                />
+                <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
+                    <StockReport reportStock={report} />
+                </ButtonIconTextFloat>
+                
+                {report?.summary?.total_active_alerts && report?.summary?.total_active_alerts > 0 && (
+                    <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
+                        <StockAlerts />
+                    </ButtonIconTextFloat>
+                )}
+            </div>
+
+            <ButtonIconTextFloat modalName="new-stock" title="Novo Controle de estoque" position="bottom-right">
+                <StockForm />
+            </ButtonIconTextFloat>
+
             <CrudLayout
                 title={
                     <PageTitle
@@ -104,36 +132,6 @@ const PageStock = () => {
                         values={products}
                         optional
                     />
-                }
-                filterButtonChildren={
-                    <div className="flex gap-2">
-                        <SelectField
-                            friendlyName="Status"
-                            name="status"
-                            selectedValue={stockFilter}
-                            setSelectedValue={setStockFilter}
-                            values={[
-                                { id: "all", name: "Todos" },
-                                { id: "low", name: "Estoque Baixo" },
-                                { id: "out", name: "Sem Estoque" }
-                            ]}
-                        />
-                        <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
-                            <StockReport reportStock={report} />
-                        </ButtonIconTextFloat>
-                        {report?.summary?.total_active_alerts && report?.summary?.total_active_alerts > 0 && (
-                            <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
-                                <StockAlerts />
-                            </ButtonIconTextFloat>
-                        )}
-                    </div>
-                }
-                plusButtonChildren={
-                    <div className="flex gap-2">
-                        <ButtonIconTextFloat modalName="new-stock" title="Novo Controle de estoque" position="bottom-right">
-                            <StockForm />
-                        </ButtonIconTextFloat>
-                    </div>
                 }
                 refreshButton={
                     <Refresh

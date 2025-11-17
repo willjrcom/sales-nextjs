@@ -43,8 +43,6 @@ const ListShift = () => {
         <>
             <CrudLayout title={<PageTitle title="Turnos" tooltip="listagem de turnos anteriores." />}
                 searchButtonChildren={<></>}
-                filterButtonChildren={<></>}
-                plusButtonChildren={<></>}
                 refreshButton={
                     <Refresh
                         slice={shiftsSlice}

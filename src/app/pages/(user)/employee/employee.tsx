@@ -66,23 +66,22 @@ const PageEmployee = () => {
                     {showDeleted ? 'Mostrar Ativos' : 'Mostrar Demitidos'}
                 </button>
             </div>
+
+            <ButtonIconTextFloat modalName="filter-employee" icon={FaFilter}>
+                <h1>Filtro</h1>
+            </ButtonIconTextFloat>
+
+            !showDeleted && (
+            <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right" size="xl"
+                title="Novo funcionário">
+                <AddEmployeeAlreadyCreated />
+            </ButtonIconTextFloat>
+            )
+
             <CrudLayout
                 title={<PageTitle title={showDeleted ? "Funcionários Demitidos" : "Funcionários"} tooltip="Gerencie funcionários, filtrando e editando registros." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do funcionário" setValue={setNome} value={nome} optional />
-                }
-                filterButtonChildren={
-                    <ButtonIconTextFloat modalName="filter-employee" icon={FaFilter}>
-                        <h1>Filtro</h1>
-                    </ButtonIconTextFloat>
-                }
-                plusButtonChildren={
-                    !showDeleted && (
-                        <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right" size="xl"
-                            title="Novo funcionário">
-                            <AddEmployeeAlreadyCreated />
-                        </ButtonIconTextFloat>
-                    )
                 }
                 refreshButton={
                     <Refresh
@@ -95,11 +94,11 @@ const PageEmployee = () => {
                 tableChildren={
                     <CrudTable
                         columns={EmployeeColumns()}
-                        data={filteredEmployees} 
+                        data={filteredEmployees}
                         totalCount={showDeleted ? employeesDeletedSlice.totalCount : employeesSlice.totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
-                        }}/>
+                        }} />
                 }
             />
         </>

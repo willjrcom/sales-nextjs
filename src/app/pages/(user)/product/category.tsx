@@ -8,18 +8,18 @@ import CategoryColumns from "@/app/entities/category/table-columns";
 import Refresh from "@/app/components/crud/refresh";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import "./style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchCategories } from "@/redux/slices/categories";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import "./style.css";
 
 const PageCategories = () => {
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    
+
     useEffect(() => {
         if (data && Object.keys(categoriesSlice.entities).length === 0) {
             dispatch(fetchCategories({ session: data }));
@@ -34,15 +34,13 @@ const PageCategories = () => {
 
     return (
         <>
+            <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
+
+            <ButtonIconTextFloat title="Nova categoria" modalName="new-category" position="bottom-right">
+                <CategoryForm />
+            </ButtonIconTextFloat>
+
             <CrudLayout title={<PageTitle title="Categorias" tooltip="Gerencie categorias de produtos, permitindo adicionar, editar ou remover." />}
-                filterButtonChildren={
-                    <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
-                }
-                plusButtonChildren={
-                    <ButtonIconTextFloat title="Nova categoria" modalName="new-category" position="bottom-right">
-                        <CategoryForm />
-                    </ButtonIconTextFloat>
-                }
                 refreshButton={
                     <Refresh
                         slice={categoriesSlice}

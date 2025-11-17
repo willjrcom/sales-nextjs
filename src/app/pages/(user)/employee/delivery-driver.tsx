@@ -39,21 +39,19 @@ const PageDeliveryDriver = () => {
 
     return (
         <>
+            <ButtonIconTextFloat modalName="filter-delivery-driver" icon={FaFilter}>
+                <h1>Filtro</h1>
+            </ButtonIconTextFloat>
+
+            <ButtonIconTextFloat modalName="new-delivery-driver" position="bottom-right"
+                title="Novo motoboy">
+                <DeliveryDriverForm />
+            </ButtonIconTextFloat>
+
             <CrudLayout
                 title={<PageTitle title="Motoboys" tooltip="Gerencie motoboys e atribua entregas." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} optional />
-                }
-                filterButtonChildren={
-                    <ButtonIconTextFloat modalName="filter-delivery-driver" icon={FaFilter}>
-                        <h1>Filtro</h1>
-                    </ButtonIconTextFloat>
-                }
-                plusButtonChildren={
-                    <ButtonIconTextFloat modalName="new-delivery-driver" position="bottom-right"
-                        title="Novo motoboy">
-                        <DeliveryDriverForm />
-                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh

@@ -35,19 +35,19 @@ const PageClient = () => {
 
     return (
         <>
+            <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}>
+                <h1>Filtro</h1>
+            </ButtonIconTextFloat>
+
+            <ButtonIconTextFloat title="Novo cliente" modalName="new-client" position="bottom-right">
+                <ClientForm />
+            </ButtonIconTextFloat>
+
             <CrudLayout title={<PageTitle title="Clientes" tooltip="Gerencie o cadastro de clientes, incluindo busca e filtro por nome." />}
                 searchButtonChildren={
                     <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional />
                 }
-                filterButtonChildren={
-                    <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
-                }
 
-                plusButtonChildren={
-                    <ButtonIconTextFloat title="Novo cliente" modalName="new-client" position="bottom-right">
-                        <ClientForm />
-                    </ButtonIconTextFloat>
-                }
                 refreshButton={
                     <Refresh
                         fetchItems={fetchClients}

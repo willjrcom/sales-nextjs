@@ -45,18 +45,14 @@ export default function PageProcessRules() {
 
     return (
         <>
+            <ButtonIconTextFloat modalName="new-process-rule" title="Novo processo" position="bottom-right">
+                <ProcessRuleForm />
+            </ButtonIconTextFloat>
+
             <CrudLayout title={<PageTitle title="Processos" tooltip="Defina as etapas de processamento para produtos, com ordem e tempo ideal." />}
                 searchButtonChildren={
                     <SelectField
                         friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={validCategories} optional />
-                }
-                filterButtonChildren={
-                    <></>
-                }
-                plusButtonChildren={
-                    <ButtonIconTextFloat modalName="new-process-rule" title="Novo processo" position="bottom-right">
-                        <ProcessRuleForm />
-                    </ButtonIconTextFloat>
                 }
                 refreshButton={
                     <Refresh
