@@ -58,10 +58,14 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     }, [selectedType])
 
     useEffect(() => {
-        if (data && Object.keys(categoriesSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasPlaces = categoriesSlice.ids.length > 0;
+
+        if (token && !hasPlaces) {
             dispatch(fetchCategories({ session: data }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, categoriesSlice.ids.length]);
+    
     useEffect(() => {
         if (category.need_print && typeof window !== 'undefined' && window.electronAPI?.getPrinters) {
             (async () => {

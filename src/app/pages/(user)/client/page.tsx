@@ -24,10 +24,13 @@ const PageClient = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     useEffect(() => {
-        if (data) {
+        const token = data?.user?.access_token;
+        const hasClients = clientsSlice.ids.length > 0;
+
+        if (token && !hasClients) {
             dispatch(fetchClients({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
         }
-    }, [data, pagination.pageIndex, pagination.pageSize, dispatch]);
+    }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, clientsSlice.ids.length]);
 
     const sortedClients = useMemo(() => {
         return Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name));

@@ -82,18 +82,24 @@ const DragAndDropGrid = () => {
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
 
     useEffect(() => {
-        if (data) {
+        const token = data?.user?.access_token;
+        const hasTableOrdersSlice = tableOrdersSlice.ids.length > 0;
+
+        if (token && !hasTableOrdersSlice) {
             dispatch(fetchTableOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasTableOrdersSlice = tableOrdersSlice.ids.length > 0;
+
+            if (token && !hasTableOrdersSlice) {
                 dispatch(fetchTableOrders({ session: data }));
             }
         }, 30000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch])
+    }, [data?.user.access_token,])
 
     useEffect(() => {
         setTableOrders(Object.values(tableOrdersSlice.entities));
@@ -167,7 +173,7 @@ const DragAndDropGrid = () => {
                                     const ordersForTable = tableOrders.filter(
                                         (order) => order.table_id === placeTable.table_id && order.status !== "Closed"
                                     );
-                                    
+
                                     return (
                                         <TableItem
                                             key={`${placeTable.table_id}-${placeTable.row}-${placeTable.column}`}
@@ -248,7 +254,7 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
                 <div className="w-full max-w-md bg-white p-6 rounded-md shadow space-y-4">
                     <h2 className="text-xl font-bold text-gray-800 mb-4">Mesa: {placeTable.table.name}</h2>
                     <p className="text-gray-600 mb-4">Existem {ordersForTable.length} pedidos abertos nesta mesa. Escolha qual deseja visualizar:</p>
-                    
+
                     <div className="space-y-2">
                         {ordersForTable.map((order) => (
                             <button

@@ -26,18 +26,17 @@ const PageEmployee = () => {
     const [showDeleted, setShowDeleted] = useState(false);
 
     useEffect(() => {
-        if (data) {
-            if (showDeleted) {
-                if (Object.keys(employeesDeletedSlice.entities).length === 0) {
-                    dispatch(fetchEmployeesDeleted({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
-                }
-            } else {
-                if (Object.keys(employeesSlice.entities).length === 0) {
-                    dispatch(fetchEmployees({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
-                }
-            }
+        const token = data?.user?.access_token;
+        const hasEmployeesDeletedSlice = employeesDeletedSlice.ids.length > 0;
+        const hasEmployeesSlice = employeesSlice.ids.length > 0;
+
+        if (showDeleted && token && !hasEmployeesDeletedSlice) {
+            dispatch(fetchEmployeesDeleted({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
+        } else if (!showDeleted && token && !hasEmployeesSlice) {
+            dispatch(fetchEmployees({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
         }
-    }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, dispatch, showDeleted]);
+
+    }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, showDeleted, employeesDeletedSlice.ids.length, employeesSlice.ids.length]);
 
     if ((showDeleted ? employeesDeletedSlice.loading : employeesSlice.loading)) {
         return (

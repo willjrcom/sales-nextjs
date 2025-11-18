@@ -4,18 +4,15 @@ import GetCategoriesWithOrderProcess from '@/app/api/category/all/with-order-pro
 import Carousel from '@/app/components/carousel/carousel';
 import Category from '@/app/entities/category/category';
 import ProcessRule from '@/app/entities/process-rule/process-rule';
-import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import { HiOutlineRefresh } from 'react-icons/hi';
 import Link from 'next/link';
 import React, { useEffect, useState, useRef } from 'react';
 import PageTitle from '@/app/components/PageTitle';
-import { useDispatch } from 'react-redux';
 
 const OrderProcess = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const { data } = useSession();
-    const dispatch = useDispatch<AppDispatch>();
 
     const fetch = async () => {
         if (!data) return;
@@ -33,10 +30,13 @@ const OrderProcess = () => {
 
     // Polling every 60 seconds
     useEffect(() => {
-        if (!data) return;
-        const interval = setInterval(() => fetch(), 30000);
-        return () => clearInterval(interval);
-    }, [data]);
+        const token = data?.user?.access_token;
+
+        if (token) {
+            const interval = setInterval(() => fetch(), 30000);
+            return () => clearInterval(interval);
+        }
+    }, [data?.user.access_token]);
 
     const noRuleCategories = categories.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement);
     const validCategories = categories.filter(c => c.use_process_rule);
@@ -128,11 +128,11 @@ const CardProcessRule = ({ processRule }: CardProcessRuleProps) => {
                 )}
 
                 {processRule.total_order_queue > 0 ? (
-                <div className="bg-yellow-400 text-white font-medium text-sm px-4 py-1 rounded-full">
-                    {processRule.total_order_queue} em fila
-                </div>
+                    <div className="bg-yellow-400 text-white font-medium text-sm px-4 py-1 rounded-full">
+                        {processRule.total_order_queue} em fila
+                    </div>
                 ) : (
-                <div>&nbsp;</div>
+                    <div>&nbsp;</div>
                 )}
             </div>
         </Link>

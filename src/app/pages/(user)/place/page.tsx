@@ -52,18 +52,25 @@ const DragAndDropGrid = () => {
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
 
     useEffect(() => {
-        if (data && Object.values(placesSlice.entities).length == 0) {
+        const token = data?.user?.access_token;
+        const hasPlacesSlice = placesSlice.ids.length > 0;
+        const hasUnusedTablesSlice = unusedTablesSlice.ids.length > 0;
+
+        if (token && !hasPlacesSlice) {
             dispatch(fetchPlaces({ session: data }));
         }
-        if (data) {
+        if (token && !hasUnusedTablesSlice) {
             dispatch(fetchUnusedTables({ session: data }))
         }
-    }, [data?.user.access_token, dispatch])
+    }, [data?.user.access_token, placesSlice.ids.length, unusedTablesSlice.ids.length])
 
     useEffect(() => {
         setPlaces(Object.values(placesSlice.entities));
 
-        const firstPlace = Object.values(placesSlice.entities)[0];
+        const places = Object.values(placesSlice.entities)
+        if (places.length == 0) return
+        
+        const firstPlace = places[0];
         if (!firstPlace) return
         if (placeSelectedID === "") setPlaceSelectedID(firstPlace.id)
     }, [placesSlice.entities])

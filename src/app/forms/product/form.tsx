@@ -35,7 +35,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        const category = categoriesSlice.entities[product.category_id];
+        const category = categoriesSlice.entities?.[product.category_id];
         if (!category) return
         setCategory(category)
     }, [product.category_id])

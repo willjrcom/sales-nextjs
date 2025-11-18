@@ -44,7 +44,9 @@ const Component = () => {
     }, [id]);
 
     useEffect(() => {
-        if (!data || !currentProcessRuleID) return;
+        const token = data?.user?.access_token;
+        
+        if (!token || !currentProcessRuleID) return;
         dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
 
         const processRule = processRules.find((p) => p.id === currentProcessRuleID)
@@ -52,7 +54,7 @@ const Component = () => {
             setProcessRule(processRule)
             updateParam(processRule.id)
         }
-    }, [data?.user.access_token, dispatch, currentProcessRuleID]);
+    }, [data?.user.access_token, currentProcessRuleID]);
 
     useEffect(() => {
         const entities = Object.values(orderProcessesSlice.entities);

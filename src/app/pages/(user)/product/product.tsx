@@ -22,10 +22,13 @@ const PageProducts = () => {
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(categoriesSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasCategories = categoriesSlice.ids.length > 0;
+
+        if (token && !hasCategories) {
             dispatch(fetchCategories({ session: data }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user?.access_token, categoriesSlice.ids.length]);
 
     // products
     useEffect(() => {

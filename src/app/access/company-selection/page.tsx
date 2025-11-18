@@ -48,10 +48,13 @@ function CompanySelection() {
     const loadingCompanies = userCompaniesSlice.loading;
 
     useEffect(() => {
-        if (data && Object.keys(userCompaniesSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasCompanies = userCompaniesSlice.ids.length > 0;
+
+        if (token && !hasCompanies) {
             dispatch(fetchUserCompanies({ session: data } as FetchItemsArgs));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, userCompaniesSlice.ids.length]);
 
     useEffect(() => {
         const companiesFound = Object.values(userCompaniesSlice.entities) || []

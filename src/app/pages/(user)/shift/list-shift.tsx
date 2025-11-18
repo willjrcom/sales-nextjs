@@ -21,10 +21,13 @@ const ListShift = () => {
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(shiftsSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasShiftsSlice = shiftsSlice.ids.length > 0;
+
+        if (token && !hasShiftsSlice) {
             dispatch(fetchShifts({ session: data }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, shiftsSlice.ids.length]);
 
     // shifts
     useEffect(() => {

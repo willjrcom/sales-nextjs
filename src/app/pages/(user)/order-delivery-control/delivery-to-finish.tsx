@@ -44,18 +44,24 @@ const DeliveryOrderToFinish = () => {
     }, [deliveryDriversSlice.entities]);
 
     useEffect(() => {
-        if (data && Object.keys(deliveryOrdersSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+
+        if (token && !hasDeliveryOrdersSlice) {
             dispatch(fetchDeliveryOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+
+            if (token && !hasDeliveryOrdersSlice) {
                 dispatch(fetchDeliveryOrders({ session: data }));
             }
         }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, deliveryOrdersSlice.ids.length]);
 
     useEffect(() => {
         const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped');
@@ -81,10 +87,10 @@ const DeliveryOrderToFinish = () => {
 
     const setCentralCoordinates = async () => {
         if (!data) return
-        
+
         const company = await GetCompany(data);
         if (!data || !company.address) return
-        
+
         const coordinates = company.address.coordinates
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;

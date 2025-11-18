@@ -19,26 +19,32 @@ const PageOrder = () => {
     const modalHandler = useModal();
 
     useEffect(() => {
-        if (data && Object.keys(ordersSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasOrdersSlice = ordersSlice.ids.length > 0;
+
+        if (token && !hasOrdersSlice) {
             dispatch(fetchOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasOrdersSlice = ordersSlice.ids.length > 0;
+
+            if (token && !hasOrdersSlice) {
                 dispatch(fetchOrders({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, ordersSlice.ids.length]);
 
-    const stagingOrders = Object.values(ordersSlice.entities).map((order) => order.status === "Staging"? order : null).filter((order) => order !== null);
+    const stagingOrders = Object.values(ordersSlice.entities).map((order) => order.status === "Staging" ? order : null).filter((order) => order !== null);
 
     const openStagingOrders = () => {
         const onClose = () => {
             modalHandler.hideModal("show-staging-orders")
         }
-        modalHandler.showModal("show-staging-orders", "Pedidos em aberto", <CardOrderListItem orders={stagingOrders} /> , "sm", onClose);
+        modalHandler.showModal("show-staging-orders", "Pedidos em aberto", <CardOrderListItem orders={stagingOrders} />, "sm", onClose);
     }
 
     const classOrderStaging = stagingOrders.length > 0 ? "text-white bg-red-400 hover:bg-red-500" : "bg-gray-200 hover:bg-gray-300";
@@ -55,6 +61,10 @@ const PageOrder = () => {
                         >
                             {stagingOrders.length} pedidos em aberto
                         </button>
+
+                        <p className="text-sm text-gray-600 mb-4 text-center">
+                            Arraste o pedido para a direita para alterar o status.
+                        </p>
                     </div>
                 }
                 refreshButton={
@@ -62,11 +72,6 @@ const PageOrder = () => {
                         fetchItems={fetchOrders}
                         slice={ordersSlice}
                     />
-                }
-                filterButtonChildren={
-                    <p className="text-sm text-gray-600 mb-4 text-center">
-                        Arraste o pedido para a direita para alterar o status.
-                    </p>
                 }
                 tableChildren={<OrderKanban slice={ordersSlice} />}
             />

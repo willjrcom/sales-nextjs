@@ -25,31 +25,37 @@ const PageStock = () => {
     const [productID, setProductID] = useState("");
     const [stockFilter, setStockFilter] = useState("all"); // all, low, out
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const reportStockSlice = useSelector((state: RootState) => state.reportStocks);
+    const reportStocksSlice = useSelector((state: RootState) => state.reportStocks);
     const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(categoriesSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasCategoriesSlice = categoriesSlice.ids.length > 0;
+
+        if (token && !hasCategoriesSlice) {
             dispatch(fetchCategories({ session: data }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, categoriesSlice.ids.length]);
 
     // Carregar dados de estoque
     useEffect(() => {
-        if (data) {
+        const token = data?.user?.access_token;
+        const hasReportStocksSlice = reportStocksSlice.ids.length > 0;
+
+        if (token && !hasReportStocksSlice) {
             dispatch(fetchReportStocks({ session: data }));
         }
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, reportStocksSlice.ids.length]);
 
-    if (reportStockSlice.loading) {
+    if (reportStocksSlice.loading) {
         return (
             <h1>Carregando página...</h1>
         )
     }
 
     // Filtrar estoques baseado nos filtros
-    let reports = Object.values(reportStockSlice.entities);
+    let reports = Object.values(reportStocksSlice.entities);
     let report: StockReportComplete = {} as StockReportComplete;
     let filteredStocks: Stock[] = [];
 
@@ -135,7 +141,7 @@ const PageStock = () => {
                 }
                 refreshButton={
                     <Refresh
-                        slice={reportStockSlice}
+                        slice={reportStocksSlice}
                         fetchItems={fetchReportStocks}
                     />
                 }

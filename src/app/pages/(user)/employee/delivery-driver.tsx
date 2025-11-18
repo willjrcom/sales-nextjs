@@ -25,9 +25,13 @@ const PageDeliveryDriver = () => {
     const { data } = useSession();
     const defaultPageSize = 10;
     useEffect(() => {
-        if (!data) return;
-        dispatch(fetchDeliveryDrivers({ session: data, page: 1, perPage: defaultPageSize } as FetchItemsArgs));
-    }, [data, dispatch]);
+        const token = data?.user?.access_token;
+        const hasDeliveryDrivers = deliveryDriversSlice.ids.length > 0;
+
+        if (token && !hasDeliveryDrivers) {
+            dispatch(fetchDeliveryDrivers({ session: data, page: 1, perPage: defaultPageSize } as FetchItemsArgs));
+        }
+    }, [data?.user?.access_token, deliveryDriversSlice.ids.length]);
 
     useEffect(() => {
         const driversFound = Object.values(deliveryDriversSlice.entities).filter((driver) => !!driver.employee);

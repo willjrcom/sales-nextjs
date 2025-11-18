@@ -30,22 +30,29 @@ const DeliveryOrderFinished = () => {
     }, [deliveryDriversSlice.entities]);
 
     useEffect(() => {
-        if (data && Object.keys(deliveryOrdersSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+
+        if (token && !hasDeliveryOrdersSlice) {
             dispatch(fetchDeliveryOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+
+            if (token && !hasDeliveryOrdersSlice) {
                 dispatch(fetchDeliveryOrders({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, deliveryOrdersSlice.ids.length]);
 
     useEffect(() => {
-        const deliveredOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Delivered');
-        const ordersNotFinished = Object.values(deliveryOrdersSlice.entities).filter((order) => order?.status === 'Ready' && order.delivery?.status === 'Delivered');
+        const orders = Object.values(deliveryOrdersSlice.entities);
+        const deliveredOrders = orders.filter((order) => order.delivery?.status === 'Delivered');
+        const ordersNotFinished = orders.filter((order) => order?.status === 'Ready' && order.delivery?.status === 'Delivered');
 
         if (!selectedDriverId) {
             setOrdersNotFinished(ordersNotFinished);
@@ -58,7 +65,7 @@ const DeliveryOrderFinished = () => {
     }, [deliveryOrdersSlice.entities, selectedDriverId]);
 
     if (!data) return null;
-    
+
     return (
         <>
             <div className="flex justify-between items-center">
@@ -72,17 +79,17 @@ const DeliveryOrderFinished = () => {
                 />
                 <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
             </div>
-            {ordersNotFinished.length > 0 && 
-            <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Pedidos não finalizados</h3>
-                <CrudTable columns={DeliveryOrderColumns()} data={ordersNotFinished} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
-            </div>}
+            {ordersNotFinished.length > 0 &&
+                <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Pedidos não finalizados</h3>
+                    <CrudTable columns={DeliveryOrderColumns()} data={ordersNotFinished} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
+                </div>}
 
             <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-2">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
-            {orderID && <ButtonIconTextFloat modalName={"show-order-"+orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders({ session: data }))}>
+            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders({ session: data }))}>
                 <CardOrder orderId={orderID} />
             </ButtonIconTextFloat>}
         </>

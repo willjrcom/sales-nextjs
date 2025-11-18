@@ -24,18 +24,24 @@ const PageNewOrderTable = () => {
     const { data } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(placesSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasPlacesSlice = placesSlice.ids.length > 0;
+
+        if (token && !hasPlacesSlice) {
             dispatch(fetchPlaces({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasPlacesSlice = placesSlice.ids.length > 0;
+
+            if (token && !hasPlacesSlice) {
                 dispatch(fetchPlaces({ session: data }));
             }
         }, 60000); // Atualiza a cada 60 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, dispatch]);
+    }, [data?.user.access_token, placesSlice.ids.length]);
 
     useEffect(() => {
         if (!placeID) return;
@@ -80,7 +86,7 @@ const PageNewOrderTable = () => {
                     setSelectedValue={setTableID}
                     values={tables}
                 />
-                
+
                 <button
                     disabled={!tableID}
                     onClick={() => newOrder(tableID)}

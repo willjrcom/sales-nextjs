@@ -39,18 +39,24 @@ const DeliveryOrderToShip = () => {
     const { data, status } = useSession();
 
     useEffect(() => {
-        if (data && Object.keys(ordersSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasOrdersSlice = ordersSlice.ids.length > 0;
+
+        if (token && !hasOrdersSlice) {
             dispatch(fetchDeliveryOrders({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasOrdersSlice = ordersSlice.ids.length > 0;
+
+            if (token && !hasOrdersSlice) {
                 dispatch(fetchDeliveryOrders({ session: data }));
             }
         }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [status]);
+    }, [data?.user?.access_token, ordersSlice.ids.length, status]);
 
     useEffect(() => {
         const orders = Object.values(ordersSlice.entities).filter((order) => order.delivery?.status === 'Ready')
@@ -151,18 +157,24 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const modalHandler = useModal();
 
     useEffect(() => {
-        if (data && Object.keys(deliveryDriversSlice.entities).length === 0) {
+        const token = data?.user?.access_token;
+        const hasDeliveryDriversSlice = deliveryDriversSlice.ids.length > 0;
+
+        if (token && !hasDeliveryDriversSlice) {
             dispatch(fetchDeliveryDrivers({ session: data }));
         }
 
         const interval = setInterval(() => {
-            if (data) {
+            const token = data?.user?.access_token;
+            const hasDeliveryDriversSlice = deliveryDriversSlice.ids.length > 0;
+
+            if (token && !hasDeliveryDriversSlice) {
                 dispatch(fetchDeliveryDrivers({ session: data }));
             }
         }, 30000); // Atualiza a cada 30 segundos
 
         return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token]);
+    }, [data?.user.access_token, deliveryDriversSlice.ids.length]);
 
     useEffect(() => {
         setDeliveryDrivers(Object.values(deliveryDriversSlice.entities));

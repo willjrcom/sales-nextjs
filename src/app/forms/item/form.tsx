@@ -70,7 +70,6 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   }
 
   useEffect(() => {
-
     if (!product.size || !product.category) {
       setReloadProduct(true);
     }
