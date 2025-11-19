@@ -2,7 +2,7 @@ export interface ReportConfig {
   id: string;
   name: string;
   endpoint: string;
-  method: 'GET' | 'POST';
+  method: 'POST' | 'POST';
   chartType: 'line' | 'bar' | 'pie';
   inputType: 'none' | 'date' | 'dateRange';
   labelKey: string;
@@ -124,7 +124,7 @@ export const reportConfigs: ReportConfig[] = [
     id: 'orders-by-status',
     name: 'Pedidos por Status',
     endpoint: '/report/orders-by-status',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
     labelKey: 'status',
@@ -134,17 +134,17 @@ export const reportConfigs: ReportConfig[] = [
     id: 'avg-process-step-duration',
     name: 'Duração Média de Etapa',
     endpoint: '/report/avg-process-step-duration',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
-    labelKey: 'process_rule_id',
+    labelKey: 'process_rule_name',
     dataKey: 'avg_seconds',
   },
   {
     id: 'cancellation-rate',
     name: 'Taxa de Cancelamento',
     endpoint: '/report/cancellation-rate',
-    method: 'GET',
+    method: 'POST',
     chartType: 'pie',
     inputType: 'none',
     labelKey: 'rate',
@@ -154,7 +154,7 @@ export const reportConfigs: ReportConfig[] = [
     id: 'current-queue-length',
     name: 'Tamanho Atual da Fila',
     endpoint: '/report/current-queue-length',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
     labelKey: 'length',
@@ -164,30 +164,30 @@ export const reportConfigs: ReportConfig[] = [
     id: 'avg-delivery-time-by-driver',
     name: 'Tempo Médio de Entrega por Entregador',
     endpoint: '/report/avg-delivery-time-by-driver',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
-    labelKey: 'driver_id',
+    labelKey: 'driver_name',
     dataKey: 'avg_seconds',
   },
   {
     id: 'deliveries-per-driver',
     name: 'Entregas por Entregador',
     endpoint: '/report/deliveries-per-driver',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
-    labelKey: 'driver_id',
+    labelKey: 'driver_name',
     dataKey: 'count',
   },
   {
     id: 'orders-per-table',
     name: 'Pedidos por Mesa',
     endpoint: '/report/orders-per-table',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
-    labelKey: 'table_id',
+    labelKey: 'table_name',
     dataKey: 'count',
   },
   {
@@ -197,7 +197,7 @@ export const reportConfigs: ReportConfig[] = [
     method: 'POST',
     chartType: 'bar',
     inputType: 'dateRange',
-    labelKey: 'shift_id',
+    labelKey: 'opened_at',
     dataKey: 'total',
   },
   {
@@ -277,7 +277,7 @@ export const reportConfigs: ReportConfig[] = [
     method: 'POST',
     chartType: 'bar',
     inputType: 'dateRange',
-    labelKey: 'rule_id',
+    labelKey: 'process_rule_name',
     dataKey: 'count',
   },
   {
@@ -287,7 +287,7 @@ export const reportConfigs: ReportConfig[] = [
     method: 'POST',
     chartType: 'bar',
     inputType: 'dateRange',
-    labelKey: 'employee_id',
+    labelKey: 'employee_name',
     dataKey: 'total',
   },
   // Top 10 mesas mais utilizadas
@@ -298,7 +298,7 @@ export const reportConfigs: ReportConfig[] = [
     method: 'POST',
     chartType: 'bar',
     inputType: 'dateRange',
-    labelKey: 'table_id',
+    labelKey: 'table_name',
     dataKey: 'count',
   },
   // Queue and process metrics
@@ -306,7 +306,7 @@ export const reportConfigs: ReportConfig[] = [
     id: 'avg-queue-duration',
     name: 'Duração Média da Fila',
     endpoint: '/report/avg-queue-duration',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
     labelKey: 'avg_seconds',
@@ -316,11 +316,21 @@ export const reportConfigs: ReportConfig[] = [
     id: 'avg-process-duration-by-product',
     name: 'Duração Média por Produto',
     endpoint: '/report/avg-process-duration-by-product',
-    method: 'GET',
+    method: 'POST',
     chartType: 'bar',
     inputType: 'none',
     labelKey: 'product_name',
     dataKey: 'avg_seconds',
+  },
+  {
+    id: 'total-queue-time-by-group-item',
+    name: 'Tempo Médio na Fila',
+    endpoint: '/report/total-queue-time-by-group-item',
+    method: 'POST',
+    chartType: 'bar',
+    inputType: 'none',
+    labelKey: 'group_item_id',
+    dataKey: 'total_seconds',
   },
   // Profitability reports
   {

@@ -48,7 +48,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormD
     const fullPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`;
 
     let fetchHeaders = { ...headers };
-    let fetchBody: any = undefined;
+    let fetchBody = undefined;
 
     if (isFormData && body instanceof FormData) {
         // NÃO definir Content-Type, o browser faz isso automaticamente

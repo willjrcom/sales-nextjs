@@ -10,10 +10,19 @@ interface ReportCardProps {
 
 const ReportCard = ({ config, date, setDate }: ReportCardProps) => {
     const body = config.inputType === 'dateRange'
-        ? { start: new Date(date.start).toISOString(), end: new Date(date.end).toISOString() }
+        ? {
+            start: new Date(date.start).toISOString(),
+            end: new Date(date.end).toISOString(),
+        }
         : config.inputType === 'date'
-            ? { day: new Date(date.start).toISOString() }
-            : undefined;
+            ? {
+                day: new Date(date.start).toISOString(),
+            }
+            : { 
+                start: new Date(),
+                end: new Date(),
+                day: new Date(),
+            };
 
     return (
         <div key={config.id} className="mb-8">
@@ -40,7 +49,7 @@ const ReportCard = ({ config, date, setDate }: ReportCardProps) => {
                     )}
                 </div>
             )}
-            
+
             <div className="bg-white p-4 rounded shadow">
                 <ReportChart
                     endpoint={config.endpoint}
