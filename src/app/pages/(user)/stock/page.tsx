@@ -1,7 +1,7 @@
 'use client';
 
 import StockForm from "@/app/forms/stock/form";
-import CrudLayout from "@/app/components/crud/layout";
+import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import StockColumns from "@/app/entities/stock/table-columns";
@@ -88,7 +88,7 @@ const PageStock = () => {
         .map((category) => {
             return category.products?.map(product => ({
                 id: product.id,
-                name: product.name
+                name: product.name + " - " + product.size.name
             })) || []
         }).flat();
 

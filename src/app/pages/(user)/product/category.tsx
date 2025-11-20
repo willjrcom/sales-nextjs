@@ -1,7 +1,7 @@
 'use client';
 
 import CategoryForm from "@/app/forms/category/form";
-import CrudLayout from "@/app/components/crud/layout";
+import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import CategoryColumns from "@/app/entities/category/table-columns";

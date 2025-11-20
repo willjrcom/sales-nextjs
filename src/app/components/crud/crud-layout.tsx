@@ -1,14 +1,20 @@
-const CrudLayout = ({
-    title,
-    searchButtonChildren,
-    refreshButton,
-    tableChildren,
-}: Readonly<{
+"use client";
+
+import React from "react";
+
+export interface CrudLayoutProps {
     title: React.ReactNode;
     searchButtonChildren?: React.ReactNode;
     refreshButton?: React.ReactNode;
     tableChildren: React.ReactNode;
-}>) => {
+}
+
+export default function CrudLayout({
+    title,
+    searchButtonChildren,
+    refreshButton,
+    tableChildren,
+}: CrudLayoutProps) {
     return (
         <div className="container mx-auto p-6">
             {/* Header */}
@@ -20,12 +26,12 @@ const CrudLayout = ({
                 <div className="text-center">
                     <h1 className="text-2xl font-bold">{title}</h1>
                 </div>
-                
+
                 <div className="flex justify-end">
                     {refreshButton}
                 </div>
             </div>
-            
+
             {/* Divider */}
             <div className="border-b my-4" />
 
@@ -36,5 +42,3 @@ const CrudLayout = ({
         </div>
     );
 };
-
-export default CrudLayout

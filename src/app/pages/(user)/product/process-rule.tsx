@@ -1,7 +1,7 @@
 'use client';
 
 import ProcessRuleForm from "@/app/forms/process-rule/form";
-import CrudLayout from "@/app/components/crud/layout";
+import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";

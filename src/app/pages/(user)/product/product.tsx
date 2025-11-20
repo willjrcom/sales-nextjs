@@ -1,5 +1,5 @@
 import ProductForm from "@/app/forms/product/form";
-import CrudLayout from "@/app/components/crud/layout";
+import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";

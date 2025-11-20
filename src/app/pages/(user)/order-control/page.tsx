@@ -1,6 +1,6 @@
 "use client"
 
-import CrudLayout from "@/app/components/crud/layout";
+import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import Refresh from "@/app/components/crud/refresh";
 import OrderKanban from "@/app/components/order/kanban/kanban";

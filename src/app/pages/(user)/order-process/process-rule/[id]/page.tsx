@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
 import { fetchOrderProcesses } from "@/redux/slices/order-processes";
-import CrudLayout from "@/app/components/crud/layout";
+import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";

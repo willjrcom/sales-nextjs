@@ -84,7 +84,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                 }
 
                 for (const product of allProducts) {
-                    records.push({ id: product.id, name: product.name })
+                    records.push({ id: product.id, name: product.name + " - " + product.size.name })
                 }
                 setRecordProducts(records);
 
