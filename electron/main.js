@@ -4,12 +4,17 @@ const path = require('path');
 const { spawn } = require('child_process');
 const waitOn = require('wait-on');
 
-let goProcess = null;
-let nextDev = null;
+// let goProcess = null;let nextPath;
+if (app.isPackaged) {
+    // Caminho correto quando empacotado
+    nextPath = path.join(process.resourcesPath, 'src');
+} else {
+    // Caminho durante desenvolvimento
+    nextPath = path.join(__dirname, '../src');
+}
 
-const goBackendPath = path.join(__dirname, '../backend');
-const goBinary = path.join(goBackendPath, 'server');
-const nextPath = path.join(__dirname, '../src');
+// const goBackendPath = path.join(__dirname, '../backend');
+// const goBinary = path.join(goBackendPath, 'server');
 
 let detectedPort = 3000; // Porta padrão inicial
 
@@ -20,7 +25,7 @@ async function createWindow(port) {
         height: 600,
         darkTheme: true,
         fullscreen: true,
-        icon: path.join(__dirname, 'icon.png'),
+        icon: path.join(__dirname, '../public/icons/logo.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -156,22 +161,22 @@ ipcMain.handle('clear-credentials', () => {
 
 app.whenReady().then(() => {
     // Inicia backend Go
-    goProcess = spawn(goBinary, ['httpserver'], {
-        cwd: goBackendPath,
-        shell: true,
-    });
+    // goProcess = spawn(goBinary, ['httpserver'], {
+    //     cwd: goBackendPath,
+    //     shell: true,
+    // });
 
-    goProcess.stdout.on('data', (data) => {
-        console.log(`Go: ${data.toString()}`);
-    });
+    // goProcess.stdout.on('data', (data) => {
+    //     console.log(`Go: ${data.toString()}`);
+    // });
 
-    goProcess.stderr.on('data', (data) => {
-        console.error(`Go Error: ${data.toString()}`);
-    });
+    // goProcess.stderr.on('data', (data) => {
+    //     console.error(`Go Error: ${data.toString()}`);
+    // });
 
-    goProcess.on('error', (err) => {
-        console.error('Erro ao iniciar Go backend:', err);
-    });
+    // goProcess.on('error', (err) => {
+    //     console.error('Erro ao iniciar Go backend:', err);
+    // });
 
     // Inicia Next.js dev
     const isWin = process.platform === 'win32';
@@ -211,7 +216,7 @@ app.whenReady().then(() => {
 
 // Limpa processos ao sair
 app.on('before-quit', () => {
-    if (goProcess) goProcess.kill();
+    // if (goProcess) goProcess.kill();
     if (nextDev) nextDev.kill();
 });
 
