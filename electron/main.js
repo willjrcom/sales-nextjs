@@ -1,64 +1,62 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const fs = require('fs');
-const path = require('path');
-const { spawn } = require('child_process');
-const waitOn = require('wait-on');
+const path = require("path");
+const next = require("next");
+const http = require("http");
 
-// let goProcess = null;let nextPath;
-if (app.isPackaged) {
-    // Caminho correto quando empacotado
-    nextPath = path.join(process.resourcesPath, 'src');
-} else {
-    // Caminho durante desenvolvimento
-    nextPath = path.join(__dirname, '../src');
-}
+const dev = process.env.NODE_ENV !== "production";
 
-// const goBackendPath = path.join(__dirname, '../backend');
-// const goBinary = path.join(goBackendPath, 'server');
+// Inicializa o Next.js apontando para a raiz do projeto (um nível acima da pasta `electron`)
+const nextApp = next({ dev, dir: path.join(__dirname, "..") });
+const handle = nextApp.getRequestHandler();
 
-let detectedPort = 3000; // Porta padrão inicial
+let mainWindow;
 
-async function createWindow(port) {
-    console.log('Criando janela Electron na porta', port);
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        darkTheme: true,
-        fullscreen: true,
-        icon: path.join(__dirname, '../public/icons/logo.png'),
+async function createWindow() {
+    // Prepara o Next.js
+    await nextApp.prepare();
+
+    // Cria o servidor interno do Next.js
+    const server = http.createServer((req, res) => {
+        handle(req, res);
+    });
+
+    const PORT = 3000;
+    server.listen(PORT);
+
+    // Cria a janela do Electron
+    mainWindow = new BrowserWindow({
+        width: 1200,
+        height: 800,
+        show: false,
         webPreferences: {
+            preload: path.join(__dirname, "preload.js"),
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
+        },
     });
 
-    win.loadURL(`http://localhost:${port}/login`);
-
-    // win.webContents.openDevTools({ mode: 'undocked' });
-    win.webContents.on('did-fail-load', () => {
-        console.error('Falha ao carregar a URL:', `http://localhost:${port}/login`);
+    // Quando a janela carregar, mostra ela
+    mainWindow.once("ready-to-show", () => {
+        mainWindow.show();
     });
 
-    win.on('closed', () => {
-        console.log('Janela fechada');
-    });
+    mainWindow.loadURL(`http://localhost:${PORT}/login`);
 }
 
-async function waitForFrontendAndCreateWindow(port) {
-    try {
-        console.log(`Esperando frontend subir em http://localhost:${port}/login ...`);
-        await waitOn({
-            resources: [`http://localhost:${port}/login`],
-            timeout: 20000, // 20s
-            interval: 500,
-        });
-        console.log('Frontend disponível. Criando janela...');
-        createWindow(port);
-    } catch (err) {
-        console.error('Erro ao esperar frontend subir:', err);
+// Use whenReady().then(...) e trate erros para evitar UnhandledPromiseRejection
+app.whenReady().then(createWindow).catch((err) => {
+    console.error("Falha ao criar a janela do Electron:", err);
+    // Encerrar o app em caso de falha na inicialização do Next
+    app.quit();
+});
+
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        app.quit();
     }
-}
+});
+
+
 
 // IPC handler para obter lista de impressoras disponíveis
 // IPC handler para obter lista de impressoras disponíveis
@@ -158,68 +156,3 @@ ipcMain.handle('clear-credentials', () => {
         return false;
     }
 });
-
-app.whenReady().then(() => {
-    // Inicia backend Go
-    // goProcess = spawn(goBinary, ['httpserver'], {
-    //     cwd: goBackendPath,
-    //     shell: true,
-    // });
-
-    // goProcess.stdout.on('data', (data) => {
-    //     console.log(`Go: ${data.toString()}`);
-    // });
-
-    // goProcess.stderr.on('data', (data) => {
-    //     console.error(`Go Error: ${data.toString()}`);
-    // });
-
-    // goProcess.on('error', (err) => {
-    //     console.error('Erro ao iniciar Go backend:', err);
-    // });
-
-    // Inicia Next.js dev
-    const isWin = process.platform === 'win32';
-    const npmCmd = isWin ? 'npm.cmd' : 'npm';
-
-    nextDev = spawn(npmCmd, ['run', 'start'], {
-        cwd: nextPath,
-        shell: true,
-    });
-
-    nextDev.stdout.on('data', (data) => {
-        const output = data.toString();
-        console.log(`Next.js: ${output}`);
-
-        // Detecta porta no log, ex: "Local: http://localhost:3002"
-        const match = output.match(/Local:\s*http:\/\/localhost:(\d+)/);
-        if (match) {
-            const port = parseInt(match[1], 10);
-            if (port !== detectedPort) {
-                detectedPort = port;
-                console.log(`Porta do Next.js detectada: ${detectedPort}`);
-            }
-        }
-    });
-
-    nextDev.stderr.on('data', (data) => {
-        console.error(`Next.js Error: ${data.toString()}`);
-    });
-
-    nextDev.on('error', (err) => {
-        console.error('Erro ao iniciar Next.js frontend:', err);
-    });
-
-    // Espera o frontend estar disponível na porta detectada
-    waitForFrontendAndCreateWindow(detectedPort);
-});
-
-// Limpa processos ao sair
-app.on('before-quit', () => {
-    // if (goProcess) goProcess.kill();
-    if (nextDev) nextDev.kill();
-});
-
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
-})

@@ -66,7 +66,7 @@ const RegisterForm = () => {
         <div className="flex h-screen">
             <div className="w-1/2 bg-yellow-500 relative">
                 <Image
-                    src="/img_login.jpg"
+                    src="/icons/logo.png"
                     alt="Register"
                     fill={true}
                     sizes="(max-width: 768px) 100vw, 50vw"

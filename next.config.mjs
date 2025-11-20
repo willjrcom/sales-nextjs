@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     crossOrigin: 'anonymous',
+    reactStrictMode: true,
+    distDir: 'build',
     images: {
         remotePatterns: [
             {

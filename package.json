@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "main": "electron/main.js",
+  "author": {
+    "email": "williamjunior67@gmail.com",
+    "name": "William Alfred Gazal Júnior"
+  },
+  "description": "Sistema de vendas para restaurantes",
+  
   "build": {
     "files": [
       "electron/**/*",
@@ -21,7 +27,7 @@
   },
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
-    "prod": "cross-env NODE_OPTIONS='--inspect' next build && next start",
+    "prod": "cross-env NODE_OPTIONS='--inspect'NODE_ENV=production next build && next start",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000/login && npm run start_electron\"",
     "build": "next build",
     "start": "next start",
@@ -42,7 +48,6 @@
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
     "decimal.js": "^10.3.1",
-    "dotenv": "^17.2.3",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "leaflet-routing-machine": "^3.2.12",
