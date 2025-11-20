@@ -1,15 +1,16 @@
 'use client';
 
-import Menu from '@/app/components/menu/layout';
-import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const Home = () => {
-  const { data, status } = useSession();
-  return (
-    <Menu>
-      <h1>Home {data && <p>{status}</p>}</h1>
-    </Menu>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/login');
+  }, [router]);
+
+  return null;
 }
 
 export default Home;

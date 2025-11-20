@@ -1,0 +1,21 @@
+version: '2.0'
+services:
+  web:
+    name: "nextjs-app"
+    image: "nextjs-app-image"
+    build:
+      context: .  # Usar o Dockerfile atual para construir a imagem
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Expondo a porta 3000
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/src  # Mapeia a pasta de código para o container
+    networks:
+      - nextjs-network
+    restart: always  # Garante que o container reinicie automaticamente
+
+networks:
+  nextjs-network:
+    driver: bridge

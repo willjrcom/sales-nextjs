@@ -8,7 +8,6 @@
     "name": "William Alfred Gazal Júnior"
   },
   "description": "Sistema de vendas para restaurantes",
-  
   "build": {
     "files": [
       "electron/**/*",
@@ -27,7 +26,7 @@
   },
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
-    "prod": "cross-env NODE_OPTIONS='--inspect'NODE_ENV=production next build && next start",
+    "prod": "cross-env NODE_OPTIONS='--inspect' next build && next start",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000/login && npm run start_electron\"",
     "build": "next build",
     "start": "next start",
