@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 /backend
+/dist
+/app
+/src/.next
 .cursor
 /.pnp
 .pnp.js
