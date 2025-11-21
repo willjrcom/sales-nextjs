@@ -36,6 +36,16 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+# Normalize build output dir: some projects set `distDir` (e.g. 'build'),
+# but the Dockerfile expects `.next/standalone`. If `build` exists, move it to `.next`.
+RUN if [ -d "./.next" ]; then \
+      echo ".next exists"; \
+    elif [ -d "./build" ]; then \
+      echo "moving build -> .next"; mv build .next; \
+    else \
+      echo "Warning: no .next or build dir found after build"; \
+    fi
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
