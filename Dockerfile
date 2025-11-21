@@ -68,16 +68,17 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
+# Entrypoint: prefer `server.js` from standalone output when present,
+# otherwise fall back to `npm run start` (next start).
+# Create the entrypoint as root so the file can be written to `/`.
+RUN printf '#!/bin/sh\nif [ -f server.js ]; then exec node server.js; else exec npm run start; fi\n' > /entrypoint.sh \
+  && chmod +x /entrypoint.sh
+
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
-
-# Entrypoint: prefer `server.js` from standalone output when present,
-# otherwise fall back to `npm run start` (next start).
-RUN printf '#!/bin/sh\nif [ -f server.js ]; then exec node server.js; else exec npm run start; fi\n' > /entrypoint.sh \
-  && chmod +x /entrypoint.sh
 
 ENV HOSTNAME="0.0.0.0"
 CMD ["/entrypoint.sh"]
