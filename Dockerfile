@@ -59,10 +59,14 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# If the build produced a standalone server, it will be inside `.next/standalone`.
+# Some projects use a custom `distDir` (e.g. `build`) and do not enable the
+# `output: 'standalone'` option in `next.config`. In that case we copy the
+# full `.next` directory and `node_modules`, and run `next start`.
+# Copy `.next` (covers both `.next/standalone` and regular builds) and node_modules.
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 USER nextjs
 
@@ -70,7 +74,10 @@ EXPOSE 3000
 
 ENV PORT=3000
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
+# Entrypoint: prefer `server.js` from standalone output when present,
+# otherwise fall back to `npm run start` (next start).
+RUN printf '#!/bin/sh\nif [ -f server.js ]; then exec node server.js; else exec npm run start; fi\n' > /entrypoint.sh \
+  && chmod +x /entrypoint.sh
+
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+CMD ["/entrypoint.sh"]
