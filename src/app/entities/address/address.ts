@@ -100,28 +100,23 @@ export class Coordinates {
 }
 
 export const SchemaAddress = z.object({
-    cep: z.string().min(8, 'Cep inválido').max(9, 'Cep inválido'),
+    cep: z.string().min(8, 'Cep inválido').max(9, 'Cep inválido').optional(),
     street: z.string().min(3, 'Rua precisa ter pelo menos 3 caracteres').max(100, 'Rua precisa ter no máximo 100 caracteres'),
     number: z.string().min(1, 'Endereço: Número minimo 1 caracter'),
-    complement: z.string().max(100, 'Complemento precisa ter no máximo 100 caracteres'),
-    reference: z.string().max(100, 'Referência precisa ter no máximo 100 caracteres'),
+    complement: z.string().max(100, 'Complemento precisa ter no máximo 100 caracteres').optional(),
+    reference: z.string().max(100, 'Referência precisa ter no máximo 100 caracteres').optional(),
     neighborhood: z.string().min(3, 'Bairro precisa ter pelo menos 3 caracteres').max(100, 'Bairro precisa ter no máximo 100 caracteres'),
-    city: z.string().min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres'),
-    uf: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
-    delivery_tax: z.coerce.number().min(0, 'Taxa de entrega inválida'),
+    city: z.string().min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres').optional(),
+    uf: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres').optional(),
+    delivery_tax: z.coerce.number().min(0, 'Taxa de entrega inválida').optional(),
     object_id: z.string().optional(),
 });
 
 export const ValidateAddressForm = (address: Address) => {
     const validatedFields = SchemaAddress.safeParse({
-        cep: address.cep,
         street: address.street,
         number: address.number,
-        complement: address.complement,
-        reference: address.reference,
         neighborhood: address.neighborhood,
-        city: address.city,
-        uf: address.uf,
         delivery_tax: new Decimal(address.delivery_tax).toNumber(),
         object_id: address.object_id
     });

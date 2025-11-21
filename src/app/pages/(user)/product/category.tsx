@@ -29,12 +29,6 @@ const PageCategories = () => {
         }
     }, [data?.user?.access_token, categoriesSlice.ids.length]);
 
-    if (categoriesSlice.loading) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
     return (
         <>
             <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>

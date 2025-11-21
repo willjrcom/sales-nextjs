@@ -37,12 +37,6 @@ export default function PageProcessRules() {
         setProcessRules(processRulesByCategories)
     }, [categoriesSlice.entities]);
 
-    if (categoriesSlice.loading) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
     const validCategories = Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement);
     const validProcessRules = processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.order - b.order);
 

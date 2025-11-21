@@ -47,11 +47,6 @@ const PageProducts = () => {
         setProducts(productsByCategories)
     }, [categoriesSlice.entities]);
 
-    if (categoriesSlice.loading) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
 
     const validProducts = products.filter(product => !categoryID || product.category_id === categoryID).sort((a, b) => a.name.localeCompare(b.name));
 

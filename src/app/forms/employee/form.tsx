@@ -60,6 +60,9 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
 
         if (newEmployee.birthday) {
             newEmployee.birthday = ToIsoDate(newEmployee.birthday)
+        } else {
+            // Remove o campo birthday se estiver vazio, pois o backend usa ponteiro
+            delete newEmployee.birthday;
         }
 
         const validationErrors = ValidateEmployeeForm(newEmployee);

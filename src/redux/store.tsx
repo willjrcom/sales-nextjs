@@ -17,10 +17,31 @@ import shiftsReducer from './slices/shifts';
 import {stocksReducer, lowStocksReducer, outOfStocksReducer, reportStocksReducer } from './slices/stock';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
+import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
+
+// Cria um storage noop para SSR (Server Side Rendering)
+const createNoopStorage = () => {
+    return {
+        getItem(_key: string) {
+            return Promise.resolve(null);
+        },
+        setItem(_key: string, value: any) {
+            return Promise.resolve(value);
+        },
+        removeItem(_key: string) {
+            return Promise.resolve();
+        },
+    };
+};
+
+// Verifica se está no lado do cliente ou servidor
+const customStorage = typeof window !== 'undefined' 
+    ? createWebStorage('local') 
+    : createNoopStorage();
 
 const persistConfig = {
     key: 'root', // Nome da chave no armazenamento
-    storage, // Tipo de armazenamento (LocalStorage neste caso)
+    storage: customStorage, // Tipo de armazenamento (LocalStorage neste caso)
     whitelist: ['clients', 'employees', 'employeesDeleted', 'places', 'deliveryDrivers', 'categories', 'user-companies', 'stock'], // Reducers que serão persistidos
 };
 

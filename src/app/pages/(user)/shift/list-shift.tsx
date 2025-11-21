@@ -36,12 +36,6 @@ const ListShift = () => {
         setShifts(Object.values(shiftsSlice.entities));
     }, [shiftsSlice.entities]);
 
-    if (shiftsSlice.loading) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
     return (
         <>
             <CrudLayout title={<PageTitle title="Turnos" tooltip="listagem de turnos anteriores." />}

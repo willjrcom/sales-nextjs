@@ -48,12 +48,6 @@ const PageStock = () => {
         }
     }, [data?.user.access_token, reportStocksSlice.ids.length]);
 
-    if (reportStocksSlice.loading) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
     // Filtrar estoques baseado nos filtros
     let reports = Object.values(reportStocksSlice.entities);
     let report: StockReportComplete = {} as StockReportComplete;

@@ -33,6 +33,9 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         
         if (newClient.birthday) {
             newClient.birthday = ToIsoDate(newClient.birthday)
+        } else {
+            // Remove o campo birthday se estiver vazio, pois o backend usa ponteiro
+            delete newClient.birthday;
         }
         
         const validationErrors = ValidateClientForm(newClient);

@@ -38,12 +38,6 @@ const PageEmployee = () => {
 
     }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, showDeleted, employeesDeletedSlice.ids.length, employeesSlice.ids.length]);
 
-    if ((showDeleted ? employeesDeletedSlice.loading : employeesSlice.loading)) {
-        return (
-            <h1>Carregando página...</h1>
-        )
-    }
-
     const filteredEmployees = Object.values(showDeleted ? employeesDeletedSlice.entities : employeesSlice.entities)
         .filter(employee => employee.name.includes(nome))
         .sort((a, b) => a.name.localeCompare(b.name));
