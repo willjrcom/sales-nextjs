@@ -23,9 +23,9 @@ const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
     },
   },
   {
-    id: 'Cpf',
+    id: 'CPF',
     accessorKey: 'cpf',
-    header: 'Cpf',
+    header: 'CPF',
   },
   {
     id: 'Endereço',

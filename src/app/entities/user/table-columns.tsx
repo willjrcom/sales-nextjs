@@ -26,9 +26,9 @@ const UserColumns = (): ColumnDef<User>[] => [
     },
   },
   {
-    id: 'Cpf',
+    id: 'CPF',
     accessorKey: 'cpf',
-    header: 'Cpf',
+    header: 'CPF',
   },
   {
     id: 'Email',

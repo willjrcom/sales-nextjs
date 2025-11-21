@@ -27,9 +27,9 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     },
   },
   {
-    id: 'Cpf',
+    id: 'CPF',
     accessorKey: 'cpf',
-    header: 'Cpf',
+    header: 'CPF',
   },
   {
     id: 'Endereço',
