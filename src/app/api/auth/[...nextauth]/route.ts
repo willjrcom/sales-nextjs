@@ -3,7 +3,6 @@ import { Buffer } from 'buffer';
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import Login from "../../user/login/login";
-import Company from "@/app/entities/company/company";
 import { NextAuthOptions } from "next-auth";
 import UserBackend from "@/app/entities/user/user";
 import RefreshAccessToken from '@/app/api/user/refresh-access-token/user';

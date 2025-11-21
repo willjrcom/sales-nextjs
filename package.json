@@ -25,7 +25,7 @@
     }
   },
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
+    "dev": "cross-env NODE_OPTIONS='--inspect' NODE_ENV=development next dev",
     "prod": "cross-env NODE_OPTIONS='--inspect' next build && next start",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000/login && npm run start_electron\"",
     "build": "next build",

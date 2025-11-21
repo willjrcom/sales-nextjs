@@ -2,11 +2,12 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require("path");
 const next = require("next");
 const http = require("http");
+const { env } = require('process');
 
 const dev = process.env.NODE_ENV !== "production";
 
 // Inicializa o Next.js apontando para a raiz do projeto (um nível acima da pasta `electron`)
-const nextApp = next({ dev, dir: path.join(__dirname, "..") });
+const nextApp = next({ dev, dir: path.join(__dirname, ".."), env: { ...env } });
 const handle = nextApp.getRequestHandler();
 
 let mainWindow;

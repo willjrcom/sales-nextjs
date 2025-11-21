@@ -1,16 +1,8 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 
 const Home = () => {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push('/login');
-  }, [router]);
-
-  return null;
+  // Server-side redirect to avoid hydration mismatch
+  redirect('/login');
 }
 
 export default Home;
