@@ -10,6 +10,12 @@ services:
       - "3000:3000"  # Expondo a porta 3000
     environment:
       - NODE_ENV=development
+      - NEXT_PUBLIC_API_BASE_URL=https://backend.gfood.shop
+      - NEXT_PUBLIC_SECRET_COOKIE_PASSWORD=pass
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=I23zeS2gmqnrC6KovGzhhyNt5d9/5JBMbDS0JM51j1o=
+      - NEXT_PUBLIC_S3_BUCKET_NAME=gfood361769556033
+      - NEXT_PUBLIC_AWS_REGION=us-east-1
     volumes:
       - .:/src  # Mapeia a pasta de código para o container
     networks:
