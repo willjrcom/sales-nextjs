@@ -2,6 +2,7 @@
 const nextConfig = {
     crossOrigin: 'anonymous',
     reactStrictMode: true,
+    output: 'standalone',
     distDir: 'build',
     images: {
         remotePatterns: [
