@@ -102,6 +102,7 @@ const CardUser = ({ user }: CardUserProps) => {
         if (!data) return;
 
         const employee = new Employee({ user_id: user.id, ...user });
+        
         try {
             await AddUserToCompany(user.email, data)
             const response = await NewEmployee(user.id, data);
@@ -112,6 +113,16 @@ const CardUser = ({ user }: CardUserProps) => {
             modalHandler.hideModal('new-already-created-employee');
 
         } catch (error: RequestError | any) {
+            if (error.message == 'user already added to company') {
+                const response = await NewEmployee(user.id, data);
+    
+                employee.id = response
+                dispatch(addEmployee(employee));
+    
+                modalHandler.hideModal('new-already-created-employee');
+                return;
+            }
+
             notifyError(error.message || 'Erro ao criar funcionário');
         }
     }
