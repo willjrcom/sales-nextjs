@@ -9,10 +9,18 @@ export default withAuth(
             // Redireciona para a página de login se não estiver autenticado
             return NextResponse.redirect(new URL('/login', req.url));
         }
+
+        // Se houver erro no refresh do token, força logout
+        if (token.error === 'RefreshAccessTokenError') {
+            return NextResponse.redirect(new URL('/login', req.url));
+        }
     },
     {
         callbacks: {
-            authorized: ({ token }) => !!token,
+            authorized: ({ token }) => {
+                // Não autoriza se não tiver token ou se houver erro de refresh
+                return !!token && token.error !== 'RefreshAccessTokenError';
+            },
         }
     }
 );

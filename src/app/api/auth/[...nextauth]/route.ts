@@ -96,11 +96,11 @@ const authOptions: NextAuthOptions = {
     ],
     secret: process.env.NEXTAUTH_SECRET,
     session: {
-        maxAge: 60 * 60, // 1 hour
+        maxAge: 2 * 60 * 60, // 2 hours (igual ao backend)
         strategy: "jwt",
     },
     jwt: {
-        maxAge: 60 * 60, // 1 hour
+        maxAge: 2 * 60 * 60, // 2 hours (igual ao backend)
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {
@@ -108,10 +108,15 @@ const authOptions: NextAuthOptions = {
             if (trigger === "update") {
                 if (session.user.access_token) {
                     token.access_token = session.user.access_token;
+                    // Decodifica o novo access_token para atualizar a expiração
+                    const decoded = decodeJwt(session.user.access_token);
+                    if (decoded.exp) token.exp = decoded.exp;
                 }
                 if (session.user.user) {
                     token.user = session.user.user;
                 }
+                // Retorna direto após update, sem verificar expiração
+                return token;
             }
 
             // Initial sign in: store the access token (access_token) on the token object
@@ -123,13 +128,22 @@ const authOptions: NextAuthOptions = {
                 // decode expiration from the access_token
                 const decoded = decodeJwt(token.access_token as string);
                 if (decoded.exp) token.exp = decoded.exp;
+                // Retorna direto no login inicial, sem verificar expiração
+                return token;
             }
+            
+            // Se já teve erro ao fazer refresh, força logout
+            if (token.error === 'RefreshAccessTokenError') {
+                return token;
+            }
+            
             // If token has sufficient time remaining, return it
             const now = Math.floor(Date.now() / 1000);
 
-            // Renew when less than 10 minutes (600 seconds) remain
-            const totalTimeLeft = 60 * 30;
-            if (token.exp && now < (token.exp as number) - totalTimeLeft) {
+            // Renew when less than 30 minutes remain (1800 seconds)
+            // Token backend válido por 2h, fazemos refresh 30min antes de expirar
+            const refreshBuffer = 30 * 60; // 30 minutos
+            if (token.exp && now < (token.exp as number) - refreshBuffer) {
                 return token;
             }
 

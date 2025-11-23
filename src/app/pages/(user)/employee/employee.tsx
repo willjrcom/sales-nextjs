@@ -64,12 +64,12 @@ const PageEmployee = () => {
                 <h1>Filtro</h1>
             </ButtonIconTextFloat>
 
-            !showDeleted && (
+            {!showDeleted && (
             <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right" size="xl"
                 title="Novo funcionário">
                 <AddEmployeeAlreadyCreated />
             </ButtonIconTextFloat>
-            )
+            )}
 
             <CrudLayout
                 title={<PageTitle title={showDeleted ? "Funcionários Demitidos" : "Funcionários"} tooltip="Gerencie funcionários, filtrando e editando registros." />}
