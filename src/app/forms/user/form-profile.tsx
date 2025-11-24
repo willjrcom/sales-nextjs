@@ -27,8 +27,6 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
 
         if (newUser.birthday) {
             newUser.birthday = ToIsoDate(newUser.birthday)
-        } else {
-            newUser.birthday = null;
         }
 
         const validationErrors = ValidatePersonForm(newUser);
