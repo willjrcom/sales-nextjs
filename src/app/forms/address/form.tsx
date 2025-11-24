@@ -60,45 +60,71 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
     }
 
     return (
-        <>
-        <br/>
-        <h2 className='text-xl'>Endereço</h2>
-        <hr className="my-4" />
+        <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-end">
+                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                    <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} formatted={true}/>
+                </div>
+                <button 
+                    className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md'
+                    onClick={getAddress}
+                >
+                    <FaSearch />&nbsp;<span>Buscar</span>
+                </button>
+            </div>
 
-        <div className="flex items-center space-x-4">
-            <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} formatted={true}/>
-            <button className='flex items-center space-x-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'
-            onClick={getAddress}><FaSearch />&nbsp;Buscar</button>
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                    <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} disabled={isHidden} />
+                </div>
+                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                    <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={value => handleInputChange('number', value)} value={address.number} disabled={isHidden} />
+                </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                    <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={value => handleInputChange('neighborhood', value)} value={address.neighborhood} disabled={isHidden} />
+                </div>
+                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                    <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={value => handleInputChange('complement', value)} value={address.complement} optional disabled={isHidden} />
+                </div>
+            </div>
+
+            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={value => handleInputChange('reference', value)} value={address.reference} optional disabled={isHidden} />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                    <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city} disabled={isHidden} />
+                </div>
+                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                    <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
+                </div>
+            </div>
+        
+            {address.isClient && (
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                        <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />
+                    </div>
+                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                        <PriceField
+                            name="delivery_tax" 
+                            friendlyName="Taxa de entrega"
+                            placeholder="Digite a taxa de entrega"
+                            setValue={value => handleInputChange('delivery_tax', value)}
+                            value={address.delivery_tax}
+                            disabled={isHidden}
+                        />
+                    </div>
+                </div>
+            )}
+        
+            <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id}/>
+            <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id}/>
         </div>
-
-        <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} disabled={isHidden} />
-
-        <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={value => handleInputChange('number', value)} value={address.number} disabled={isHidden} />
-
-        <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={value => handleInputChange('neighborhood', value)} value={address.neighborhood} disabled={isHidden} />
-
-        <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={value => handleInputChange('complement', value)} value={address.complement} optional disabled={isHidden} />
-
-        <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={value => handleInputChange('reference', value)} value={address.reference} optional disabled={isHidden} />
-
-        <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city} disabled={isHidden} />
-
-        <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
-        
-        {address.isClient && <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />}
-
-        {address.isClient && <PriceField
-            name="delivery_tax" 
-            friendlyName="Taxa de entrega"
-            placeholder="Digite a taxa de entrega"
-            setValue={value => handleInputChange('delivery_tax', value)}
-            value={address.delivery_tax}
-            disabled={isHidden}
-        />}
-        
-        <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id}/>
-        <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id}/>
-        </>
     );
 };
 

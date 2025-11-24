@@ -143,76 +143,99 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const isUpdated = JSON.stringify(category) !== JSON.stringify(item)
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 className="text-md font-medium mb-4">Dados Básicos</h2>
-
-            <TextField
-                friendlyName="Nome"
-                name="name"
-                setValue={value => handleInputChange('name', value)}
-                value={category.name}
-            />
-            <ImageField
-                friendlyName="Imagem"
-                name="image_path"
-                setValue={value => handleInputChange('image_path', value)}
-                value={category.image_path}
-                optional
-                onUploadError={(error) => notifyError(error)}
-            />
-
-            {/* Bloco de Tipo de Categoria */}
-            {!isUpdate && (
-                <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
-            )}
-
-            {selectedType === "Normal" &&
-                <>
-                    <CheckboxField
-                        friendlyName="Deseja imprimir ao lançar o pedido?"
-                        name="need_print"
-                        setValue={value => handleInputChange('need_print', value)}
-                        value={category.need_print}
-                        optional
+        <div className="text-black space-y-6">
+            {/* Seção: Dados Básicos */}
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Dados Básicos</h3>
+                <div className="space-y-4">
+                    <TextField
+                        friendlyName="Nome"
+                        name="name"
+                        setValue={value => handleInputChange('name', value)}
+                        value={category.name}
                     />
-                    {category.need_print && (
-                        <SelectField
-                            friendlyName="Impressora"
-                            name="printer_name"
-                            values={printers}
-                            selectedValue={category.printer_name}
-                            setSelectedValue={(value) => handleInputChange('printer_name', value)}
-                            optional
-                        />
+                    <ImageField
+                        friendlyName="Imagem"
+                        name="image_path"
+                        setValue={value => handleInputChange('image_path', value)}
+                        value={category.image_path}
+                        optional
+                        onUploadError={(error) => notifyError(error)}
+                    />
+
+                    {/* Bloco de Tipo de Categoria */}
+                    {!isUpdate && (
+                        <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
                     )}
-                    <CheckboxField
-                        friendlyName="Deseja produzir com processos?"
-                        name="use_process_rule"
-                        setValue={value => handleInputChange('use_process_rule', value)}
-                        value={category.use_process_rule}
-                        optional
-                    />
+                </div>
+            </div>
 
-                    {/* Bloco de Categorias Adicionais e Complementos (Condicional) */}
-                    <hr className="my-4" />
-                    <AdditionalCategorySelector
-                        additionalCategories={Object.values(categoriesSlice.entities)}
-                        selectedCategory={category}
-                        setSelectedCategory={setCategory}
-                    />
+            {selectedType === "Normal" && (
+                <>
+                    {/* Seção: Configurações de Impressão */}
+                    <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Configurações de Impressão</h3>
+                        <div className="space-y-4">
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <CheckboxField
+                                    friendlyName="Deseja imprimir ao lançar o pedido?"
+                                    name="need_print"
+                                    setValue={value => handleInputChange('need_print', value)}
+                                    value={category.need_print}
+                                    optional
+                                />
+                            </div>
+                            {category.need_print && (
+                                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <SelectField
+                                        friendlyName="Impressora"
+                                        name="printer_name"
+                                        values={printers}
+                                        selectedValue={category.printer_name}
+                                        setSelectedValue={(value) => handleInputChange('printer_name', value)}
+                                        optional
+                                    />
+                                </div>
+                            )}
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <CheckboxField
+                                    friendlyName="Deseja produzir com processos?"
+                                    name="use_process_rule"
+                                    setValue={value => handleInputChange('use_process_rule', value)}
+                                    value={category.use_process_rule}
+                                    optional
+                                />
+                            </div>
+                        </div>
+                    </div>
 
-                    <hr className="my-4" />
-                    <ComplementCategorySelector
-                        complementCategories={Object.values(categoriesSlice.entities)}
-                        selectedCategory={category}
-                        setSelectedCategory={setCategory}
-                    />
+                    {/* Seção: Categorias Adicionais */}
+                    <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Categorias Adicionais</h3>
+                        <AdditionalCategorySelector
+                            additionalCategories={Object.values(categoriesSlice.entities)}
+                            selectedCategory={category}
+                            setSelectedCategory={setCategory}
+                        />
+                    </div>
 
-                    {/* Bloco de Ingredientes Removíveis */}
-                    <hr className="my-4" />
-                    <RemovableItensComponent item={category} setItem={setCategory} />
+                    {/* Seção: Complementos */}
+                    <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Complementos</h3>
+                        <ComplementCategorySelector
+                            complementCategories={Object.values(categoriesSlice.entities)}
+                            selectedCategory={category}
+                            setSelectedCategory={setCategory}
+                        />
+                    </div>
+
+                    {/* Seção: Ingredientes Removíveis */}
+                    <div className="bg-gradient-to-br from-white to-orange-50 rounded-lg shadow-sm border border-orange-100 p-6 transition-all duration-300 hover:shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-orange-200">Ingredientes Removíveis</h3>
+                        <RemovableItensComponent item={category} setItem={setCategory} />
+                    </div>
                 </>
-            }
+            )}
 
             {/* Campo Oculto para ID */}
             <HiddenField
@@ -223,8 +246,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
             {/* Exibição de Erros */}
             <ErrorForms errors={errors} setErrors={setErrors} />
-
-            <hr className="my-6" />
 
             {/* Botões para Atualizar ou Excluir */}
             {isUpdated ? (

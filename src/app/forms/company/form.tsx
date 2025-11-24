@@ -19,11 +19,14 @@ import { useModal } from '@/app/context/modal/context';
 import UpdateCompany from '@/app/api/company/update/company';
 import FormArrayPattern from '@/app/components/modal/form-array-pattern';
 import printService from '@/app/utils/print-service';
+import Address from "@/app/entities/address/address";
+import AddressForm from "../address/form";
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
     const [company, setCompany] = useState<Company>(item || new Company());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [address, setAddress] = useState<Address>(company.address || new Address())
     const { data, update } = useSession();
     const router = useRouter();
     const modalHandler = useModal();
@@ -31,6 +34,10 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const handleInputChange = (field: keyof Company, value: any) => {
         setCompany(prev => ({ ...prev, [field]: value }));
     };
+
+    useEffect(() => {
+        handleInputChange('address', address);
+    }, [address]);
 
     const handleAddContact = () => {
         setCompany(prev => ({
@@ -106,14 +113,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             await update({
                 ...data,
                 user: {
-                    access_token: response
-                },
-            });
-
-            await update({
-                ...data,
-                user: {
                     ...data.user,
+                    access_token: response
                 },
             })
 
@@ -153,120 +154,158 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     };
 
     return (
-        <>
-            <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
-            <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} formatted={true} />
+        <div className="text-black space-y-6">
+            {/* Seção: Informações Básicas */}
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
+                <div className="space-y-4">
+                    <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
+                    <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} formatted={true} />
+                </div>
+            </div>
 
-            <hr className="my-4" />
-            <FormArrayPattern
-                title='Contatos'
-                singleItemName='Contato'
-                items={company.contacts}
-                patternName='full-phone'
-                onAdd={handleAddContact}
-                onRemove={handleRemoveContact}
-                onChange={handleContactChange}
-            />
-
-            {/* Preferences */}
-            <hr className="my-4" />
-            <h2 className="text-md font-medium mb-2">Preferências</h2>
-
-            <div className='flex justify-between'>
-                <CheckboxField
-                    friendlyName="Entregas disponível"
-                    name="enable_delivery"
-                    value={company.preferences.enable_delivery === 'true'}
-                    setValue={value => handlePreferenceChange('enable_delivery', value)}
-                />
-                <CheckboxField
-                    friendlyName="Mesas disponíveis"
-                    name="enable_table"
-                    value={company.preferences.enable_table === 'true'}
-                    setValue={value => handlePreferenceChange('enable_table', value)}
+            {/* Seção: Contatos */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Contatos</h3>
+                <FormArrayPattern
+                    title='Contatos'
+                    singleItemName='Contato'
+                    items={company.contacts}
+                    patternName='full-phone'
+                    onAdd={handleAddContact}
+                    onRemove={handleRemoveContact}
+                    onChange={handleContactChange}
                 />
             </div>
 
-            <div className='flex justify-between'>
-                <CheckboxField
-                    friendlyName="Habilitar valor mínimo para entrega gratuita"
-                    name="enable_min_order_value_for_free_delivery"
-                    value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
-                    setValue={value => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
-                />
-
-                <PriceField
-                    friendlyName="Valor mínimo para entrega gratuita"
-                    name="min_order_value_for_free_delivery"
-                    value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
-                    setValue={value => handlePreferenceChange('min_order_value_for_free_delivery', value)}
-                    disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
-                />
+            {/* Seção: Endereço */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Contatos</h3>
+                <AddressForm addressParent={company.address} setAddressParent={setAddress} isHidden={!isUpdate} />
             </div>
 
-            {/* Taxas */}
-            <div className='flex justify-between'>
-                <NumberField
-                    friendlyName="Taxa de mesa (%)"
-                    name="table_tax_rate"
-                    value={parseFloat(company.preferences.table_tax_rate || '0')}
-                    setValue={value => handlePreferenceChange('table_tax_rate', value)}
-                    disabled={company.preferences.enable_table !== 'true'}
-                />
+            {/* Seção: Preferências */}
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Preferências</h3>
+                <div className="space-y-4">
 
-                <PriceField
-                    friendlyName="Taxa mínima de entrega"
-                    name="min_delivery_tax"
-                    value={new Decimal(company.preferences.min_delivery_tax || '0')}
-                    setValue={value => handlePreferenceChange('min_delivery_tax', value)}
-                />
+                    <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField
+                                friendlyName="Entregas disponível"
+                                name="enable_delivery"
+                                value={company.preferences.enable_delivery === 'true'}
+                                setValue={value => handlePreferenceChange('enable_delivery', value)}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField
+                                friendlyName="Mesas disponíveis"
+                                name="enable_table"
+                                value={company.preferences.enable_table === 'true'}
+                                setValue={value => handlePreferenceChange('enable_table', value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField
+                                friendlyName="Habilitar valor mínimo para entrega gratuita"
+                                name="enable_min_order_value_for_free_delivery"
+                                value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
+                                setValue={value => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <PriceField
+                                friendlyName="Valor mínimo para entrega gratuita"
+                                name="min_order_value_for_free_delivery"
+                                value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
+                                setValue={value => handlePreferenceChange('min_order_value_for_free_delivery', value)}
+                                disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Taxas */}
+                    <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <NumberField
+                                friendlyName="Taxa de mesa (%)"
+                                name="table_tax_rate"
+                                value={parseFloat(company.preferences.table_tax_rate || '0')}
+                                setValue={value => handlePreferenceChange('table_tax_rate', value)}
+                                disabled={company.preferences.enable_table !== 'true'}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <PriceField
+                                friendlyName="Taxa mínima de entrega"
+                                name="min_delivery_tax"
+                                value={new Decimal(company.preferences.min_delivery_tax || '0')}
+                                setValue={value => handlePreferenceChange('min_delivery_tax', value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Impressora para pedido */}
+                    <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField
+                                friendlyName="Deseja imprimir ao lançar o pedido?"
+                                name="enable_print_order_on_pend_order"
+                                value={company.preferences.enable_print_order_on_pend_order === 'true'}
+                                setValue={value => handlePreferenceChange('enable_print_order_on_pend_order', value)}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <SelectField
+                                friendlyName="Impressora de pedido"
+                                name="printer_order_on_pend_order"
+                                values={printers}
+                                selectedValue={company.preferences.printer_order_on_pend_order || ''}
+                                setSelectedValue={value => handlePreferenceChange('printer_order_on_pend_order', value)}
+                                optional
+                                disabled={company.preferences.enable_print_order_on_pend_order === 'false'}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Impressora para entrega */}
+                    <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField
+                                friendlyName="Deseja imprimir ao lançar a entrega?"
+                                name="enable_print_order_on_ship_delivery"
+                                value={company.preferences.enable_print_order_on_ship_delivery === 'true'}
+                                setValue={value => handlePreferenceChange('enable_print_order_on_ship_delivery', value)}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <SelectField
+                                friendlyName="Impressora de entrega"
+                                name="printer_delivery_on_ship_delivery"
+                                values={printers}
+                                selectedValue={company.preferences.printer_delivery_on_ship_delivery || ''}
+                                setSelectedValue={value => handlePreferenceChange('printer_delivery_on_ship_delivery', value)}
+                                optional
+                                disabled={company.preferences.enable_print_order_on_ship_delivery === 'false'}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Impressora para finalizar processo */}
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <CheckboxField
+                            friendlyName="Deseja imprimir ao finalizar o processo?"
+                            name="enable_print_items_on_finish_process"
+                            value={company.preferences.enable_print_items_on_finish_process === 'true'}
+                            setValue={value => handlePreferenceChange('enable_print_items_on_finish_process', value)}
+                        />
+                    </div>
+                </div>
             </div>
-
-            {/* Impressora para pedido */}
-            <div className='flex justify-between'>
-                <CheckboxField
-                    friendlyName="Deseja imprimir ao lançar o pedido?"
-                    name="enable_print_order_on_pend_order"
-                    value={company.preferences.enable_print_order_on_pend_order === 'true'}
-                    setValue={value => handlePreferenceChange('enable_print_order_on_pend_order', value)}
-                />
-                <SelectField
-                    friendlyName="Impressora de pedido"
-                    name="printer_order_on_pend_order"
-                    values={printers}
-                    selectedValue={company.preferences.printer_order_on_pend_order || ''}
-                    setSelectedValue={value => handlePreferenceChange('printer_order_on_pend_order', value)}
-                    optional
-                    disabled={company.preferences.enable_print_order_on_pend_order === 'false'}
-                />
-            </div>
-
-            {/* Impressora para entrega */}
-            <div className='flex justify-between'>
-                <CheckboxField
-                    friendlyName="Deseja imprimir ao lançar a entrega?"
-                    name="enable_print_order_on_ship_delivery"
-                    value={company.preferences.enable_print_order_on_ship_delivery === 'true'}
-                    setValue={value => handlePreferenceChange('enable_print_order_on_ship_delivery', value)}
-                />
-                <SelectField
-                    friendlyName="Impressora de entrega"
-                    name="printer_delivery_on_ship_delivery"
-                    values={printers}
-                    selectedValue={company.preferences.printer_delivery_on_ship_delivery || ''}
-                    setSelectedValue={value => handlePreferenceChange('printer_delivery_on_ship_delivery', value)}
-                    optional
-                    disabled={company.preferences.enable_print_order_on_ship_delivery === 'false'}
-                />
-            </div>
-
-            {/* Impressora para finalizar processo */}
-            <CheckboxField
-                friendlyName="Deseja imprimir ao finalizar o processo?"
-                name="enable_print_items_on_finish_process"
-                value={company.preferences.enable_print_items_on_finish_process === 'true'}
-                setValue={value => handlePreferenceChange('enable_print_items_on_finish_process', value)}
-            />
             
             <HiddenField name="id" value={company.id} setValue={value => handleInputChange('id', value)} />
 
@@ -281,7 +320,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 name="Empresa"
                 onSubmit={handleUpdate}
             />}
-        </>
+        </div>
     );
 };
 

@@ -109,7 +109,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     }
 
     return (
-        <div className="w-full min-w-[30vw] bg-white shadow-md rounded-md p-8">
+        <div className="text-black">
             <PersonForm person={person} setPerson={setPerson} isEmployee isHidden={isDisabledPerson} />
 
             <HiddenField
