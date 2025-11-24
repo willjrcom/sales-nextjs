@@ -166,8 +166,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
             {/* Seção: Contatos */}
             <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Contatos</h3>
                 <FormArrayPattern
+                    title='Contatos'
                     singleItemName='Contato'
                     items={company.contacts}
                     patternName='full-phone'
