@@ -54,37 +54,53 @@ const PageStock = () => {
     let filteredStocks: Stock[] = [];
 
     if (reports?.length > 0) {
-        report = reports[0]
-        filteredStocks = report.all_stocks;
-    }
-    if (productID) {
-        filteredStocks = report?.all_stocks?.filter(stock => stock.product_id === productID);
+        report = reports[0];
+        // Garantir que all_stocks seja um array
+        filteredStocks = Array.isArray(report.all_stocks) ? report.all_stocks : [];
     }
 
-    if (stockFilter === "low") {
-        filteredStocks = [...filteredStocks].filter(stock =>
-            new Decimal(stock?.current_stock || 0).lessThanOrEqualTo(stock.min_stock) &&
-            new Decimal(stock?.current_stock || 0).greaterThan(0)
-        );
-    } else if (stockFilter === "out") {
-        filteredStocks = [...filteredStocks].filter(stock =>
-            new Decimal(stock?.current_stock || 0).lessThanOrEqualTo(0)
+    // Filtrar por produto se selecionado
+    if (productID && Array.isArray(filteredStocks)) {
+        filteredStocks = filteredStocks.filter(stock => stock.product_id === productID);
+    }
+
+    // Aplicar filtros de status
+    if (Array.isArray(filteredStocks)) {
+        if (stockFilter === "low") {
+            filteredStocks = filteredStocks.filter(stock =>
+                new Decimal(stock?.current_stock || 0).lessThanOrEqualTo(stock.min_stock) &&
+                new Decimal(stock?.current_stock || 0).greaterThan(0)
+            );
+        } else if (stockFilter === "out") {
+            filteredStocks = filteredStocks.filter(stock =>
+                new Decimal(stock?.current_stock || 0).lessThanOrEqualTo(0)
+            );
+        }
+
+        // Ordenar por nome do produto
+        filteredStocks = filteredStocks.sort((a, b) =>
+            (a.product?.name || '').localeCompare(b.product?.name || '')
         );
     }
 
-    // Ordenar por nome do produto
-    filteredStocks = [...filteredStocks].sort((a, b) =>
-        (a.product?.name || '').localeCompare(b.product?.name || '')
-    );
+    // Garantir que sempre seja um array
+    if (!Array.isArray(filteredStocks)) {
+        filteredStocks = [];
+    }
 
     // Preparar produtos para o filtro
     const products = Object.values(categoriesSlice.entities)
         .map((category) => {
-            return category.products?.map(product => ({
-                id: product.id,
-                name: product.name + " - " + product.size.name
-            })) || []
-        }).flat();
+            if (!category.products || !Array.isArray(category.products)) return [];
+            return category.products
+                .filter(product => product && product.size) // Garantir que product e size existam
+                .map(product => ({
+                    id: product.id,
+                    name: `${product.name} - ${product.size?.name || ''}`
+                }));
+        })
+        .flat()
+        .filter(p => p.id && p.name); // Remover entradas inválidas
 
     return (
         <>
@@ -105,7 +121,7 @@ const PageStock = () => {
                     <StockReport reportStock={report} />
                 </ButtonIconTextFloat>
                 
-                {report?.summary?.total_active_alerts && report?.summary?.total_active_alerts > 0 && (
+                {report?.summary && typeof report.summary.total_active_alerts === 'number' && report.summary.total_active_alerts > 0 && (
                     <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
                         <StockAlerts />
                     </ButtonIconTextFloat>
