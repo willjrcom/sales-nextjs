@@ -37,15 +37,22 @@ const RegisterForm = () => {
 
     if (isSuccess) {
         return (
-            <div className="flex h-screen">
-                <div className="w-1/2 bg-yellow-500 relative">
-                    <Image src="/icons/logo.png" alt="Register" fill style={{ objectFit: 'cover' }} />
-                    <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
+            <div className="flex flex-col sm:flex-row h-screen">
+                <div className="w-full sm:w-1/2 bg-yellow-500 relative min-h-[40vh] sm:min-h-screen">
+                    <Image 
+                        src="/icons/logo.png" 
+                        alt="Logo Image" 
+                        fill 
+                        style={{ objectFit: 'cover', objectPosition: 'center' }} 
+                        unoptimized 
+                        priority
+                    />
+                    <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
                         <h2 className="text-2xl mb-2">GazalTech</h2>
                         <p>Verifique sua caixa de entrada.</p>
                     </div>
                 </div>
-                <div className="w-1/2 flex flex-col items-center justify-center bg-white">
+                <div className="w-full sm:w-1/2 flex flex-col items-center justify-center bg-white">
                     <div className="text-center max-w-md px-8">
                         <div className="bg-green-100 text-green-600 rounded-full p-4 mb-6 mx-auto w-20 h-20 flex items-center justify-center">
                             <HiOutlineCheckCircle size={40} />
@@ -168,15 +175,22 @@ const RegisterForm = () => {
     }
 
     return (
-        <div className="flex h-screen">
-            <div className="w-1/2 bg-yellow-500 relative">
-                <Image src="/icons/logo.png" alt="Register" fill style={{ objectFit: 'cover' }} />
-                <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
+        <div className="flex flex-col sm:flex-row h-screen">
+            <div className="w-full sm:w-1/2 bg-yellow-500 relative min-h-[40vh] sm:min-h-screen">
+                <Image 
+                    src="/icons/logo.png" 
+                    alt="Register" 
+                    fill 
+                    style={{ objectFit: 'cover', objectPosition: 'center' }} 
+                    unoptimized 
+                    priority
+                />
+                <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
                     <h2 className="text-2xl mb-2">GazalTech</h2>
                     <p>Redefina sua senha.</p>
                 </div>
             </div>
-            <div className="w-1/2 flex flex-col items-center bg-white pt-10">
+            <div className="w-full sm:w-1/2 flex flex-col items-center bg-white pt-10">
                 <h2 className="text-2xl mb-6">Esqueci minha senha</h2>
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto ">
                     <div className="flex flex-col">

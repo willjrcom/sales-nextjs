@@ -3,7 +3,6 @@
 import RequestError from '@/app/utils/error';
 import NewUser from '@/app/api/user/new/user';
 import ErrorForms from '@/app/components/modal/error-forms';
-import { TextField } from '@/app/components/modal/field';
 import PasswordField from '@/app/components/modal/fields/password';
 import Person from '@/app/entities/person/person';
 import User, { ValidateUserForm } from '@/app/entities/user/user';
@@ -12,7 +11,7 @@ import { ToIsoDate } from '@/app/utils/date';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { notifyError, notifySuccess } from '@/app/utils/notifications';
 
 const RegisterForm = () => {
@@ -56,21 +55,23 @@ const RegisterForm = () => {
     }
 
     return (
-        <div className="flex h-screen">
-            <div className="w-1/2 bg-yellow-500 relative">
+        <div className="flex flex-col sm:flex-row h-screen">
+            <div className="w-full sm:w-1/2 bg-yellow-500 relative min-h-[40vh] sm:min-h-screen">
                 <Image
                     src="/icons/logo.png"
-                    alt="Register"
-                    fill={true}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    alt="Logo Image"
+                    fill
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                    unoptimized
+                    priority
                 />
 
-                <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
+                <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
                     <h2 className="text-2xl mb-2">GazalTech</h2>
                     <p>Crie sua conta agora mesmo.</p>
                 </div>
             </div>
-            <div className="w-1/2 h-screen flex flex-col items-center bg-white pt-10">
+            <div className="w-full sm:w-1/2 h-screen flex flex-col items-center bg-white pt-10">
                 <h2 className="text-2xl mb-6">Cadastro</h2>
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto flex-1">
                     <div className="flex flex-col">

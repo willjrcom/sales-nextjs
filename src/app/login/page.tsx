@@ -4,7 +4,7 @@ import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Loading from '../components/loading/Loading';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
@@ -16,12 +16,8 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [isMounted, setIsMounted] = useState(false);
   const [remember, setRemember] = useState<boolean>(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // Sempre renderiza para evitar problemas de hidratação
   // Os campos só serão preenchidos após o mount (no useEffect acima)
@@ -56,16 +52,23 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex h-screen" suppressHydrationWarning>
-      <div className="hidden sm:block sm:w-1/2 bg-yellow-500 relative">
-        <Image src="/icons/logo.png" alt="Login" fill style={{ objectFit: 'cover' }} />
-        <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
+    <div className="flex flex-col sm:flex-row h-screen overflow-hidden" suppressHydrationWarning>
+      <div className="w-full sm:w-1/2 bg-yellow-500 relative h-[40vh] sm:h-screen flex-shrink-0">
+        <Image 
+          src="/icons/logo.png"
+          alt="Login"
+          fill 
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          unoptimized
+          priority
+        />
+        <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
           <h2 className="text-2xl mb-2">GazalTech</h2>
           <p>Conecte-se a sua conta.</p>
         </div>
       </div>
 
-      <div className="w-full sm:w-1/2 flex items-center justify-center bg-white">
+      <div className="w-full sm:w-1/2 flex items-center justify-center bg-white flex-1 overflow-y-auto">
         <div className="w-full max-w-md px-8 py-10">
           <h2 className="text-2xl mb-6 hidden sm:block">Conecte-se</h2>
           <div className="flex flex-col">
@@ -94,9 +97,9 @@ const LoginForm = () => {
               {loading ? <Loading /> : 'Conectar'}
             </Button>
 
-            <div className="flex justify-between mt-4 text-yellow-500 hidden sm:flex">
-              <Link href="/login/forget-password" className="hover:underline">Esqueceu a senha?</Link>
-              <Link href="/login/sign-up" className="hover:underline">Novo usuário</Link>
+            <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 mt-4 text-yellow-500">
+              <Link href="/login/forget-password" className="hover:underline text-center sm:text-left">Esqueceu a senha?</Link>
+              <Link href="/login/sign-up" className="hover:underline text-center sm:text-left">Novo usuário</Link>
             </div>
           </div>
         </div>
