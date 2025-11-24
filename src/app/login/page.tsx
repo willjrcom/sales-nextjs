@@ -21,21 +21,10 @@ const LoginForm = () => {
 
   useEffect(() => {
     setIsMounted(true);
-    // Se estiver em Electron, tenta carregar credenciais salvas
-    if (typeof window !== 'undefined' && window.electronAPI?.getCredentials) {
-      window.electronAPI.getCredentials().then((creds) => {
-        if (creds?.email) {
-          setEmail(creds.email);
-          setPassword(creds.password);
-          setRemember(true);
-        }
-      });
-    }
   }, []);
 
-  if (!isMounted) {
-    return null; // Evita renderizar HTML até o componente estar pronto
-  }
+  // Sempre renderiza para evitar problemas de hidratação
+  // Os campos só serão preenchidos após o mount (no useEffect acima)
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -52,17 +41,9 @@ const LoginForm = () => {
 
       if (res?.error) {
         notifyError(res.error);
+        console.log(res);
         return;
       }
-
-      // Salva ou limpa credenciais conforme opção
-      // if (typeof window !== 'undefined' && window.electronAPI) {
-      //   if (remember && window.electronAPI.saveCredentials) {
-      //     window.electronAPI.saveCredentials(email, password);
-      //   } else if (!remember && window.electronAPI.clearCredentials) {
-      //     window.electronAPI.clearCredentials();
-      //   }
-      // }
 
       // Redirect on successful login
       router.push('/access/company-selection');
@@ -75,9 +56,9 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen" suppressHydrationWarning>
       <div className="hidden sm:block sm:w-1/2 bg-yellow-500 relative">
-        {/* <Image src="/icons/logo.png" alt="Login" fill style={{ objectFit: 'cover' }} /> */}
+        <Image src="/icons/logo.png" alt="Login" fill style={{ objectFit: 'cover' }} />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white">
           <h2 className="text-2xl mb-2">GazalTech</h2>
           <p>Conecte-se a sua conta.</p>

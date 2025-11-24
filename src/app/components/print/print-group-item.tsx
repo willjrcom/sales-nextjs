@@ -11,7 +11,6 @@ interface PrintGroupItemProps {
 }
 
 const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupItemProps) => {
-    if (typeof window === 'undefined') return;
 
     // Obtém o conteúdo de impressão uma única vez
     let html: string;
@@ -46,7 +45,7 @@ const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupI
         
         // Fallback: tenta Electron se ainda estiver disponível
         try {
-            if (typeof window !== 'undefined' && (window as any).electronAPI?.printer) {
+            if ((window as any).electronAPI?.printer) {
                 let selectedPrinter = printerName || "default";
 
                 if (selectedPrinter === "default") {

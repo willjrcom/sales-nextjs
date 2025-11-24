@@ -295,10 +295,9 @@ class PrintService {
 // Singleton instance
 const printService = new PrintService();
 
-// Conecta automaticamente ao carregar o módulo (apenas no browser)
-if (typeof window !== 'undefined') {
-    printService.connect().catch(console.error);
-}
+// Não conecta automaticamente para evitar problemas de hidratação SSR
+// A conexão será feita quando necessário (lazy connection)
+// Para forçar conexão inicial, chame printService.connect() explicitamente
 
 export default printService;
 

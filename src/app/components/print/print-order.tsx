@@ -11,7 +11,6 @@ interface PrintOrderProps {
 }
 
 const printOrder = async ({ orderID, session }: PrintOrderProps) => {
-    if (typeof window === 'undefined') return;
 
     // Obtém o conteúdo de impressão uma única vez
     let html: string;
@@ -47,7 +46,7 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
         
         // Fallback: tenta Electron se ainda estiver disponível
         try {
-            if (typeof window !== 'undefined' && (window as any).electronAPI?.printer) {
+            if ((window as any).electronAPI?.printer) {
                 const company = await GetCompany(session);
                 let printerName = company.preferences["printer_order_on_pend_order"] || "default";
 

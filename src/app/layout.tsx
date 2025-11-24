@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="br">
-      <body className={inter.className + " text-black bg-gray-100"} >
+    <html lang="br" suppressHydrationWarning>
+      <body className={inter.className + " text-black bg-gray-100"} suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
         <Toaster position="top-right" />
       </body>

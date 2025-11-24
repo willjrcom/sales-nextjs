@@ -16,9 +16,9 @@ import Access from '@/app/api/auth/access/access';
 import { useRouter } from 'next/navigation';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useModal } from '@/app/context/modal/context';
-import GetCompany from '@/app/api/company/company';
 import UpdateCompany from '@/app/api/company/update/company';
 import FormArrayPattern from '@/app/components/modal/form-array-pattern';
+import printService from '@/app/utils/print-service';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
@@ -67,31 +67,28 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     // Carrega impressoras disponíveis via Print Agent (WebSocket) ou Electron
     const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            (async () => {
-                try {
-                    // Tenta usar Print Agent (WebSocket) primeiro
-                    const printService = (await import('@/app/utils/print-service')).default;
-                    const list = await printService.getPrinters();
-                    setPrinters(
-                        list.map((p: any) => ({ id: p.name, name: p.name }))
-                    );
-                } catch (err) {
-                    console.warn('Erro ao carregar impressoras via Print Agent, tentando Electron...', err);
-                    // Fallback: tenta Electron se ainda estiver disponível
-                    if (typeof window !== 'undefined' && (window as any).electronAPI?.getPrinters) {
-                        try {
-                            const list = await (window as any).electronAPI.getPrinters();
-                            setPrinters(
-                                list.map((p: any) => ({ id: p.name, name: p.name }))
-                            );
-                        } catch (electronErr) {
-                            console.error('Error loading printers via Electron:', electronErr);
-                        }
+        (async () => {
+            try {
+                // Tenta usar Print Agent (WebSocket) primeiro
+                const list = await printService.getPrinters();
+                setPrinters(
+                    list.map((p: any) => ({ id: p.name, name: p.name }))
+                );
+            } catch (err) {
+                console.warn('Erro ao carregar impressoras via Print Agent, tentando Electron...', err);
+                // Fallback: tenta Electron se ainda estiver disponível
+                if ((window as any).electronAPI?.getPrinters) {
+                    try {
+                        const list = await (window as any).electronAPI.getPrinters();
+                        setPrinters(
+                            list.map((p: any) => ({ id: p.name, name: p.name }))
+                        );
+                    } catch (electronErr) {
+                        console.error('Error loading printers via Electron:', electronErr);
                     }
                 }
-            })();
-        }
+            }
+        })();
     }, []);
 
     const handleSubmit = async () => {

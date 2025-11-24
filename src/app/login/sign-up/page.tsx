@@ -21,15 +21,8 @@ const RegisterForm = () => {
     const [user, setUser] = useState<Person>(new Person());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const router = useRouter();
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
-    if (!isMounted) {
-        return null; // Evita renderizar HTML até o componente estar pronto
-    }
+    // Sempre renderiza para evitar problemas de hidratação
+    // O estado inicial já está configurado corretamente
     
     const submit = async () => {
         if (password !== confirmPassword && password.length > 0) {

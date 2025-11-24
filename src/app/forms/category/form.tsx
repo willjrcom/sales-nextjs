@@ -20,6 +20,7 @@ import AdditionalCategorySelector from './additional-category';
 import ComplementCategorySelector from './complement-category';
 import RemovableItensComponent from './removable-ingredients';
 import { useRouter } from 'next/navigation';
+import printService from '@/app/utils/print-service';
 
 interface CategoryFormProps extends CreateFormsProps<Category> {
     setItem?: (item: Category) => void
@@ -67,17 +68,16 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     }, [data?.user.access_token, categoriesSlice.ids.length]);
     
     useEffect(() => {
-        if (category.need_print && typeof window !== 'undefined') {
+        if (category.need_print) {
             (async () => {
                 try {
                     // Tenta usar Print Agent (WebSocket) primeiro
-                    const printService = (await import('@/app/utils/print-service')).default;
                     const list = await printService.getPrinters();
                     setPrinters(list.map((p: any) => ({ id: p.name, name: p.name })));
                 } catch (err) {
                     console.warn('Erro ao carregar impressoras via Print Agent, tentando Electron...', err);
                     // Fallback: tenta Electron se ainda estiver disponível
-                    if (typeof window !== 'undefined' && (window as any).electronAPI?.getPrinters) {
+                    if ((window as any).electronAPI?.getPrinters) {
                         try {
                             const list = await (window as any).electronAPI.getPrinters();
                             setPrinters(list.map((p: any) => ({ id: p.name, name: p.name })));

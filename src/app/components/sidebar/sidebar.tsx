@@ -1,7 +1,7 @@
  'use client';
 import React, { useEffect, useState } from 'react';
 import { IconType } from 'react-icons';
-import { FaUserTie, FaPlus, FaSignOutAlt, FaRedo, FaUserLock, FaTh, FaSlidersH, FaTools } from 'react-icons/fa';
+import { FaUserTie, FaPlus, FaSignOutAlt, FaRedo, FaTh, FaTools, FaPrint, FaBox } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from "react-icons/md";
 import { BsFillPeopleFill } from "react-icons/bs";
@@ -95,7 +95,8 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
       <SidebarLinkItem icon={BsFillPeopleFill} label="Clientes" href="/pages/client" />
       <SidebarLinkItem icon={FaUserTie} label="Funcionários" href="/pages/employee" />
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
-      <SidebarLinkItem icon={FaTh} label="Estoque" href="/pages/stock" />
+      <SidebarLinkItem icon={FaBox} label="Estoque" href="/pages/stock" />
+      <SidebarLinkItem icon={FaPrint} label="Impressão" href="/pages/print" />
       <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
       <div className="mt-auto flex flex-col">
         {onToggleAdmin && (

@@ -5,10 +5,17 @@ import React from 'react'
 import { notifyError, notifySuccess } from "./../../../utils/notifications";
 
 export default function Page() {
+    const [mounted, setMounted] = useState(false)
     const { connected, printers, getPrinters, print } = usePrintAgent()
     const [selected, setSelected] = useState('')
     const [text, setText] = useState('Teste de impressão via WebSocket\nLinha 2\nLinha 3')
     const [loading, setLoading] = useState(false)
+
+    // Previne problemas de hidratação SSR
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
 
     useEffect(() => {
         if (connected) {
@@ -40,8 +47,21 @@ export default function Page() {
         notifySuccess(`Impressora selecionada: ${printer || 'Padrão'}`)
     }
 
+    // Retorna estrutura vazia durante SSR para evitar diferenças de hidratação
+    if (!mounted) {
+        return (
+            <div className="container mx-auto p-6 max-w-4xl">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <p className="text-gray-500">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
     return (
-        <div className="container mx-auto p-6 max-w-4xl">
+        <div className="container mx-auto p-6 max-w-4xl" suppressHydrationWarning>
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-3xl font-bold mb-2">Sistema de Impressão</h1>

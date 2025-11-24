@@ -62,14 +62,14 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
     const isModalOpen = (modalName: string) => !!modals[modalName];
 
-    if (!isClient) return null; // Previne erros de hidratação
-
+    // Sempre retorna a estrutura para evitar problemas de hidratação
+    // Apenas os modais são renderizados condicionalmente baseado em isClient
     return (
         <ContextModal.Provider value={{ modals, showModal, hideModal, isModalOpen }}>
             {children}
 
-            {/* Renderizar modais dinâmicos */}
-            {Object.entries(modals).map(([modalName, { title, content, size, onClose }]) => (
+            {/* Renderizar modais dinâmicos apenas no cliente para evitar problemas de hidratação */}
+            {isClient && Object.entries(modals).map(([modalName, { title, content, size, onClose }]) => (
                 <Modal
                     key={modalName}
                     title={title}
