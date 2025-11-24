@@ -67,16 +67,24 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     }
 
     return (
-        <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
-
-            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
+        <div className="text-black space-y-6">
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações da Mesa</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
+                    </div>
+                </div>
+            </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={table} name="Table" onSubmit={submit} deleteItem={onDelete} />
-        </>
+        </div>
     );
 };
 

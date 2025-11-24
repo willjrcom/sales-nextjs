@@ -52,15 +52,25 @@ const PaymentForm = ({ item, isUpdate,  }: PaymentFormProps) => {
     }
 
     return (
-        <>
-            <PriceField friendlyName='Total Pago' name='total_paid' setValue={value => handleInputChange('total_paid', value)} value={payment.total_paid}/>
-            <SelectField friendlyName='Método de pagamento' values={payMethodsWithId} name='method' setSelectedValue={value => handleInputChange('method', value)} selectedValue={payment.method}/>
+        <div className="text-black space-y-6">
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Informações do Pagamento</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <PriceField friendlyName='Total Pago' name='total_paid' setValue={value => handleInputChange('total_paid', value)} value={payment.total_paid}/>
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <SelectField friendlyName='Método de pagamento' values={payMethodsWithId} name='method' setSelectedValue={value => handleInputChange('method', value)} selectedValue={payment.method}/>
+                    </div>
+                </div>
+            </div>
+
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={payment.id}/>
             <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={order?.id}/>
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={payment} name="Tamanho" onSubmit={submit} isAddItem />
-        </>
+        </div>
     );
 };
 

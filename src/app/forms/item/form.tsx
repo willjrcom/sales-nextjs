@@ -80,24 +80,40 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   }
 
   return (
-    <div className="overflow-y-auto">
-      <h3 className="text-lg font-semibold mb-4">{product.name}</h3>
-      <p className="text-sm font-bold">Descrição: <span className="font-normal">{product.description}</span></p>
-      <p className="text-sm font-bold">Tamanho: <span className="font-normal">{product.size.name}</span></p>
-      <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
-      <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
-      <hr className="my-4" />
-
-      {/* Valor unitario */}
-      <div className="flex justify-between">
-        <p className="text-lg font-bold">Valor unitário:</p>
-        <p className="text-lg font-bold">R$ {new Decimal(product.price).toFixed(2)}</p>
+    <div className="overflow-y-auto text-black space-y-6">
+      {/* Seção: Informações do Produto */}
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">{product.name}</h3>
+        <div className="space-y-2">
+          <p className="text-sm font-bold">Descrição: <span className="font-normal">{product.description}</span></p>
+          <p className="text-sm font-bold">Tamanho: <span className="font-normal">{product.size.name}</span></p>
+        </div>
       </div>
 
-      {/* Total do item */}
-      <div className="flex justify-between">
-        <p className="text-lg font-bold">Total:</p>
-        <p className="text-lg font-bold">R$ {new Decimal(product.price).times(quantity.quantity || 1).toFixed(2)}</p>
+      {/* Seção: Quantidade e Observação */}
+      <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Configurações</h3>
+        <div className="space-y-4">
+          <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
+          <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+            <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
+          </div>
+        </div>
+      </div>
+
+      {/* Seção: Valores */}
+      <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Valores</h3>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+            <p className="text-lg font-bold">Valor unitário:</p>
+            <p className="text-lg font-bold text-green-600">R$ {new Decimal(product.price).toFixed(2)}</p>
+          </div>
+          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+            <p className="text-lg font-bold">Total:</p>
+            <p className="text-lg font-bold text-green-600">R$ {new Decimal(product.price).times(quantity.quantity || 1).toFixed(2)}</p>
+          </div>
+        </div>
       </div>
 
       <ButtonsModal item={product} name="produto" onSubmit={submit} isAddItem={true} />

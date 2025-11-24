@@ -12,6 +12,8 @@ interface FormArrayProps {
 }
 
 const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, onRemove, onChange }: FormArrayProps) => {
+    if (items.length === 0) return onAdd();
+    
     return (
         <div className="space-y-4">
             <h3 className="text-md font-semibold">{title}</h3>

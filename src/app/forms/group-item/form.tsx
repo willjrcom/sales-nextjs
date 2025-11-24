@@ -70,66 +70,74 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
     const showRemoveButton = groupItem.start_at && !showUpdateButton;
 
     return (
-        <>
-            <div className="flex items-center space-x-4">
-                <div className="flex-1">
-                    <TextField
-                        name='Observation'
-                        setValue={setObservation}
-                        value={observation}
-                        friendlyName='Observação'
-                        placeholder='Digite a observação'
-                    />
+        <div className="text-black space-y-6">
+            {/* Seção: Observação */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Observação</h3>
+                <div className="flex flex-col sm:flex-row gap-4 items-end">
+                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField
+                            name='Observation'
+                            setValue={setObservation}
+                            value={observation}
+                            friendlyName='Observação'
+                            placeholder='Digite a observação'
+                        />
+                    </div>
+                    <button
+                        className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
+                        onClick={() => onSaveObservation(observation)}
+                    >
+                        <FaSave className="mr-2" />
+                        Salvar
+                    </button>
                 </div>
-                <button
-                    className="flex items-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-200"
-                    onClick={() => onSaveObservation(observation)}
-                >
-                    <FaSave className="mr-2" />
-                    Salvar
-                </button>
             </div>
 
-            <div className="flex items-center space-x-4">
-                <div className="flex-1">
-                    <DateTimeField
-                        friendlyName="Agendar"
-                        name="schedule"
-                        value={startAt}
-                        setValue={setStartAt}
-                    />
+            {/* Seção: Agendamento */}
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Agendamento</h3>
+                <div className="flex flex-col sm:flex-row gap-4 items-end">
+                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                        <DateTimeField
+                            friendlyName="Agendar"
+                            name="schedule"
+                            value={startAt}
+                            setValue={setStartAt}
+                        />
+                    </div>
+                    {showScheduleButton && (
+                        <button
+                            className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
+                            onClick={() => onSaveSchedule(startAt)}
+                        >
+                            <FaCalendarTimes className="mr-2" />
+                            Agendar
+                        </button>
+                    )}
+
+                    {showUpdateButton && (
+                        <button
+                            className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
+                            onClick={() => onSaveSchedule(startAt)}
+                        >
+                            <FaCalendarTimes className="mr-2" />
+                            Atualizar
+                        </button>
+                    )}
+
+                    {showRemoveButton && (
+                        <button
+                            className="flex items-center justify-center px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
+                            onClick={() => onSaveSchedule(null)}
+                        >
+                            <FaTrash className="mr-2" />
+                            Remover
+                        </button>
+                    )}
                 </div>
-                {showScheduleButton && (
-                    <button
-                        className="flex items-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-200"
-                        onClick={() => onSaveSchedule(startAt)}
-                    >
-                        <FaCalendarTimes className="mr-2" />
-                        Agendar
-                    </button>
-                )}
-
-                {showUpdateButton && (
-                    <button
-                        className="flex items-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-200"
-                        onClick={() => onSaveSchedule(startAt)}
-                    >
-                        <FaCalendarTimes className="mr-2" />
-                        Atualizar
-                    </button>
-                )}
-
-                {showRemoveButton && (
-                    <button
-                        className="flex items-center px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition duration-200"
-                        onClick={() => onSaveSchedule(null)}
-                    >
-                        <FaTrash className="mr-2" />
-                        Remover
-                    </button>
-                )}
             </div>
-        </>
+        </div>
     );
 };
 

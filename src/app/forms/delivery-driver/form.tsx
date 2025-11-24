@@ -74,11 +74,18 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     }
     
     return (
-        <>
-            {!isUpdate && <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={employees} />}
+        <div className="text-black space-y-6">
+            {!isUpdate && (
+                <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Selecionar Motoboy</h3>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <SelectField friendlyName='Motoboy' name='name' setSelectedValue={setSelectedEmployeeId} selectedValue={selectedEmployeeId} values={employees} />
+                    </div>
+                </div>
+            )}
             {isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" deleteItem={onDelete} />}
             {!isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} />}
-        </>
+        </div>
     );
 };
 

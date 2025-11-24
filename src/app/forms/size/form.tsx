@@ -89,19 +89,28 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
-        <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name} />
-
-            {isDefaultCategory && <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active} />}
+        <div className="text-black space-y-6">
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações do Tamanho</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name} />
+                    </div>
+                    {isDefaultCategory && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active} />
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id} />
-
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             {isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />}
             {!isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />}
-        </>
+        </div>
     );
 };
 

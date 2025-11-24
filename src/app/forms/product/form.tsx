@@ -186,37 +186,76 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     }, [categories, product.category_id, data?.user.access_token])
 
     return (
-        <>
-            <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code} />
+        <div className="text-black space-y-6">
+            {/* Seção: Informações Básicas */}
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code} />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name} />
+                        </div>
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description} optional />
+                    </div>
+                </div>
+            </div>
 
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name} />
+            {/* Seção: Preços e Custos */}
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Preços e Custos</h3>
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                        <PriceField friendlyName='Preço' name='price' setValue={value => handleInputChange('price', value)} value={product.price} />
+                    </div>
+                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                        <PriceField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost} optional />
+                    </div>
+                </div>
+            </div>
 
-            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description} optional />
+            {/* Seção: Imagem e Disponibilidade */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Imagem e Disponibilidade</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <ImageField 
+                            friendlyName='Imagem' 
+                            name='image_path' 
+                            setValue={value => handleInputChange('image_path', value)} 
+                            value={product.image_path} 
+                            optional
+                            onUploadError={(error) => notifyError(error)}
+                        />
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available} />
+                    </div>
+                </div>
+            </div>
 
-            <PriceField friendlyName='Preço' name='price' setValue={value => handleInputChange('price', value)} value={product.price} />
-
-            <PriceField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost} optional />
-
-            <ImageField 
-                friendlyName='Imagem' 
-                name='image_path' 
-                setValue={value => handleInputChange('image_path', value)} 
-                value={product.image_path} 
-                optional
-                onUploadError={(error) => notifyError(error)}
-            />
-
-            <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available} />
-
-            <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories} />
-
-            <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes} />
+            {/* Seção: Categoria e Tamanho */}
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria e Tamanho</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories} />
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes} />
+                    </div>
+                </div>
+            </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={product} name='produto' onSubmit={submit} deleteItem={onDelete} />
-        </>
+        </div>
     );
 };
 

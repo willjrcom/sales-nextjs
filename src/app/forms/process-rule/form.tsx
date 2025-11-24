@@ -79,32 +79,59 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const validCategories = Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement);
 
     return (
-        <>
-            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={processRule.name} />
+        <div className="text-black space-y-6">
+            {/* Seção: Informações Básicas */}
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={processRule.name} />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={value => handleInputChange('order', value)} value={processRule.order} />
+                        </div>
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={processRule.description} optional />
+                    </div>
+                </div>
+            </div>
 
-            <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={processRule.description} optional />
+            {/* Seção: Imagem e Tempo */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Imagem e Tempo</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <ImageField 
+                            friendlyName='Imagem' 
+                            name='image_path' 
+                            setValue={value => handleInputChange('image_path', value)} 
+                            value={processRule.image_path || ""} 
+                            optional
+                            onUploadError={(error) => notifyError(error)}
+                        />
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
+                    </div>
+                </div>
+            </div>
 
-            <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={value => handleInputChange('order', value)} value={processRule.order} />
-
-            <ImageField 
-                friendlyName='Imagem' 
-                name='image_path' 
-                setValue={value => handleInputChange('image_path', value)} 
-                value={processRule.image_path || ""} 
-                optional
-                onUploadError={(error) => notifyError(error)}
-            />
-
-            <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
-
-            {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
-            {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={validCategories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
+            {/* Seção: Categoria */}
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
+                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
+                    {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={validCategories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
+                </div>
+            </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} deleteItem={onDelete} />
-        </>
+        </div>
     );
 };
 

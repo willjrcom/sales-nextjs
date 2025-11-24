@@ -97,50 +97,77 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     }, [data?.user.access_token, categoriesSlice.entities]);
 
     return (
-        <>
-            <SelectField
-                friendlyName="Produto"
-                name="product_id"
-                selectedValue={stock.product_id}
-                setSelectedValue={(value) => handleInputChange('product_id', value)}
-                values={recordProducts}
-            />
+        <div className="text-black space-y-6">
+            {/* Seção: Produto */}
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Produto</h3>
+                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    <SelectField
+                        friendlyName="Produto"
+                        name="product_id"
+                        selectedValue={stock.product_id}
+                        setSelectedValue={(value) => handleInputChange('product_id', value)}
+                        values={recordProducts}
+                    />
+                </div>
+            </div>
 
-            <TextField
-                friendlyName="Estoque Atual"
-                name="current_stock"
-                setValue={(value) => handleInputChange('current_stock', new Decimal(value || 0))}
-                value={stock.current_stock.toString()}
-            />
+            {/* Seção: Níveis de Estoque */}
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Níveis de Estoque</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField
+                            friendlyName="Estoque Atual"
+                            name="current_stock"
+                            setValue={(value) => handleInputChange('current_stock', new Decimal(value || 0))}
+                            value={stock.current_stock.toString()}
+                        />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                friendlyName="Estoque Mínimo"
+                                name="min_stock"
+                                setValue={(value) => handleInputChange('min_stock', new Decimal(value || 0))}
+                                value={stock.min_stock.toString()}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                friendlyName="Estoque Máximo"
+                                name="max_stock"
+                                setValue={(value) => handleInputChange('max_stock', new Decimal(value || 0))}
+                                value={stock.max_stock.toString()}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <TextField
-                friendlyName="Estoque Mínimo"
-                name="min_stock"
-                setValue={(value) => handleInputChange('min_stock', new Decimal(value || 0))}
-                value={stock.min_stock.toString()}
-            />
-
-            <TextField
-                friendlyName="Estoque Máximo"
-                name="max_stock"
-                setValue={(value) => handleInputChange('max_stock', new Decimal(value || 0))}
-                value={stock.max_stock.toString()}
-            />
-
-            <TextField
-                friendlyName="Unidade"
-                name="unit"
-                setValue={(value) => handleInputChange('unit', value)}
-                value={stock.unit}
-                placeholder="ex: unidades, kg, litros"
-            />
-
-            <CheckboxField
-                friendlyName="Controle Ativo"
-                name="is_active"
-                setValue={(value) => handleInputChange('is_active', value)}
-                value={stock.is_active}
-            />
+            {/* Seção: Configurações */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Configurações</h3>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField
+                            friendlyName="Unidade"
+                            name="unit"
+                            setValue={(value) => handleInputChange('unit', value)}
+                            value={stock.unit}
+                            placeholder="ex: unidades, kg, litros"
+                        />
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <CheckboxField
+                            friendlyName="Controle Ativo"
+                            name="is_active"
+                            setValue={(value) => handleInputChange('is_active', value)}
+                            value={stock.is_active}
+                        />
+                    </div>
+                </div>
+            </div>
 
             <ErrorForms errors={errors} setErrors={setErrors} />
 
@@ -149,7 +176,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                 name="stock"
                 onSubmit={submit}
             />
-        </>
+        </div>
     )
 }
 

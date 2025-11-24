@@ -88,17 +88,21 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
-        <>
-            <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity} disabled={isUpdate} />
+        <div className="text-black space-y-6">
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações da Quantidade</h3>
+                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity} disabled={isUpdate} />
+                </div>
+            </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={quantity.id} />
-
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             {!isUpdate && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" onSubmit={submit} />}
             {isUpdate && isDefaultCategory && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" deleteItem={onDelete} />}
-        </>
+        </div>
     );
 };
 

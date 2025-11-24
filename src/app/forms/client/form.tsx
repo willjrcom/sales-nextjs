@@ -74,7 +74,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     }
 
     return (
-        <>
+        <div className="text-black">
             <PersonForm person={person} setPerson={setPerson} />
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal
@@ -83,7 +83,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                 onSubmit={submit}
                 deleteItem={onDelete}
             />
-        </>
+        </div>
     );
     
 };
