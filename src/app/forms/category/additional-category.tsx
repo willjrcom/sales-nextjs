@@ -56,7 +56,12 @@ const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, se
                             onClick={() => handleCategorySelection(category)}
                         >
                             {category.image_path ? (
-                                <Image src={category.image_path} alt={category.name} className="w-full h-32 object-cover rounded-md mb-4" />
+                                <Image src={category.image_path} 
+                                alt={category.name} 
+                                className="w-full h-32 object-cover rounded-md mb-4" 
+                                width={100} 
+                                height={100} 
+                                />
                             ) : (
                                 <FaTags className="text-4xl text-gray-300 mb-4" />
                             )}

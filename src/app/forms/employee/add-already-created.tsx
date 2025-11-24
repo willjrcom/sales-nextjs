@@ -113,7 +113,7 @@ const CardUser = ({ user }: CardUserProps) => {
             modalHandler.hideModal('new-already-created-employee');
 
         } catch (error: RequestError | any) {
-            if (error.message == 'user already added to company') {
+            if (error.message == 'user already added to company' || error.message == 'Usuário já foi adicionado à empresa') {
                 const response = await NewEmployee(user.id, data);
     
                 employee.id = response

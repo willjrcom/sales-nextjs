@@ -30,6 +30,7 @@ const translateError = (errorMessage: string): string => {
 const errorTranslations: Record<string, string> = {
     // Erros de sistema gerais
     "must open a new shift": "Um novo turno deve ser aberto",
+    "user must be an employee": "O usuário deve se cadastrar como um funcionário",
     "sql: no rows in result set": "Nenhum resultado encontrado",
     "internal server error": "Erro interno do servidor",
     "header content-type is different from application/json": "Content-Type deve ser application/json",
@@ -159,7 +160,6 @@ const errorTranslations: Record<string, string> = {
     
     // Erros de Funcionário
     "employee already exists": "Funcionário já existe",
-    "employee not found": "Funcionário não encontrado",
     
     // Erros de Pedido - Entregas
     "order not found": "Pedido não encontrado",

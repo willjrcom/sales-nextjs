@@ -4,7 +4,6 @@ import User from "@/app/entities/user/user";
 import UserForm from "@/app/forms/user/form-profile";
 import Image from "next/image";
 import React, { useState } from "react";
-import { TextField } from "@/app/components/modal/field";
 import PasswordField from "@/app/components/modal/fields/password";
 import UpdateUserPassword from "@/app/api/user/update/password/user";
 import { notifySuccess, notifyError } from "@/app/utils/notifications";
@@ -161,10 +160,12 @@ const EmployeeUserProfile = ({ user }: EmployeeUserProfileProps) => {
                     title={user.name}
                 >
                     {user.image_path ? (
-                        <img
+                        <Image
                             src={user.image_path}
                             alt={`${user.name}'s profile`}
                             className="w-full h-full object-cover"
+                            width={100}
+                            height={100}
                         />
                     ) : (
                         <span className="text-lg font-bold text-gray-600">{getInitial(user.name)}</span>

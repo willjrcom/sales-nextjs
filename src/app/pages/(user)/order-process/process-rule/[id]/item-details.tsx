@@ -6,6 +6,7 @@ import Product from '@/app/entities/product/product';
 import { FaRegImage } from 'react-icons/fa';
 import { useModal } from '@/app/context/modal/context';
 import ObservationCard from '@/app/components/order/observation';
+import Image from 'next/image';
 
 interface ItemDetailsProps {
     item: Item;
@@ -19,7 +20,13 @@ const ItemDetails = ({ item, product }: ItemDetailsProps) => {
         modalHandler.showModal(
             `product-image-${item.id}`,
             product.name,
-            <img src={product.image_path} alt={product.name} className="w-auto h-auto rounded" />,
+            <Image
+                src={product.image_path}
+                alt={product.name}
+                className="w-auto h-auto rounded"
+                width={100}
+                height={100}
+            />,
             'xl',
             () => modalHandler.hideModal(`product-image-${item.id}`)
         );
@@ -30,10 +37,12 @@ const ItemDetails = ({ item, product }: ItemDetailsProps) => {
                 {/* Left: Product Thumbnail */}
                 <div className="w-24 h-24 flex-shrink-0 mr-4 cursor-pointer" onClick={openImage}>
                     {product?.image_path ? (
-                        <img
+                        <Image
                             src={product.image_path}
                             alt={product.name}
                             className="w-full h-full object-cover rounded"
+                            width={100}
+                            height={100}
                         />
                     ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded">

@@ -6,7 +6,6 @@ import GroupItem from "@/app/entities/order/group-item";
 import Product from "@/app/entities/product/product";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Decimal from "decimal.js";
 import { notifyError } from "@/app/utils/notifications";
