@@ -1,8 +1,8 @@
 "use client";
 import GetGroupItemPrintByID from "@/app/api/print/print-group-item";
-import GetOrderPrintByID from "@/app/api/print/print-order"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
+import printService from '@/app/utils/print-service';
 
 interface PrintGroupItemProps {
     groupItemID: string;
@@ -13,38 +13,76 @@ interface PrintGroupItemProps {
 const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupItemProps) => {
     if (typeof window === 'undefined') return;
 
-    // obtém o conteúdo de impressão (pode vir como Blob ou string)
-    const result = await GetGroupItemPrintByID(groupItemID, session) as any;
+    // Obtém o conteúdo de impressão uma única vez
     let html: string;
-    if (result instanceof Blob) {
-        html = await result.text();
-    } else {
-        html = String(result);
+    try {
+        const result = await GetGroupItemPrintByID(groupItemID, session) as any;
+        if (result instanceof Blob) {
+            html = await result.text();
+        } else {
+            html = String(result);
+        }
+    } catch (fetchError: any) {
+        notifyError(`Erro ao obter conteúdo de impressão: ${fetchError?.message || "Erro desconhecido"}`);
+        return;
     }
-    if (window.electronAPI?.printer) {
-        printerName = printerName || "default";
 
-        if (printerName === "default") {
-            const printers = await window.electronAPI.getPrinters();
+    // Tenta usar o Print Agent (WebSocket) primeiro
+    try {
+        let selectedPrinter = printerName || "default";
+
+        if (selectedPrinter === "default") {
+            const printers = await printService.getPrinters();
             if (printers.length > 0) {
-                printerName = printers[0].name;
+                selectedPrinter = printers[0].name;
             }
         }
 
+        await printService.print(html, selectedPrinter);
+        notifySuccess(`Impressão enviada para ${selectedPrinter}`);
+        return;
+    } catch (wsError: any) {
+        console.warn("Erro ao usar Print Agent, tentando fallback:", wsError);
+        
+        // Fallback: tenta Electron se ainda estiver disponível
         try {
-            await window.electronAPI.printer(html, printerName, { silent: false, printBackground: true });
-            notifySuccess(`Impressão enviada para ${printerName}`);
-        } catch (err: any) {
-            notifyError(`Erro ao chamar a impressora: ${err?.message || err}`);
+            if (typeof window !== 'undefined' && (window as any).electronAPI?.printer) {
+                let selectedPrinter = printerName || "default";
+
+                if (selectedPrinter === "default") {
+                    const printers = await (window as any).electronAPI.getPrinters();
+                    if (printers.length > 0) {
+                        selectedPrinter = printers[0].name;
+                    }
+                }
+
+                await (window as any).electronAPI.printer(html, selectedPrinter, { silent: false, printBackground: true });
+                notifySuccess(`Impressão enviada para ${selectedPrinter}`);
+                return;
+            }
+        } catch (electronError: any) {
+            console.warn("Erro ao usar Electron, tentando fallback do browser:", electronError);
         }
-    } else {
-        const w = window.open('', '_blank', 'width=800,height=600');
-        if (!w) return;
-        w.document.write(html);
-        w.document.close();
-        w.focus();
-        w.print();
-        w.onafterprint = () => w.close();
+
+        // Fallback final: abre diálogo de impressão do browser
+        try {
+            const w = window.open('', '_blank', 'width=800,height=600');
+            if (!w) {
+                throw new Error("Não foi possível abrir janela de impressão");
+            }
+            w.document.write(html);
+            w.document.close();
+            w.focus();
+            w.print();
+            w.onafterprint = () => w.close();
+            notifySuccess("Diálogo de impressão aberto");
+        } catch (browserError: any) {
+            const errorMessage = wsError?.message || 
+                                (typeof wsError === 'string' ? wsError : '') ||
+                                browserError?.message || 
+                                "Erro desconhecido ao imprimir";
+            notifyError(`Erro ao imprimir: ${errorMessage}`);
+        }
     }
 };
 

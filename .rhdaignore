@@ -1,0 +1,13 @@
+# Ignorar diretórios gerados automaticamente
+/.next/
+/build/
+/dist/
+/node_modules/
+/out/
+
+# Arquivos gerados automaticamente
+**/.next/**
+**/build/**
+**/dist/**
+**/node_modules/**
+
