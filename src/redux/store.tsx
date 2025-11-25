@@ -45,7 +45,7 @@ const persistConfig = {
     whitelist: ['clients', 'employees', 'employeesDeleted', 'places', 'deliveryDrivers', 'categories', 'user-companies', 'stock'], // Reducers que serão persistidos
 };
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
     orders: ordersReducer,
     deliveryOrders: deliveryOrdersReducer,
     pickupOrders: pickupOrdersReducer,
@@ -67,6 +67,26 @@ const rootReducer = combineReducers({
     reportStocks: reportStocksReducer,
 });
 
+// Wrap the app reducer so we can reset the entire store when dispatching RESET_APP
+const rootReducer = (state: any, action: any) => {
+    if (action?.type === 'RESET_APP') {
+        // Optionally remove persisted key (persist:root) from storage so rehydration doesn't restore old data
+        try {
+            if (typeof customStorage !== 'undefined' && customStorage?.removeItem) {
+                // key used by redux-persist
+                customStorage.removeItem('persist:root');
+            }
+        } catch (err) {
+            // ignore errors on server or storage
+            // console.warn('failed to remove persist storage', err)
+        }
+
+        state = undefined; // reset reducers to initial state
+    }
+
+    return appReducer(state, action);
+};
+
 // Aplica o persistReducer para o rootReducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
@@ -79,6 +99,18 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
+
+// Helper to reset the whole app state and clear persisted storage
+export const resetApp = async () => {
+    // purge persisted storage first
+    try {
+        await persistor.purge();
+    } catch (err) {
+        // Ignore purge errors
+    }
+    // dispatch a reset action that forces reducers to initial state
+    store.dispatch({ type: 'RESET_APP' });
+};
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

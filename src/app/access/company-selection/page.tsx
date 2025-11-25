@@ -11,7 +11,7 @@ import { fetchClients } from '@/redux/slices/clients';
 import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
 import { fetchEmployees } from '@/redux/slices/employees';
 import { fetchPlaces } from '@/redux/slices/places';
-import { AppDispatch, persistor, RootState, store } from '@/redux/store';
+import { AppDispatch, persistor, RootState, store, resetApp } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -46,6 +46,18 @@ function CompanySelection() {
     const modalHandler = useModal();
     const [selecting, setSelecting] = useState<boolean>(false);
     const loadingCompanies = userCompaniesSlice.loading;
+
+    // Clear entire redux store + persisted storage every time this page is visited
+    useEffect(() => {
+        // run async reset
+        (async () => {
+            try {
+                await resetApp();
+            } catch (err) {
+                // ignore
+            }
+        })();
+    }, []);
 
     useEffect(() => {
         const token = data?.user?.access_token;

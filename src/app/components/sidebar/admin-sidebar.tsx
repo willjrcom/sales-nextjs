@@ -18,6 +18,8 @@ import { TiFlowMerge } from 'react-icons/ti';
 import { MdFastfood, MdOutlineHomeWork } from 'react-icons/md';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { resetApp } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';
 import Company from '@/app/entities/company/company';
 import { useModal } from '@/app/context/modal/context';
@@ -61,6 +63,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
   const modalHandler = useModal();
+  const router = useRouter();
   const { data } = useSession();
   const [company, setCompany] = useState<Company>(new Company());
 
@@ -107,7 +110,14 @@ const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
       <SidebarLinkItem icon={FaPlus} label="Pedidos" href="/pages/admin-order" />
       <SidebarLinkItem icon={FaClock} label="Turnos" href="/pages/admin-shift" />
       <SidebarLinkItem icon={FaChartBar} label="Relatórios" href="/pages/admin-report" />
-      <SidebarLinkItem icon={FaRedo} label="Trocar de empresa" href="/access/company-selection" />
+      <SidebarLinkItem
+        icon={FaRedo}
+        label="Trocar de empresa"
+        onClick={async () => {
+          await resetApp();
+          router.push('/access/company-selection');
+        }}
+      />
       <div className="mt-auto flex flex-col">
         <SidebarLinkItem icon={FaTools} label="User Mode" onClick={onToggleAdmin} />
         <SidebarLinkItem icon={FaSignOutAlt} label="Sair" onClick={signOutToLogin} />
