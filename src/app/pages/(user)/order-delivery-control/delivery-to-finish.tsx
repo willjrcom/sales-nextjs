@@ -191,7 +191,9 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
             modalHandler.hideModal("finish-delivery");
             showOrder(order.id);
         } catch (error: RequestError | any) {
-            notifyError(error);
+            const err = error as RequestError;
+            notifyError(err.message || "Erro ao finalizar entrega");
+            console.error(err);
         }
     }
 

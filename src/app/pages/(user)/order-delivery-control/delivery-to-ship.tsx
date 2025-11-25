@@ -185,15 +185,16 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
 
         if (deliveryIDs.length === 0) {
             notifyError('Selecione pelo menos uma entrega');
-            return
+            return;
         }
 
         if (!selectedDriver) {
             notifyError('Selecione um entregador');
-            return
-        };
+            return;
+        }
 
         const deliveryOrderIds = Array.from(deliveryIDs);
+
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
 
@@ -202,18 +203,22 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
                 for (let i = 0; i < orderIDs.length; i++) {
                     await printOrder({
                         orderID: orderIDs[i],
-                        session: data
-                    })
+                        session: data,
+                    });
                 }
             }
 
             dispatch(fetchDeliveryOrders({ session: data }));
             dispatch(fetchOrders({ session: data }));
             modalHandler.hideModal("ship-delivery");
-        } catch (error: RequestError | any) {
-            notifyError(error);
+        } catch (error) {
+            const err = error as RequestError;
+            // mensagem já vem traduzida pelo RequestApi
+            notifyError(err.message || "Erro ao enviar entregas");
+            // opcional: logar para debug
+            console.error(err);
         }
-    }
+    };
 
     return (
         <>
