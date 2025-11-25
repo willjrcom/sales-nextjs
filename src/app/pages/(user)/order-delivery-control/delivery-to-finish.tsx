@@ -21,7 +21,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { notifyError } from "@/app/utils/notifications";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { fetchOrders } from "@/redux/slices/orders";
 import GetCompany from "@/app/api/company/company";
 
@@ -145,7 +145,7 @@ const DeliveryOrderToFinish = () => {
                     <Map mapId="delivery-to-finish" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>
-            {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Finalizar entrega" position="bottom-right">
+            {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Receber entrega" position="bottom-right">
                 <FinishDelivery order={selectedOrder} />
             </ButtonIconTextFloat>}
         </>
@@ -186,13 +186,16 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
 
         try {
             await DeliveryOrderDelivery(deliveryID, data);
+
+            notifySuccess("Entrega recebida com sucesso");
+
             dispatch(fetchDeliveryOrders({ session: data }));
             dispatch(fetchOrders({ session: data }));
             modalHandler.hideModal("finish-delivery");
             showOrder(order.id);
         } catch (error: RequestError | any) {
             const err = error as RequestError;
-            notifyError(err.message || "Erro ao finalizar entrega");
+            notifyError(err.message || "Erro ao receber entrega");
             console.error(err);
         }
     }

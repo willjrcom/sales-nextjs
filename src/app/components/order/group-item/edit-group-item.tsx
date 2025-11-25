@@ -4,9 +4,9 @@ import { useGroupItem } from "@/app/context/group-item/context";
 import { useSession } from 'next-auth/react';
 import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
 import { useEffect, useState } from "react";
-import { notifyError } from '@/app/utils/notifications';
+import { notifyError, notifySuccess } from '@/app/utils/notifications';
 import ItemCard from "../item/card-item";
-import GroupItem, { StatusGroupItem } from "@/app/entities/order/group-item";
+import GroupItem from "@/app/entities/order/group-item";
 import GroupItemForm from "@/app/forms/group-item/form";
 import StatusComponent from "../../button/show-status";
 import ButtonIconText from "../../button/button-icon-text";
@@ -15,6 +15,8 @@ import ComplementItemCard from "./complement-item";
 import Item from "@/app/entities/order/item";
 import { CartToAdd } from "../cart/cart-to-add";
 import Decimal from "decimal.js";
+import { FaTimes } from "react-icons/fa";
+import { useModal } from "@/app/context/modal/context";
 
 export default function EditGroupItem() {
     const contextGroupItem = useGroupItem();
@@ -65,6 +67,7 @@ const GroupItemCard = () => {
     const { data } = useSession();
     const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
     const [complementItem, setComplementItem] = useState<Item | null>();
+    const modalHandler = useModal();
 
     useEffect(() => {
         setGroupItem(contextGroupItem.groupItem);
@@ -78,7 +81,7 @@ const GroupItemCard = () => {
 
     const containItems = groupItem?.items && groupItem?.items.length > 0
     const isGroupItemStaging = groupItem?.status === "Staging"
-    
+
     return (
         <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
             <div className="flex justify-between items-center">
@@ -124,20 +127,26 @@ const GroupItemCard = () => {
             {/* Botão para cancelar grupo de itens se não estiver em Staging */}
             {groupItem && groupItem.status !== "Staging" && groupItem.status !== "Canceled" && (
                 <div className="mt-4">
-                    <button
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                        onClick={async () => {
-                            if (!data || !groupItem) return;
-                            try {
-                                await CancelGroupItem(groupItem, data);
-                                contextGroupItem.fetchData(groupItem.id);
-                            } catch (error: any) {
-                                notifyError(error.message || 'Erro ao cancelar grupo de itens');
-                            }
-                        }}
-                    >
-                        Cancelar
-                    </button>
+                    <ButtonIconText modalName={"cancel-group-item-" + groupItem.id} title="Cancelar item" size="md" color="red" icon={FaTimes}>
+                        <p className="mb-2">tem certeza que deseja cancelar o item?</p>
+                        <button
+                            onClick={async () => {
+                                if (!data || !groupItem) return;
+                                try {
+                                    await CancelGroupItem(groupItem.id, "cancelado pelo usuario", data);
+                                    notifySuccess("Item cancelado com sucesso!");
+
+                                    contextGroupItem.fetchData(groupItem.id);
+                                    modalHandler.hideModal("cancel-group-item-" + groupItem.id);
+                                } catch (error: any) {
+                                    notifyError(error.message || 'Erro ao cancelar grupo de itens');
+                                }
+                            }}
+                            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                        >
+                            Confirmar
+                        </button>
+                    </ButtonIconText>
                 </div>
             )}
         </div>

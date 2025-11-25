@@ -5,7 +5,7 @@ import { useModal } from "@/app/context/modal/context";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { removeOrderProcess } from "@/redux/slices/order-processes";
-import CancelOrderProcessAPI from "@/app/api/order-process/cancel/order-process";
+import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import RequestError from "@/app/utils/error";
 
@@ -32,13 +32,13 @@ const CancelOrderProcess = ({ orderProcess }: CancelOrderProcessProps) => {
     ];
 
     const handleCancelProcess = async () => {
-        if (!selectedReason || !data) return;
+        if (!selectedReason || !data || !groupItem) return;
 
         setIsLoading(true);
         try {
-            await CancelOrderProcessAPI(orderProcess.id, selectedReason, data);
+            await CancelGroupItem(groupItem.id, selectedReason, data);
             dispatch(removeOrderProcess(orderProcess.id));
-            notifySuccess("Processo cancelado com sucesso!");
+            notifySuccess("Item cancelado com sucesso!");
             modalHandler.hideModal("order-process-cancel-" + orderProcess.id);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao cancelar processo');

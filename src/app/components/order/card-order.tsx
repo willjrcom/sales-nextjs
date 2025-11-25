@@ -162,7 +162,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                     modalHandler.hideModal('finish-delivery');
                 }
                 modalHandler.showModal(
-                    'finish-delivery', 'Finalizar entrega',
+                    'finish-delivery', 'Receber entrega',
                     <FinishDelivery order={order} />,
                     'md',
                     onClose,

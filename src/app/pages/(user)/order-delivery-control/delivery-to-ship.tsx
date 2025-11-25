@@ -22,7 +22,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaMotorcycle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { notifyError } from "@/app/utils/notifications";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import { fetchOrders } from "@/redux/slices/orders";
 
@@ -198,6 +198,12 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
 
+            if (orderIDs.length > 1) {
+                notifySuccess("Entregas enviadas com sucesso");
+            } else {
+                notifySuccess("Entrega enviada com sucesso");
+            }
+
             const company = await GetCompany(data);
             if (company.preferences.enable_print_order_on_ship_delivery) {
                 for (let i = 0; i < orderIDs.length; i++) {
@@ -210,6 +216,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
 
             dispatch(fetchDeliveryOrders({ session: data }));
             dispatch(fetchOrders({ session: data }));
+
             modalHandler.hideModal("ship-delivery");
         } catch (error) {
             const err = error as RequestError;

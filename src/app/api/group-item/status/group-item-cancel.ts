@@ -1,12 +1,11 @@
-import GroupItem from "@/app/entities/order/group-item";
 import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
-const CancelGroupItem = async (groupItem: GroupItem, session: Session): Promise<string> => {
-    const response = await RequestApi<GroupItem, string>({
-        path: "/group-item/cancel/" + groupItem.id, 
+const CancelGroupItem = async (groupItemID: string, reason: string, session: Session): Promise<string> => {
+    const response = await RequestApi<Object, string>({
+        path: "/group-item/cancel/" + groupItemID,
         method: "POST",
-        body: groupItem,
+        body: { reason },
         headers: await AddAccessToken(session),
     });
 
