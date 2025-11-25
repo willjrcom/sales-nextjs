@@ -27,6 +27,7 @@ export default class Order {
     pickup?: OrderPickup;
     pending_at?: Date;
     finished_at?: Date;
+    ready_at?: Date;
     canceled_at?: Date;
     archived_at?: Date;
 
