@@ -168,27 +168,6 @@ const authOptions: NextAuthOptions = {
     debug: process.env.NODE_ENV === "development",
 };
 
-declare module "next-auth/jwt" {
-    interface JWT {
-        id: string;
-        user: UserBackend;
-        access_token?: string;
-        exp?: number;
-        error?: string;
-    }
-}
-
-declare module "next-auth" {
-    interface Session {
-        user: User
-    }
-
-    interface User {
-        user: UserBackend;
-        access_token?: string;
-    }
-}
-
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

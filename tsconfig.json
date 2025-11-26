@@ -34,6 +34,7 @@
     "**/*.js",
     ".next/types/**/*.ts",
     "next-env.d.ts",
+    "src/types/next-auth.d.ts",
     "build/types/**/*.ts"
   ],
   "exclude": [

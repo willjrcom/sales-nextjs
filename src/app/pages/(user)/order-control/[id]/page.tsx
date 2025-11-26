@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/utils/error";

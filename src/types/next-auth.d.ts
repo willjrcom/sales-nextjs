@@ -1,6 +1,14 @@
 import type { DefaultSession } from "next-auth";
 import type { JWT as DefaultJWT } from "next-auth/jwt";
-import type UserBackend from "../app/entities/user/user";
+
+// Tipagem básica do usuário retornado pelo backend.
+// Mantida aqui para evitar problemas de resolução de módulos em arquivos .d.ts.
+interface UserBackend {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    [key: string]: any;
+}
 
 declare module "next-auth" {
     interface Session {
