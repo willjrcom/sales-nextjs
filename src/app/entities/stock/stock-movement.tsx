@@ -3,16 +3,16 @@ import Decimal from 'decimal.js';
 import Product from "../product/product";
 
 export default class StockMovement {
-    id: string = "";
-    stock_id: string = "";
-    type: string = ""; // 'in', 'out', 'adjust_in', 'adjust_out'
+    id: string = '';
+    stock_id: string = '';
+    type: string = ''; // 'in', 'out', 'adjust_in', 'adjust_out'
     quantity: Decimal = new Decimal(0);
-    reason: string = "";
+    reason: string = '';
     order_id?: string;
     employee_id?: string;
     price: Decimal = new Decimal(0);
     total_price: Decimal = new Decimal(0);
-    created_at: string = "";
+    created_at: string = '';
     product?: Product;
 
     constructor(data: Partial<StockMovement> = {}) {

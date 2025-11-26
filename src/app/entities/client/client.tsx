@@ -1,5 +1,5 @@
 import { z } from "zod";
-import Person, { ValidatePersonForm } from "../person/person";
+import Person, { ValidatePersonClientForm } from "../person/person";
 import Address from "../address/address";
 import Decimal from "decimal.js";
 
@@ -15,7 +15,7 @@ const SchemaClient = z.object({
 });
 
 export const ValidateClientForm = (client: Client) => {
-    const errors = ValidatePersonForm(client);
+    const errors = ValidatePersonClientForm(client);
     const validatedFields = SchemaClient.safeParse({
     });
 

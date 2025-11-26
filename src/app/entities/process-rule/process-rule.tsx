@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 export default class ProcessRule {
-    id: string = "";
-    name: string = "";
-    order: number = 0;
-    description: string = "";
-    image_path?: string = "";
-    ideal_time: string = "";
-    category_id: string = "";
+    id: string = '';
+    name: string = '';
+    order: number = 1;
+    description: string = '';
+    image_path?: string = '';
+    ideal_time: string = '00:00';
+    category_id: string = '';
     total_order_process_late: number = 0;
     total_order_queue: number = 0;
 

@@ -4,7 +4,6 @@ import PatternField from "@/app/components/modal/fields/pattern";
 import { useModal } from "@/app/context/modal/context";
 import Employee from "@/app/entities/employee/employee";
 import User from "@/app/entities/user/user";
-import Person from "@/app/entities/person/person";
 import RequestError from "@/app/utils/error";
 import { notifyError } from "@/app/utils/notifications";
 import { addEmployee } from "@/redux/slices/employees";

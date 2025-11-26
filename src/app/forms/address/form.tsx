@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { HiddenField, SelectField, TextField } from '../../components/modal/field';
 import PriceField from '@/app/components/modal/fields/price';
-import Address, { addressUFsWithId, AddressTypesWithId } from '@/app/entities/address/address';
+import Address from '@/app/entities/address/address';
+import { addressUFsWithId, AddressTypesWithId } from '@/app/entities/address/utils';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';

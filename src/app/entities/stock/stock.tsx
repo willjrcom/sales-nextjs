@@ -3,15 +3,15 @@ import Decimal from 'decimal.js';
 import Product from "../product/product";
 
 export default class Stock {
-    id: string = "";
-    product_id: string = "";
+    id: string = '';
+    product_id: string = '';
     current_stock: Decimal = new Decimal(0);
     min_stock: Decimal = new Decimal(0);
     max_stock: Decimal = new Decimal(1000);
-    unit: string = "";
+    unit: string = '';
     is_active: boolean = true;
-    created_at: string = "";
-    updated_at: string = "";
+    created_at: string = '';
+    updated_at: string = '';
     product?: Product;
 
     constructor(data: Partial<Stock> = {}) {

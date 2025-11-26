@@ -54,11 +54,11 @@ class PrintService {
                     this.isConnected = false;
                     
                     // Código 1006 indica conexão fechada anormalmente (geralmente servidor não está rodando)
-                    if (event.code === 1006) {
-                        console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando em localhost:8089?");
-                    } else {
-                        console.log("🔴 Print Agent desconectado, reconectando...");
-                    }
+                    // if (event.code === 1006) {
+                    //     console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando em localhost:8089?");
+                    // } else {
+                    //     console.log("🔴 Print Agent desconectado, reconectando...");
+                    // }
                     
                     this.connectPromise = null;
                     this.scheduleReconnect();
@@ -71,15 +71,15 @@ class PrintService {
                     const readyState = this.ws?.readyState;
                     let errorMessage = "Erro ao conectar com o Print Agent";
                     
-                    if (readyState === WebSocket.CONNECTING) {
-                        errorMessage = "Não foi possível conectar ao Print Agent em ws://localhost:8089/ws. Verifique se o serviço está rodando.";
-                        console.error("❌ Erro ao conectar:", errorMessage);
-                    } else if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
-                        errorMessage = "Conexão com Print Agent foi fechada.";
-                        console.error("❌ Conexão fechada:", errorMessage);
-                    } else {
-                        console.error("❌ Erro no WebSocket (readyState:", readyState, ")");
-                    }
+                    // if (readyState === WebSocket.CONNECTING) {
+                    //     errorMessage = "Não foi possível conectar ao Print Agent em ws://localhost:8089/ws. Verifique se o serviço está rodando.";
+                    //     console.error("❌ Erro ao conectar:", errorMessage);
+                    // } else if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
+                    //     errorMessage = "Conexão com Print Agent foi fechada.";
+                    //     console.error("❌ Conexão fechada:", errorMessage);
+                    // } else {
+                    //     console.error("❌ Erro no WebSocket (readyState:", readyState, ")");
+                    // }
                     
                     this.connectPromise = null;
                     reject(new Error(errorMessage));

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import Company from "../company/company";
-import Person, { ValidatePersonForm } from "../person/person";
+import Person, { ValidatePersonUserForm } from "../person/person";
 
 export default class User extends Person {
     id: string = '';
@@ -17,7 +17,7 @@ const SchemaUser = z.object({
 });
 
 export const ValidateUserForm = (user: User) => {
-    const errors = ValidatePersonForm(user);
+    const errors = ValidatePersonUserForm(user);
     const validatedFields = SchemaUser.safeParse({
     });
 

@@ -10,7 +10,7 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { ToIsoDate } from '@/app/utils/date';
-import Person, { ValidatePersonForm } from '@/app/entities/person/person';
+import Person, { ValidatePersonUserForm } from '@/app/entities/person/person';
 
 const UserForm = ({ item }: CreateFormsProps<User>) => {
     const modalName = 'show-user'
@@ -29,7 +29,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
             newUser.birthday = ToIsoDate(newUser.birthday)
         }
 
-        const validationErrors = ValidatePersonForm(newUser);
+        const validationErrors = ValidatePersonUserForm(newUser);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
         
         try {

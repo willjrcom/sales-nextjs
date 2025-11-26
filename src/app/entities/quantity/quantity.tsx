@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export default class Quantity {
-  id: string = "";
+  id: string = '';
   quantity: number = 0;
-  category_id: string = "";
+  category_id: string = '';
 
   constructor(data: Partial<Quantity> = {}) {
     Object.assign(this, data);

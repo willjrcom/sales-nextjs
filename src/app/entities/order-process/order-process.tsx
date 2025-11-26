@@ -7,25 +7,25 @@ type StatusProcess = "Pending" | "Started" | "Finished" | "Paused" | "Continued"
 type orderType = "Delivery" | "Pickup" | "Table";
 
 export default class OrderProcess {
-    id: string = "";
+    id: string = '';
     order_number: number = 0;
     order_type: orderType = "Delivery";
-    employee_id?: string = "";
-    group_item_id: string = "";
+    employee_id?: string = '';
+    group_item_id: string = '';
     group_item?: GroupItem;
-    process_rule_id: string = "";
+    process_rule_id: string = '';
     process_rule?: ProcessRule = new ProcessRule();
     queue?: OrderQueue = new OrderQueue();
     status: StatusProcess = "Pending";
     products: Product[] = [];
-    started_at?: string = "";
-    paused_at?: string = "";
-    continued_at?: string = "";
-    finished_at?: string = "";
-    canceled_at?: string = "";
+    started_at?: string = '';
+    paused_at?: string = '';
+    continued_at?: string = '';
+    finished_at?: string = '';
+    canceled_at?: string = '';
     canceled_reason?: string;
     duration: number = 0;
-    duration_formatted: string = "";
+    duration_formatted: string = '';
     total_paused: number = 0;
 
     

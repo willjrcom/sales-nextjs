@@ -25,7 +25,7 @@ interface EmployeeFormProps extends CreateFormsProps<Employee> {
 }
 
 const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) => {
-    const modalName = isUpdate ? 'edit-employee-' + item?.id : 'new-employee'
+    const modalName = 'new-already-created-employee'
     const modalHandler = useModal();
     const [employee, setEmployee] = useState<Employee>(item || new Employee());
     const [person, setPerson] = useState<Person>(item || new Person());
@@ -90,7 +90,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         }
 
         const validationErrors = ValidateEmployeeForm(newEmployee);
-        if (Object.values(validationErrors).length > 0) return notifyError(validationErrors.toString());
+        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
             const responseUser = await NewUser(newEmployee, "", true)

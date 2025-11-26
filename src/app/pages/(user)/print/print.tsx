@@ -38,12 +38,12 @@ export function usePrintAgent() {
                     setConnected(false);
                     
                     // Código 1006 indica conexão fechada anormalmente (geralmente servidor não está rodando)
-                    if (event.code === 1006) {
-                        setError("Print Agent não está rodando. Verifique se o serviço está em localhost:8089");
-                        console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando?");
-                    } else {
-                        console.log("🔴 Print Agent desconectado, reconectando em", reconnectTimer / 1000, "segundos");
-                    }
+                    // if (event.code === 1006) {
+                    //     setError("Print Agent não está rodando. Verifique se o serviço está em localhost:8089");
+                    //     console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando?");
+                    // } else {
+                    //     console.log("🔴 Print Agent desconectado, reconectando em", reconnectTimer / 1000, "segundos");
+                    // }
                     
                     setTimeout(() => {
                         if (mounted) connect();

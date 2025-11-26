@@ -96,7 +96,7 @@ const errorTranslations: Record<string, string> = {
     "process already continued": "O processo já foi continuado",
     
     // Erros de Usuário
-    "user already exists": "Usuário já existe",
+    "user already exists": "Usuário já cadastrado",
     "invalid email": "Email inválido",
     "invalid password": "Senha inválida",
     "email cannot be empty": "Email não pode estar vazio",
@@ -106,33 +106,33 @@ const errorTranslations: Record<string, string> = {
     "invalid id": "ID inválido",
     
     // Erros de Cliente/Contato
-    "contact already exists": "Contato já existe",
+    "contact already exists": "Contato já cadastrado",
     "contact not found": "Contato não encontrado",
     "invalid contact": "Contato inválido",
     "ddd and number are required": "DDD e número são obrigatórios",
     "contact format invalid": "Formato de contato inválido",
     
     // Erros de Endereço
-    "address already exists": "Endereço já existe",
+    "address already exists": "Endereço já cadastrado",
     "address not found": "Endereço não encontrado",
     "invalid address": "Endereço inválido",
     
     // Erros de Empresa (Company)
     "user already added to company": "Usuário já foi adicionado à empresa",
     "user already removed from company": "Usuário já foi removido da empresa",
-    "company already exists": "Empresa já existe",
+    "company already exists": "Empresa já cadastrado",
     "company not found": "Empresa não encontrada",
     "invalid company": "Empresa inválida",
     "no company found": "Nenhuma empresa encontrada",
     "invalid userID": "ID de usuário inválido",
     
     // Erros de Cliente
-    "client already exists": "Cliente já existe",
+    "client already exists": "Cliente já cadastrado",
     "client not found": "Cliente não encontrado",
     "invalid client": "Cliente inválido",
     
     // Erros de Produto
-    "code product already exists": "Código do produto já existe",
+    "code product already exists": "Código do produto já cadastrado",
     "product category not found": "Categoria do produto não encontrada",
     "size is invalid": "Tamanho inválido",
     "size not found": "Tamanho não encontrado",

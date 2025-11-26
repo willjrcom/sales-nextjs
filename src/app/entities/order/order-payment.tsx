@@ -27,10 +27,10 @@ export const payMethodsWithId: { id: string; name: string }[] = Array.from(payMe
 }));
 
 export class PaymentOrder {
-    id: string = "";
+    id: string = '';
     total_paid: Decimal = new Decimal(0);
     method: PayMethod = "Dinheiro";
-    order_id: string = "";
+    order_id: string = '';
     order_number: number = 0;
 
     

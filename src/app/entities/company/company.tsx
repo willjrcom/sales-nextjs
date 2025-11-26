@@ -2,12 +2,12 @@ import { z } from "zod";
 import Address from "../address/address";
 
 export default class Company {
-    id: string = "";
-    schema_name: string = "";
-    business_name: string = "";
-    email: string = "";
-    trade_name: string = "";
-    cnpj: string = "";
+    id: string = '';
+    schema_name: string = '';
+    business_name: string = '';
+    email: string = '';
+    trade_name: string = '';
+    cnpj: string = '';
     contacts: string[] = [];
     address: Address = new Address();
     preferences: Record<string, string> = {};

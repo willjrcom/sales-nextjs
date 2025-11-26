@@ -1,13 +1,13 @@
 import { z } from "zod";
-import Address, { SchemaAddress } from "../address/address";
+import Address, { SchemaAddressClient, SchemaAddressUser } from "../address/address";
 import Contact, { SchemaContact } from "../contact/contact";
 
 export default class Person {
-    image_path: string = "";
-    name: string = "";
-    email: string = "";
-    cpf: string = "";
-    birthday?: string = "";
+    image_path: string = '';
+    name: string = '';
+    email: string = '';
+    cpf?: string;
+    birthday?: string;
     contact: Contact = new Contact();
     address: Address = new Address();
 
@@ -16,17 +16,41 @@ export default class Person {
     }
 };
 
-const SchemaPerson = z.object({
+const SchemaPersonClient = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    cpf: z.string().optional(),
     contact: SchemaContact,
-    address: SchemaAddress,
+    address: SchemaAddressClient,
 });
 
-export const ValidatePersonForm = (person: Person) => {
-    const validatedFields = SchemaPerson.safeParse({
+const SchemaPersonUser = z.object({
+    name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
+    email: z.string().email('Email inválido'),
+    cpf: z.string().min(11, 'CPF precisa ter pelo menos 11 caracteres').max(14, 'CPF precisa ter no máximo 14 caracteres'),
+    birthday: z.string(),
+    contact: SchemaContact,
+    address: SchemaAddressUser,
+});
+
+export const ValidatePersonUserForm = (person: Person) => {
+    const validatedFields = SchemaPersonUser.safeParse({
         name: person.name,
+        email: person.email,
         cpf: person.cpf,
+        birthday: person.birthday,
+        contact: person.contact,
+        address: person.address,
+    });
+
+    if (!validatedFields.success) {
+        // Usa o método flatten para simplificar os erros
+        return validatedFields.error.flatten().fieldErrors;
+    }
+    return {}
+};
+
+export const ValidatePersonClientForm = (person: Person) => {
+    const validatedFields = SchemaPersonClient.safeParse({
+        name: person.name,
         contact: person.contact,
         address: person.address,
     });

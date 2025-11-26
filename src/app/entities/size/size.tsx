@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export default class Size {
-  id: string = "";
-  name: string = "";
+  id: string = '';
+  name: string = '';
   is_active: boolean = true;
-  category_id: string = "";
+  category_id: string = '';
 
   constructor(data: Partial<Size> = {}) {
     Object.assign(this, data);

@@ -4,18 +4,18 @@ import Order from "../order/order";
 import { PaymentOrder } from "../order/order-payment";
 import DeliveryDriverTax from "./delivery-driver-tax";
 import Redeem from "./redeem";
-
+import { OrderProcessAnalytics, QueueAnalytics } from "./metrics";
 export default class Shift {
-    id: string = "";
+    id: string = '';
     current_order_number: number = 0;
     orders: Order[] = [];
     redeems: Redeem[] = [];
     start_change: Decimal = new Decimal(0);
     end_change: Decimal = new Decimal(0);
-    attendant_id: string = "";
+    attendant_id: string = '';
     attendant: Employee = new Employee();
-    opened_at: string = "";
-    closed_at: string = "";
+    opened_at: string = '';
+    closed_at: string = '';
 
 	total_orders_finished: number = 0;
 	total_orders_canceled: number = 0;

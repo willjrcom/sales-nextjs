@@ -4,19 +4,19 @@ import Table from "../table/table";
 type StatusOrderTable = "Staging" | "Pending" | "Closed";
 
 export default class OrderTable {
-  id: string = "";
-  name: string = "";
-  contact: string = "";
+  id: string = '';
+  name: string = '';
+  contact: string = '';
   status: StatusOrderTable = "Staging";
   tax_rate: Decimal = new Decimal(0);
-  order_id: string = "";
-  table_id: string = "";
+  order_id: string = '';
+  table_id: string = '';
   table: Table = new Table();
-  created_at: string = "";
-  pending_at?: string = "";
-  closed_at?: string = "";
+  created_at: string = '';
+  pending_at?: string = '';
+  closed_at?: string = '';
   order_number: number = 0;
-  canceled_at?: string = "";
+  canceled_at?: string = '';
 
   
   constructor(data: Partial<OrderTable> = {}) {

@@ -1,6 +1,6 @@
 
 // Interfaces para analytics de produção
-interface OrderProcessAnalytics {
+export interface OrderProcessAnalytics {
     process_rule_id: string;
     process_rule_name: string;
     total_processes: number;
@@ -14,7 +14,7 @@ interface OrderProcessAnalytics {
     employee_performance: Record<string, EmployeeProcessMetrics>;
 }
 
-interface QueueAnalytics {
+export interface QueueAnalytics {
     process_rule_id: string;
     process_rule_name: string;
     total_queues: number;
@@ -23,14 +23,14 @@ interface QueueAnalytics {
     total_queue_time: number; // em segundos
 }
 
-interface CategoryProcessMetrics {
+export interface CategoryProcessMetrics {
     category_id: string;
     category_name: string;
     total_processes: number;
     average_process_time: number; // em segundos
 }
 
-interface EmployeeProcessMetrics {
+export interface EmployeeProcessMetrics {
     employee_id: string;
     employee_name: string;
     total_processes: number;
