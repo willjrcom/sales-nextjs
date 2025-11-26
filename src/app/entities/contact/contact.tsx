@@ -19,5 +19,5 @@ export enum ContactType {
 
 export const SchemaContact = z.object({
     ddd: z.string().length(2, 'Celular: DDD inválido, precisa ter 2 caracteres'),
-    number: z.string().min(9, 'Celular: Número min inválido').max(10, 'Celular: Número max inválido'),
+    number: z.string().min(9, 'Celular: Número inválido').max(10, 'Celular: Número inválido'),
 });
