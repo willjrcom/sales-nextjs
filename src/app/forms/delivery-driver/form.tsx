@@ -83,7 +83,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
                     </div>
                 </div>
             )}
-            {isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" deleteItem={onDelete} />}
+            {isUpdate && <ButtonsModal item={deliveryDriver.employee} name="Motoboy" deleteItem={onDelete} />}
             {!isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} />}
         </div>
     );
