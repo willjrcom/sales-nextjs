@@ -59,9 +59,21 @@ const userColumns: ColumnDef<User>[] = [
     header: "Email",
   },
   {
-    id: "companies_count",
+    id: "companies_names",
     header: "Empresas Vinculadas",
-    accessorFn: (row) => row.companies?.length ?? 0,
+    cell: ({ row }) => {
+      const companies = row.original.companies ?? [];
+      if (companies.length === 0) {
+        return <span className="text-gray-400">Sem empresas</span>;
+      }
+      return (
+        <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+          {companies.map((company) => (
+            <li key={company.id || company.schema_name}>{company.trade_name || company.business_name || company.schema_name}</li>
+          ))}
+        </ul>
+      );
+    },
   },
 ];
 
