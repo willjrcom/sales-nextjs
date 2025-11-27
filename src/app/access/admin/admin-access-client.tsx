@@ -11,6 +11,7 @@ import User from "@/app/entities/user/user";
 import ListPublicCompanies from "@/app/api/public/companies";
 import ListPublicUsers from "@/app/api/public/users";
 import { notifyError } from "@/app/utils/notifications";
+import Link from "next/link";
 
 interface AdminAccessClientProps {
   whitelist: string;
@@ -102,6 +103,15 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
   const [companiesError, setCompaniesError] = useState<string | null>(null);
   const [usersError, setUsersError] = useState<string | null>(null);
 
+  const backButton = (
+    <Link
+      href="/access/company-selection"
+      className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+    >
+      Voltar para seleção
+    </Link>
+  );
+
   const loadCompanies = useCallback(async () => {
     if (!session) return;
     setCompaniesLoading(true);
@@ -152,8 +162,9 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
         <Loading />
+        {backButton}
       </div>
     );
   }
@@ -164,6 +175,7 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
         <p className="text-lg text-gray-700 text-center">
           Você precisa estar autenticado para acessar esta página.
         </p>
+        {backButton}
       </div>
     );
   }
@@ -176,6 +188,7 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
           Adicione a variável de ambiente <code className="bg-gray-100 px-1 rounded">WHITE_LIST</code>{" "}
           com os e-mails autorizados (separados por vírgula) antes de liberar o acesso.
         </p>
+        {backButton}
       </div>
     );
   }
@@ -188,19 +201,23 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
           O e-mail <strong>{session.user.user?.email ?? "sem e-mail"}</strong> não está presente na
           lista de autorização configurada em <code className="bg-gray-100 px-1 rounded">WHITE_LIST</code>.
         </p>
+        {backButton}
       </div>
     );
   }
 
   return (
     <div className="space-y-8 p-6">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-yellow-600">Acesso Administrativo</p>
-        <h1 className="text-3xl font-bold text-gray-900">APIs públicas monitoradas</h1>
-        <p className="text-gray-600 max-w-3xl">
-          Visualize rapidamente os metadados expostos pelos endpoints <code className="bg-gray-100 px-1 rounded">/public/companies</code>{" "}
-          e <code className="bg-gray-100 px-1 rounded">/public/users</code>. Os dados são apenas para leitura.
-        </p>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-sm uppercase tracking-wide text-yellow-600">Acesso Administrativo</p>
+          <h1 className="text-3xl font-bold text-gray-900">APIs públicas monitoradas</h1>
+          <p className="text-gray-600 max-w-3xl">
+            Visualize rapidamente os metadados expostos pelos endpoints <code className="bg-gray-100 px-1 rounded">/public/companies</code>{" "}
+            e <code className="bg-gray-100 px-1 rounded">/public/users</code>. Os dados são apenas para leitura.
+          </p>
+        </div>
+        {backButton}
       </header>
 
       <SectionCard
