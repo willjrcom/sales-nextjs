@@ -1,8 +1,8 @@
 "use client";
 
-import PaymentStatusScreen from "@/app/components/mensalidade/payment-status";
+import PaymentStatusScreen from "@/app/components/company-payment/payment-status";
 
-const MensalidadePendingPage = () => (
+const CompanyPaymentPendingPage = () => (
   <PaymentStatusScreen
     status="pending"
     title="Pagamento em análise"
@@ -10,4 +10,4 @@ const MensalidadePendingPage = () => (
   />
 );
 
-export default MensalidadePendingPage;
+export default CompanyPaymentPendingPage;

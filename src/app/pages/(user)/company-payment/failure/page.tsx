@@ -1,8 +1,8 @@
 "use client";
 
-import PaymentStatusScreen from "@/app/components/mensalidade/payment-status";
+import PaymentStatusScreen from "@/app/components/company-payment/payment-status";
 
-const MensalidadeFailurePage = () => (
+const CompanyPaymentFailurePage = () => (
   <PaymentStatusScreen
     status="failure"
     title="Pagamento não finalizado"
@@ -10,4 +10,4 @@ const MensalidadeFailurePage = () => (
   />
 );
 
-export default MensalidadeFailurePage;
+export default CompanyPaymentFailurePage;

@@ -1,8 +1,8 @@
 "use client";
 
-import PaymentStatusScreen from "@/app/components/mensalidade/payment-status";
+import PaymentStatusScreen from "@/app/components/company-payment/payment-status";
 
-const MensalidadeSuccessPage = () => (
+const CompanyPaymentSuccessPage = () => (
   <PaymentStatusScreen
     status="success"
     title="Pagamento confirmado!"
@@ -10,4 +10,4 @@ const MensalidadeSuccessPage = () => (
   />
 );
 
-export default MensalidadeSuccessPage;
+export default CompanyPaymentSuccessPage;

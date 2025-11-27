@@ -53,7 +53,7 @@ const InfoCard = ({
   );
 };
 
-const MensalidadePage = () => {
+const CompanyPaymentPage = () => {
   const { data: session } = useSession();
   const [company, setCompany] = useState<Company | null>(null);
   const [payments, setPayments] = useState<CompanyPayment[]>([]);
@@ -199,7 +199,7 @@ const MensalidadePage = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-semibold">Mensalidade</h1>
+            <h1 className="text-3xl font-semibold">CompanyPayment</h1>
             <p className="text-gray-500">
               Gere o checkout via Mercado Pago e acompanhe os pagamentos da sua
               empresa.
@@ -350,4 +350,4 @@ const MensalidadePage = () => {
   );
 };
 
-export default MensalidadePage;
+export default CompanyPaymentPage;

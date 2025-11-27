@@ -147,8 +147,8 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
       <SidebarLinkItem icon={FaPrint} label="Impressão" href="/pages/print" />
       <SidebarLinkItem
         icon={MdOutlineAttachMoney}
-        label="Mensalidade"
-        href="/pages/mensalidade"
+        label="CompanyPayment"
+        href="/pages/company-payment"
       />
       <SidebarLinkItem
         icon={FaRedo}

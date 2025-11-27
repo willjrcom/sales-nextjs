@@ -63,7 +63,7 @@ const PaymentStatusScreen = ({
 
         <div className="flex flex-col md:flex-row gap-4 justify-center">
           <Link
-            href="/pages/mensalidade"
+            href="/pages/company-payment"
             className="w-full md:w-auto px-6 py-3 rounded-md bg-indigo-600 text-white font-medium shadow hover:bg-indigo-700 transition"
           >
             Ir para Mensalidade
