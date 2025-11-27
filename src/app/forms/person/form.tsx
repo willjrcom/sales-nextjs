@@ -78,7 +78,7 @@ const PersonForm = ({ person, setPerson, isEmployee, isHidden }: PersonProps) =>
 
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf} optional={!isEmployee} disabled={isHidden} formatted={true} />
+                            <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={person.cpf || ''} optional={!isEmployee} disabled={isHidden} formatted={true} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={person.birthday} optional={!isEmployee} disabled={isHidden} />
