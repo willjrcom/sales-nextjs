@@ -138,7 +138,6 @@ const ImageField = ({
                                 setImgError(true);
                                 onUploadError?.('Erro ao carregar a imagem. Verifique se a URL está correta.');
                             }}
-                            unoptimized
                         />
                         {!disabled && (
                             <button
