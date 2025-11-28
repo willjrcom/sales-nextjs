@@ -7,17 +7,19 @@ import {
 
 const REGION = process.env.NEXT_PUBLIC_AWS_REGION!;
 const BUCKET = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
+const DEFAULT_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 
 export interface UploadParams {
     key: string;
     body: any;
     contentType?: string;
+    cacheControl?: string;
 }
 
 /**
  * Uploads data to S3 and returns its public URL.
  */
-export async function uploadObject({ key, body, contentType }: UploadParams): Promise<string> {
+export async function uploadObject({ key, body, contentType, cacheControl }: UploadParams): Promise<string> {
     await s3Client.send(
         new PutObjectCommand({
             Bucket: BUCKET,
@@ -25,6 +27,7 @@ export async function uploadObject({ key, body, contentType }: UploadParams): Pr
             Body: body,
             ContentType: contentType,
             ACL: 'public-read',
+            CacheControl: cacheControl ?? DEFAULT_CACHE_CONTROL,
         }),
     );
     return `https://${BUCKET}.s3.${REGION}.amazonaws.com/${key}`;
