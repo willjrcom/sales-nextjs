@@ -43,6 +43,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <div className="text-center">
                 <h2 className="font-bold text-lg mb-1">{product.name}</h2>
                 <p className="text-gray-600 mb-2">R$ {new Decimal(product.price).toFixed(2)}</p>
+                {product.flavors && product.flavors.length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-2 mt-2">
+                        {product.flavors.map((flavor, index) => (
+                            <span
+                                key={`${product.id}-${index}-${flavor}`}
+                                className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full border border-orange-200"
+                            >
+                                {flavor}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Tamanhos e botão */}

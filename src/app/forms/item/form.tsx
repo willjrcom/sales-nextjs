@@ -87,6 +87,21 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
         <div className="space-y-2">
           <p className="text-sm font-bold">Descrição: <span className="font-normal">{product.description}</span></p>
           <p className="text-sm font-bold">Tamanho: <span className="font-normal">{product.size.name}</span></p>
+          {product.flavors && product.flavors.length > 0 && (
+            <div>
+              <p className="text-sm font-bold mb-1">Sabores disponíveis:</p>
+              <div className="flex flex-wrap gap-2">
+                {product.flavors.map((flavor, index) => (
+                  <span
+                    key={`${product.id}-${index}-${flavor}`}
+                    className="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full border border-orange-200"
+                  >
+                    {flavor}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
