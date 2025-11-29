@@ -25,6 +25,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalHandler = useModal();
     const categoriesSlice = useSelector((state: RootState) => state.categories);
     const [product, setProduct] = useState<Product>(item || new Product());
+    const [flavorsInput, setFlavorsInput] = useState<string>(item?.flavors?.join(', ') || '');
     const [categories, setCategories] = useState<Category[]>([]);
     const [category, setCategory] = useState<Category>(new Category());
     const [size, setSize] = useState<Size>(item?.size || new Size());
@@ -50,6 +51,14 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         setProduct(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleFlavorsChange = (value: string) => {
+        setFlavorsInput(value);
+        const parsedFlavors = value.split(',')
+            .map(flavor => flavor.trim())
+            .filter((flavor) => flavor.length > 0);
+        setProduct(prev => ({ ...prev, flavors: parsedFlavors }));
+    };
+
     const submit = async () => {
         if (!data) return;
         const validationErrors = ValidateProductForm(product);
@@ -65,6 +74,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 image_path: product.image_path,
                 name: product.name,
                 description: product.description,
+                flavors: product.flavors,
                 price: product.price,
                 cost: product.cost,
                 category_id: product.category_id,
@@ -201,6 +211,17 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <TextField friendlyName='Descrição' name='description' setValue={value => handleInputChange('description', value)} value={product.description} optional />
+                    </div>
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField
+                            friendlyName='Sabores (separados por vírgula)'
+                            name='flavors'
+                            placeholder='Ex.: Calabresa, 4 queijos, Pepperoni'
+                            setValue={(value) => handleFlavorsChange(value)}
+                            value={flavorsInput}
+                            optional
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Digite os sabores e separe cada um com vírgula.</p>
                     </div>
                 </div>
             </div>

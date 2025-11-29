@@ -9,6 +9,7 @@ export default class Product {
     image_path: string = '';
     name: string = '';
     description: string = '';
+    flavors: string[] = [];
     price: Decimal = new Decimal(0);
     cost: Decimal = new Decimal(0);
     category_id: string = '';
@@ -28,6 +29,7 @@ const SchemaProduct = z.object({
     image_path: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     description: z.string().optional(),
+    flavors: z.array(z.string().trim().min(1, 'Sabor inválido')).optional(),
     price: z.coerce.number().min(1, 'Preço inválido'),
     cost: z.coerce.number().optional(),
     category_id: z.string().uuid("Categoria inválida"),
@@ -40,6 +42,7 @@ export const ValidateProductForm = (product: Product) => {
         code: product.code,
         name: product.name,
         description: product.description,
+        flavors: product.flavors,
         price: new Decimal(product.price).toNumber(),
         cost: new Decimal(product.cost).toNumber(),
         category_id: product.category_id,

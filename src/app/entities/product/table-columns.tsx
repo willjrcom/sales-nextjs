@@ -16,6 +16,15 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Nome',
   },
   {
+    id: 'Sabores',
+    accessorKey: 'flavors',
+    header: 'Sabores',
+    cell: (info) => {
+      const flavors = info.row.original.flavors || [];
+      return flavors.length > 0 ? flavors.join(', ') : 'Sem sabores';
+    },
+  },
+  {
     id: 'Preço',
     accessorKey: 'price',
     header: 'Preço',

@@ -9,6 +9,7 @@ export default class Item {
     quantity: number = 0;
     group_item_id: string = '';
     category_id: string = '';
+    flavor?: string;
     additional_items?: Item[] = [];
     removed_items?: string[] = [];
     product_id: string = '';
