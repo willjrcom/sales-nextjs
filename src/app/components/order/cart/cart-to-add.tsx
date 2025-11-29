@@ -81,6 +81,13 @@ export const CartToAdd = () => {
                 <Refresh slice={categoriesSlice} fetchItems={fetchCategories} />
             </div>
 
+            <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">
+                <span aria-hidden="true">ℹ️</span>
+                <span title="Depois de escolher um item, o catálogo filtra os produtos para manter a mesma categoria e tamanho do grupo em edição.">
+                    Ao selecionar um item, o catálogo mantém apenas produtos da mesma categoria e tamanho do grupo atual.
+                </span>
+            </div>
+
             <div>
                 {categories?.map((category) => {
                     if (!category.products) return null;
