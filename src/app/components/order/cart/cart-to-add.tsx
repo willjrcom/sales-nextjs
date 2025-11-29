@@ -1,7 +1,7 @@
 import { useGroupItem } from "@/app/context/group-item/context";
 import Category from "@/app/entities/category/category";
 import { RootState } from "@/redux/store";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import Carousel from "../../carousel/carousel";
 import ProductCard from "../product/card-product";
@@ -18,31 +18,33 @@ import AddProductCard from "@/app/forms/item/form";
 
 export const CartToAdd = () => {
     const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const [categories, setCategories] = useState<Category[]>(Object.values(categoriesSlice.entities));
     const contextGroupItem = useGroupItem();
     const [searchCode, setSearchCode] = useState("");
     const { data } = useSession();
     const modalHandler = useModal();
 
-    useEffect(() => {
-        // Show only group item category
+    const allCategories = useMemo(
+        () => Object.values(categoriesSlice.entities),
+        [categoriesSlice.entities]
+    );
+
+    const categories = useMemo(() => {
+        if (!allCategories.length) return [];
+
         if (contextGroupItem.groupItem?.category_id) {
-            const filteredCategories = categories.filter((category) =>
-                category.id === contextGroupItem.groupItem?.category_id
-            )
-            setCategories(filteredCategories);
-            return
+            return allCategories.filter(
+                (category) => category.id === contextGroupItem.groupItem?.category_id
+            );
         }
 
-        // Show all categories less additional and complement
-        const filteredCategories = Object.values(categoriesSlice.entities)
-            .filter((category) => category.products
-                && category.products.length > 0
-                && !category.is_additional
-                && !category.is_complement
-            );
-        setCategories(filteredCategories);
-    }, [contextGroupItem.groupItem?.category_id])
+        return allCategories.filter(
+            (category) =>
+                category.products &&
+                category.products.length > 0 &&
+                !category.is_additional &&
+                !category.is_complement
+        );
+    }, [allCategories, contextGroupItem.groupItem?.category_id]);
 
     const onSearch = async () => {
         if (!data) return
