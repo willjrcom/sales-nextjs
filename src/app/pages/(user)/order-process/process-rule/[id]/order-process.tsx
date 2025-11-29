@@ -174,6 +174,9 @@ const ItemProcessCard = ({ item }: ItemProcessProps) => {
                 <div className="flex justify-between">
                     <span className="text-gray-800 font-medium">{item.quantity} x {item.name}</span>
                 </div>
+                {item.flavor && (
+                    <p className="text-sm text-orange-700 mt-1">Sabor selecionado: <span className="font-semibold">{item.flavor}</span></p>
+                )}
                 {item.observation && (
                     <ObservationCard observation={item.observation} />
                 )}

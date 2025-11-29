@@ -66,6 +66,13 @@ const ItemDetails = ({ item, product }: ItemDetailsProps) => {
                             <p className="text-gray-600 text-sm">{product?.description || 'Sem descrição'}</p>
                         </div>
 
+                        {item.flavor && (
+                            <div className="bg-orange-50 rounded-lg shadow p-3">
+                                <h3 className="font-semibold text-md mb-2">Sabor selecionado</h3>
+                                <p className="text-orange-700 text-sm font-medium">{item.flavor}</p>
+                            </div>
+                        )}
+
                         <div className='bg-gray-50 rounded-lg shadow p-3 space-y-2 space-x-2'>
                             {item.observation && (
                                 <ObservationCard observation={item.observation} />

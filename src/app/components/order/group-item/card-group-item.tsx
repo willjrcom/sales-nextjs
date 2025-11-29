@@ -80,13 +80,20 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
           <div key={item.id} className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow-inner">
             <div className="col-span-2">
               <p className="font-medium">{item.quantity} x {item.name}</p>
+              {item.flavor && (
+                <p className="text-sm text-orange-700">Sabor: <span className="font-semibold">{item.flavor}</span></p>
+              )}
               {item.observation && (
                 <ObservationCard observation={item.observation} />
               )}
               {item.additional_items && item.additional_items?.length > 0 && (
                 <ul className="mt-2 list-disc list-inside text-sm text-green-700">
                   {item.additional_items.map(add => (
-                    <li key={add.id}>{add.quantity} x {add.name} (+R$ {new Decimal(add.price).toFixed(2)})</li>
+                    <li key={add.id}>
+                      {add.quantity} x {add.name}
+                      {add.flavor && <span className="ml-1 text-orange-700">(Sabor: {add.flavor})</span>}
+                      (+R$ {new Decimal(add.price).toFixed(2)})
+                    </li>
                   ))}
                 </ul>
               )}
@@ -110,7 +117,12 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
         <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
           <h3 className="text-md font-semibold border-b pb-2">Complemento</h3>
           <div className="flex justify-between">
-            <p className="text-gray-700">{groupItem.complement_item.quantity} x {groupItem.complement_item.name}</p>
+            <div>
+              <p className="text-gray-700">{groupItem.complement_item.quantity} x {groupItem.complement_item.name}</p>
+              {groupItem.complement_item.flavor && (
+                <p className="text-xs text-orange-700">Sabor: {groupItem.complement_item.flavor}</p>
+              )}
+            </div>
             <p className="font-semibold">R$ {new Decimal(groupItem.complement_item.price).toFixed(2)}</p>
           </div>
         </div>

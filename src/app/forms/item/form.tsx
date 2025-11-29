@@ -29,10 +29,26 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const [quantity, setQuantity] = useState<Quantity>(new Quantity());
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);
+  const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavor || null);
 
   useEffect(() => {
     fetchProduct();
   }, [data?.user.access_token, reloadProduct]);
+
+  useEffect(() => {
+    const availableFlavors = product.flavors || [];
+    if (!availableFlavors.length) {
+      setSelectedFlavor(null);
+      return;
+    }
+
+    setSelectedFlavor((current) => {
+      if (current && availableFlavors.includes(current)) {
+        return current;
+      }
+      return availableFlavors[0];
+    });
+  }, [product.id, product.flavors]);
 
   const fetchProduct = async () => {
     setReloadProduct(false);
@@ -47,12 +63,19 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const submit = async () => {
     if (!contextCurrentOrder.order || !quantity || !data) return;
 
+    const requiresFlavorSelection = product.flavors && product.flavors.length > 0;
+    if (requiresFlavorSelection && !selectedFlavor) {
+      notifyError("Selecione um sabor para continuar");
+      return;
+    }
+
     try {
       const body = {
         product_id: product.id,
         quantity_id: quantity?.id,
         order_id: contextCurrentOrder.order.id,
         observation: observation,
+        flavor: selectedFlavor || undefined,
       } as NewItemProps
 
       if (contextGroupItem.groupItem?.id) {
@@ -100,6 +123,11 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                   </span>
                 ))}
               </div>
+              {selectedFlavor && (
+                <p className="text-xs text-green-700 mt-2">
+                  Sabor selecionado: <span className="font-semibold">{selectedFlavor}</span>
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -109,6 +137,31 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Configurações</h3>
         <div className="space-y-4">
+          {product.flavors && product.flavors.length > 0 && (
+            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Selecione um sabor:
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {product.flavors.map((flavor) => {
+                  const isSelected = selectedFlavor === flavor;
+                  return (
+                    <button
+                      type="button"
+                      key={`${product.id}-selector-${flavor}`}
+                      className={`px-3 py-1 rounded-full border text-sm transition
+                        ${isSelected ? "bg-orange-500 text-white border-orange-600" : "bg-white text-gray-700 border-gray-300"}
+                        hover:shadow focus:outline-none focus:ring-2 focus:ring-orange-400`}
+                      onClick={() => setSelectedFlavor(flavor)}
+                    >
+                      {flavor}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Obrigatório selecionar um sabor para produtos com variações.</p>
+            </div>
+          )}
           <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
           <div className="transform transition-transform duration-200 hover:scale-[1.01]">
             <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
