@@ -3,14 +3,15 @@ import Size from "@/app/entities/size/size";
 import SizeForm from "@/app/forms/size/form";
 import { useModal } from "@/app/context/modal/context";
 import Category from "@/app/entities/category/category";
+import { Dispatch, SetStateAction } from "react";
 
 interface ListSizeProps {
     category: Category;
+    setCategory: Dispatch<SetStateAction<Category | null>>;
 }
 
-const ListSize = ({ category }: ListSizeProps) => {
+const ListSize = ({ category, setCategory }: ListSizeProps) => {
     const modalHandler = useModal();
-    if (category?.sizes === undefined || category?.sizes.length === 0) category!.sizes = [];
 
     const onClose = (id?: string) => {
         if (id) modalHandler.hideModal("edit-size-" + id);
@@ -20,7 +21,7 @@ const ListSize = ({ category }: ListSizeProps) => {
     const onEdit = (size: Size) => {
         const modalName = "edit-size-" + size.id;
         const title = "Editar tamanho: " + size.name;
-        const elem = <SizeForm category={category} isUpdate={true} item={size} />
+        const elem = <SizeForm category={category} setCategory={setCategory} isUpdate={true} item={size} />
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(size.id))
     }
 
@@ -42,7 +43,7 @@ const ListSize = ({ category }: ListSizeProps) => {
                 ))}
                 {isDefaultCategory && (
                     <ButtonIconText modalName="new-size" title="Tamanho">
-                        <SizeForm category={category} />
+                        <SizeForm category={category} setCategory={setCategory} />
                     </ButtonIconText>
                 )}
             </div>
