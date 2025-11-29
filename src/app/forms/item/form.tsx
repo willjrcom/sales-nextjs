@@ -29,7 +29,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const [quantity, setQuantity] = useState<Quantity>(new Quantity());
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);
-  const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavor || null);
+  const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
 
   useEffect(() => {
     fetchProduct();
