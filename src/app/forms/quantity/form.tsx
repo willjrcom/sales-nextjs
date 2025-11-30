@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { useState } from 'react';
 import { HiddenField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -21,10 +21,10 @@ import { updateCategory } from '@/redux/slices/categories';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
     category: Category;
-    setCategory: Dispatch<SetStateAction<Category | null>>;
+    onQuantitiesChange: (builder: (prev: Quantity[]) => Quantity[]) => Quantity[];
 }
 
-const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormProps) => {
+const QuantityForm = ({ item, isUpdate, category, onQuantitiesChange }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity';
     const modalHandler = useModal();
     const dispatch = useDispatch<AppDispatch>();
@@ -37,15 +37,10 @@ const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormPro
         setQuantity(prev => ({ ...prev, [field]: value }));
     };
 
-    const syncCategoryQuantities = (builder: (prevQuantities: Quantity[]) => Quantity[]) => {
-        let computed: Quantity[] | null = null;
-        setCategory(prev => {
-            if (!prev) return prev;
-            const nextQuantities = builder(prev.quantities ?? []);
-            computed = nextQuantities;
-            return { ...prev, quantities: nextQuantities };
-        });
-        return computed;
+    const applyQuantitiesChange = (builder: (prevQuantities: Quantity[]) => Quantity[]) => {
+        const nextQuantities = onQuantitiesChange(builder);
+        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...nextQuantities] } } }));
+        return nextQuantities;
     };
 
     const submit = async () => {
@@ -61,16 +56,12 @@ const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormPro
             let nextQuantities: Quantity[] | null = null;
             if (isUpdate) {
                 const updatedQuantity = { ...quantity };
-                nextQuantities = syncCategoryQuantities(prev => prev.map(q => q.id === updatedQuantity.id ? updatedQuantity : q));
+                nextQuantities = applyQuantitiesChange(prev => prev.map(q => q.id === updatedQuantity.id ? updatedQuantity : q));
                 notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
             } else {
                 const createdQuantity = { ...quantity, id: response };
-                nextQuantities = syncCategoryQuantities(prev => [...prev, createdQuantity]);
+                nextQuantities = applyQuantitiesChange(prev => [...prev, createdQuantity]);
                 notifySuccess(`Quantidade ${createdQuantity.quantity} adicionada com sucesso`);
-            }
-
-            if (nextQuantities) {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...nextQuantities] } } }));
             }
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -83,11 +74,7 @@ const QuantityForm = ({ item, isUpdate, category, setCategory }: QuantityFormPro
         if (!data) return;
         try {
             await DeleteQuantity(quantity.id, data);
-            const nextQuantities = syncCategoryQuantities(prev => prev.filter(q => q.id !== quantity.id));
-
-            if (nextQuantities) {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...nextQuantities] } } }));
-            }
+            applyQuantitiesChange(prev => prev.filter(q => q.id !== quantity.id));
 
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);

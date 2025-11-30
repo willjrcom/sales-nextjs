@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { useState } from 'react';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Size, { ValidateSizeForm } from '@/app/entities/size/size';
 import { notifyError } from '@/app/utils/notifications';
@@ -21,10 +21,10 @@ import { updateCategory } from '@/redux/slices/categories';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
     category: Category;
-    setCategory: Dispatch<SetStateAction<Category | null>>;
+    onSizesChange: (builder: (prev: Size[]) => Size[]) => Size[];
 }
 
-const SizeForm = ({ item, isUpdate, category, setCategory }: SizeFormProps) => {
+const SizeForm = ({ item, isUpdate, category, onSizesChange }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const dispatch = useDispatch<AppDispatch>();
@@ -36,15 +36,10 @@ const SizeForm = ({ item, isUpdate, category, setCategory }: SizeFormProps) => {
         setSize(prev => ({ ...prev, [field]: value }));
     };
 
-    const syncCategorySizes = (builder: (prevSizes: Size[]) => Size[]) => {
-        let computed: Size[] | null = null;
-        setCategory(prev => {
-            if (!prev) return prev;
-            const nextSizes = builder(prev.sizes ?? []);
-            computed = nextSizes;
-            return { ...prev, sizes: nextSizes };
-        });
-        return computed;
+    const applySizesChange = (builder: (prevSizes: Size[]) => Size[]) => {
+        const nextSizes = onSizesChange(builder);
+        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...nextSizes] } } }));
+        return nextSizes;
     };
 
     const submit = async () => {
@@ -61,16 +56,12 @@ const SizeForm = ({ item, isUpdate, category, setCategory }: SizeFormProps) => {
             let nextSizes: Size[] | null = null;
             if (isUpdate) {
                 const updatedSize = { ...size };
-                nextSizes = syncCategorySizes(prev => prev.map(s => s.id === updatedSize.id ? updatedSize : s));
+                nextSizes = applySizesChange(prev => prev.map(s => s.id === updatedSize.id ? updatedSize : s));
                 notifySuccess(`Tamanho ${updatedSize.name} atualizado com sucesso`);
             } else {
                 const createdSize = { ...size, id: response };
-                nextSizes = syncCategorySizes(prev => [...prev, createdSize]);
+                nextSizes = applySizesChange(prev => [...prev, createdSize]);
                 notifySuccess(`Tamanho ${createdSize.name} criado com sucesso`);
-            }
-
-            if (nextSizes) {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...nextSizes] } } }));
             }
 
             modalHandler.hideModal(modalName);
@@ -86,10 +77,7 @@ const SizeForm = ({ item, isUpdate, category, setCategory }: SizeFormProps) => {
         try {
             await DeleteSize(size.id, data);
 
-            const nextSizes = syncCategorySizes(prev => prev.filter(q => q.id !== size.id));
-            if (nextSizes) {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...nextSizes] } } }));
-            }
+            applySizesChange(prev => prev.filter(q => q.id !== size.id));
             modalHandler.hideModal(modalName);
             notifySuccess(`Tamanho ${size.name} removido com sucesso`);
         } catch (error: RequestError | any) {
