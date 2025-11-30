@@ -59,7 +59,16 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         try {
             await StartOrderProcess(id, data)
-            dispatch(updateOrderProcess({ type: "UPDATE", payload: { id, changes: { status: "Started" } } }))
+            dispatch(updateOrderProcess({
+                type: "UPDATE",
+                payload: {
+                    id,
+                    changes: {
+                        status: "Started",
+                        started_at: new Date().toISOString(),
+                    },
+                }
+            }))
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
         }
