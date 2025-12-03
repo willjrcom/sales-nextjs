@@ -1,4 +1,4 @@
-import type { DefaultSession } from "next-auth";
+import type { DefaultSession, DefaultUser } from "next-auth";
 import type { JWT as DefaultJWT } from "next-auth/jwt";
 import UserBackend from "@/app/entities/user/user";
 
@@ -12,29 +12,36 @@ import UserBackend from "@/app/entities/user/user";
 // }
 
 declare module "next-auth" {
-    interface Session {
-        user: DefaultSession["user"] & {
-            user: UserBackend;
-            access_token?: string;
-            id?: string;
-        };
-    }
+  interface Session extends DefaultSession {
+    user: (DefaultSession["user"] & UserBackend & {
+      /**
+       * Keeps backward compatibility with previous nested structure.
+       * The whole backend payload is duplicated here so legacy code can still access `session.user.user`.
+       */
+      user?: UserBackend;
+      access_token?: string;
+      id?: string;
+    }) | undefined;
+  }
 
-    interface User {
-        user: UserBackend;
-        access_token?: string;
-        id?: string;
-    }
+  interface User extends DefaultUser, UserBackend {
+    /**
+     * Raw backend payload (kept for compatibility with existing usage).
+     */
+    user?: UserBackend;
+    access_token?: string;
+    id?: string;
+  }
 }
 
 declare module "next-auth/jwt" {
-    interface JWT extends DefaultJWT {
-        id: string;
-        user: UserBackend;
-        access_token?: string;
-        exp?: number;
-        error?: string;
-    }
+  interface JWT extends DefaultJWT {
+    id?: string;
+    user?: UserBackend;
+    access_token?: string;
+    exp?: number;
+    error?: string;
+  }
 }
 
 export { };
