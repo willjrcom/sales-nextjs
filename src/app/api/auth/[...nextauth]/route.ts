@@ -40,6 +40,26 @@ async function refreshAccessToken(token: any) {
     }
 }
 
+/**
+ * Ensures we always work with the full backend user payload.
+ * Falls back to nested `user` objects when present and strips auth-only fields.
+ */
+function extractBackendUser(payload: unknown): UserBackend | undefined {
+    if (!payload || typeof payload !== 'object') {
+        return undefined;
+    }
+
+    const record = payload as Record<string, unknown>;
+
+    if (record.user && typeof record.user === 'object') {
+        return extractBackendUser(record.user);
+    }
+
+    const { access_token: _ignoredAccessToken, ...rest } = record;
+
+    return rest as UserBackend;
+}
+
 const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
@@ -61,10 +81,12 @@ const authOptions: NextAuthOptions = {
                     const response = await Login({ email, password });
 
                     if (response?.id_token) {
+                        const backendUser = extractBackendUser(response.user);
                         return {
                             id: response.id_token,
-                            name: response.user.name || email,
-                            user: response.user,
+                            name: backendUser?.name || email,
+                            user: backendUser ?? response.user,
+                            access_token: response.id_token,
                             email,
                         };
                     }
@@ -106,14 +128,15 @@ const authOptions: NextAuthOptions = {
         async jwt({ token, user, trigger, session }) {
             // Handle session updates (e.g., setting access_token via session.update)
             if (trigger === "update") {
-                if (session.user.access_token) {
+                if (session.user?.access_token) {
                     token.access_token = session.user.access_token;
                     // Decodifica o novo access_token para atualizar a expiração
                     const decoded = decodeJwt(session.user.access_token);
                     if (decoded.exp) token.exp = decoded.exp;
                 }
-                if (session.user.user) {
-                    token.user = session.user.user;
+                const updatedBackendUser = extractBackendUser(session.user);
+                if (updatedBackendUser) {
+                    token.user = updatedBackendUser;
                 }
                 // Retorna direto após update, sem verificar expiração
                 return token;
@@ -123,8 +146,11 @@ const authOptions: NextAuthOptions = {
             if (user) {
                 token.email = user.email;
                 token.sub = user.id;
-                token.access_token = user.id;
-                token.user = user.user;
+                token.access_token = user.access_token ?? user.id;
+                const backendUser = extractBackendUser(user) ?? user.user;
+                if (backendUser) {
+                    token.user = backendUser;
+                }
                 // decode expiration from the access_token
                 const decoded = decodeJwt(token.access_token as string);
                 if (decoded.exp) token.exp = decoded.exp;
@@ -153,10 +179,19 @@ const authOptions: NextAuthOptions = {
 
         async session({ session, token }) {
             // Transfere o access_token e outras informações do token para a sessão
-            session.user = session.user || {};
+            if (!session.user) {
+                session.user = {} as typeof session.user;
+            }
+
+            const backendUser = extractBackendUser(token.user);
+
+            if (backendUser) {
+                Object.assign(session.user, backendUser);
+                session.user.user = backendUser;
+            }
+
             if (token.sub) session.user.id = token.sub;
             if (token.access_token) session.user.access_token = token.access_token;
-            if (token.user) session.user.user = token.user;
 
             return session
         },
