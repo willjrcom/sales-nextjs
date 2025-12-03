@@ -45,8 +45,8 @@ const PageCategoryEdit = () => {
             <CategoryForm isUpdate={true} item={category} setItem={setCategory} />
 
             <ButtonIconTextFloat title="Tamanhos e quantidades" modalName="edit-size-and-quantity" size="xl" icon={FaEdit} position="bottom-right">
-                <ListSize category={category} />
-                <ListQuantity category={category} />
+                <ListSize category={category} setCategory={setCategory} />
+                <ListQuantity category={category} setCategory={setCategory} />
             </ButtonIconTextFloat>
         </div>
     );

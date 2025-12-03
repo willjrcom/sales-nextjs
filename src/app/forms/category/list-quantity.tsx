@@ -3,14 +3,26 @@ import { useModal } from "@/app/context/modal/context";
 import Category from "@/app/entities/category/category";
 import Quantity from "@/app/entities/quantity/quantity";
 import QuantityForm from "@/app/forms/quantity/form";
+import { Dispatch, SetStateAction, useState } from "react";
 
 interface ListQuantityProps {
     category: Category;
+    setCategory: Dispatch<SetStateAction<Category | null>>;
 }
 
-const ListQuantity = ({ category }: ListQuantityProps) => {
+const ListQuantity = ({ category, setCategory }: ListQuantityProps) => {
     const modalHandler = useModal();
-    if (category?.quantities === undefined || category?.quantities?.length === 0) category!.quantities = [];
+    const [quantities, setQuantities] = useState<Quantity[]>(() => [...(category?.quantities || [])]);
+
+    const handleQuantitiesChange = (builder: (prev: Quantity[]) => Quantity[]) => {
+        let nextQuantities: Quantity[] = [];
+        setQuantities(prev => {
+            nextQuantities = builder(prev);
+            return nextQuantities;
+        });
+        setCategory(prev => prev ? { ...prev, quantities: nextQuantities } : prev);
+        return nextQuantities;
+    };
 
     const onClose = (id?: string) => {
         if (id) modalHandler.hideModal("edit-quantity-" + id);
@@ -20,18 +32,18 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
     const onEdit = (quantity: Quantity) => {
         const modalName = "edit-quantity-" + quantity.id;
         const title = "Editar quantidade: " + quantity.quantity;
-        const elem = <QuantityForm category={category} isUpdate={true} item={quantity} />
+        const elem = <QuantityForm category={category} onQuantitiesChange={handleQuantitiesChange} isUpdate={true} item={quantity} />
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(quantity.id))
     }
 
-    const quantities = [...(category?.quantities || [])].sort((a, b) => a.quantity - b.quantity);
+    const sortedQuantities = [...quantities].sort((a, b) => a.quantity - b.quantity);
     const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Quantidades</h2>
             <div className="flex flex-wrap gap-4">
-                {quantities.map((quantity) => (
+                {sortedQuantities.map((quantity) => (
                     <div
                         onClick={() => onEdit(quantity)}
                         key={quantity.id}
@@ -42,7 +54,7 @@ const ListQuantity = ({ category }: ListQuantityProps) => {
                 ))}
                 {isDefaultCategory && (
                     <ButtonIconText modalName="new-quantity" title="Quantidade">
-                        <QuantityForm category={category} />
+                        <QuantityForm category={category} onQuantitiesChange={handleQuantitiesChange} />
                     </ButtonIconText>
                 )}
             </div>

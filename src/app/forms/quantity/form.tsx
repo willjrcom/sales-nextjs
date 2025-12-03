@@ -20,10 +20,11 @@ import { AppDispatch } from '@/redux/store';
 import { updateCategory } from '@/redux/slices/categories';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
-    category: Category
+    category: Category;
+    onQuantitiesChange: (builder: (prev: Quantity[]) => Quantity[]) => Quantity[];
 }
 
-const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
+const QuantityForm = ({ item, isUpdate, category, onQuantitiesChange }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity';
     const modalHandler = useModal();
     const dispatch = useDispatch<AppDispatch>();
@@ -36,6 +37,12 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         setQuantity(prev => ({ ...prev, [field]: value }));
     };
 
+    const applyQuantitiesChange = (builder: (prevQuantities: Quantity[]) => Quantity[]) => {
+        const nextQuantities = onQuantitiesChange(builder);
+        dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...nextQuantities] } } }));
+        return nextQuantities;
+    };
+
     const submit = async () => {
         if (!data || !category) return;
 
@@ -46,20 +53,16 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
         try {
             const response = isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
+            let nextQuantities: Quantity[] | null = null;
             if (isUpdate) {
-                const index = category.quantities.findIndex(q => q.id === quantity.id);
-                if (index !== -1) {
-                    category.quantities[index] = quantity;
-                }
-                notifySuccess(`Quantidade ${quantity.quantity} atualizada com sucesso`);
+                const updatedQuantity = { ...quantity };
+                nextQuantities = applyQuantitiesChange(prev => prev.map(q => q.id === updatedQuantity.id ? updatedQuantity : q));
+                notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
             } else {
-                quantity.id = response;
-                category.quantities.push(quantity);
-                notifySuccess(`Quantidade ${quantity.quantity} adicionada com sucesso`);
+                const createdQuantity = { ...quantity, id: response };
+                nextQuantities = applyQuantitiesChange(prev => [...prev, createdQuantity]);
+                notifySuccess(`Quantidade ${createdQuantity.quantity} adicionada com sucesso`);
             }
-
-            // Atualiza o Redux com a lista de quantidades atualizada
-            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...(category.quantities ?? [])] } } }));
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
@@ -71,13 +74,8 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         if (!data) return;
         try {
             await DeleteQuantity(quantity.id, data);
-            if (category) {
-                const newQuantities = category.quantities.filter(q => q.id !== quantity.id);
+            applyQuantitiesChange(prev => prev.filter(q => q.id !== quantity.id));
 
-                // Atualiza o Redux com a lista de quantidades atualizada
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...(newQuantities ?? [])] } } }));
-            }
-            
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
