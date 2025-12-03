@@ -40,8 +40,8 @@ const createOrderProcessesSlice = ({ name, getItemsByID }: GenericsProps<OrderPr
             addOrderProcess: (state, action: PayloadAction<OrderProcess>) => {
                 adapter.addOne(state, action.payload);
             }, // Adiciona um item
-            updateOrderProcess: (state, action: PayloadAction<PayloadAction<Update<OrderProcess, string>>>) => {
-                adapter.updateOne(state, action.payload);
+            updateOrderProcess: (state, action: PayloadAction<Update<OrderProcess, string>>) => {
+                adapter.updateOne(state, action);
             }, // Atualiza um item
             removeOrderProcess: (state, action: PayloadAction<string>) => {
                 adapter.removeOne(state, action.payload);

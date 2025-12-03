@@ -12,7 +12,6 @@ import { useDispatch } from 'react-redux';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import CancelOrderProcess from './cancel-process-order';
-import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
 import StatusComponent from '@/app/components/button/show-status';
 import Item from '@/app/entities/order/item';
@@ -24,6 +23,18 @@ import GetCompany from '@/app/api/company/company';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
+};
+
+const formatProcessDuration = (now: Date, startedAt?: string | null) => {
+    if (!startedAt) return "00:00";
+
+    const startDate = new Date(startedAt);
+    const diffMs = now.getTime() - startDate.getTime();
+    const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
 const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
@@ -48,7 +59,16 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         try {
             await StartOrderProcess(id, data)
-            dispatch(updateOrderProcess({ type: "UPDATE", payload: { id, changes: { status: "Started" } } }))
+            dispatch(updateOrderProcess({
+                type: "UPDATE",
+                payload: {
+                    id,
+                    changes: {
+                        status: "Started",
+                        started_at: new Date().toISOString(),
+                    },
+                }
+            }))
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
         }
@@ -146,14 +166,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                     </div>
                     {orderProcess.status === "Started" && (
                         <p className="mt-2 text-sm text-gray-500">
-                            Duração: {(() => {
-                                const startAt = orderProcess.started_at
-                                    ? new Date(orderProcess.started_at)
-                                    : new Date();
-                                const diffMs = now.getTime() - startAt.getTime();
-                                const durationDate = new Date(diffMs);
-                                return ToUtcMinutesSeconds(durationDate.toISOString());
-                            })()}
+                            Duração: {formatProcessDuration(now, orderProcess.started_at)}
                         </p>
                     )}
                 </div>
