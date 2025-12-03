@@ -31,32 +31,41 @@ const ImageField = ({
 }: ImageFieldProps) => {
     const [uploading, setUploading] = useState<boolean>(false);
     const [imgError, setImgError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { data: session } = useSession();
+
+    const emitError = (message: string) => {
+        setErrorMessage(message);
+        onUploadError?.(message);
+    };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setErrorMessage(null);
+        setImgError(false);
+
         if (!session) {
-            onUploadError?.('Sessão não encontrada. Faça login novamente.');
+            emitError('Sessão não encontrada. Faça login novamente.');
             return;
         }
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            onUploadError?.('Por favor, selecione apenas arquivos de imagem (JPG, PNG, GIF, etc.)');
+            emitError('Por favor, selecione apenas arquivos de imagem (JPG, PNG, GIF, etc.)');
             return;
         }
 
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-            onUploadError?.('A imagem deve ter no máximo 5MB');
+            emitError('A imagem deve ter no máximo 5MB');
             return;
         }
 
         // Validate file name
         if (!file.name || file.name.trim() === '') {
-            onUploadError?.('Nome do arquivo inválido');
+            emitError('Nome do arquivo inválido');
             return;
         }
 
@@ -69,22 +78,23 @@ const ImageField = ({
 
             setValue(public_url);
             setImgError(false);
+            setErrorMessage(null);
             onUploadComplete?.(public_url);
         } catch (error: any) {
             console.error('Error uploading image:', error);
             
-            let errorMessage = 'Erro ao enviar imagem';
+            let formattedError = 'Erro ao enviar imagem';
             
             // Handle specific error cases
             if (error.name === 'NetworkError' || error.message?.includes('Failed to fetch')) {
-                errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+                formattedError = 'Erro de conexão. Verifique sua internet e tente novamente.';
             } else if (error.name === 'AccessDenied') {
-                errorMessage = 'Acesso negado. Verifique as configurações do S3.';
+                formattedError = 'Acesso negado. Verifique as configurações do S3.';
             } else if (error.message) {
-                errorMessage = error.message;
+                formattedError = error.message;
             }
             
-            onUploadError?.(errorMessage);
+            emitError(formattedError);
         } finally {
             setUploading(false);
         }
@@ -93,6 +103,7 @@ const ImageField = ({
     const removeImage = () => {
         setValue('');
         setImgError(false);
+        setErrorMessage(null);
     };
 
     return (
@@ -136,7 +147,7 @@ const ImageField = ({
                             className="max-h-32 max-w-full rounded-lg border border-gray-300 shadow-sm"
                             onError={() => {
                                 setImgError(true);
-                                onUploadError?.('Erro ao carregar a imagem. Verifique se a URL está correta.');
+                                emitError('Erro ao carregar a imagem. Verifique se a URL está correta.');
                             }}
                         />
                         {!disabled && (
@@ -149,6 +160,13 @@ const ImageField = ({
                                 ×
                             </button>
                         )}
+                    </div>
+                )}
+
+                {/* Error Message */}
+                {errorMessage && (
+                    <div className="text-sm text-red-600" role="alert">
+                        {errorMessage}
                     </div>
                 )}
 
