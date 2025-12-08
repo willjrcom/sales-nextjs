@@ -7,8 +7,9 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: '**.amazonaws.com'
-            }
+                hostname: '*.amazonaws.com',
+                pathname: '/**',
+            },
         ],
     },
 };
