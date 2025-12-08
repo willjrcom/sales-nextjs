@@ -13,7 +13,7 @@ type EmployeeUserProfileProps = {
     user: User;
 };
 
-const ChangePasswordModal = ({ user }: { user: User }) => {
+const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
     const { data } = useSession();
     const modalHandler = useModal();
     const [currentPassword, setCurrentPassword] = useState('');
@@ -37,6 +37,12 @@ const ChangePasswordModal = ({ user }: { user: User }) => {
                     notifyError('Sessão inválida');
                     return;
                 }
+
+                if (!user.email) {
+                    notifyError('Email do usuário não disponível');
+                    return;
+                }
+                
                 setLoading(true);
                 try {
                     await UpdateUserPassword({

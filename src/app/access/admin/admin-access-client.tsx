@@ -104,7 +104,8 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
   const allowedEmails = useMemo(() => parseWhitelist(whitelist), [whitelist]);
   const { data: session, status } = useSession();
 
-  const userEmail = session?.user?.user?.email?.toLowerCase();
+  // use top-level `session.user.email` instead of nested `session.user.user`
+  const userEmail = session?.user?.email?.toLowerCase();
   const isAllowed =
     !!userEmail && (allowedEmails.size === 0 ? false : allowedEmails.has(userEmail));
 
@@ -210,7 +211,7 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3 px-6 text-center">
         <h1 className="text-2xl font-semibold">Acesso restrito</h1>
         <p className="text-gray-600 max-w-xl">
-          O e-mail <strong>{session.user.user?.email ?? "sem e-mail"}</strong> não está presente na
+          O e-mail <strong>{session.user?.email ?? "sem e-mail"}</strong> não está presente na
           lista de autorização configurada em <code className="bg-gray-100 px-1 rounded">WHITE_LIST</code>.
         </p>
         {backButton}

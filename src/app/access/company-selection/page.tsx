@@ -67,7 +67,7 @@ function CompanySelection() {
         if (token && !hasCompanies) {
             dispatch(fetchUserCompanies({ session: data } as FetchItemsArgs));
         }
-    }, [data?.user.access_token, userCompaniesSlice.ids.length]);
+    }, [data?.user?.access_token, userCompaniesSlice.ids.length]);
 
     useEffect(() => {
         const companiesFound = Object.values(userCompaniesSlice.entities) || []
@@ -151,7 +151,7 @@ function CompanySelection() {
                         Bem-vindo, {data?.user?.user?.name?.split(' ')[0] || 'Usuário'}
                     </h1>
                 </div>
-                {data?.user && <EmployeeUserProfile user={data?.user.user} />}
+                {data?.user?.user && <EmployeeUserProfile user={data?.user.user} />}
             </div>
             {loadingCompanies && (
                 <div className="flex justify-center items-center h-64 mb-10">
