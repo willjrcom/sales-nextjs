@@ -38,12 +38,18 @@ RUN \
 
 # Normalize build output dir: some projects set `distDir` (e.g. 'build'),
 # but the Dockerfile expects `.next/standalone`. If `build` exists, move it to `.next`.
-RUN if [ -d "./.next" ]; then \
-      echo ".next exists"; \
+RUN if [ -d "./build/standalone" ]; then \
+      echo "standalone build exists in build/"; \
+      mv build .next; \
+    elif [ -d "./.next/standalone" ]; then \
+      echo ".next/standalone exists"; \
     elif [ -d "./build" ]; then \
-      echo "moving build -> .next"; mv build .next; \
+      echo "moving build -> .next"; \
+      mv build .next; \
+    elif [ -d "./.next" ]; then \
+      echo ".next exists"; \
     else \
-      echo "Warning: no .next or build dir found after build"; \
+      echo "Warning: no build dir found after build"; \
     fi
 
 # Production image, copy all the files and run next
@@ -57,20 +63,15 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+# Copy standalone build
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# If the build produced a standalone server, it will be inside `.next/standalone`.
-# Some projects use a custom `distDir` (e.g. `build`) and do not enable the
-# `output: 'standalone'` option in `next.config`. In that case we copy the
-# full `.next` directory and `node_modules`, and run `next start`.
-# Copy `.next` (covers both `.next/standalone` and regular builds) and node_modules.
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# Copy next.config.mjs for image optimization configuration
 COPY --from=builder --chown=nextjs:nodejs /app/next.config.mjs ./next.config.mjs
 
-# Entrypoint: prefer `server.js` from standalone output when present,
-# otherwise fall back to `npm run start` (next start).
+# Entrypoint: use standalone server.js
 # Create the entrypoint as root so the file can be written to `/`.
 RUN printf '#!/bin/sh\nif [ -f server.js ]; then exec node server.js; else exec npm run start; fi\n' > /entrypoint.sh \
   && chmod +x /entrypoint.sh
