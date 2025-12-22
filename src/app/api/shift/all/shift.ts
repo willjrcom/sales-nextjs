@@ -6,7 +6,7 @@ const GetAllShifts = async (session: Session, page?: number, perPage?: number): 
     const response = await RequestApi<null, Shift[]>({
         path: `/shift/all?page=${page}&per_page=${perPage}`, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return {items: response.data, headers: response.headers}
 };

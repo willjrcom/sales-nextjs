@@ -7,7 +7,7 @@ const UpdateDeliveryDriver = async (order: DeliveryDriver, session: Session): Pr
         path: "/delivery-driver/update/" + order.id, 
         method: "PATCH",
         body: order,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -5,7 +5,7 @@ export async function getEmployeePayments(employeeId: string, session: Session) 
     const response = await RequestApi<null, any[]>({
         path: `/employee/${employeeId}/payments`,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data;
 }
@@ -15,7 +15,7 @@ export async function createEmployeePayment(employeeId: string, data: any, sessi
         path: `/employee/${employeeId}/payments`,
         method: "POST",
         body: data,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data;
 } 

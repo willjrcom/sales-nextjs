@@ -8,7 +8,7 @@ const PayOrder = async (payment: PaymentOrder, session: Session): Promise<string
         path: "/order/update/" + payment.order_id + "/payment", 
         method: "PUT",
         body: payment,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

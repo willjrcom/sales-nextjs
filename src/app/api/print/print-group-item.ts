@@ -5,7 +5,7 @@ const GetGroupItemPrintByID = async (id: string, session: Session): Promise<stri
     const response = await RequestApi<never, string>({
         path: "/order-print/kitchen/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

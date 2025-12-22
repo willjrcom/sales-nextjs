@@ -34,7 +34,7 @@ export async function listCompanyPayments(
     const response = await RequestApi<null, CompanyPaymentResponse[]>({
         path: `/company/payments?page=${pageIndex + 1}&per_page=${pageSize}`,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     const items = response.data.map(
@@ -61,7 +61,7 @@ export async function createSubscriptionCheckout(
         path: "/company/payments/mercadopago/checkout",
         method: "POST",
         body: { months },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data;
@@ -71,7 +71,7 @@ export async function getSubscriptionSettings(session: Session) {
     const response = await RequestApi<null, SubscriptionSettings>({
         path: "/company/payments/mercadopago/settings",
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return new SubscriptionSettings(response.data);

@@ -6,7 +6,7 @@ const GetCurrentShift = async (session: Session): Promise<Shift> => {
     const response = await RequestApi<null, Shift>({
         path: "/shift/current", 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

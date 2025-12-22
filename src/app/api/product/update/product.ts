@@ -7,7 +7,7 @@ const UpdateProduct = async (product: Product, session: Session): Promise<string
         path: "/product/update/" + product.id, 
         method: "PATCH",
         body: product,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

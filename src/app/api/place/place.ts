@@ -6,7 +6,7 @@ const GetPlaces = async (session: Session): Promise<GetAllResponse<Place>> => {
     const response = await RequestApi<null, Place[]>({
         path: "/place/all",
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return { items: response.data, headers: response.headers }
 };

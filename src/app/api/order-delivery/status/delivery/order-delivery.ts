@@ -5,7 +5,7 @@ const DeliveryOrderDelivery = async (delivery_id: string, session: Session): Pro
     const response = await RequestApi<null, string>({
         path: "/order-delivery/update/delivery/" + delivery_id, 
         method: "POST",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

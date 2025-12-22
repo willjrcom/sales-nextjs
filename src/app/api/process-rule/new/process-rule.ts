@@ -7,7 +7,7 @@ const NewProcessRule = async (processRule: ProcessRule, session: Session): Promi
         path: "/product-category/process-rule/new", 
         method: "POST",
         body: processRule,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

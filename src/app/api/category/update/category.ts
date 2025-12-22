@@ -7,7 +7,7 @@ const UpdateCategory = async (category: Category, session: Session): Promise<str
         path: "/product-category/update/" + category.id, 
         method: "PATCH",
         body: category,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

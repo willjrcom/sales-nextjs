@@ -11,7 +11,7 @@ const RemoveRemovedItem = async (itemId: string, name: string, session: Session)
         path: "/item/delete/" + itemId + "/removed-item", 
         method: "DELETE",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

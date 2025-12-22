@@ -7,7 +7,7 @@ const NewStock = async (stock: Stock, session: Session): Promise<string> => {
         path: "/stock/new", 
         method: "POST",
         body: stock,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -6,7 +6,7 @@ const GetMovementsByStockID = async (stockID: string, session: Session): Promise
     const response = await RequestApi<null, StockMovement[]>({
         path: `/stock/movements/${stockID}`, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

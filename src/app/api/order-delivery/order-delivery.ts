@@ -6,7 +6,7 @@ const GetDeliveryOrders = async (session: Session): Promise<OrderDelivery[]> => 
     const response = await RequestApi<null, OrderDelivery[]>({
         path: "/order-delivery/all", 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

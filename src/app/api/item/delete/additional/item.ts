@@ -6,7 +6,7 @@ const DeleteAdditionalItem = async (additionalItemId: string, session: Session):
     const response = await RequestApi<null, string>({
         path: "/item/delete/" + additionalItemId + "/additional", 
         method: "DELETE",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

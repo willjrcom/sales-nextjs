@@ -6,7 +6,7 @@ const GetProcessesByGroupItemID = async (id: string, session: Session): Promise<
     const response = await RequestApi<null, OrderProcess[]>({
         path: "/order-process/by-group-item/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

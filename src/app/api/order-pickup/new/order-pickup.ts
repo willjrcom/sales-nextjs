@@ -10,7 +10,7 @@ const NewOrderPickup = async (name: string, session: Session): Promise<NewPickup
         path: "/order-pickup/new", 
         method: "POST",
         body: { name: name },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

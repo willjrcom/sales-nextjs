@@ -12,7 +12,7 @@ const RemoveTableTax = async (
   const response = await RequestApi<never, string>({
     path: "/order-table/update/remove-tax/" + orderTableId,
     method: "POST",
-    headers: await AddAccessToken(session),
+    headers: AddAccessToken(session),
   });
   return response.data;
 };

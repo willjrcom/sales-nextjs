@@ -5,7 +5,7 @@ const DeleteDeliveryDriver = async (id: string, session: Session): Promise<strin
     const response = await RequestApi<null, string>({
         path: "/delivery-driver/" + id, 
         method: "DELETE",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

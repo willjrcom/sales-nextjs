@@ -11,7 +11,7 @@ const NewAdditionalItem = async (itemId: string, body: NewItemProps, session: Se
         path: "/item/update/" + itemId + "/additional", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

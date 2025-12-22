@@ -6,7 +6,7 @@ const GetProcessesByProductID = async (id: string, session: Session): Promise<Or
     const response = await RequestApi<null, OrderProcess[]>({
         path: "/order-process/by-product/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -7,7 +7,7 @@ const UpdateProcessRule = async (processRule: ProcessRule, session: Session): Pr
         path: "/product-category/process-rule/update/" + processRule.id, 
         method: "PATCH",
         body: processRule,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

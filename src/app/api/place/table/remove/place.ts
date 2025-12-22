@@ -5,7 +5,7 @@ const RemoveTableFromPlace = async (id: string, session: Session): Promise<strin
     const response = await RequestApi<string, string>({
         path: "/place/table/" + id, 
         method: "DELETE",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

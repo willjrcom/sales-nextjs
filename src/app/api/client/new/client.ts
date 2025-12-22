@@ -7,7 +7,7 @@ const NewClient = async (client: Client, session: Session): Promise<string> => {
         path: "/client/new", 
         method: "POST",
         body: client,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

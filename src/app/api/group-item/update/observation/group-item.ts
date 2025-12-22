@@ -11,7 +11,7 @@ const ObservationGroupItem = async (groupItem: GroupItem, session: Session, obse
         path: "/group-item/update/observation/" + groupItem.id, 
         method: "POST",
         body: { observation } as ObservationGroupItemProps,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

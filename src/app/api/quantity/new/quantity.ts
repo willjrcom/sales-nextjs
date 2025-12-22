@@ -7,7 +7,7 @@ const NewQuantity = async (quantity: Quantity, session: Session): Promise<string
         path: "/product-category/quantity/new", 
         method: "POST",
         body: quantity,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

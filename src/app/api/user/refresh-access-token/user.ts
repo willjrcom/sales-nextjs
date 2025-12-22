@@ -9,7 +9,7 @@ const RefreshAccessToken = async (session: Session): Promise<string> => {
   const response = await RequestApi<null, string>({
     path: '/user/refresh-access-token',
     method: 'GET',
-    headers: await AddAccessToken(session),
+    headers: AddAccessToken(session),
   });
   
   return response.data;

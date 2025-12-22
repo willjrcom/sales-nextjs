@@ -6,7 +6,7 @@ const GetEmployees = async (session: Session, page?: number, perPage?: number): 
     const response = await RequestApi<null, Employee[]>({
         path: `/employee/all?page=${page}&per_page=${perPage}`, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return {items: response.data, headers: response.headers}
 };
@@ -15,7 +15,7 @@ export const GetEmployeesDeleted = async (session: Session, page?: number, perPa
     const response = await RequestApi<null, Employee[]>({
         path: `/employee/deleted?page=${page}&per_page=${perPage}`,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return {items: response.data, headers: response.headers}
 };

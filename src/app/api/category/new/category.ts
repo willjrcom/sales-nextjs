@@ -7,7 +7,7 @@ const NewCategory = async (category: Category, session: Session): Promise<string
         path: "/product-category/new", 
         method: "POST",
         body: category,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

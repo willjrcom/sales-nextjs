@@ -11,7 +11,7 @@ const NewOrderDelivery = async (client_id: string, session: Session): Promise<Ne
         path: "/order-delivery/new", 
         method: "POST",
         body: { client_id: client_id },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

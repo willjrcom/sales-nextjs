@@ -1,6 +1,6 @@
 import { Session } from "next-auth";
 import Company from "@/app/entities/company/company";
-import RequestApi, { AddIDToken } from "../request";
+import RequestApi, { AddAccessToken } from "../request";
 
 /**
  * Fetches the list of companies exposed by the public metadata API.
@@ -10,7 +10,7 @@ const ListPublicCompanies = async (session: Session): Promise<Company[]> => {
   const response = await RequestApi<null, Company[]>({
     path: "/public/companies",
     method: "GET",
-    headers: await AddIDToken(session),
+    headers: AddAccessToken(session),
   });
 
   return response.data;

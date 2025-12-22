@@ -7,7 +7,7 @@ const UpdateSize = async (size: Size, session: Session): Promise<string> => {
         path: "/product-category/size/update/" + size.id, 
         method: "PATCH",
         body: size,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

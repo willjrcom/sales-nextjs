@@ -7,7 +7,7 @@ const UpdateQuantity = async (quantity: Quantity, session: Session): Promise<str
         path: "/product-category/quantity/update/" + quantity.id, 
         method: "PATCH",
         body: quantity,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -6,7 +6,7 @@ const GetGroupItemByID = async (id: string, session: Session): Promise<GroupItem
     const response = await RequestApi<string, GroupItem>({
         path: "/group-item/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

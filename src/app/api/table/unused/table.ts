@@ -6,7 +6,7 @@ const GetUnusedTables = async (session: Session): Promise<GetAllResponse<Table>>
     const response = await RequestApi<null, Table[]>({
         path: "/table/all/unused",
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return { items: response.data, headers: response.headers }
 };

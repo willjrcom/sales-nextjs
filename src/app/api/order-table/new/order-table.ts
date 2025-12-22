@@ -11,7 +11,7 @@ const NewOrderTable = async (table_id: string, session: Session): Promise<NewOrd
         path: "/order-table/new", 
         method: "POST",
         body: { table_id: table_id },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

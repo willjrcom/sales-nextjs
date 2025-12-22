@@ -6,7 +6,7 @@ const GetProcessRules = async (session: Session): Promise<ProcessRule[]> => {
     const response = await RequestApi<null, ProcessRule[]>({
         path: "/product-category/process-rule/all", 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

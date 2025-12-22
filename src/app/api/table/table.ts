@@ -6,7 +6,7 @@ const GetTables = async (session: Session, page?: number, perPage?: number): Pro
     const response = await RequestApi<null, Table[]>({
         path: `/table/all?page=${page}&per_page=${perPage}`,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return { items: response.data, headers: response.headers }
 };

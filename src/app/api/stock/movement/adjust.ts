@@ -14,7 +14,7 @@ const AdjustStock = async (id: string, request: AdjustStockRequest, session: Ses
         path: "/stock/"+id+"/movement/adjust", 
         method: "POST",
         body: request,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

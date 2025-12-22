@@ -14,7 +14,7 @@ const ScheduleGroupItem = async (groupItem: GroupItem, session: Session, startAt
         path: "/group-item/update/schedule/" + groupItem.id, 
         method: "POST",
         body: { start_at: startAtString } as ScheduleGroupItemProps,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

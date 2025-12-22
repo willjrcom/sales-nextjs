@@ -6,7 +6,7 @@ const GetClients = async (session: Session, page?: number, perPage?: number): Pr
     const response = await RequestApi<null, Client[]>({
         path: `/client/all?page=${page}&per_page=${perPage}`, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return {items: response.data, headers: response.headers}
 };

@@ -6,7 +6,7 @@ const GetCategoryByID = async (id: string, session: Session): Promise<Category> 
     const response = await RequestApi<string, Category>({
         path: "/product-category/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

@@ -6,7 +6,7 @@ const CancelGroupItem = async (groupItemID: string, reason: string, session: Ses
         path: "/group-item/cancel/" + groupItemID,
         method: "POST",
         body: { reason },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -18,7 +18,7 @@ const RemoveStock = async (id: string, movement: RemoveStockRequest, session: Se
         path: "/stock/"+id+"/movement/remove", 
         method: "POST",
         body: movement,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -20,7 +20,7 @@ const NewItem = async (body: NewItemProps, session: Session): Promise<NewItemRes
         path: "/item/add", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

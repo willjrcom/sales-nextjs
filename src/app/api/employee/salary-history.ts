@@ -5,7 +5,7 @@ export async function getEmployeeSalaryHistory(employeeId: string, session: Sess
     const response = await RequestApi<null, any[]>({
         path: `/employee/${employeeId}/salary-history`,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data;
 }
@@ -15,7 +15,7 @@ export async function createEmployeeSalaryHistory(employeeId: string, data: any,
         path: `/employee/${employeeId}/salary-history`,
         method: "POST",
         body: data,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data;
 } 

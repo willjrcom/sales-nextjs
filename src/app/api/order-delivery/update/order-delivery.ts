@@ -7,7 +7,7 @@ const UpdateOrderDelivery = async (order: Order, session: Session): Promise<stri
         path: "/order-delivery/update/" + order.id, 
         method: "PATCH",
         body: order,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

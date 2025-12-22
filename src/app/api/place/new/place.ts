@@ -7,7 +7,7 @@ const NewPlace = async (place: Place, session: Session): Promise<string> => {
         path: "/place/new", 
         method: "POST",
         body: place,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

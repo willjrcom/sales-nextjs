@@ -25,7 +25,7 @@ const GetPresignedUrl = async (filename: string, contentType: string, session: S
             content_type: contentType,
             schema_name: schemaName 
         },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data;

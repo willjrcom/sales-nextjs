@@ -10,7 +10,7 @@ const SearchUser = async (search: SearchUserProps, session: Session): Promise<Us
         path: "/user/search",
         method: "POST",
         body: search,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

@@ -24,20 +24,12 @@ const jsonHeaders = {
     "Accept": "application/json",
 }
 
-const AddAccessToken = async (session: Session) => {
+const AddAccessToken = (session: Session) => {
     if (session.user?.access_token === undefined) {
         throw new Error("access token not found in session");
     }
 
     return { "access-token": session.user.access_token }
-}
-
-const AddIDToken = async (session: Session) => {
-    if (session.user?.id === undefined) {
-        throw new Error("access token not found in session");
-    }
-
-    return { "id-token": session.user.id }
 }
 
 const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormData }: RequestApiProps<T>): Promise<Response<TR>> => {
@@ -123,4 +115,4 @@ const RequestExternalApi = async <T, TR>({ path, body, method, headers }: Reques
 
 
 export default RequestApi
-export { AddAccessToken, AddIDToken, RequestExternalApi }
+export { AddAccessToken, RequestExternalApi }

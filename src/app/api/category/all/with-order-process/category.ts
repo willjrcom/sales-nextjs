@@ -6,7 +6,7 @@ const GetCategoriesWithOrderProcess = async (session: Session): Promise<Category
     const response = await RequestApi<null, Category[]>({
         path: "/product-category/all-with-order-process", 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

@@ -15,7 +15,7 @@ const ChangeTable = async (orderTableId: string, tableID: string, session: Sessi
         path: "/order-table/update/change-table/" + orderTableId, 
         method: "POST",
         body: changeTable,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

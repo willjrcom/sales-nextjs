@@ -12,7 +12,7 @@ const UpdateChangeOrderDelivery = async (delivery_id: string, change: number, pa
         path: "/order-delivery/update/change/" + delivery_id, 
         method: "PUT",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

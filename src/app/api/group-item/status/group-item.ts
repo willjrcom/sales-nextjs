@@ -7,7 +7,7 @@ const UpdateGroupItem = async (groupItem: GroupItem, session: Session): Promise<
         path: "/group-item/update/" + groupItem.id, 
         method: "PATCH",
         body: groupItem,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

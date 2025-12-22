@@ -7,7 +7,7 @@ const UpdatePlace = async (place: Place, session: Session): Promise<string> => {
         path: "/place/update/" + place.id, 
         method: "PATCH",
         body: place,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

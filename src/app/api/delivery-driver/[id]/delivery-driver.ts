@@ -6,7 +6,7 @@ const GetDeliveryDriver = async (id: string, session: Session): Promise<string> 
     const response = await RequestApi<Order, string>({
         path: "/delivery-driver/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

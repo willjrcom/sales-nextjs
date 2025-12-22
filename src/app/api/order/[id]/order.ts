@@ -6,7 +6,7 @@ const GetOrderByID = async (id: string, session: Session): Promise<Order> => {
     const response = await RequestApi<string, Order>({
         path: "/order/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

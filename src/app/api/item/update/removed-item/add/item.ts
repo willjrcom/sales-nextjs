@@ -11,7 +11,7 @@ const AddRemovedItem = async (itemId: string, name: string, session: Session): P
         path: "/item/update/" + itemId + "/removed-item", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

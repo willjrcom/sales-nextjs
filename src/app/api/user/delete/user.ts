@@ -11,7 +11,7 @@ const DeleteUser = async (body: DeleteUserProps, session: Session): Promise<stri
         path: "/user", 
         method: "DELETE",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

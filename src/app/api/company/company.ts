@@ -6,7 +6,7 @@ const GetCompany = async (session: Session, token?: string): Promise<Company> =>
     const response = await RequestApi<null, Company>({
         path: "/company", 
         method: "GET",
-        headers: token ? { "id-token": token } : await AddAccessToken(session),
+        headers: token ? { "id-token": token } : AddAccessToken(session),
     });
     return response.data
 };

@@ -7,7 +7,7 @@ const NewTable = async (table: Table, session: Session): Promise<string> => {
         path: "/table/new", 
         method: "POST",
         body: table,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

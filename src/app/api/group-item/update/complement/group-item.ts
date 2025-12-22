@@ -6,7 +6,7 @@ const NewComplementGroupItem = async (groupItemId: string, productId: string, se
     const response = await RequestApi<null, null>({
         path: "/group-item/update/" + groupItemId + "/complement-item/" + productId, 
         method: "POST",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

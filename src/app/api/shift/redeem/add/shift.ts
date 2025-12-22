@@ -13,7 +13,7 @@ const AddRedeemToShift = async (name: string, value: number, session: Session): 
         path: "/shift/redeem/add", 
         method: "PUT",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

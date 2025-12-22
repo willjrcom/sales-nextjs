@@ -10,7 +10,7 @@ const CancelOrderProcess = async (id: string, reason: string, session: Session):
         path: "/order-process/cancel/" + id, 
         method: "POST",
         body: { reason },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

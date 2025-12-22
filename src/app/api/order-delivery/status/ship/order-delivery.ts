@@ -12,7 +12,7 @@ const ShipOrderDelivery = async (deliveryOrderIds: string[], driverId: string, s
         path: "/order-delivery/update/ship", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

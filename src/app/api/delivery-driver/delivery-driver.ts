@@ -6,7 +6,7 @@ const GetAllDeliveryDrivers = async (session: Session, page?: number, perPage?: 
     const response = await RequestApi<null, DeliveryDriver[]>({
         path: `/delivery-driver/all?page=${page}&per_page=${perPage}`, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return {items: response.data, headers: response.headers}
 };

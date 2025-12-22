@@ -12,7 +12,7 @@ const OpenShift = async (startChange: number, session: Session): Promise<string>
         path: "/shift/open", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

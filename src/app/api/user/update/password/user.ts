@@ -12,7 +12,7 @@ const UpdateUserPassword = async (body: UpdateUserProps, session: Session): Prom
         path: "/user/update/password",
         method: "PATCH",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

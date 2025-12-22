@@ -55,7 +55,7 @@ export default function ReportChart({
         const schema = company.schema_name;
         let path = endpoint;
         let reqBody = body;
-        const headers = await AddAccessToken(sessionData);
+        const headers = AddAccessToken(sessionData);
         if (method === 'GET') {
           const params = { schema, ...(queryParams || {}) };
           const query = new URLSearchParams(

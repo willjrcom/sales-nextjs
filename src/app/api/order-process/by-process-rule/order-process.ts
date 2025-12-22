@@ -6,7 +6,7 @@ const GetProcessesByProcessRuleID = async (id: string, session: Session): Promis
     const response = await RequestApi<null, OrderProcess[]>({
         path: "/order-process/by-process-rule/" + id,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return { items: response.data, headers: response.headers }

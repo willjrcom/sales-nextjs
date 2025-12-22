@@ -7,7 +7,7 @@ const Newsize = async (size: size, session: Session): Promise<string> => {
         path: "/product-category/size/new", 
         method: "POST",
         body: size,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

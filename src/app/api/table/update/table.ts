@@ -7,7 +7,7 @@ const UpdateTable = async (table: Table, session: Session): Promise<string> => {
         path: "/table/update/" + table.id, 
         method: "PATCH",
         body: table,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

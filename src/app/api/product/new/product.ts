@@ -7,7 +7,7 @@ const NewProduct = async (product: Product, session: Session): Promise<string> =
         path: "/product/new", 
         method: "POST",
         body: product,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

@@ -6,7 +6,7 @@ const NewDeliveryDriver = async (employee_id: string, session: Session): Promise
         path: "/delivery-driver/new", 
         method: "POST",
         body: { employee_id: employee_id },
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

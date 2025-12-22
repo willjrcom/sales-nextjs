@@ -7,7 +7,7 @@ const AddTableToPlace = async (placeTable: PlaceTable, session: Session): Promis
         path: "/place/table", 
         method: "POST",
         body: placeTable,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

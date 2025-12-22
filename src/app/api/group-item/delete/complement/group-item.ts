@@ -6,7 +6,7 @@ const DeleteComplementGroupItem = async (groupItemId: string, session: Session):
     const response = await RequestApi<null, null>({
         path: "/group-item/update/" + groupItemId + "/complement-item", 
         method: "DELETE",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

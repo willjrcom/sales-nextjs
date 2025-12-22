@@ -7,7 +7,7 @@ const NewOrder = async (order: Order, session: Session): Promise<string> => {
         path: "/order/new", 
         method: "POST",
         body: order,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

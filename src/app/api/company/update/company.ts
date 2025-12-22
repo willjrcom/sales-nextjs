@@ -8,7 +8,7 @@ const UpdateCompany = async (company: Company, session: Session): Promise<string
         path: "/company/update", 
         method: "PUT",
         body: company,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

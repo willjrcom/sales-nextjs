@@ -12,7 +12,7 @@ const GetClientByContact = async (contact: string, session: Session): Promise<Cl
         path: "/client/by-contact", 
         method: "POST",
         body: contactObj,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

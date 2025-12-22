@@ -5,7 +5,7 @@ const UpdateAddressOrderDelivery = async (delivery_id: string, session: Session)
     const response = await RequestApi<null, string>({
         path: "/order-delivery/update/address/" + delivery_id, 
         method: "PUT",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

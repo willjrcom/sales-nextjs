@@ -11,7 +11,7 @@ const AddUserToCompany = async (email: string, session: Session): Promise<string
         path: "/company/add/user", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

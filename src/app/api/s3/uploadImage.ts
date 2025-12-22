@@ -46,7 +46,7 @@ const UploadImage = async (file: File, session: Session): Promise<UploadResponse
         path: "/s3/upload",
         method: "POST",
         body: formData,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
         isFormData: true,
     });
 

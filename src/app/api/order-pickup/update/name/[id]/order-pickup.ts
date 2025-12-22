@@ -13,7 +13,7 @@ const UpdatePickupOrderName = async (pickupOrderId: string, name: string, sessio
         path: "/order-pickup/update/name/" + pickupOrderId, 
         method: "PUT",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

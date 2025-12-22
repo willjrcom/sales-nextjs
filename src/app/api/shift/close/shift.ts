@@ -12,7 +12,7 @@ const CloseShift = async (endChange: number, session: Session): Promise<string> 
         path: "/shift/close", 
         method: "PUT",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

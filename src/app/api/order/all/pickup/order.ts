@@ -6,7 +6,7 @@ const GetOrdersWithPickup = async (session: Session, page?: number, perPage?: nu
     const response = await RequestApi<null, Order[]>({
         path: "/order/all/pickup", 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     
     return {items: response.data, headers: response.headers}

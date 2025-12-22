@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import RequestApi, { AddIDToken } from "../request";
+import RequestApi, { AddAccessToken } from "../request";
 import User from "@/app/entities/user/user";
 
 /**
@@ -10,7 +10,7 @@ const ListPublicUsers = async (session: Session): Promise<User[]> => {
   const response = await RequestApi<null, User[]>({
     path: "/public/users",
     method: "GET",
-    headers: await AddIDToken(session),
+    headers: AddAccessToken(session),
   });
 
   return response.data;

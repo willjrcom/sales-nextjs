@@ -11,7 +11,7 @@ const RemoveUserFromCompany = async (email: string, session: Session): Promise<s
         path: "/company/remove/user", 
         method: "POST",
         body: body,
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
 
     return response.data

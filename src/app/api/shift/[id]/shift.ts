@@ -6,7 +6,7 @@ const GetShiftByID = async (id: string, session: Session): Promise<Shift> => {
     const response = await RequestApi<null, Shift>({
         path: "/shift/" + id, 
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

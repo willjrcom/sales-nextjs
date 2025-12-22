@@ -6,7 +6,7 @@ const GetProductByCode = async (code: string, session: Session): Promise<Product
     const response = await RequestApi<null, Product>({
         path: "/product/code/" + code,
         method: "GET",
-        headers: await AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };
