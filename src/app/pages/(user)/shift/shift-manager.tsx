@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import User from "@/app/entities/user/user";
 import { useModal } from "@/app/context/modal/context";
 import { notifyError } from "@/app/utils/notifications";
+import GetUser from "@/app/api/user/me/user";
 
 interface ShiftProps {
     shift?: Shift | null;
@@ -24,11 +25,17 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
     const modalHandler = useModal();
 
     useEffect(() => {
-        if (!data?.user.user) return;
+        if (!data) return;
+        getUser();
+    }, [data?.user?.access_token]);
 
-        setUser(data?.user.user);
-    }, [data?.user.user]);
+    const getUser = async () => {
+        if (!data) return;
+        const user = await GetUser(data);
 
+        setUser(user);
+    }
+    
     const handleOpenShift = async () => {
         if (!data) return;
 

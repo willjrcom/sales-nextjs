@@ -22,7 +22,7 @@ import printService from '@/app/utils/print-service';
 import Address from "@/app/entities/address/address";
 import AddressForm from "../address/form";
 
-const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
+const CompanyForm = ({ item, isUpdate, setItem }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
     const [company, setCompany] = useState<Company>(item || new Company());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -113,10 +113,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             await update({
                 ...data,
                 user: {
-                    ...data.user,
-                    access_token: response
+                    access_token: response,
                 },
-            })
+            });
 
             notifySuccess('Empresa criada com sucesso');
             router.push('/pages/new-order');
@@ -136,14 +135,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
         try {
             await UpdateCompany(company, data);
-
-            await update({
-                ...data,
-                user: {
-                    ...data.user,
-                },
-            })
-
+            setCompany(company);
+            if (setItem) setItem(company);
             notifySuccess('Empresa atualizada com sucesso');
             modalHandler.hideModal(modalName);
 

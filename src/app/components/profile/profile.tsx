@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 
 type EmployeeUserProfileProps = {
     user: User;
+    setUser?: (user: User) => void;
 };
 
 const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
@@ -113,7 +114,7 @@ const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
     );
 };
 
-const EmployeeUserProfile = ({ user }: EmployeeUserProfileProps) => {
+const EmployeeUserProfile = ({ user, setUser }: EmployeeUserProfileProps) => {
     const getInitial = (name?: string) => name?.charAt(0).toUpperCase(); // Pega a primeira letra do nome
     const modalHandler = useModal();
 
@@ -141,14 +142,15 @@ const EmployeeUserProfile = ({ user }: EmployeeUserProfileProps) => {
                 </div>
                 <p className="mt-2 text-lg font-bold">{user.name}</p>
                 <hr className="my-4" />
-                <UserForm item={user} />
+                <UserForm item={user} setItem={setUser} />
+
                 <hr className="my-4" />
                 <button
                     onClick={() => {
                         const onClose = () => {
                             modalHandler.hideModal("change-password")
                         }
-                        modalHandler.showModal("change-password", "Alterar Senha", <ChangePasswordModal user={user} />, "md", onClose)
+                        modalHandler.showModal("change-password", "Alterar Senha", <ChangePasswordModal user={user} setUser={setUser} />, "md", onClose)
                     }}
                     className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                 >

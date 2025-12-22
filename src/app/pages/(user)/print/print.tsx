@@ -30,7 +30,7 @@ export function usePrintAgent() {
                     setConnected(true);
                     setError(null);
                     reconnectTimer = 1000;
-                    console.log("🟢 Print Agent conectado");
+                    // console.log("🟢 Print Agent conectado");
                 };
 
                 ws.current.onclose = (event) => {
@@ -40,9 +40,9 @@ export function usePrintAgent() {
                     // Código 1006 indica conexão fechada anormalmente (geralmente servidor não está rodando)
                     // if (event.code === 1006) {
                     //     setError("Print Agent não está rodando. Verifique se o serviço está em localhost:8089");
-                    //     console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando?");
+                    //     // console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando?");
                     // } else {
-                    //     console.log("🔴 Print Agent desconectado, reconectando em", reconnectTimer / 1000, "segundos");
+                    //     // console.log("🔴 Print Agent desconectado, reconectando em", reconnectTimer / 1000, "segundos");
                     // }
                     
                     setTimeout(() => {
@@ -66,7 +66,7 @@ export function usePrintAgent() {
                     }
                     
                     setError(errorMessage);
-                    console.error("❌ Erro no WebSocket (readyState:", readyState, "):", errorMessage);
+                    //// console.error("❌ Erro no WebSocket (readyState:", readyState, "):", errorMessage);
                 };
 
                 ws.current.onmessage = (ev) => {
@@ -75,19 +75,19 @@ export function usePrintAgent() {
                         
                         if (res.status === "ok" && Array.isArray(res.data)) {
                             setPrinters(res.data);
-                            console.log("📄 Impressoras encontradas:", res.data.length);
+                            // console.log("📄 Impressoras encontradas:", res.data.length);
                         } else if (res.status === "ok" && res.message) {
-                            console.log("✅", res.message);
+                            // console.log("✅", res.message);
                         } else if (res.status === "error") {
                             setError(res.message || "Erro desconhecido");
-                            console.error("❌ Erro do servidor:", res.message);
+                            // console.error("❌ Erro do servidor:", res.message);
                         }
                     } catch (e) {
-                        console.error("❌ Erro ao parsear resposta:", e);
+                        // console.error("❌ Erro ao parsear resposta:", e);
                     }
                 };
             } catch (e) {
-                console.error("❌ Erro ao criar WebSocket:", e);
+                // console.error("❌ Erro ao criar WebSocket:", e);
                 setError("Não foi possível conectar ao Print Agent");
             }
         }
@@ -105,7 +105,7 @@ export function usePrintAgent() {
     const getPrinters = useCallback(() => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ action: "get_printers" }));
-            console.log("📋 Solicitando lista de impressoras...");
+            // console.log("📋 Solicitando lista de impressoras...");
         } else {
             console.warn("⚠️ WebSocket não está conectado");
         }
@@ -118,9 +118,9 @@ export function usePrintAgent() {
                 data: { printer: printer || "default", text }
             };
             ws.current.send(JSON.stringify(data));
-            console.log("🖨️ Enviando para impressão:", printer || "padrão");
+            // console.log("🖨️ Enviando para impressão:", printer || "padrão");
         } else {
-            console.error("❌ WebSocket não está conectado");
+            // console.error("❌ WebSocket não está conectado");
             throw new Error("Print Agent não está conectado");
         }
     }, []);

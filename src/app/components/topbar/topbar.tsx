@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconType } from 'react-icons';
@@ -8,6 +8,8 @@ import { FaExclamationCircle } from 'react-icons/fa';
 import { useCurrentOrder } from '@/app/context/current-order/context';
 import EmployeeUserProfile from '../profile/profile';
 import { useSession } from 'next-auth/react';
+import GetUser from '@/app/api/user/me/user';
+import User from '@/app/entities/user/user';
 
 interface TopbarItemProps {
   label: string;
@@ -45,6 +47,7 @@ const TopbarItemAlert = ({ label, icon: Icon, href }: TopbarItemIconProps) => (
 const Topbar = () => {
   const contextCurrentOrder = useCurrentOrder();
   const [showCurrentOrder, setCurrentOrder] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const { data } = useSession();
 
   // Notificação: abre o toast com central de notificações
@@ -60,19 +63,30 @@ const Topbar = () => {
     }
   }, [contextCurrentOrder.order?.status]);
 
+  useEffect(() => {
+    getUser();
+  }, [data?.user?.access_token]);
+
+  const getUser = async () => {
+    if (!data) return;
+    const user = await GetUser(data);
+
+    setUser(user);
+  }
+
   return (
     <>
       <header className="flex justify-between items-center bg-gray-800 text-white h-16 w-full px-4 shadow-sm relative">
-      <div className="flex space-x-4">
-        <TopbarItem label="Pedidos" href="/pages/order-control" />
-        <TopbarItem label="Mesas" href="/pages/order-table-control" />
-        <TopbarItem label="Entregas" href="/pages/order-delivery-control" />
-        <TopbarItem label="Retiradas" href="/pages/order-pickup-control" />
-        {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
-      </div>
+        <div className="flex space-x-4">
+          <TopbarItem label="Pedidos" href="/pages/order-control" />
+          <TopbarItem label="Mesas" href="/pages/order-table-control" />
+          <TopbarItem label="Entregas" href="/pages/order-delivery-control" />
+          <TopbarItem label="Retiradas" href="/pages/order-pickup-control" />
+          {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
+        </div>
 
         <div className="flex space-x-4 items-center">
-          <TopbarItem label="Turno" href="/pages/shift" color='green'/>
+          <TopbarItem label="Turno" href="/pages/shift" color='green' />
           <button
             onClick={handleNotifications}
             className="p-2 rounded hover:bg-gray-700 transition-colors duration-200"
@@ -80,7 +94,7 @@ const Topbar = () => {
             <IoIosNotifications className="text-xl text-gray-300" />
           </button>
           <div className="absolute top-4 right-4">
-            {data?.user.user && <EmployeeUserProfile user={data?.user.user} />}
+            {user && <EmployeeUserProfile user={user} setUser={setUser}/>}
           </div>
         </div>
       </header>

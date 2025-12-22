@@ -104,7 +104,7 @@ export default function AdminAccessClient({ whitelist }: AdminAccessClientProps)
   const allowedEmails = useMemo(() => parseWhitelist(whitelist), [whitelist]);
   const { data: session, status } = useSession();
 
-  // use top-level `session.user.email` instead of nested `session.user.user`
+  // use top-level `session.user.email` instead of nested `session.user`
   const userEmail = session?.user?.email?.toLowerCase();
   const isAllowed =
     !!userEmail && (allowedEmails.size === 0 ? false : allowedEmails.has(userEmail));

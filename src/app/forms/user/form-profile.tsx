@@ -12,13 +12,13 @@ import RequestError from '@/app/utils/error';
 import { ToIsoDate } from '@/app/utils/date';
 import Person, { ValidatePersonUserForm } from '@/app/entities/person/person';
 
-const UserForm = ({ item }: CreateFormsProps<User>) => {
+const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
     const modalName = 'show-user'
     const modalHandler = useModal();
     const [user, setUser] = useState<User>(item || new User());
     const [person, setPerson] = useState<Person>(user as Person);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const { data, update } = useSession();
+    const { data } = useSession();
 
     const submit = async () => {
         if (!data) return;
@@ -34,13 +34,8 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
         
         try {
             await UpdateUser(newUser, data)
-            await update({
-                ...data,
-                user: {
-                    ...data.user,
-                    user: newUser
-                },
-            })
+            setUser(newUser);
+            if (setItem) setItem(newUser); // update parent state if setter provided
             notifySuccess('Perfil atualizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {

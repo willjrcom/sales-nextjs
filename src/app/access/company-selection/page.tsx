@@ -1,7 +1,6 @@
 'use client';
 
 import Access from '@/app/api/auth/access/access';
-import GetCompany from '@/app/api/company/company';
 import RequestError from '@/app/utils/error';
 import { ModalProvider, useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
@@ -25,6 +24,8 @@ import { FetchItemsArgs } from '@/redux/slices/generics';
 import { notifyError } from '@/app/utils/notifications';
 import EmployeeUserProfile from '@/app/components/profile/profile';
 import Link from 'next/link';
+import GetUser from '@/app/api/user/me/user';
+import User from '@/app/entities/user/user';
 
 export default function Page() {
     return (
@@ -42,6 +43,7 @@ function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
     const [companies, setCompanies] = useState<Company[]>([]);
+    const [user, setUser] = useState<User | null>(null);
     const userCompaniesSlice = useSelector((state: RootState) => state.userCompanies);
     const dispatch = useDispatch<AppDispatch>();
     const modalHandler = useModal();
@@ -71,8 +73,21 @@ function CompanySelection() {
 
     useEffect(() => {
         const companiesFound = Object.values(userCompaniesSlice.entities) || []
-        setCompanies(companiesFound.sort((a, b) => a.trade_name.localeCompare(b.trade_name)))
+        const sortedCompanies = companiesFound.sort((a, b) => a.trade_name.localeCompare(b.trade_name))
+        setCompanies(sortedCompanies);
     }, [userCompaniesSlice.entities]);
+
+
+    useEffect(() => {
+        getUser();
+    }, [data?.user?.access_token]);
+
+    const getUser = async () => {
+        if (!data) return;
+        const user = await GetUser(data);
+
+        setUser(user);
+    }
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
@@ -104,13 +119,6 @@ function CompanySelection() {
             });
 
             data.user.access_token = response;
-
-            await update({
-                ...data,
-                user: {
-                    ...data.user,
-                },
-            })
 
             dispatch(fetchClients({ session: data, page: 1, perPage: 10 } as FetchItemsArgs))
             dispatch(fetchEmployees({ session: data, page: 1, perPage: 10 } as FetchItemsArgs))
@@ -148,10 +156,10 @@ function CompanySelection() {
             <div className="absolute top-4 right-4 z-10 flex items-center gap-4">
                 <div className="text-right">
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-                        Bem-vindo, {data?.user?.user?.name?.split(' ')[0] || 'Usuário'}
+                        Bem-vindo, {user?.name?.split(' ')[0] || 'Usuário'}
                     </h1>
                 </div>
-                {data?.user?.user && <EmployeeUserProfile user={data?.user.user} />}
+                {user && <EmployeeUserProfile user={user} setUser={setUser} />}
             </div>
             {loadingCompanies && (
                 <div className="flex justify-center items-center h-64 mb-10">

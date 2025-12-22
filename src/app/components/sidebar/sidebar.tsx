@@ -100,7 +100,7 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
     modalHandler.showModal(
       "edit-company-" + company.id,
       "Editar Empresa",
-      <CompanyForm item={company} isUpdate />,
+      <CompanyForm item={company} setItem={setCompany} isUpdate />,
       "md",
       onClose,
     );

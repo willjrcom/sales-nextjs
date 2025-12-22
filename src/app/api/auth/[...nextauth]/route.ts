@@ -64,7 +64,6 @@ const authOptions: NextAuthOptions = {
                         return {
                             id: response.id_token,
                             name: response.user.name || email,
-                            user: response.user,
                             email,
                         };
                     }
@@ -112,9 +111,6 @@ const authOptions: NextAuthOptions = {
                     const decoded = decodeJwt(session.user.access_token);
                     if (decoded.exp) token.exp = decoded.exp;
                 }
-                if (session.user.user) {
-                    token.user = session.user.user;
-                }
                 // Retorna direto após update, sem verificar expiração
                 return token;
             }
@@ -124,7 +120,6 @@ const authOptions: NextAuthOptions = {
                 token.email = user.email;
                 token.sub = user.id;
                 token.access_token = user.id;
-                token.user = user.user;
                 // decode expiration from the access_token
                 const decoded = decodeJwt(token.access_token as string);
                 if (decoded.exp) token.exp = decoded.exp;
@@ -156,7 +151,6 @@ const authOptions: NextAuthOptions = {
             session.user = session.user || {};
             if (token.sub) session.user.id = token.sub;
             if (token.access_token) session.user.access_token = token.access_token;
-            if (token.user) session.user.user = token.user;
 
             return session
         },
@@ -171,7 +165,6 @@ const authOptions: NextAuthOptions = {
 declare module "next-auth/jwt" {
     interface JWT {
         id: string;
-        user: UserBackend;
         access_token?: string;
         exp?: number;
         error?: string;
@@ -184,7 +177,6 @@ declare module "next-auth" {
     }
 
     interface User {
-        user: UserBackend;
         access_token?: string;
     }
 }
