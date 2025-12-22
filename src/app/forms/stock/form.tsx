@@ -34,6 +34,12 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
         setStock(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleDecimalChange = (field: keyof Stock, value: string) => {
+        const sanitized = value.replace(/[^\d.-]/g, '').trim();
+        const decimalValue = sanitized === '' || sanitized === '-' ? new Decimal(0) : new Decimal(sanitized);
+        handleInputChange(field, decimalValue);
+    };
+
     const submit = async () => {
         if (!data) return;
         const validationErrors = ValidateStockForm(stock);
@@ -120,7 +126,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                         <TextField
                             friendlyName="Estoque Atual"
                             name="current_stock"
-                            setValue={(value) => handleInputChange('current_stock', new Decimal(value || 0))}
+                            setValue={(value) => handleDecimalChange('current_stock', value)}
                             value={stock.current_stock.toString()}
                         />
                     </div>
@@ -129,7 +135,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                             <TextField
                                 friendlyName="Estoque Mínimo"
                                 name="min_stock"
-                                setValue={(value) => handleInputChange('min_stock', new Decimal(value || 0))}
+                                setValue={(value) => handleDecimalChange('min_stock', value)}
                                 value={stock.min_stock.toString()}
                             />
                         </div>
@@ -137,7 +143,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                             <TextField
                                 friendlyName="Estoque Máximo"
                                 name="max_stock"
-                                setValue={(value) => handleInputChange('max_stock', new Decimal(value || 0))}
+                                setValue={(value) => handleDecimalChange('max_stock', value)}
                                 value={stock.max_stock.toString()}
                             />
                         </div>
