@@ -41,9 +41,7 @@ const paymentIcons: Record<string, IconType> = {
 };
 const DefaultPaymentIcon = FaDollarSign;
 import CloseTable from "@/app/api/order-table/status/close/order-table";
-import { fetchTableOrders } from "@/redux/slices/table-orders";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+import { useQueryClient } from "@tanstack/react-query";
 import { notifyError } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
@@ -54,7 +52,6 @@ import GroupItem from "@/app/entities/order/group-item";
 import AdditionalItem from "@/app/components/order/additional-item";
 import RemovedItem from "@/app/components/order/removed-item";
 import Item from "@/app/entities/order/item";
-import { fetchPickupOrders } from "@/redux/slices/pickup-orders";
 
 interface CardOrderProps {
     orderId: string | null;
@@ -64,7 +61,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -214,7 +211,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
                 try {
                     await CloseTable(order.table?.id, data);
-                    dispatch(fetchTableOrders({ session: data }));
+                    queryClient.invalidateQueries({ queryKey: ['orders'] });
                     fetchOrder();
                 } catch (error) {
                     const err = error as RequestError;
@@ -250,7 +247,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
-                    dispatch(fetchPickupOrders({ session: data }));
+                    queryClient.invalidateQueries({ queryKey: ['orders'] });
                     fetchOrder();
                 } catch (error) {
                     const err = error as RequestError;

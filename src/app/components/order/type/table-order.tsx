@@ -1,63 +1,51 @@
 import ButtonIcon from "../../button/button-icon";
 import Order from "@/app/entities/order/order";
 import StatusComponent from "../../button/show-status";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import { SelectField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { fetchPlaces } from "@/redux/slices/places";
-import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import RequestError from "@/app/utils/error";
 import ChangeTable from "@/app/api/order-table/update/change-table/order-table";
 import Table from "@/app/entities/table/table";
 import { FaExchangeAlt } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetPlaces from '@/app/api/place/place';
 
 const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
     const [tables, setTables] = useState<Table[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const placesSlice = useSelector((state: RootState) => state.places);
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
     const contextCurrentOrder = useCurrentOrder();
 
-    useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasPlaces = placesSlice.ids.length > 0;
+    const { data: placesResponse } = useQuery({
+        queryKey: ['places'],
+        queryFn: () => GetPlaces(data!),
+        enabled: !!data?.user?.access_token,
+    });
 
-        if (token && !hasPlaces) {
-            dispatch(fetchPlaces({ session: data }) );
-        }
-
-        const interval = setInterval(() => {
-            if (data) {
-                dispatch(fetchPlaces({ session: data }));
-            }
-        }, 60000); // Atualiza a cada 60 segundos
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, placesSlice.ids.length]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
 
     useEffect(() => {
         if (!placeID) return;
-        const selectedPlace = placesSlice.entities[placeID];
-        if (!selectedPlace) return
+        const selectedPlace = places.find(p => p.id === placeID);
+        if (!selectedPlace) return;
 
         const filteredTables: Table[] = [];
         for (const placeTable of selectedPlace.tables) {
-            filteredTables.push(placeTable.table)
+            filteredTables.push(placeTable.table);
         }
         setTables(filteredTables);
-    }, [placeID]);
+    }, [placeID, places]);
 
     const changeTable = async () => {
-        if (!data || !tableID) return
+        if (!data || !tableID) return;
         
         setIsLoading(true);
         try {
@@ -65,7 +53,8 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
             notifySuccess('Mesa alterada com sucesso');
             
             // Recarregar dados
-            dispatch(fetchTableOrders({ session: data }));
+            queryClient.invalidateQueries({ queryKey: ['places'] });
+            queryClient.invalidateQueries({ queryKey: ['tableOrders'] });
             
             // Recarregar dados do pedido atual
             if (contextCurrentOrder.order) {
@@ -89,7 +78,7 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
                 name="local"
                 selectedValue={placeID}
                 setSelectedValue={setPlaceID}
-                values={Object.values(placesSlice.entities)}
+                values={places}
             />
             <SelectField
                 friendlyName="Mesa"

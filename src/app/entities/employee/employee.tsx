@@ -32,5 +32,6 @@ export const ValidateEmployeeForm = (employee: Employee) => {
         // Usa o método flatten para simplificar os erros
         return { ...errors, ...validatedFields.error.flatten().fieldErrors };
     } 
-    return errors
+    
+    return {}
 };

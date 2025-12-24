@@ -15,9 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import Category from '@/app/entities/category/category';
 import NumericField from '@/app/components/modal/fields/numeric';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
-import { updateCategory } from '@/redux/slices/categories';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
     category: Category
@@ -26,11 +24,49 @@ interface QuantityFormProps extends CreateFormsProps<Quantity> {
 const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity';
     const modalHandler = useModal();
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const [quantity, setQuantity] = useState<Quantity>(item || new Quantity());
 
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+    const createMutation = useMutation({
+        mutationFn: (newQuantity: Quantity) => NewQuantity(newQuantity, data!),
+
+        onSuccess: (response, newQuantity) => {
+            newQuantity.id = response;
+            queryClient.invalidateQueries({ queryKey: ['quantities'] });
+            notifySuccess(`Quantidade ${newQuantity.quantity} criada com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar quantitye');
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (updatedQuantity: Quantity) => UpdateQuantity(updatedQuantity, data!),
+        onSuccess: (_, updatedQuantity) => {
+            queryClient.invalidateQueries({ queryKey: ['quantities'] });
+            notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar quantitye');
+        }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (quantityId: string) => DeleteQuantity(quantityId, data!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['quantities'] });
+            notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || `Erro ao remover quantitye ${quantity.quantity}`);
+        }
+    });
 
     const handleInputChange = (field: keyof Quantity, value: any) => {
         setQuantity(prev => ({ ...prev, [field]: value }));
@@ -58,8 +94,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
                 notifySuccess(`Quantidade ${quantity.quantity} adicionada com sucesso`);
             }
 
-            // Atualiza o Redux com a lista de quantidades atualizada
-            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...(category.quantities ?? [])] } } }));
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
@@ -73,11 +108,9 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
             await DeleteQuantity(quantity.id, data);
             if (category) {
                 const newQuantities = category.quantities.filter(q => q.id !== quantity.id);
-
-                // Atualiza o Redux com a lista de quantidades atualizada
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { quantities: [...(newQuantities ?? [])] } } }));
             }
             
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {

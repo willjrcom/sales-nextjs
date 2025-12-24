@@ -6,20 +6,16 @@ import ReadyOrder from "@/app/api/order/status/ready/order";
 import { useSession } from "next-auth/react";
 import FinishOrder from "@/app/api/order/status/finish/order";
 import RequestError from "@/app/utils/error";
-import { EntityState } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
-import { fetchOrders } from "@/redux/slices/orders";
 import DroppableFinish from "./droppable-finish";
 import { notifyError } from "@/app/utils/notifications";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface OrderKanbanProps {
-    slice: EntityState<Order, string>;
+    orders: Order[];
 }
 
-function OrderKanban({ slice }: OrderKanbanProps) {
-    // Derive lists via useMemo to avoid extra state and reduce renders
-    const allOrders = useMemo(() => Object.values(slice.entities), [slice.entities]);
+function OrderKanban({ orders }: OrderKanbanProps) {
+    const allOrders = useMemo(() => orders, [orders]);
     const pendingOrders = useMemo(
         () => allOrders.filter(order => order.status === "Pending"),
         [allOrders]
@@ -28,9 +24,9 @@ function OrderKanban({ slice }: OrderKanbanProps) {
         () => allOrders.filter(order => order.status === "Ready"),
         [allOrders]
     );
-    const [activeId, setActiveId] = useState<string | null>(null); // ID do item sendo arrastado
-    const [preventDrag, setPreventDrag] = useState(false); // Flag para evitar o arrasto
-    const dispatch = useDispatch<AppDispatch>();
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const [preventDrag, setPreventDrag] = useState(false);
+    const queryClient = useQueryClient();
 
     const { data } = useSession();
 
@@ -62,7 +58,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             if (!orderId || !data) return;
             try {
                 await ReadyOrder(orderId, data);
-                dispatch(fetchOrders({ session: data }));
+                queryClient.invalidateQueries({ queryKey: ['orders'] });
             } catch (error: RequestError | any) { 
                 notifyError(error.message || 'erro ao deixar pedido pronto')
             }
@@ -71,7 +67,7 @@ function OrderKanban({ slice }: OrderKanbanProps) {
             if (!orderId || !data) return;
             try {
                 await FinishOrder(orderId, data);
-                dispatch(fetchOrders({ session: data }));
+                queryClient.invalidateQueries({ queryKey: ['orders'] });
             } catch (error: RequestError | any) {
                 notifyError(error.message || 'erro ao finalizar pedido')
             }

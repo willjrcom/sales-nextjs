@@ -9,15 +9,13 @@ import AddUserToCompany from '@/app/api/company/add/company';
 import RemoveUserFromCompany from '@/app/api/company/remove/company';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from '@/app/components/modal/field';
-import { fetchUsers, removeUser } from '@/redux/slices/users';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
+import { useQueryClient } from '@tanstack/react-query';
 
 const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
     const modalName = isUpdate ? 'edit-user-' + item?.id : 'edit-user'
     const modalHandler = useModal();
     const [user, setUser] = useState<User>(item || new User());
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { data } = useSession();
 
     const handleAddUserToCompany = async () => {
@@ -25,7 +23,7 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
 
         try {
             await AddUserToCompany(user.email, data)
-            dispatch(fetchUsers({ session: data }));
+            queryClient.invalidateQueries({ queryKey: ['users'] });
             notifySuccess(`Usuário ${user.name} adicionado com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -39,7 +37,7 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
 
         try {
             await RemoveUserFromCompany(user.email, data)
-            dispatch(removeUser(user.id))
+            queryClient.invalidateQueries({ queryKey: ['users'] });
             notifySuccess(`Usuário ${user.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error) {

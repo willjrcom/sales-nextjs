@@ -13,9 +13,7 @@ import UpdatePlace from '@/app/api/place/update/place';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { addPlace, removePlace, updatePlace } from '@/redux/slices/places';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalName = isUpdate ? 'edit-place-' + item?.id : 'new-place'
@@ -23,7 +21,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const [place, setPlace] = useState<Place>(item || new Place());
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     
     const handleInputChange = (field: keyof Place, value: any) => {
         setPlace(prev => ({ ...prev, [field]: value }));
@@ -40,13 +38,12 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
 
             if (!isUpdate) {
                 place.id = response
-                dispatch(addPlace(place));
                 notifySuccess(`Local ${place.name} criado com sucesso`);
             } else {
-                dispatch(updatePlace({ type: "UPDATE", payload: {id: place.id, changes: place}}));
                 notifySuccess(`Local ${place.name} atualizado com sucesso`);
             }
 
+            queryClient.invalidateQueries({ queryKey: ['places'] });
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
@@ -58,7 +55,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
         if (!data) return;
         try {
             await DeletePlace(place.id, data);
-            dispatch(removePlace(place.id));
+            queryClient.invalidateQueries({ queryKey: ['places'] });
             notifySuccess(`Local ${place.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {

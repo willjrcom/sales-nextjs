@@ -9,11 +9,11 @@ import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import Product from "@/app/entities/product/product";
 import Quantity from "@/app/entities/quantity/quantity";
-import { RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
+import { useQuery } from '@tanstack/react-query';
+import GetCategories from '@/app/api/category/category';
 
 interface AddProductCardProps {
   product: Product;
@@ -197,16 +197,23 @@ interface QuantitySelectorProps {
 
 const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }: QuantitySelectorProps) => {
   const [quantities, setQuantities] = useState<Quantity[]>([]);
-  const categoriesSlice = useSelector((state: RootState) => state.categories);
+  const { data } = useSession();
+
+  const { data: categoriesResponse } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => GetCategories(data!),
+    enabled: !!data?.user?.access_token,
+  });
+
+  const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
   useEffect(() => {
-    if (!Object.values(categoriesSlice.entities)) return;
-    const category = categoriesSlice.entities[categoryID];
+    const category = categories.find(c => c.id === categoryID);
     if (!category || !category.quantities) return setQuantities([]);
 
-    const quantities = [...category?.quantities || []].sort((a, b) => a.quantity - b.quantity)
-    setQuantities(quantities);
-  }, [categoryID])
+    const sortedQuantities = [...category?.quantities || []].sort((a, b) => a.quantity - b.quantity);
+    setQuantities(sortedQuantities);
+  }, [categoryID, categories]);
 
   useEffect(() => {
     quantities.forEach((quantity) => {

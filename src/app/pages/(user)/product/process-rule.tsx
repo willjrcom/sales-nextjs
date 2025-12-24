@@ -5,40 +5,45 @@ import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import ProcessRuleColumns from "@/app/entities/process-rule/table-columns";
-import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { fetchCategories } from "@/redux/slices/categories";
-import ProcessRule from "@/app/entities/process-rule/process-rule";
+import { useQuery } from "@tanstack/react-query";
+import GetCategories from "@/app/api/category/category";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 export default function PageProcessRules() {
     const [categoryID, setCategoryID] = useState("");
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const [processRules, setProcessRules] = useState<ProcessRule[]>([]);
-    const dispatch = useDispatch<AppDispatch>();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { data } = useSession();
 
-    useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasCategories = categoriesSlice.ids.length > 0;
+    const { data: categoriesResponse, refetch, isPending } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
 
-        if (token && !hasCategories) {
-            dispatch(fetchCategories({ session: data }));
-        }
-    }, [data?.user?.access_token, categoriesSlice.ids.length]);
+    const handleRefresh = async () => {
+        await refetch();
+        setLastUpdate(new Date().toLocaleTimeString());
+    };
 
-    useEffect(() => {
-        if (Object.keys(categoriesSlice.entities).length === 0) return;
-        const processRulesByCategories = Object.values(categoriesSlice.entities).map((category) => category.process_rules || []).flat();
-        setProcessRules(processRulesByCategories)
-    }, [categoriesSlice.entities]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
-    const validCategories = Object.values(categoriesSlice.entities).filter(c => !c.is_additional && !c.is_complement);
-    const validProcessRules = processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.order - b.order);
+    const processRules = useMemo(() => {
+        return categories.map((category) => category.process_rules || []).flat();
+    }, [categories]);
+
+    const validCategories = useMemo(() => 
+        categories.filter(c => !c.is_additional && !c.is_complement), 
+        [categories]
+    );
+
+    const validProcessRules = useMemo(() => 
+        processRules.filter(processRule => !categoryID || processRule.category_id === categoryID).sort((a, b) => a.order - b.order),
+        [processRules, categoryID]
+    );
 
     return (
         <>
@@ -48,20 +53,16 @@ export default function PageProcessRules() {
 
             <CrudLayout title={<PageTitle title="Processos" tooltip="Defina as etapas de processamento para produtos, com ordem e tempo ideal." />}
                 searchButtonChildren={
-                    <SelectField
-                        friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={validCategories} optional />
+                        <SelectField
+                            friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={validCategories} optional />
                 }
+
                 refreshButton={
-                    <Refresh
-                        slice={categoriesSlice}
-                        fetchItems={fetchCategories}
-                    />
+                    <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
                 }
+
                 tableChildren={
-                    <CrudTable
-                        columns={ProcessRuleColumns()}
-                        data={validProcessRules}>
-                    </CrudTable>
+                    <CrudTable columns={ProcessRuleColumns()} data={validProcessRules} />
                 }
             />
         </>

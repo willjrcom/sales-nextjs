@@ -2,15 +2,12 @@
 import Sidebar from '../sidebar/sidebar';
 import AdminSidebar from '../sidebar/admin-sidebar';
 import Topbar from '../topbar/topbar';
-import { Provider } from 'react-redux';
 import { ModalProvider } from '@/app/context/modal/context';
 import { CurrentOrderProvider } from '@/app/context/current-order/context';
 import { GroupItemProvider } from '@/app/context/group-item/context';
-import { persistor, RootState, store } from '@/redux/store';
 import { useRef } from 'react';
-import { PersistGate } from 'redux-persist/integration/react';
-
 import { useState } from 'react';
+
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [adminMode, setAdminMode] = useState(false);
   const [isHover, setIsHover] = useState(false);
@@ -47,23 +44,14 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 }
 
 const ContextProviders = ({ children }: { children: React.ReactNode }) => {
-  const storeRef = useRef<RootState>();
-  if (!storeRef.current) {
-    storeRef.current = store.getState();
-  }
-
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <CurrentOrderProvider>
-          <GroupItemProvider>
-            <ModalProvider>
-              {children}
-            </ModalProvider>
-          </GroupItemProvider>
-        </CurrentOrderProvider>
-      </PersistGate>
-    </Provider>
+    <CurrentOrderProvider>
+      <GroupItemProvider>
+        <ModalProvider>
+          {children}
+        </ModalProvider>
+      </GroupItemProvider>
+    </CurrentOrderProvider>
   )
 }
 

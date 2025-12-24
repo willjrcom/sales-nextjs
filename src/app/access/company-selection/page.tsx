@@ -5,37 +5,25 @@ import RequestError from '@/app/utils/error';
 import { ModalProvider, useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
 import Loading from '@/app/components/loading/Loading';
-import { fetchCategories } from '@/redux/slices/categories';
-import { fetchClients } from '@/redux/slices/clients';
-import { fetchDeliveryDrivers } from '@/redux/slices/delivery-drivers';
-import { fetchEmployees } from '@/redux/slices/employees';
-import { fetchPlaces } from '@/redux/slices/places';
-import { AppDispatch, persistor, RootState, store, resetApp } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { fetchUserCompanies } from '@/redux/slices/user-companies';
 import Company from '@/app/entities/company/company';
-import Refresh from '@/app/components/crud/refresh';
-import { FetchItemsArgs } from '@/redux/slices/generics';
+import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import { notifyError } from '@/app/utils/notifications';
 import EmployeeUserProfile from '@/app/components/profile/profile';
 import Link from 'next/link';
 import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetUserCompanies from '@/app/api/user/companies/user';
 
 export default function Page() {
     return (
-        <Provider store={store}>
-            <PersistGate persistor={persistor}>
-                <ModalProvider>
-                    <CompanySelection />
-                </ModalProvider>
-            </PersistGate>
-        </Provider>
+        <ModalProvider>
+            <CompanySelection />
+        </ModalProvider>
     )
 }
 
@@ -44,39 +32,29 @@ function CompanySelection() {
     const { data, update } = useSession();
     const [companies, setCompanies] = useState<Company[]>([]);
     const [user, setUser] = useState<User | null>(null);
-    const userCompaniesSlice = useSelector((state: RootState) => state.userCompanies);
-    const dispatch = useDispatch<AppDispatch>();
     const modalHandler = useModal();
     const [selecting, setSelecting] = useState<boolean>(false);
-    const loadingCompanies = userCompaniesSlice.loading;
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const queryClient = useQueryClient();
 
-    // Clear entire redux store + persisted storage every time this page is visited
-    useEffect(() => {
-        // run async reset
-        (async () => {
-            try {
-                await resetApp();
-            } catch (err) {
-                // ignore
-            }
-        })();
-    }, []);
+    const { isPending: loadingCompanies, error, data: companiesResponse, refetch } = useQuery({
+        queryKey: ['user-companies'],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetUserCompanies(data!);
+        },
+        enabled: !!data?.user?.access_token,
+    });
 
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasCompanies = userCompaniesSlice.ids.length > 0;
-
-        if (token && !hasCompanies) {
-            dispatch(fetchUserCompanies({ session: data } as FetchItemsArgs));
-        }
-    }, [data?.user?.access_token, userCompaniesSlice.ids.length]);
+        if (error) notifyError('Erro ao carregar empresas');
+    }, [error]);
 
     useEffect(() => {
-        const companiesFound = Object.values(userCompaniesSlice.entities) || []
-        const sortedCompanies = companiesFound.sort((a, b) => a.trade_name.localeCompare(b.trade_name))
+        const companiesFound = companiesResponse?.items || [];
+        const sortedCompanies = companiesFound.sort((a, b) => a.trade_name.localeCompare(b.trade_name));
         setCompanies(sortedCompanies);
-    }, [userCompaniesSlice.entities]);
-
+    }, [companiesResponse]);
 
     useEffect(() => {
         getUser();
@@ -85,7 +63,6 @@ function CompanySelection() {
     const getUser = async () => {
         if (!data) return;
         const user = await GetUser(data);
-
         setUser(user);
     }
 
@@ -120,11 +97,12 @@ function CompanySelection() {
 
             data.user.access_token = response;
 
-            dispatch(fetchClients({ session: data, page: 1, perPage: 10 } as FetchItemsArgs))
-            dispatch(fetchEmployees({ session: data, page: 1, perPage: 10 } as FetchItemsArgs))
-            dispatch(fetchCategories({ session: data } as FetchItemsArgs))
-            dispatch(fetchDeliveryDrivers({ session: data } as FetchItemsArgs))
-            dispatch(fetchPlaces({ session: data } as FetchItemsArgs))
+            // Prefetch data for next page
+            queryClient.prefetchQuery({ queryKey: ['clients'], queryFn: () => ({items: [], headers: {}}) });
+            queryClient.prefetchQuery({ queryKey: ['employees'], queryFn: () => ({items: [], headers: {}}) });
+            queryClient.prefetchQuery({ queryKey: ['categories'], queryFn: () => ({items: [], headers: {}}) });
+            queryClient.prefetchQuery({ queryKey: ['delivery-drivers'], queryFn: () => ({items: [], headers: {}}) });
+            queryClient.prefetchQuery({ queryKey: ['places'], queryFn: () => ({items: [], headers: {}}) });
 
             router.push('/pages/new-order');
             setSelecting(false);
@@ -174,7 +152,7 @@ function CompanySelection() {
 
             {!loadingCompanies && companies.length > 0 && <div className='flex justify-center items-center gap-4 mb-10'>
                 <h2 className="text-2xl">Selecione uma Empresa</h2>
-                <Refresh slice={userCompaniesSlice} fetchItems={fetchUserCompanies} removeText />
+                <Refresh onRefresh={refetch} isPending={loadingCompanies} lastUpdate={lastUpdate} />
             </div>}
 
             {!loadingCompanies && (companies.length === 0 ? (

@@ -2,12 +2,10 @@ import OrderProcess from "@/app/entities/order-process/order-process";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useModal } from "@/app/context/modal/context";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
-import { removeOrderProcess } from "@/redux/slices/order-processes";
 import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import RequestError from "@/app/utils/error";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CancelOrderProcessProps {
     orderProcess: OrderProcess;
@@ -16,10 +14,9 @@ interface CancelOrderProcessProps {
 const CancelOrderProcess = ({ orderProcess }: CancelOrderProcessProps) => {
     const { data } = useSession();
     const modalHandler = useModal();
-    const dispatch = useDispatch<AppDispatch>();
     const [selectedReason, setSelectedReason] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
-
+    const queryClient = useQueryClient();
     const groupItem = orderProcess.group_item;
 
     const cancelReasons = [
@@ -37,7 +34,7 @@ const CancelOrderProcess = ({ orderProcess }: CancelOrderProcessProps) => {
         setIsLoading(true);
         try {
             await CancelGroupItem(groupItem.id, selectedReason, data);
-            dispatch(removeOrderProcess(orderProcess.id));
+            queryClient.invalidateQueries({queryKey: ['orderProcesses']});
             notifySuccess("Item cancelado com sucesso!");
             modalHandler.hideModal("order-process-cancel-" + orderProcess.id);
         } catch (error: RequestError | any) {

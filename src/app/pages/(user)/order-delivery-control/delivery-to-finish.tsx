@@ -2,7 +2,6 @@
 import RequestError from "@/app/utils/error";
 import DeliveryOrderDelivery from "@/app/api/order-delivery/status/delivery/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import dynamic from 'next/dynamic';
 import type { Point } from "@/app/components/map/map";
@@ -15,87 +14,82 @@ import Address from "@/app/entities/address/address";
 import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
-import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
-import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-import { fetchOrders } from "@/redux/slices/orders";
 import GetCompany from "@/app/api/company/company";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
+import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const DeliveryOrderToFinish = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
-    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
-    const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
-    const [deliveryDrivers, setDeliveryDrivers] = useState<Employee[]>([]);
+    const queryClient = useQueryClient();
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [points, setPoints] = useState<Point[]>([]);
     const [orderID, setSelectedOrderID] = useState<string>("");
     const [selectedOrder, setOrder] = useState<Order | null>(null);
     const [selectedDriverId, setSelectedDriverId] = useState<string>();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { data } = useSession();
 
-    useEffect(() => {
-        setDeliveryDrivers(Object.values(deliveryDriversSlice.entities).map((deliveryDriver) => deliveryDriver.employee));
-    }, [deliveryDriversSlice.entities]);
+    const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
+        queryKey: ['deliveryOrdersWithDelivery'],
+        queryFn: () => GetOrdersWithDelivery(data!),
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
 
-    useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+    const { data: deliveryDriversResponse } = useQuery({
+        queryKey: ['deliveryDrivers'],
+        queryFn: () => GetAllDeliveryDrivers(data!),
+        enabled: !!data?.user?.access_token,
+    });
 
-        if (token && !hasDeliveryOrdersSlice) {
-            dispatch(fetchDeliveryOrders({ session: data }));
-        }
+    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
 
-        const interval = setInterval(() => {
-            const token = data?.user?.access_token;
-            const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+    const deliveryDrivers = useMemo(() => {
+        return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
+    }, [deliveryDriversResponse?.items]);
 
-            if (token && !hasDeliveryOrdersSlice) {
-                dispatch(fetchDeliveryOrders({ session: data }));
-            }
-        }, 30000); // Atualiza a cada 30 segundos
+    const handleRefresh = async () => {
+        await refetch();
+        setLastUpdate(new Date().toLocaleTimeString());
+    };
 
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, deliveryOrdersSlice.ids.length]);
-
-    useEffect(() => {
-        const shippedOrders = Object.values(deliveryOrdersSlice.entities).filter((order) => order.delivery?.status === 'Shipped');
+    const deliveryOrders = useMemo(() => {
+        const shippedOrders = allOrders.filter((order) => order.delivery?.status === 'Shipped');
 
         if (!selectedDriverId) {
-            setDeliveryOrders(shippedOrders);
-            return;
+            return shippedOrders;
         }
 
-        setDeliveryOrders(shippedOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId));
-    }, [deliveryOrdersSlice.entities, selectedDriverId]);
+        return shippedOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId);
+    }, [allOrders, selectedDriverId]);
 
     useEffect(() => {
-        const order = deliveryOrdersSlice.entities[orderID]
-        if (!order) return setOrder(null)
-
+        const order = allOrders.find(o => o.id === orderID);
+        if (!order) return setOrder(null);
         setOrder(order);
-    }, [orderID]);
+    }, [orderID, allOrders]);
 
     useEffect(() => {
-        setCentralCoordinates()
-    }, [data?.user.access_token])
+        setCentralCoordinates();
+    }, [data?.user.access_token]);
 
     const setCentralCoordinates = async () => {
-        if (!data) return
+        if (!data) return;
 
         const company = await GetCompany(data);
-        if (!data || !company.address) return
+        if (!data || !company.address) return;
 
-        const coordinates = company.address.coordinates
+        const coordinates = company.address.coordinates;
 
         const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
         setCenterPoint(point);
-    }
+    };
 
     useEffect(() => {
         const newPoints: Point[] = [];
@@ -105,11 +99,10 @@ const DeliveryOrderToFinish = () => {
             const address = Object.assign(new Address(), order.delivery?.address);
             if (!address) continue;
 
-            const coordinates = address.coordinates
+            const coordinates = address.coordinates;
             if (!coordinates) continue;
 
             const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
-
 
             if (orderID === order.id) {
                 newSelectedPoints.push(point);
@@ -124,7 +117,8 @@ const DeliveryOrderToFinish = () => {
 
     return (
         <>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-4">
+                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
                 <SelectField
                     friendlyName=""
                     name="name"
@@ -133,7 +127,6 @@ const DeliveryOrderToFinish = () => {
                     values={deliveryDrivers}
                     optional
                 />
-                <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
             </div>
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}
@@ -156,7 +149,7 @@ interface FinishDeliveryProps {
     order: Order | null;
 }
 export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -183,14 +176,12 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
             return;
         }
 
-
         try {
             await DeliveryOrderDelivery(deliveryID, data);
 
             notifySuccess("Entrega recebida com sucesso");
+            queryClient.invalidateQueries({ queryKey: ['deliveryOrders'] });
 
-            dispatch(fetchDeliveryOrders({ session: data }));
-            dispatch(fetchOrders({ session: data }));
             modalHandler.hideModal("finish-delivery");
             showOrder(order.id);
         } catch (error: RequestError | any) {

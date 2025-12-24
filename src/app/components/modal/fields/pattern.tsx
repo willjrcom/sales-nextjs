@@ -11,6 +11,8 @@ interface PatternFieldProps {
     optional?: boolean;
     /** If true, setValue will receive the formatted value including mask symbols; otherwise receives raw digits */
     formatted?: boolean;
+    /** Error message to display */
+    error?: string;
 }
 
 // Tipando corretamente 'patterns' como um objeto, e não como um array
@@ -43,7 +45,7 @@ export const patterns = {
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
 
-const PatternField = ({ friendlyName, name, disabled, value, setValue, patternName, optional, formatted = false }: PatternFieldProps) => {
+const PatternField = ({ friendlyName, name, disabled, value, setValue, patternName, optional, formatted = false, error }: PatternFieldProps) => {
     const { pattern, placeholder } = patterns[patternName];
 
     return (
@@ -64,8 +66,9 @@ const PatternField = ({ friendlyName, name, disabled, value, setValue, patternNa
                     setValue(formatted ? formattedValue : raw)
                 }
                 placeholder={placeholder}
-                className={InputClassName}
+                className={`${InputClassName} ${error ? 'border-red-500' : ''}`}
             />
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     );
 };

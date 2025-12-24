@@ -2,18 +2,18 @@
 
 import OrderProcess from "@/app/entities/order-process/order-process";
 import ProcessRule from "@/app/entities/process-rule/process-rule";
-import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
 import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
-import { fetchOrderProcesses } from "@/redux/slices/order-processes";
 import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
-import Refresh from "@/app/components/crud/refresh";
 import { SelectField } from "@/app/components/modal/field";
 import OrderProcessCard from "./order-process";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetCategories from '@/app/api/category/category';
+import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const PageProcessRule = () => {
     return (
@@ -27,13 +27,32 @@ const Component = () => {
     const { id } = useParams();
     const { data } = useSession();
     const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>("");
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const orderProcessesSlice = useSelector((state: RootState) => state.orderProcesses);
     const [processRule, setProcessRule] = useState<ProcessRule | null>(null);
     const [processRules, setProcessRules] = useState<ProcessRule[]>([]);
-    const [orderProcesses, setOrderProcesses] = useState<OrderProcess[]>([]);
-    const dispatch = useDispatch<AppDispatch>();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const queryClient = useQueryClient();
     const router = useRouter();
+
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const { data: orderProcessesResponse, refetch, isPending } = useQuery({
+        queryKey: ['orderProcesses', currentProcessRuleID],
+        queryFn: () => GetProcessesByProcessRuleID(currentProcessRuleID, data!),
+        enabled: !!data?.user?.access_token && !!currentProcessRuleID,
+        refetchInterval: 5000,
+    });
+
+    const handleRefresh = async () => {
+        await refetch();
+        setLastUpdate(new Date().toLocaleTimeString());
+    };
+
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse?.items]);
 
     const updateParam = (newId: string) => {
         router.replace(`/pages/order-process/process-rule/${newId}`);
@@ -44,45 +63,31 @@ const Component = () => {
     }, [id]);
 
     useEffect(() => {
-        const token = data?.user?.access_token;
-        
-        if (!token || !currentProcessRuleID) return;
-        dispatch(fetchOrderProcesses({ id: currentProcessRuleID, session: data }));
+        if (!currentProcessRuleID) return;
 
-        const processRule = processRules.find((p) => p.id === currentProcessRuleID)
+        const processRule = processRules.find((p) => p.id === currentProcessRuleID);
         if (processRule) {
-            setProcessRule(processRule)
-            updateParam(processRule.id)
+            setProcessRule(processRule);
+            updateParam(processRule.id);
         }
-    }, [data?.user.access_token, currentProcessRuleID]);
+    }, [currentProcessRuleID, processRules]);
 
     useEffect(() => {
-        const entities = Object.values(orderProcessesSlice.entities);
-        if (entities.length === 0) {
-            setOrderProcesses([]);
-            return;
-        }
-    
-        setOrderProcesses([...entities]); 
-    }, [data?.user.access_token, orderProcessesSlice.entities]);
-    
+        if (categories.length === 0) return;
 
-    useEffect(() => {
-        if (Object.keys(categoriesSlice.entities).length === 0) return;
-
-        const category = Object.values(categoriesSlice.entities).find((category) =>
-            category.process_rules?.some((processRule) => processRule.id === id)
+        const category = categories.find((cat) =>
+            cat.process_rules?.some((pr) => pr.id === id)
         );
         if (!category) return;
 
-        const processRules = category.process_rules ? [...category.process_rules] : []; // Cria uma cópia
-        setProcessRules(processRules.sort((a, b) => a.order - b.order)); // Ordena a cópia
+        const rules = category.process_rules ? [...category.process_rules] : [];
+        setProcessRules(rules.sort((a, b) => a.order - b.order));
 
-        const processRule = processRules.find((processRule) => processRule.id === id);
-        if (!processRule) return;
+        const rule = rules.find((pr) => pr.id === id);
+        if (!rule) return;
 
-        setProcessRule({ ...processRule }); // Cria uma cópia para evitar referência direta
-    }, [categoriesSlice.entities, id]);
+        setProcessRule({ ...rule });
+    }, [categories, id]);
 
 
     if (!processRule) return null;
@@ -111,11 +116,7 @@ const Component = () => {
                     <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional />
                 }
                 refreshButton={
-                    <Refresh
-                        slice={orderProcessesSlice}
-                        fetchItemsByID={fetchOrderProcesses}
-                        id={currentProcessRuleID}
-                    />
+                    <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
                 }
                 tableChildren={body}
             />

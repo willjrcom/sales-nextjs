@@ -20,12 +20,12 @@ import {
 import { BsFillPeopleFill } from "react-icons/bs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { resetApp } from "@/redux/store";
 import { signOut, useSession } from "next-auth/react";
 import Company from "@/app/entities/company/company";
 import { useModal } from "@/app/context/modal/context";
 import CompanyForm from "@/app/forms/company/form";
 import GetCompany from "@/app/api/company/company";
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SidebarLinkItemProps {
   href?: string;
@@ -73,6 +73,7 @@ interface SidebarProps {
 const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
   const modalHandler = useModal();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const signOutToLogin = async () => {
     await signOut({ callbackUrl: "/login", redirect: true });
@@ -154,8 +155,7 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
         icon={FaRedo}
         label="Trocar de empresa"
         onClick={async () => {
-          // purge redux + persisted storage then navigate
-          await resetApp();
+          queryClient.clear();
           router.push("/access/company-selection");
         }}
       />

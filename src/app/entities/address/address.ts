@@ -13,7 +13,6 @@ export default class Address {
     uf: string = '';
     cep: string = '';
     delivery_tax: Decimal = new Decimal(0);
-    isClient: boolean = false;
     coordinates: Coordinates = new Coordinates();
     address_type: string = '';
 
@@ -68,6 +67,16 @@ export const SchemaAddressClient = z.object({
     number: z.string().min(1, 'Endereço: Número minimo 1 caracter'),
     neighborhood: z.string().min(3, 'Bairro precisa ter pelo menos 3 caracteres').max(100, 'Bairro precisa ter no máximo 100 caracteres'),
     delivery_tax: z.coerce.number().min(0, 'Taxa de entrega inválida').optional(),
+    complement: z.string().max(100, 'Complemento precisa ter no máximo 100 caracteres').optional(),
+    reference: z.string().max(100, 'Referência precisa ter no máximo 100 caracteres').optional(),
+    city: z.string().min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres'),
+    uf: z.string().min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
+    cep: z.string().min(8, 'Cep inválido').max(9, 'Cep inválido').optional().or(z.literal('')),
+    coordinates: z.object({
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
+    }).optional(),
+    address_type: z.string().optional(),
 });
 
 export const ValidateAddressClientForm = (address: Address) => {
@@ -87,7 +96,7 @@ export const ValidateAddressClientForm = (address: Address) => {
 
 
 export const SchemaAddressUser = z.object({
-    cep: z.string().min(8, 'Cep inválido').max(9, 'Cep inválido').optional(),
+    cep: z.string().min(8, 'Cep inválido').max(9, 'Cep inválido').optional().or(z.literal('')),
     street: z.string().min(3, 'Rua precisa ter pelo menos 3 caracteres').max(100, 'Rua precisa ter no máximo 100 caracteres'),
     number: z.string().min(1, 'Endereço: Número minimo 1 caracter'),
     neighborhood: z.string().min(3, 'Bairro precisa ter pelo menos 3 caracteres').max(100, 'Bairro precisa ter no máximo 100 caracteres'),

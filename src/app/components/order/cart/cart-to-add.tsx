@@ -1,12 +1,8 @@
 import { useGroupItem } from "@/app/context/group-item/context";
 import Category from "@/app/entities/category/category";
-import { RootState } from "@/redux/store";
 import { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import Carousel from "../../carousel/carousel";
 import ProductCard from "../product/card-product";
-import Refresh from "../../crud/refresh";
-import { fetchCategories } from "@/redux/slices/categories";
 import { TextField } from "../../modal/field";
 import Button from "../../ui/Button";
 import GetProductByCode from "@/app/api/product/code/[code]";
@@ -15,17 +11,30 @@ import RequestError from "@/app/utils/error";
 import { notifyError } from "@/app/utils/notifications";
 import { useModal } from "@/app/context/modal/context";
 import AddProductCard from "@/app/forms/item/form";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import GetCategories from "@/app/api/category/category";
+import { FiRefreshCw } from "react-icons/fi";
 
 export const CartToAdd = () => {
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
     const contextGroupItem = useGroupItem();
     const [searchCode, setSearchCode] = useState("");
     const { data } = useSession();
     const modalHandler = useModal();
+    const queryClient = useQueryClient();
+
+    const { data: categoriesResponse, isFetching } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const refreshCategories = () => {
+        queryClient.invalidateQueries({ queryKey: ['categories'] });
+    };
 
     const allCategories = useMemo(
-        () => Object.values(categoriesSlice.entities),
-        [categoriesSlice.entities]
+        () => categoriesResponse?.items || [],
+        [categoriesResponse?.items]
     );
 
     const categories = useMemo(() => {
@@ -78,7 +87,14 @@ export const CartToAdd = () => {
                     <Button onClick={onSearch}>Buscar</Button>
                 </div>
 
-                <Refresh slice={categoriesSlice} fetchItems={fetchCategories} />
+                <button
+                    onClick={refreshCategories}
+                    disabled={isFetching}
+                    className="p-2 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    title="Atualizar categorias"
+                >
+                    <FiRefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
+                </button>
             </div>
 
             <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">

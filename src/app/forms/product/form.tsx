@@ -13,33 +13,38 @@ import NewProduct from '@/app/api/product/new/product';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
 import Size from '@/app/entities/size/size';
-import { updateCategory } from '@/redux/slices/categories';
 import PriceField from '@/app/components/modal/fields/price';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetCategories from '@/app/api/category/category';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
     const modalHandler = useModal();
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const queryClient = useQueryClient();
+    const { data } = useSession();
     const [product, setProduct] = useState<Product>(item || new Product());
     const [flavorsInput, setFlavorsInput] = useState<string>(item?.flavors?.join(', ') || '');
-    const [categories, setCategories] = useState<Category[]>([]);
+
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const categories = categoriesResponse?.items || [];
     const [category, setCategory] = useState<Category>(new Category());
     const [size, setSize] = useState<Size>(item?.size || new Size());
     const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
     const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
-    const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        const category = categoriesSlice.entities?.[product.category_id];
+        const category = categories.find(c => c.id === product.category_id);
         if (!category) return
         setCategory(category)
-    }, [product.category_id])
+    }, [product.category_id, categories])
 
     useEffect(() => {
         const size = category.sizes.find(size => size.id === product.size_id);
@@ -67,48 +72,8 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         try {
             const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
             
-            // prepare plain product data without mutating state entities
-            const plainProduct = {
-                id: isUpdate ? product.id : response,
-                code: product.code,
-                image_path: product.image_path,
-                name: product.name,
-                description: product.description,
-                flavors: product.flavors,
-                price: product.price,
-                cost: product.cost,
-                category_id: product.category_id,
-                category: category,
-                size_id: product.size_id,
-                size: size,
-                is_available: product.is_available,
-            } as Product;
-
-            if (!isUpdate) {
-                // add new product to category
-                dispatch(updateCategory({
-                    type: "UPDATE",
-                    payload: {
-                        id: category.id,
-                        changes: {
-                            products: [...(category.products ?? []), plainProduct]
-                        }
-                    }
-                }));
-                notifySuccess(`Produto ${product.name} criado com sucesso`);
-            } else {
-                // update existing product in category
-                dispatch(updateCategory({
-                    type: "UPDATE",
-                    payload: {
-                        id: category.id,
-                        changes: {
-                            products: (category.products ?? []).map(p => p.id === product.id ? plainProduct : p)
-                        }
-                    }
-                }));
-                notifySuccess(`Produto ${product.name} atualizado com sucesso`);
-            }
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            notifySuccess(isUpdate ? `Produto ${product.name} atualizado com sucesso` : `Produto ${product.name} criado com sucesso`);
             modalHandler.hideModal(modalName);
 
         } catch (error) {
@@ -122,15 +87,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         try {
             await DeleteProduct(product.id, data);
-            dispatch(updateCategory({
-                type: "UPDATE",
-                payload: {
-                    id: category.id,
-                    changes: {
-                        products: (category.products ?? []).filter(p => p.id !== product.id)
-                    }
-                }
-            }));
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
             modalHandler.hideModal(modalName);
             notifySuccess(`Produto ${product.name} removido com sucesso`);
         } catch (error: RequestError | any) {
@@ -140,30 +97,17 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     useEffect(() => {
         const LoadCategories = async () => {
-            if (!data) return;
-
-            try {
-                setCategories(Object.values(categoriesSlice.entities));
-
-                let records: Record<string, string>[] = [];
-
-                if (Object.values(categoriesSlice.entities).length === 0) {
-                    setRecordCategories([]);
-                    return;
-                }
-
-                for (const category of Object.values(categoriesSlice.entities)) {
-                    records.push({ id: category.id, name: category.name })
-                }
-                setRecordCategories(records);
-
-            } catch (error: RequestError | any) {
-                notifyError(error);
+            if (!data || categories.length === 0) {
+                setRecordCategories([]);
+                return;
             }
+
+            const records = categories.map(cat => ({ id: cat.id, name: cat.name }));
+            setRecordCategories(records);
         }
 
         LoadCategories();
-    }, [data?.user.access_token, categoriesSlice.entities]);
+    }, [data?.user.access_token, categories]);
 
     useEffect(() => {
         const LoadSizes = async () => {

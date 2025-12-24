@@ -19,12 +19,12 @@ import { MdFastfood, MdOutlineHomeWork } from 'react-icons/md';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { resetApp } from '@/redux/store';
 import { signOut, useSession } from 'next-auth/react';
 import Company from '@/app/entities/company/company';
 import { useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
 import GetCompany from '@/app/api/company/company';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SidebarLinkItemProps {
   href?: string;
@@ -66,6 +66,7 @@ const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
   const router = useRouter();
   const { data } = useSession();
   const [company, setCompany] = useState<Company>(new Company());
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     getCurrentCompany()
@@ -114,7 +115,7 @@ const AdminSidebar = ({ onToggleAdmin, setHover }: AdminSidebarProps) => {
         icon={FaRedo}
         label="Trocar de empresa"
         onClick={async () => {
-          await resetApp();
+          queryClient.clear();
           router.push('/access/company-selection');
         }}
       />

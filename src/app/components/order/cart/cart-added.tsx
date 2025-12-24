@@ -3,21 +3,30 @@
 import { useEffect, useState } from "react";
 import ButtonIconTextFloat from "../../button/button-float";
 import EditGroupItem from "../group-item/edit-group-item";
-import { useSelector } from "react-redux";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import Order from "@/app/entities/order/order";
-import { RootState } from "@/redux/store";
 import { useGroupItem } from "@/app/context/group-item/context";
 import GroupItem from "@/app/entities/order/group-item";
 import CategoryOrder from "../category/category";
 import { FaSearch } from 'react-icons/fa';
+import { useQuery } from "@tanstack/react-query";
+import GetCategories from "@/app/api/category/category";
+import { useSession } from "next-auth/react";
 
 export const CartAdded = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
     const contextGroupItem = useGroupItem();
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
+    const { data: session } = useSession();
+    
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(session!),
+        enabled: !!session?.user?.access_token,
+    });
+
+    const categories = categoriesResponse?.items || [];
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
@@ -56,8 +65,8 @@ export const CartAdded = () => {
                     </div>
                 ) : (
                     Object.entries(groupedItems).map(([key, groupItems]) => {
-                        if (Object.values(categoriesSlice.entities).length === 0) return null;
-                        const category = categoriesSlice.entities[key];
+                        if (categories.length === 0) return null;
+                        const category = categories.find(cat => cat.id === key);
                         if (!category) return null;
                         return (
                             <CategoryOrder key={key} category={category} groupItems={groupItems} />

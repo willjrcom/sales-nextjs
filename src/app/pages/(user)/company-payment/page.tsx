@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from "@/app/components/PageTitle";
 import CrudTable from "@/app/components/crud/table";
+import Refresh from "@/app/components/crud/refresh";
 import CompanyPaymentColumns from "@/app/entities/company/company-payment-columns";
 import CompanyPayment from "@/app/entities/company/company-payment";
 import Company from "@/app/entities/company/company";
@@ -318,15 +319,10 @@ const CompanyPaymentPage = () => {
           />
         }
         refreshButton={
-          <button
-            onClick={() =>
-              loadPayments(pagination.pageIndex, pagination.pageSize)
-            }
-            className="px-4 py-2 border rounded-md text-sm hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={loadingPayments}
-          >
-            {loadingPayments ? "Atualizando..." : "Recarregar"}
-          </button>
+          <Refresh
+            onRefresh={() => loadPayments(pagination.pageIndex, pagination.pageSize)}
+            isPending={loadingPayments}
+          />
         }
         tableChildren={
           <>

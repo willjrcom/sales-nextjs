@@ -11,10 +11,10 @@ const PageWithTabs = () => {
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'produtos':
-                return <PageProducts />;
             case 'categorias':
                 return <PageCategories />;
+            case 'produtos':
+                return <PageProducts />;
             case 'processos':
                 return <PageProcessRules />;
             default:
@@ -24,18 +24,18 @@ const PageWithTabs = () => {
 
     return (
         <div>
+            <button
+                className={`tab ${activeTab === 'categorias' ? 'active' : ''}`}
+                onClick={() => setActiveTab('categorias')}
+            >
+                Categorias
+            </button>
             <div className="tabs">
                 <button
                     className={`tab ${activeTab === 'produtos' ? 'active' : ''}`}
                     onClick={() => setActiveTab('produtos')}
                 >
                     Produtos
-                </button>
-                <button
-                    className={`tab ${activeTab === 'categorias' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('categorias')}
-                >
-                    Categorias
                 </button>
                 <button
                     className={`tab ${activeTab === 'processos' ? 'active' : ''}`}

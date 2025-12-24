@@ -5,11 +5,7 @@ import Address from "@/app/entities/address/address";
 import { HiOutlineUser, HiOutlinePhone, HiOutlineHome, HiOutlineIdentification, HiOutlineMail, HiOutlineCalendar } from "react-icons/hi";
 import ButtonsModal from "@/app/components/modal/buttons-modal";
 import DeleteEmployee from "@/app/api/employee/delete/employee";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
-import { removeEmployee, updateEmployee } from "@/redux/slices/employees";
 import RemoveUserFromCompany from "@/app/api/company/remove/company";
-import { removeUser } from "@/redux/slices/users";
 import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useModal } from "@/app/context/modal/context";
@@ -23,6 +19,7 @@ import SalaryHistoryModal from "./SalaryHistoryModal";
 import PaymentModal from "./PaymentModal";
 import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
+import { useQueryClient } from '@tanstack/react-query';
 
 interface EmployeeCardProps {
     item: Employee;
@@ -39,7 +36,7 @@ function EmployeeCard({ item }: EmployeeCardProps) {
     const modalName = "view-employee-" + item.id;
     const contact = item.contact as Contact;
     const address = item.address as Address;
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
     const [salaryHistory, setSalaryHistory] = useState<EmployeeSalaryHistory[]>([]);
@@ -84,7 +81,6 @@ function EmployeeCard({ item }: EmployeeCardProps) {
         try {
             const employeeWithPermissions = { ...item, permissions } as Employee;
             await UpdateEmployee(employeeWithPermissions, data);
-            dispatch(updateEmployee({ type: "UPDATE", payload: {id: employeeWithPermissions.id, changes: employeeWithPermissions}}));
         } catch (error: RequestError | any) {
             console.error('Erro ao atualizar permissões:', error);
             
@@ -111,12 +107,11 @@ function EmployeeCard({ item }: EmployeeCardProps) {
         if (!data) return;
         try {
             await DeleteEmployee(item.id, data);
-            dispatch(removeEmployee(item.id));
 
             await RemoveUserFromCompany(item.email, data)
-            dispatch(removeUser(item.user_id))
 
             notifySuccess('Funcionário removido com sucesso');
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || `Erro ao remover funcionário ${item.name}`);

@@ -5,11 +5,11 @@ import { useGroupItem } from '@/app/context/group-item/context';
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';
-import { RootState } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { notifyError } from '@/app/utils/notifications';
+import { useQuery } from '@tanstack/react-query';
+import GetCategories from '@/app/api/category/category';
 
 interface ItemAdditional {
     name: string;
@@ -44,53 +44,53 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
 
 const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     const [additionalItemsToAdd, setAdditionalItems] = useState<ItemAdditional[]>([]);
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
     const isStaging = contextGroupItem.groupItem?.status === "Staging";
 
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const categories = categoriesResponse?.items || [];
+
     useEffect(() => {
         try {
-            // Passo 1: Buscar a categoria atual do item
-            const category = categoriesSlice.entities[item.category_id];
+            const category = categories.find(c => c.id === item.category_id);
             if (!category) {
-                return setAdditionalItems([]); // Caso não encontre a categoria, retorna lista vazia
+                return setAdditionalItems([]);
             }
 
-            // Passo 2: Buscar as categorias adicionais relacionadas à categoria do item
             const additionalCategories = category.additional_categories;
             if (!additionalCategories || additionalCategories.length === 0) {
-                return setAdditionalItems([]); // Se não houver categorias adicionais, retorna lista vazia
+                return setAdditionalItems([]);
             }
 
-            // Passo 3: Buscar os produtos disponíveis em cada categoria adicional
             const productsFound = additionalCategories
-                .map((additionalCategory) => categoriesSlice.entities[additionalCategory.id]?.products) // Obter os produtos de cada categoria adicional
-                .flat().filter(item => item != null && item !== undefined); // "Flatten" para uma lista única de produtos
+                .map((additionalCategory) => categories.find(c => c.id === additionalCategory.id)?.products)
+                .flat().filter(item => item != null && item !== undefined);
 
             if (!productsFound || productsFound.length === 0) {
-                return setAdditionalItems([]); // Se não houver produtos, retorna lista vazia
+                return setAdditionalItems([]);
             }
 
-            // Passo 5: Converter os produtos válidos para itens
-            const items = convertProductToItem(productsFound, item.additional_items || []);
-            // Passo 6: Verificar se após conversão existem itens válidos
+            const items = convertProductToItem(productsFound as Product[], item.additional_items || []);
             if (!items || items.length === 0) {
-                return setAdditionalItems([]); // Se não houver itens válidos após a conversão, retorna lista vazia
+                return setAdditionalItems([]);
             }
 
-            // Atualiza o estado com os itens convertidos
             setAdditionalItems(items);
-
         } catch (error : RequestError | any) {
             notifyError(error);
         }
-    }, [item.id]);
+    }, [item.id, categories]);
 
     const updateAdditionalItem = async (clickedItem: ItemAdditional) => {
         if (!data) return
 
-        const categoryFound = categoriesSlice.entities[clickedItem.category_id]
+        const categoryFound = categories.find(c => c.id === clickedItem.category_id);
         if (!categoryFound) return notifyError("Categoria indisponivel")
 
         const quantityFound = categoryFound?.quantities.find(quantity => quantity.quantity === clickedItem.quantity)

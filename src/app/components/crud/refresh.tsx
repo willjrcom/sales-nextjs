@@ -1,65 +1,32 @@
-import { FetchItemsArgs, GenericState } from "@/redux/slices/generics";
-import { AppDispatch } from "@/redux/store";
-import { Session } from "next-auth";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
-import Loading from "../loading/Loading";
 import { HiOutlineRefresh } from "react-icons/hi";
-import { useDispatch } from "react-redux";
-import { notifyError } from "@/app/utils/notifications";
 
 interface RefreshProps {
-    /**
-     * Fetch items thunk, receives session, page, perPage
-     */
-    fetchItems?: (data: FetchItemsArgs) => any;
-    /**
-     * Fetch by ID thunk
-     */
-    fetchItemsByID?: (params: { id: string; session: Session }) => any;
-    /** ID for fetchItemsByID */
-    id?: string;
-    /** Current page (1-based) */
-    page?: number;
-    /** Items per page */
-    perPage?: number;
-    /** Generic slice for loading and lastUpdate */
-    slice: GenericState;
+    /** React Query refetch function */
+    onRefresh: () => void;
     /** Hide text label */
     removeText?: boolean;
+    /** Last update time formatted */
+    lastUpdate?: string;
+    /** Loading state */
+    isPending?: boolean;
 }
 
-const Refresh = ({ fetchItems, fetchItemsByID, id, page, perPage, slice, removeText }: RefreshProps) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { data } = useSession();
-
-    const [isRefreshing, setRefreshing] = useState(false);
-
-    const handleRefresh = async () => {
-        if (!data || (!fetchItems && !fetchItemsByID) || isRefreshing) return;
-        setRefreshing(true);
-        try {
-            if (fetchItems) {
-                dispatch(fetchItems({ session: data, page: page, perPage: perPage }));
-            } else if (fetchItemsByID && id) {
-                dispatch(fetchItemsByID({ id, session: data }));
-
-            }
-        } catch (error) {
-            notifyError("Erro ao atualizar os dados:" + error);
-        } finally {
-            setRefreshing(false);
-        }
-    };
-
-    const isLoading = slice.loading || isRefreshing;
+const Refresh = ({ onRefresh, removeText, lastUpdate, isPending }: RefreshProps) => {
     return (
         <div className="flex items-center gap-3">
-            <button onClick={!isLoading ? handleRefresh : undefined} disabled={isLoading}>
-                {isLoading ? <Loading /> : <HiOutlineRefresh className="h-5 w-5 text-gray-800" />}
+            <button 
+                onClick={!isPending ? onRefresh : undefined} 
+                disabled={isPending}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:cursor-not-allowed"
+            >
+                {isPending ? (
+                    <HiOutlineRefresh className="h-5 w-5 text-blue-500 animate-spin" />
+                ) : (
+                    <HiOutlineRefresh className="h-5 w-5 text-gray-800" />
+                )}
             </button>
-            {!removeText && (
-                <label className="text-gray-800">{`Atualizado em ${slice.lastUpdate}`}</label>
+            {!removeText && lastUpdate && (
+                <label className="text-gray-800">{`Atualizado em ${lastUpdate}`}</label>
             )}
         </div>
     );

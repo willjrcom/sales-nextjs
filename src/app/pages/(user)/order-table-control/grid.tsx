@@ -1,22 +1,22 @@
 "use client";
 
-import React, { CSSProperties, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
+import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import Place from "@/app/entities/place/place";
 import RequestError from "@/app/utils/error";
-import Refresh from "@/app/components/crud/refresh";
 import { useModal } from "@/app/context/modal/context";
 import CardOrder from "@/app/components/order/card-order";
 import OrderTable from "@/app/entities/order/order-table";
-import { fetchTableOrders } from "@/redux/slices/table-orders";
 import { FaPlus, FaList } from "react-icons/fa";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import { useRouter } from "next/navigation";
 import { notifyError } from "@/app/utils/notifications";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetPlaces from '@/app/api/place/place';
+import GetOrderTables from '@/app/api/order-table/order-table';
+
 // Sidebar listing active tables and showing elapsed usage time
 const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
     const [now, setNow] = useState<Date>(new Date());
@@ -69,57 +69,43 @@ const generateGrid = (rows: number, cols: number) => {
 };
 
 const DragAndDropGrid = () => {
-    const placesSlice = useSelector((state: RootState) => state.places);
-    const tableOrdersSlice = useSelector((state: RootState) => state.tableOrders);
+    const queryClient = useQueryClient();
     const [totalRows, setTotalRows] = useState(INITIAL_GRID_SIZE);
     const [totalCols, setTotalCols] = useState(INITIAL_GRID_SIZE);
     const [grid, setGrid] = useState(generateGrid(totalRows, totalCols));
-    const [places, setPlaces] = useState<Place[]>(Object.values(placesSlice.entities));
     const [droppedTables, setDroppedTables] = useState<PlaceTable[]>([]);
-    const [tableOrders, setTableOrders] = useState<OrderTable[]>([]);
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
 
-    useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasTableOrdersSlice = tableOrdersSlice.ids.length > 0;
+    const { data: placesResponse } = useQuery({
+        queryKey: ['places'],
+        queryFn: () => GetPlaces(data!),
+        enabled: !!data?.user?.access_token,
+    });
 
-        if (token && !hasTableOrdersSlice) {
-            dispatch(fetchTableOrders({ session: data }));
+    const { data: tableOrdersResponse } = useQuery({
+        queryKey: ['tableOrders'],
+        queryFn: () => GetOrderTables(data!),
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
+
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
+    const tableOrders = useMemo(() => tableOrdersResponse?.items || [], [tableOrdersResponse?.items]);
+
+    useEffect(() => {
+        if (places.length > 0 && placeSelectedID === "") {
+            setPlaceSelectedID(places[0].id);
         }
-
-        const interval = setInterval(() => {
-            const token = data?.user?.access_token;
-            const hasTableOrdersSlice = tableOrdersSlice.ids.length > 0;
-
-            if (token && !hasTableOrdersSlice) {
-                dispatch(fetchTableOrders({ session: data }));
-            }
-        }, 30000); // Atualiza a cada 60 segundos
-
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token,])
+    }, [places, placeSelectedID]);
 
     useEffect(() => {
-        setTableOrders(Object.values(tableOrdersSlice.entities));
-    }, [tableOrdersSlice.entities])
-
-    useEffect(() => {
-        setPlaces(Object.values(placesSlice.entities));
-
-        const firstPlace = Object.values(placesSlice.entities)[0];
-        if (!firstPlace) return
-        if (placeSelectedID === "") setPlaceSelectedID(firstPlace.id)
-    }, [placesSlice.entities])
-
-    useEffect(() => {
-        const place = placesSlice.entities[placeSelectedID]
+        const place = places.find(p => p.id === placeSelectedID);
         if (!place) return;
 
         setDroppedTables(place.tables || []);
         reloadGrid(place.tables);
-    }, [placeSelectedID])
+    }, [placeSelectedID, places]);
 
     const reloadGrid = (tables: PlaceTable[]) => {
         if (!tables || tables.length === 0) return;
@@ -151,7 +137,6 @@ const DragAndDropGrid = () => {
                 <div className="flex items-center justify-between">
                     <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
                         optional />
-                    <Refresh slice={tableOrdersSlice} fetchItems={fetchTableOrders} />
                 </div>
                 <div
                     style={{
@@ -192,7 +177,7 @@ const DragAndDropGrid = () => {
 };
 
 const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ordersForTable: OrderTable[] }) => {
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { data } = useSession();
     const router = useRouter();
     const modalHandler = useModal();
@@ -214,7 +199,6 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
                 try {
                     const response = await NewOrderTable(tableID, data)
                     router.push('/pages/order-control/' + response.order_id)
-                    dispatch(fetchTableOrders({ session: data }));
                     onClose()
                 } catch (error: RequestError | any) {
                     notifyError(error.message || 'Ocorreu um erro ao criar o pedido');

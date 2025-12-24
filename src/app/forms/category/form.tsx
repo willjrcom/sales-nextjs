@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { TextField, CheckboxField, SelectField, HiddenField, ImageField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -13,14 +13,13 @@ import UpdateCategory from '@/app/api/category/update/category';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import { fetchCategories, removeCategory, updateCategory } from '@/redux/slices/categories';
 import AdditionalCategorySelector from './additional-category';
 import ComplementCategorySelector from './complement-category';
 import RemovableItensComponent from './removable-ingredients';
 import { useRouter } from 'next/navigation';
 import printService from '@/app/utils/print-service';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import GetCategories from '@/app/api/category/category';
 
 interface CategoryFormProps extends CreateFormsProps<Category> {
     setItem?: (item: Category) => void
@@ -33,9 +32,53 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const router = useRouter();
+
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const createMutation = useMutation({
+        mutationFn: (newCategory: Category) => NewCategory(newCategory, data!),
+        onSuccess: (response, newCategory) => {
+            newCategory.id = response;
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            notifySuccess(`Categoria ${newCategory.name} criada com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar categoria');
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (updatedClient: Category) => UpdateCategory(updatedClient, data!),
+        onSuccess: (_, updatedClient) => {
+            queryClient.invalidateQueries({ queryKey: ['clients'] });
+            notifySuccess(`Cliente ${updatedClient.name} atualizado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar cliente');
+        }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (categoryId: string) => DeleteCategory(categoryId, data!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            notifySuccess(`Categoria ${category.name} removida com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || `Erro ao remover categoria ${category.name}`);
+        }
+    });
+
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     useEffect(() => {
         if (item?.is_additional) setSelectedType("Adicional");
@@ -57,15 +100,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
             handleInputChange('need_print', false);
         }
     }, [selectedType])
-
-    useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasPlaces = categoriesSlice.ids.length > 0;
-
-        if (token && !hasPlaces) {
-            dispatch(fetchCategories({ session: data }));
-        }
-    }, [data?.user.access_token, categoriesSlice.ids.length]);
     
     useEffect(() => {
         if (category.need_print) {
@@ -99,24 +133,11 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         const validationErrors = ValidateCategoryForm(category);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
-
-        try {
-            const response = isUpdate ? await UpdateCategory(category, data) : await NewCategory(category, data)
-
-            if (!isUpdate) {
-                category.id = response
-                dispatch(fetchCategories({ session: data }));
-                notifySuccess(`Categoria ${category.name} criada com sucesso`);
-                modalHandler.hideModal(modalName);
-            } else {
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: category } }));
-                if (setItem) setItem(category)
-                notifySuccess(`Categoria ${category.name} atualizada com sucesso`);
-            }
-
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao salvar categoria');
+        
+        if (isUpdate) {
+            updateMutation.mutate(category)
+        } else {
+            createMutation.mutate(category)
         }
     }
 
@@ -125,7 +146,6 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
 
         try {
             await DeleteCategory(category.id, data);
-            dispatch(removeCategory(category.id));
 
             if (!isUpdate) {
                 modalHandler.hideModal(modalName);
@@ -213,7 +233,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                     <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Categorias Adicionais</h3>
                         <AdditionalCategorySelector
-                            additionalCategories={Object.values(categoriesSlice.entities)}
+                            additionalCategories={categories}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />
@@ -223,7 +243,7 @@ const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
                     <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Complementos</h3>
                         <ComplementCategorySelector
-                            complementCategories={Object.values(categoriesSlice.entities)}
+                            complementCategories={categories}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />

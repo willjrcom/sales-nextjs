@@ -2,44 +2,36 @@
 
 import { useState, useEffect, useMemo } from "react";
 import PageTitle from '@/app/components/PageTitle';
-import Refresh from "@/app/components/crud/refresh";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
-import { fetchPickupOrders } from "@/redux/slices/pickup-orders";
-import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { useDispatch, useSelector } from "react-redux";
 import PickupOrderColumns from "@/app/entities/order/pickup-table-columns";
 import "./style.css";
+import { useQuery } from "@tanstack/react-query";
+import GetOrdersWithPickup from "@/app/api/order/all/pickup/order";
+import { notifyError } from "@/app/utils/notifications";
 
 const PickupOrderPage = () => {
-    const pickupOrdersSlice = useSelector((state: RootState) => state.pickupOrders);
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [activeTab, setActiveTab] = useState<'Prontas' | 'Últimos 10'>('Prontas');
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    // fetch and polling
+    const { isPending, error, data: response, refetch } = useQuery({
+        queryKey: ['pickup-orders'],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetOrdersWithPickup(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
+
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasOrdersSlice = pickupOrdersSlice.ids.length > 0;
+        if (error) notifyError('Erro ao carregar pedidos de retirada');
+    }, [error]);
 
-        if (token && !hasOrdersSlice) {
-            dispatch(fetchPickupOrders({ session: data }));
-        }
-        const interval = setInterval(() => {
-        const token = data?.user?.access_token;
-        const hasPickupOrdersSlice = pickupOrdersSlice.ids.length > 0;
+    const allOrders = useMemo(() => response?.items || [], [response]);
 
-        if (token && !hasPickupOrdersSlice) {
-                dispatch(fetchPickupOrders({ session: data }));
-            }
-        }, 30000);
-        return () => clearInterval(interval);
-    }, [data?.user.access_token, pickupOrdersSlice.ids.length]);
-
-    // derive orders list
-    const allOrders = useMemo(() => Object.values(pickupOrdersSlice.entities), [pickupOrdersSlice.entities]);
-
-    // last 10 ready
     const last10 = useMemo(() => [...allOrders].sort((a, b) => {
         const da = a.pickup?.ready_at || '';
         const db = b.pickup?.ready_at || '';
@@ -63,7 +55,7 @@ const PickupOrderPage = () => {
             </div>
             <div className="content">
                 <div className="flex justify-end items-center mb-2">
-                    <Refresh slice={pickupOrdersSlice} fetchItems={fetchPickupOrders} />
+                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
                 </div>
                 {renderContent()}
             </div>

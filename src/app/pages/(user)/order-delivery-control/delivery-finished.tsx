@@ -1,74 +1,73 @@
 "use client";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import Refresh from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import { SelectField } from "@/app/components/modal/field";
 import CardOrder from "@/app/components/order/card-order";
 import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
-import { fetchDeliveryOrders } from "@/redux/slices/delivery-orders";
-import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaBoxOpen } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
+import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const DeliveryOrderFinished = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const deliveryOrdersSlice = useSelector((state: RootState) => state.deliveryOrders);
-    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
-    const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
-    const [ordersNotFinished, setOrdersNotFinished] = useState<Order[]>([]);
-    const [deliveryDrivers, setDeliveryDrivers] = useState<Employee[]>([]);
+    const queryClient = useQueryClient();
     const [orderID, setSelectedOrderID] = useState<string>("");
     const [selectedDriverId, setSelectedDriverId] = useState<string>();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { data } = useSession();
 
-    useEffect(() => {
-        setDeliveryDrivers(Object.values(deliveryDriversSlice.entities).map((deliveryDriver) => deliveryDriver.employee));
-    }, [deliveryDriversSlice.entities]);
+    const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
+        queryKey: ['deliveryOrdersWithDelivery'],
+        queryFn: () => GetOrdersWithDelivery(data!),
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
+    });
 
-    useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+    const { data: deliveryDriversResponse } = useQuery({
+        queryKey: ['deliveryDrivers'],
+        queryFn: () => GetAllDeliveryDrivers(data!),
+        enabled: !!data?.user?.access_token,
+    });
 
-        if (token && !hasDeliveryOrdersSlice) {
-            dispatch(fetchDeliveryOrders({ session: data }));
-        }
+    const deliveryDrivers = useMemo(() => {
+        return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
+    }, [deliveryDriversResponse?.items]);
 
-        const interval = setInterval(() => {
-            const token = data?.user?.access_token;
-            const hasDeliveryOrdersSlice = deliveryOrdersSlice.ids.length > 0;
+    const handleRefresh = async () => {
+        await refetch();
+        setLastUpdate(new Date().toLocaleTimeString());
+    };
 
-            if (token && !hasDeliveryOrdersSlice) {
-                dispatch(fetchDeliveryOrders({ session: data }));
-            }
-        }, 60000); // Atualiza a cada 60 segundos
+    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
 
-        return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-    }, [data?.user.access_token, deliveryOrdersSlice.ids.length]);
-
-    useEffect(() => {
-        const orders = Object.values(deliveryOrdersSlice.entities);
-        const deliveredOrders = orders.filter((order) => order.delivery?.status === 'Delivered');
-        const ordersNotFinished = orders.filter((order) => order?.status === 'Ready' && order.delivery?.status === 'Delivered');
+    const { deliveryOrders, ordersNotFinished } = useMemo(() => {
+        const deliveredOrders = allOrders.filter((order) => order.delivery?.status === 'Delivered');
+        const notFinished = allOrders.filter((order) => order.status === 'Ready' && order.delivery?.status === 'Delivered');
 
         if (!selectedDriverId) {
-            setOrdersNotFinished(ordersNotFinished);
-            setDeliveryOrders(deliveredOrders);
-            return;
+            return {
+                deliveryOrders: deliveredOrders,
+                ordersNotFinished: notFinished
+            };
         }
 
-        setOrdersNotFinished(ordersNotFinished.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId));
-        setDeliveryOrders(deliveredOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId));
-    }, [deliveryOrdersSlice.entities, selectedDriverId]);
+        return {
+            deliveryOrders: deliveredOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId),
+            ordersNotFinished: notFinished.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId)
+        };
+    }, [allOrders, selectedDriverId]);
 
     if (!data) return null;
 
     return (
         <>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-4">
+                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
                 <SelectField
                     friendlyName=""
                     name="name"
@@ -77,7 +76,6 @@ const DeliveryOrderFinished = () => {
                     values={deliveryDrivers}
                     optional
                 />
-                <Refresh slice={deliveryOrdersSlice} fetchItems={fetchDeliveryOrders} />
             </div>
             {ordersNotFinished.length > 0 &&
                 <div className="mt-4">
@@ -89,7 +87,7 @@ const DeliveryOrderFinished = () => {
                 <h3 className="text-lg font-semibold mb-2">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
-            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => dispatch(fetchDeliveryOrders({ session: data }))}>
+            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => queryClient.invalidateQueries({ queryKey: ['deliveryOrdersWithDelivery'] })}>
                 <CardOrder orderId={orderID} />
             </ButtonIconTextFloat>}
         </>

@@ -1,28 +1,26 @@
 "use client";
 
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import PageTitle from '@/app/components/PageTitle';
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { fetchPlaces, updatePlace } from "@/redux/slices/places";
 import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
-import Place from "@/app/entities/place/place";
 import RequestError from "@/app/utils/error";
 import Table from "@/app/entities/table/table";
-import { addUnusedTable, fetchUnusedTables, removeUnusedTable, updateUnusedTable } from "@/redux/slices/unused-tables";
 import AddTableToPlace from "@/app/api/place/table/add/place";
 import RemoveTableFromPlace from "@/app/api/place/table/remove/place";
 import PlaceForm from "@/app/forms/place/form";
 import TableForm from "@/app/forms/table/form";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import Refresh from "@/app/components/crud/refresh";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { notifyError } from "@/app/utils/notifications";
 import { useModal } from "@/app/context/modal/context";
 import { FaEdit } from "react-icons/fa";
 import ButtonIconText from "@/app/components/button/button-icon-text";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetPlaces from '@/app/api/place/place';
+import GetUnusedTables from '@/app/api/table/unused/table';
 
 const INITIAL_GRID_SIZE = 5; // Tamanho inicial da grade
 class GridItem { x: number = 0; y: number = 0; constructor(x: number, y: number) { this.x = x; this.y = y; } };
@@ -42,50 +40,49 @@ const DragAndDropGrid = () => {
     const [totalRows, setTotalRows] = useState(INITIAL_GRID_SIZE);
     const [totalCols, setTotalCols] = useState(INITIAL_GRID_SIZE);
     const [grid, setGrid] = useState(generateGrid(totalRows, totalCols));
-    const placesSlice = useSelector((state: RootState) => state.places);
-    const unusedTablesSlice = useSelector((state: RootState) => state.unusedTables);
-    const [places, setPlaces] = useState<Place[]>(Object.values(placesSlice.entities));
     const [unusedTables, setUnusedTables] = useState<Table[]>([]);
     const [droppedTables, setDroppedTables] = useState<PlaceTable[]>([]);
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const queryClient = useQueryClient();
+
+    const { data: placesResponse, refetch: refetchPlaces, isPending: isPendingPlaces } = useQuery({
+        queryKey: ['places'],
+        queryFn: () => GetPlaces(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const { data: unusedTablesResponse, refetch: refetchUnusedTables } = useQuery({
+        queryKey: ['unusedTables'],
+        queryFn: () => GetUnusedTables(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const handleRefresh = async () => {
+        await Promise.all([refetchPlaces(), refetchUnusedTables()]);
+        setLastUpdate(new Date().toLocaleTimeString());
+    };
+
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
 
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasPlacesSlice = placesSlice.ids.length > 0;
-        const hasUnusedTablesSlice = unusedTablesSlice.ids.length > 0;
-
-        if (token && !hasPlacesSlice) {
-            dispatch(fetchPlaces({ session: data }));
+        if (places.length > 0 && placeSelectedID === "") {
+            setPlaceSelectedID(places[0].id);
         }
-        if (token && !hasUnusedTablesSlice) {
-            dispatch(fetchUnusedTables({ session: data }))
-        }
-    }, [data?.user.access_token, placesSlice.ids.length, unusedTablesSlice.ids.length])
+    }, [places, placeSelectedID]);
 
     useEffect(() => {
-        setPlaces(Object.values(placesSlice.entities));
-
-        const places = Object.values(placesSlice.entities)
-        if (places.length == 0) return
-        
-        const firstPlace = places[0];
-        if (!firstPlace) return
-        if (placeSelectedID === "") setPlaceSelectedID(firstPlace.id)
-    }, [placesSlice.entities])
+        setUnusedTables(unusedTablesResponse?.items || []);
+    }, [unusedTablesResponse?.items]);
 
     useEffect(() => {
-        setUnusedTables(Object.values(unusedTablesSlice.entities));
-    }, [unusedTablesSlice.entities])
-
-    useEffect(() => {
-        const place = placesSlice.entities[placeSelectedID]
+        const place = places.find(p => p.id === placeSelectedID);
         if (!place) return;
 
         setDroppedTables(place.tables || []);
         reloadGrid(place.tables);
-    }, [placeSelectedID])
+    }, [placeSelectedID, places]);
 
     const reloadGrid = (tables: PlaceTable[]) => {
         if (!tables || tables.length === 0) return;
@@ -132,8 +129,7 @@ const DragAndDropGrid = () => {
                 setDroppedTables(newDroppedTables);
                 setUnusedTables(newUnusedTables);
 
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables ?? [] } } }));
-                dispatch(addUnusedTable(table));
+                queryClient.invalidateQueries({ queryKey: ['places'] });
                 return
             }
 
@@ -158,9 +154,7 @@ const DragAndDropGrid = () => {
 
                 setUnusedTables(newUnusedTables);
                 setDroppedTables(newDroppedTables);
-
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: newDroppedTables ?? [] } } }));
-                dispatch(removeUnusedTable(table.id));
+                queryClient.invalidateQueries({ queryKey: ['places'] });
                 return
             }
 
@@ -183,7 +177,7 @@ const DragAndDropGrid = () => {
                     return
                 }
 
-                dispatch(updatePlace({ type: "UPDATE", payload: { id: placeSelectedID, changes: { tables: tables ?? [] } } }));
+                queryClient.invalidateQueries({ queryKey: ['places'] });
                 setDroppedTables(newDroppedTables);
                 return
             }
@@ -250,7 +244,7 @@ const DragAndDropGrid = () => {
                                         <PlaceForm item={places.find(p => p.id === placeSelectedID)!} isUpdate />
                                     </ButtonIconText>
                                 )}
-                                <Refresh slice={placesSlice} fetchItems={fetchPlaces} />
+                                <Refresh onRefresh={handleRefresh} isPending={isPendingPlaces} lastUpdate={lastUpdate} />
                             </div>
                         </div>
                         <div className="min-h-[80vh]"
@@ -363,7 +357,6 @@ const DragAndDropGrid = () => {
                                 <ButtonIconTextFloat title="Nova Mesa" modalName="new-table" position="bottom-right-1">
                                     <TableForm />
                                 </ButtonIconTextFloat>
-                                <Refresh slice={unusedTablesSlice} fetchItems={fetchUnusedTables} removeText={true} />
                             </div>
                         </div>
                         <DroppableColumn key="unused-tables" id="unused-tables">

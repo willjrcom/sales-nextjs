@@ -8,12 +8,10 @@ import Stock from '@/app/entities/stock/stock';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import AdjustStock, { AdjustStockRequest } from '@/app/api/stock/movement/adjust';
 import Decimal from 'decimal.js';
-import { fetchReportStocks } from '@/redux/slices/stock';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AdjustStockFormProps {
     stock?: Stock;
@@ -25,7 +23,7 @@ const AdjustStockForm = ({ stock }: AdjustStockFormProps) => {
     const [movement, setMovement] = useState<AdjustStockRequest>({} as AdjustStockRequest);
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (stock) {
@@ -47,7 +45,7 @@ const AdjustStockForm = ({ stock }: AdjustStockFormProps) => {
         try {
             await AdjustStock(stock.id, movement, data);
             notifySuccess(`Estoque removido com sucesso`);
-            dispatch(fetchReportStocks({ session: data }));
+            queryClient.invalidateQueries({ queryKey: ['stocks'] });
             modalHandler.hideModal(modalName);
 
         } catch (error) {

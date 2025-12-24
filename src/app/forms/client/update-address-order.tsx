@@ -8,10 +8,10 @@ import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import AddressForm from '../address/form';
 import Address from '@/app/entities/address/address';
 import UpdateAddressOrderDelivery from '@/app/api/order-delivery/update/address/order-delivery';
-import { updateClient } from '@/redux/slices/clients';
+import { useQueryClient } from '@tanstack/react-query';
+import AddressClientForm from '../address/client-form';
 
 interface ClientAddressFormProps extends CreateFormsProps<Client> {
     deliveryOrderId?: string;
@@ -20,6 +20,7 @@ interface ClientAddressFormProps extends CreateFormsProps<Client> {
 const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) => {
     const modalName = 'edit-client-' + item?.id;
     const modalHandler = useModal();
+    const queryClient = useQueryClient();
     const [client, setClient] = useState<Client>(item as Client)
     const [address, setAddress] = useState<Address>(client.address)
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -38,7 +39,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
             await UpdateClient(client, data);
             await UpdateAddressOrderDelivery(deliveryOrderId, data)
 
-            updateClient({ type: "UPDATE", payload: {id: client.id, changes: client}});
+            queryClient.invalidateQueries({ queryKey: ['clients'] });
             notifySuccess('Endereço atualizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -49,7 +50,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
 
     return (
         <>
-            <AddressForm addressParent={client.address} setAddressParent={setAddress} />
+            <AddressClientForm addressParent={client.address} setAddressParent={setAddress} />
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal
                 item={client}

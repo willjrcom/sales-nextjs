@@ -5,56 +5,55 @@ import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import StockColumns from "@/app/entities/stock/table-columns";
-import Refresh from "@/app/components/crud/refresh";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { FaChartBar, FaExclamationTriangle } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { SelectField } from "@/app/components/modal/field";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetchCategories } from "@/redux/slices/categories";
-import { fetchReportStocks } from "@/redux/slices/stock";
 import StockReport from "@/app/components/stock/stock-report";
 import StockAlerts from "@/app/components/stock/stock-alerts";
 import Stock from "@/app/entities/stock/stock";
 import { StockReportComplete } from "@/app/entities/stock/stock-report";
 import Decimal from "decimal.js";
+import { useQuery } from "@tanstack/react-query";
+import { GetStockReport } from "@/app/api/stock/stock";
+import GetCategories from "@/app/api/category/category";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageStock = () => {
     const [productID, setProductID] = useState("");
     const [stockFilter, setStockFilter] = useState("all"); // all, low, out
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
-    const reportStocksSlice = useSelector((state: RootState) => state.reportStocks);
-    const dispatch = useDispatch<AppDispatch>();
+    const [lastUpdate, setLastUpdate] = useState(FormatRefreshTime(new Date()));
     const { data } = useSession();
 
+    const { isPending: categoriesPending, error: categoriesError, data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const { isPending: stockPending, error: stockError, data: report, refetch } = useQuery({
+        queryKey: ['stock-report'],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetStockReport(data!);
+        },
+        enabled: !!data?.user?.access_token,
+    });
+
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasCategoriesSlice = categoriesSlice.ids.length > 0;
+        if (categoriesError) notifyError('Erro ao carregar categorias');
+    }, [categoriesError]);
 
-        if (token && !hasCategoriesSlice) {
-            dispatch(fetchCategories({ session: data }));
-        }
-    }, [data?.user.access_token, categoriesSlice.ids.length]);
-
-    // Carregar dados de estoque
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasReportStocksSlice = reportStocksSlice.ids.length > 0;
-
-        if (token && !hasReportStocksSlice) {
-            dispatch(fetchReportStocks({ session: data }));
-        }
-    }, [data?.user.access_token, reportStocksSlice.ids.length]);
+        if (stockError) notifyError('Erro ao carregar relatório de estoque');
+    }, [stockError]);
 
     // Filtrar estoques baseado nos filtros
-    let reports = Object.values(reportStocksSlice.entities);
-    let report: StockReportComplete = {} as StockReportComplete;
     let filteredStocks: Stock[] = [];
 
-    if (reports?.length > 0) {
-        report = reports[0];
+    if (report?.all_stocks) {
         // Garantir que all_stocks seja um array
         filteredStocks = Array.isArray(report.all_stocks) ? report.all_stocks : [];
     }
@@ -89,7 +88,8 @@ const PageStock = () => {
     }
 
     // Preparar produtos para o filtro
-    const products = Object.values(categoriesSlice.entities)
+    const products = useMemo(() => (categoriesResponse?.items || []), [categoriesResponse?.items]);
+    const filteredProducts = useMemo(() => products
         .map((category) => {
             if (!category.products || !Array.isArray(category.products)) return [];
             return category.products
@@ -100,8 +100,8 @@ const PageStock = () => {
                 }));
         })
         .flat()
-        .filter(p => p.id && p.name); // Remover entradas inválidas
-
+        .filter(p => p.id && p.name), [products]);
+    
     return (
         <>
 
@@ -118,7 +118,7 @@ const PageStock = () => {
                     ]}
                 />
                 <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
-                    <StockReport reportStock={report} />
+                    <StockReport reportStock={report || {} as StockReportComplete} />
                 </ButtonIconTextFloat>
                 
                 {report?.summary && typeof report.summary.total_active_alerts === 'number' && report.summary.total_active_alerts > 0 && (
@@ -145,14 +145,15 @@ const PageStock = () => {
                         name="produto"
                         selectedValue={productID}
                         setSelectedValue={setProductID}
-                        values={products}
+                        values={filteredProducts}
                         optional
                     />
                 }
                 refreshButton={
                     <Refresh
-                        slice={reportStocksSlice}
-                        fetchItems={fetchReportStocks}
+                        onRefresh={refetch}
+                        isPending={stockPending && categoriesPending}
+                        lastUpdate={lastUpdate}
                     />
                 }
                 tableChildren={

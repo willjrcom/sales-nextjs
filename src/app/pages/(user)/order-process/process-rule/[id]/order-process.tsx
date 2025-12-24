@@ -3,12 +3,9 @@ import FinishOrderProcess from '@/app/api/order-process/finish/order-process';
 import StartOrderProcess from '@/app/api/order-process/start/order-process';
 import { useModal } from '@/app/context/modal/context';
 import OrderProcess from '@/app/entities/order-process/order-process';
-import { removeOrderProcess, updateOrderProcess } from '@/redux/slices/order-processes';
-import { AppDispatch } from '@/redux/store';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle, HiX } from 'react-icons/hi';
-import { useDispatch } from 'react-redux';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import CancelOrderProcess from './cancel-process-order';
@@ -21,15 +18,16 @@ import AdditionalItem from '../../../../../components/order/additional-item';
 import RemovedItem from '../../../../../components/order/removed-item';
 import printGroupItem from '@/app/components/print/print-group-item';
 import GetCompany from '@/app/api/company/company';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
 };
 
 const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
+    const queryClient = useQueryClient();
 
     // atualiza o timer a cada segundo para mostrar duração dinâmica
     const [now, setNow] = useState(new Date());
@@ -48,7 +46,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         try {
             await StartOrderProcess(id, data)
-            dispatch(updateOrderProcess({ type: "UPDATE", payload: { id, changes: { status: "Started" } } }))
+            queryClient.invalidateQueries({queryKey: ['orderProcesses']});
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
         }
@@ -66,7 +64,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                 await printGroupItem({groupItemID: groupItem.id,printerName: groupItem.printer_name, session: data})
             }
 
-            dispatch(removeOrderProcess(id))
+            queryClient.invalidateQueries({queryKey: ['orderProcesses']});
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');
         }
@@ -79,18 +77,6 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         modalHandler.showModal("group-item-details-" + groupItem.id, groupItem.category?.name || "Detalhes do pedido",
             <OrderProcessDetails orderProcess={orderProcess} />,
-            'lg',
-            onClose
-        )
-    }
-
-    const openCancelOrderProcess = (orderProcess: OrderProcess) => {
-        const onClose = () => {
-            modalHandler.hideModal("order-process-cancel-" + orderProcess.id)
-        }
-
-        modalHandler.showModal("order-process-cancel-" + orderProcess.id, "Cancelar Processo",
-            <CancelOrderProcess orderProcess={orderProcess} />,
             'lg',
             onClose
         )

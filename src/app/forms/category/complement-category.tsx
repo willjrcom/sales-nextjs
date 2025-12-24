@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Category from "@/app/entities/category/category";
 import Carousel from "@/app/components/carousel/carousel";
 import { FaPlusCircle } from 'react-icons/fa';
@@ -7,7 +7,7 @@ import Image from "next/image";
 interface CategorySelectorProps {
     complementCategories: Category[];
     selectedCategory: Category; // Categoria que possui o produto
-    setSelectedCategory: React.Dispatch<React.SetStateAction<Category>>; // Função para atualizar a categoria
+    setSelectedCategory: Dispatch<SetStateAction<Category>>; // Função para atualizar a categoria
 }
 
 const ComplementCategorySelector = ({ complementCategories, selectedCategory, setSelectedCategory }: CategorySelectorProps) => {

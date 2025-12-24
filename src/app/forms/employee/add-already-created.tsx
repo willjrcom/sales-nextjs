@@ -5,15 +5,13 @@ import { useModal } from "@/app/context/modal/context";
 import Employee from "@/app/entities/employee/employee";
 import User from "@/app/entities/user/user";
 import RequestError from "@/app/utils/error";
-import { notifyError } from "@/app/utils/notifications";
-import { addEmployee } from "@/redux/slices/employees";
-import { AppDispatch } from "@/redux/store";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { FaCheck, FaSearch, FaUserPlus, FaExclamationCircle } from "react-icons/fa";
-import { useDispatch } from "react-redux";
 import EmployeeForm from "@/app/forms/employee/form";
 import AddUserToCompany from "@/app/api/company/add/company";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AddEmployeeAlreadyCreated = () => {
     const [userFound, setUserFound] = useState<User | null>();
@@ -93,37 +91,37 @@ interface CardUserProps {
 }
 
 const CardUser = ({ user }: CardUserProps) => {
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const modalHandler = useModal();
+    const queryClient = useQueryClient();
+
+    const addEmployeeMutation = useMutation({
+        mutationFn: async (user: User) => {
+            const employee = new Employee({ user_id: user.id, ...user });
+            try {
+                await AddUserToCompany(user.email, data!);
+            } catch (error: any) {
+                if (error.message !== 'user already added to company' && error.message !== 'Usuário já foi adicionado à empresa') {
+                    throw error;
+                }
+            }
+            const response = await NewEmployee(user.id, data!);
+            employee.id = response;
+            return employee;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            notifySuccess('Funcionário criado com sucesso');
+            modalHandler.hideModal('new-already-created-employee');
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar funcionário');
+        }
+    });
 
     const newEmployee = async (user: User) => {
         if (!data) return;
-
-        const employee = new Employee({ user_id: user.id, ...user });
-        
-        try {
-            await AddUserToCompany(user.email, data)
-            const response = await NewEmployee(user.id, data);
-
-            employee.id = response
-            dispatch(addEmployee(employee));
-
-            modalHandler.hideModal('new-already-created-employee');
-
-        } catch (error: RequestError | any) {
-            if (error.message == 'user already added to company' || error.message == 'Usuário já foi adicionado à empresa') {
-                const response = await NewEmployee(user.id, data);
-    
-                employee.id = response
-                dispatch(addEmployee(employee));
-    
-                modalHandler.hideModal('new-already-created-employee');
-                return;
-            }
-
-            notifyError(error.message || 'Erro ao criar funcionário');
-        }
+        addEmployeeMutation.mutate(user);
     }
 
     if (!user) return null;

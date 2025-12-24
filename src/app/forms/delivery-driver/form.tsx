@@ -11,26 +11,37 @@ import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
 import { SelectField } from '@/app/components/modal/field';
 import Employee from '@/app/entities/employee/employee';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import { addDeliveryDriver, removeDeliveryDriver, updateDeliveryDriver } from '@/redux/slices/delivery-drivers';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetEmployees from '@/app/api/employee/employee';
+import GetDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 
 const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>) => {
     const modalName = isUpdate ? 'edit-delivery-driver-' + item?.id : 'new-delivery-driver'
     const modalHandler = useModal();
-    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
-    const employeesSlice = useSelector((state: RootState) => state.employees);
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
     const [employees, setEmployees] = useState<Employee[]>([]);
     const { data } = useSession();
 
+    const { data: employeesResponse } = useQuery({
+        queryKey: ['employees'],
+        queryFn: () => GetEmployees(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const { data: deliveryDriversResponse } = useQuery({
+        queryKey: ['delivery-drivers'],
+        queryFn: () => GetDeliveryDrivers(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
     useEffect(() => {
-        // remove repeted employees between deliveryDrivers and employees
-        const employeesFiltered = Object.values(employeesSlice.entities).filter(employee => !Object.values(deliveryDriversSlice.entities).some(deliveryDriver => deliveryDriver.employee_id === employee.id))
+        const allEmployees = employeesResponse?.items || [];
+        const allDrivers = deliveryDriversResponse?.items || [];
+        const employeesFiltered = allEmployees.filter(employee => !allDrivers.some(driver => driver.employee_id === employee.id))
         setEmployees(employeesFiltered)
-    }, [deliveryDriversSlice.entities, employeesSlice.entities]);
+    }, [deliveryDriversResponse?.items, employeesResponse?.items]);
 
     const submit = async () => {
         if (!data) return;
@@ -39,21 +50,23 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             return
         }
         
+        const allEmployees = employeesResponse?.items || [];
+        
         try {
             deliveryDriver.employee_id = selectedEmployeeId
             const response = isUpdate ? await UpdateDeliveryDriver(deliveryDriver, data) : await NewDeliveryDriver(deliveryDriver.employee_id, data)
 
-            deliveryDriver.employee = Object.values(employeesSlice.entities).filter(employee => employee.id === selectedEmployeeId)[0]
+            deliveryDriver.employee = allEmployees.find(employee => employee.id === selectedEmployeeId) || new Employee();
 
             if (!isUpdate) {
                 deliveryDriver.id = response
-                dispatch(addDeliveryDriver(deliveryDriver));
                 notifySuccess(`Motoboy ${deliveryDriver.employee.name} adicionado com sucesso`);
             } else {
-                dispatch(updateDeliveryDriver({ type: "UPDATE", payload: { id: deliveryDriver.id, changes: deliveryDriver }}));
                 notifySuccess(`Motoboy ${deliveryDriver.employee.name} atualizado com sucesso`);
             }
 
+            queryClient.invalidateQueries({ queryKey: ['delivery-drivers'] });
+            queryClient.invalidateQueries({ queryKey: ['deliveryDrivers'] });
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
@@ -65,8 +78,9 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
         if (!data) return;
         try {
             await DeleteDeliveryDriver(deliveryDriver.id, data);
-            dispatch(removeDeliveryDriver(deliveryDriver.id));
             notifySuccess(`Motoboy ${deliveryDriver.employee.name} removido com sucesso`);
+            queryClient.invalidateQueries({ queryKey: ['delivery-drivers'] });
+            queryClient.invalidateQueries({ queryKey: ['deliveryDrivers'] });
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao remover motoboy');

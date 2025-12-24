@@ -15,9 +15,7 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import Category from '@/app/entities/category/category';
 import { notifySuccess } from '@/app/utils/notifications';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
-import { updateCategory } from '@/redux/slices/categories';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
     category: Category
@@ -26,7 +24,7 @@ interface SizeFormProps extends CreateFormsProps<Size> {
 const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const [size, setSize] = useState<Size>(item || new Size());
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -34,6 +32,44 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const handleInputChange = (field: keyof Size, value: any) => {
         setSize(prev => ({ ...prev, [field]: value }));
     };
+
+    const createMutation = useMutation({
+        mutationFn: (newSize: Size) => NewSize(newSize, data!),
+
+        onSuccess: (response, newSize) => {
+            newSize.id = response;
+            queryClient.invalidateQueries({ queryKey: ['sizes'] });
+            notifySuccess(`Tamanho ${newSize.name} criado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar tamanho');
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (updatedSize: Size) => UpdateSize(updatedSize, data!),
+        onSuccess: (_, updatedSize) => {
+            queryClient.invalidateQueries({ queryKey: ['sizes'] });
+            notifySuccess(`Tamanho ${updatedSize.name} atualizado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar tamanho');
+        }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (sizeId: string) => DeleteSize(sizeId, data!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['sizes'] });
+            notifySuccess(`Tamanho ${size.name} removido com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || `Erro ao remover tamanho ${size.name}`);
+        }
+    });
 
     const submit = async () => {
         if (!data || !category) return;
@@ -57,8 +93,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
                 category.sizes.push(size);
                 notifySuccess(`Tamanho ${size.name} criado com sucesso`);
             }
-            // Atualiza o Redux com a lista de tamanhos atualizada
-            dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...(category.sizes ?? [])] } } }));
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
 
             modalHandler.hideModal(modalName);
 
@@ -75,10 +110,9 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             if (category) {
                 const newSizes = category.sizes.filter(q => q.id !== size.id);
-                // Atualiza o Redux com a lista de tamanhos atualizada
-                dispatch(updateCategory({ type: "UPDATE", payload: { id: category.id, changes: { sizes: [...(newSizes ?? [])] } } }));
             }
 
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
             modalHandler.hideModal(modalName);
             notifySuccess(`Tamanho ${size.name} removido com sucesso`);
         } catch (error: RequestError | any) {

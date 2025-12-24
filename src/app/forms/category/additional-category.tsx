@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Category from "@/app/entities/category/category";
 import Carousel from "@/app/components/carousel/carousel";
 import { FaTags } from 'react-icons/fa';
@@ -7,7 +7,7 @@ import Image from "next/image";
 interface CategorySelectorProps {
     additionalCategories: Category[];
     selectedCategory: Category; // Categoria que possui o produto
-    setSelectedCategory: React.Dispatch<React.SetStateAction<Category>>; // Função para atualizar a categoria
+    setSelectedCategory: Dispatch<SetStateAction<Category>>; // Função para atualizar a categoria
 }
 
 const AdditionalCategorySelector = ({ additionalCategories, selectedCategory, setSelectedCategory }: CategorySelectorProps) => {

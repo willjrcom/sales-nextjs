@@ -4,42 +4,65 @@ import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
-import Refresh from "@/app/components/crud/refresh";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { TextField } from "@/app/components/modal/field";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { fetchEmployees, fetchEmployeesDeleted } from "@/redux/slices/employees";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import AddEmployeeAlreadyCreated from "@/app/forms/employee/add-already-created";
+import { useQuery } from "@tanstack/react-query";
+import GetEmployees, { GetEmployeesDeleted } from "@/app/api/employee/employee";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageEmployee = () => {
     const [nome, setNome] = useState<string>("");
-    const employeesSlice = useSelector((state: RootState) => state.employees);
-    const employeesDeletedSlice = useSelector((state: RootState) => state.employeesDeleted);
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [showDeleted, setShowDeleted] = useState(false);
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+
+    const { isPending: employeesPending, error: employeesError, data: employeesResponse, refetch: refetchEmployees } = useQuery({
+        queryKey: ['employees', pagination.pageIndex, pagination.pageSize],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetEmployees(data!, pagination.pageIndex, pagination.pageSize);
+        },
+        enabled: !!data?.user?.access_token && !showDeleted,
+    });
+
+    const { isPending: employeesDeletedPending, error: employeesDeletedError, data: employeesDeletedResponse, refetch: refetchEmployeesDeleted } = useQuery({
+        queryKey: ['employees-deleted', pagination.pageIndex, pagination.pageSize],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetEmployeesDeleted(data!, pagination.pageIndex, pagination.pageSize);
+        },
+        enabled: !!data?.user?.access_token && showDeleted,
+    });
 
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasEmployeesDeletedSlice = employeesDeletedSlice.ids.length > 0;
-        const hasEmployeesSlice = employeesSlice.ids.length > 0;
+        if (employeesError) notifyError('Erro ao carregar funcionários');
+    }, [employeesError]);
 
-        if (showDeleted && token && !hasEmployeesDeletedSlice) {
-            dispatch(fetchEmployeesDeleted({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
-        } else if (!showDeleted && token && !hasEmployeesSlice) {
-            dispatch(fetchEmployees({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
-        }
+    useEffect(() => {
+        if (employeesDeletedError) notifyError('Erro ao carregar funcionários demitidos');
+    }, [employeesDeletedError]);
 
-    }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, showDeleted, employeesDeletedSlice.ids.length, employeesSlice.ids.length]);
+    const employeesDeleted = useMemo(() => employeesDeletedResponse?.items || [], [employeesDeletedResponse?.items]);
+    const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse?.items]);
 
-    const filteredEmployees = Object.values(showDeleted ? employeesDeletedSlice.entities : employeesSlice.entities)
+    const items = useMemo(() => showDeleted ? employeesDeleted : employees, [showDeleted, employeesDeleted, employees]);
+
+    const totalCount = useMemo(() => showDeleted ? 
+        (employeesDeletedResponse ? parseInt(employeesDeletedResponse.headers.get('x-total-count') || '0') : 0) : 
+        (employeesResponse ? parseInt(employeesResponse.headers.get('x-total-count') || '0') : 0), [showDeleted, employeesDeletedResponse, employeesResponse]);
+
+    const filteredEmployees = useMemo(() => items
         .filter(employee => employee.name.includes(nome))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.name.localeCompare(b.name)), [items, nome]);
+
+    const isPending = useMemo(() => employeesPending || employeesDeletedPending, [employeesPending, employeesDeletedPending]); const employeesPendingOrDeleted = useMemo(() => showDeleted ? employeesDeletedPending : employeesPending, [showDeleted, employeesDeletedPending, employeesPending]);
+    const refetch = useMemo(() => showDeleted ? refetchEmployeesDeleted : refetchEmployees, [showDeleted, refetchEmployeesDeleted, refetchEmployees]);
 
     return (
         <>
@@ -77,17 +100,16 @@ const PageEmployee = () => {
                 }
                 refreshButton={
                     <Refresh
-                        slice={showDeleted ? employeesDeletedSlice : employeesSlice}
-                        fetchItems={showDeleted ? fetchEmployeesDeleted : fetchEmployees}
-                        page={pagination.pageIndex}
-                        perPage={pagination.pageSize}
+                        onRefresh={refetch}
+                        isPending={isPending}
+                        lastUpdate={lastUpdate}
                     />
                 }
                 tableChildren={
                     <CrudTable
                         columns={EmployeeColumns()}
                         data={filteredEmployees}
-                        totalCount={showDeleted ? employeesDeletedSlice.totalCount : employeesSlice.totalCount}
+                        totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
                         }} />

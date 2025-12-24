@@ -9,11 +9,13 @@ interface TextFieldProps {
     optional?: boolean;
     /** Callback fired when user presses Enter in the input */
     onEnter?: () => void;
+    /** Error message to display */
+    error?: string;
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
-const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern, optional, onEnter }: TextFieldProps) => {
+const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue, pattern, optional, onEnter, error }: TextFieldProps) => {
     return (
         <div className="mb-4">
             {friendlyName && (
@@ -23,7 +25,7 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
             )}
 
             <input
-                className={InputClassName}
+                className={`${InputClassName} ${error ? 'border-red-500' : ''}`}
                 id={name}
                 type="text"
                 placeholder={placeholder}
@@ -38,6 +40,7 @@ const TextField = ({ friendlyName, name, placeholder, disabled, value, setValue,
                 }}
                 pattern={pattern}
             />
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     );
 };

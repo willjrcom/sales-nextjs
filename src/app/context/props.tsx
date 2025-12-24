@@ -27,8 +27,7 @@ interface GenericProviderProps<T> {
 const GenericProvider = <T extends { id: string },>({ getItems }: GenericProviderProps<T>) => {
     const [items, setItems] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
-    const formattedTime = FormatRefreshTime(new Date())
-    const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { data } = useSession();
 
     const fetchData = useCallback(async () => {

@@ -5,36 +5,41 @@ import PageTitle from '@/app/components/PageTitle';
 import ClientForm from "@/app/forms/client/form";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
-import Refresh from "@/app/components/crud/refresh";
 import { TextField } from "@/app/components/modal/field";
-import { useEffect, useState } from "react";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { FaFilter } from "react-icons/fa";
-import { fetchClients } from "@/redux/slices/clients";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import GetClients from "@/app/api/client/client";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageClient = () => {
     const [nome, setNome] = useState<string>("");
-    const clientsSlice = useSelector((state: RootState) => state.clients);
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+
+    const { isPending, error, data: response, refetch } = useQuery({
+        queryKey: ['clients', pagination.pageIndex, pagination.pageSize],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetClients(data!, pagination.pageIndex, pagination.pageSize);
+        },
+        enabled: !!data?.user?.access_token,
+    })
 
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasClients = clientsSlice.ids.length > 0;
-
-        if (token && !hasClients) {
-            dispatch(fetchClients({ session: data, page: pagination.pageIndex, perPage: pagination.pageSize }));
+        if (error) {
+            notifyError('Erro ao carregar clientes');
         }
-    }, [data?.user.access_token, pagination.pageIndex, pagination.pageSize, clientsSlice.ids.length]);
-
+    }, [error]);
+    
+    const clients = useMemo(() => response?.items || [], [response?.items]);
     const sortedClients = useMemo(() => {
-        return Object.values(clientsSlice.entities).sort((a, b) => a.name.localeCompare(b.name));
-    }, [clientsSlice.entities]);
+        return clients.sort((a, b) => a.name.localeCompare(b.name));
+    }, [clients]);
 
     return (
         <>
@@ -53,17 +58,17 @@ const PageClient = () => {
 
                 refreshButton={
                     <Refresh
-                        fetchItems={fetchClients}
-                        slice={clientsSlice}
-                        page={pagination.pageIndex}
-                        perPage={pagination.pageSize}
+                        onRefresh={refetch}
+                        isPending={isPending}
+                        lastUpdate={lastUpdate}
                     />
                 }
+
                 tableChildren={
                     <CrudTable
                         columns={ClientColumns()}
                         data={sortedClients}
-                        totalCount={clientsSlice.totalCount}
+                        totalCount={clients.length}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
                         }}

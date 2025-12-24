@@ -5,53 +5,38 @@ import Carousel from '@/app/components/carousel/carousel';
 import Category from '@/app/entities/category/category';
 import ProcessRule from '@/app/entities/process-rule/process-rule';
 import { useSession } from 'next-auth/react';
-import { HiOutlineRefresh } from 'react-icons/hi';
+import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import Link from 'next/link';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useMemo, useState } from 'react';
 import PageTitle from '@/app/components/PageTitle';
+import { useQuery } from '@tanstack/react-query';
 
 const OrderProcess = () => {
-    const [categories, setCategories] = useState<Category[]>([]);
     const { data } = useSession();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const fetch = async () => {
-        if (!data) return;
-        const categoriesFound = await GetCategoriesWithOrderProcess(data);
-        setCategories(categoriesFound);
-    }
+    const { isPending, data: categories = [], refetch } = useQuery({
+        queryKey: ['categoriesWithOrderProcess'],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetCategoriesWithOrderProcess(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
 
-    // Initial fetch (guard against double invocation in React.StrictMode)
-    const initialFetched = useRef(false);
-    useEffect(() => {
-        if (!data || initialFetched.current) return;
-        initialFetched.current = true;
-        fetch();
-    }, [data]);
-
-    // Polling every 60 seconds
-    useEffect(() => {
-        const token = data?.user?.access_token;
-
-        if (token) {
-            const interval = setInterval(() => fetch(), 30000);
-            return () => clearInterval(interval);
-        }
-    }, [data?.user.access_token]);
-
-    const noRuleCategories = categories.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement);
-    const validCategories = categories.filter(c => c.use_process_rule);
+    const noRuleCategories = useMemo(() => categories.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement), [categories]);
+    const validCategories = useMemo(() => categories.filter(c => c.use_process_rule), [categories]);
 
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
             <div className="flex items-center justify-between mb-4">
                 <PageTitle title="Processos" tooltip="Exibe as regras de processamento de pedidos, agrupadas por categoria, com indicadores de atraso e fila." />
-                <button
-                    onClick={fetch}
-                    className="p-2 bg-gray-200 hover:bg-gray-300 rounded"
-                    aria-label="Atualizar"
-                >
-                    <HiOutlineRefresh className="h-5 w-5 text-gray-800" />
-                </button>
+                <Refresh
+                    onRefresh={refetch}
+                    isPending={isPending}
+                    lastUpdate={lastUpdate}
+                />
             </div>
             <div className="mb-6">
                 <h2 className="text-sm font-semibold text-gray-700 mb-2">Categorias principais sem regra de processo</h2>

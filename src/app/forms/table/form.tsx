@@ -13,9 +13,7 @@ import UpdateTable from '@/app/api/table/update/table';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { addTable, removeTable, updateTable } from '@/redux/slices/tables';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
@@ -23,11 +21,50 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const [table, setTable] = useState<Table>(item || new Table());
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
 
     const handleInputChange = (field: keyof Table, value: any) => {
         setTable(prev => ({ ...prev, [field]: value }));
     };
+
+
+    const createMutation = useMutation({
+        mutationFn: (newTable: Table) => NewTable(newTable, data!),
+
+        onSuccess: (response, newTable) => {
+            newTable.id = response;
+            queryClient.invalidateQueries({ queryKey: ['tables'] });
+            notifySuccess(`Mesa ${newTable.name} criada com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar mesa');
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (updatedTable: Table) => UpdateTable(updatedTable, data!),
+        onSuccess: (_, updatedTable) => {
+            queryClient.invalidateQueries({ queryKey: ['tables'] });
+            notifySuccess(`Mesa ${updatedTable.name} atualizada com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar mesa');
+        }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (tableId: string) => DeleteTable(tableId, data!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tables'] });
+            notifySuccess(`Mesa ${table.name} removido com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || `Erro ao remover mesa ${table.name}`);
+        }
+    });
 
     const submit = async () => {
         if (!data) return;
@@ -40,13 +77,13 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
             if (!isUpdate) {
                 table.id = response
-                dispatch(addTable(table));
                 notifySuccess(`Mesa ${table.name} criada com sucesso`);
             } else {
-                dispatch(updateTable({ type: "UPDATE", payload: { id: table.id, changes: table } }));
                 notifySuccess(`Mesa ${table.name} atualizada com sucesso`);
             }
 
+            queryClient.invalidateQueries({ queryKey: ['tables'] });
+            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao salvar mesa');
@@ -58,7 +95,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
         try {
             await DeleteTable(table.id, data);
-            dispatch(removeTable(table.id));
+            queryClient.invalidateQueries({ queryKey: ['tables'] });
             modalHandler.hideModal(modalName);
             notifySuccess(`Mesa ${table.name} removida com sucesso`);
         } catch (error: RequestError | any) {

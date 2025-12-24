@@ -21,8 +21,7 @@ export const CurrentProcessRuleProvider = ({ children }: { children: ReactNode }
     const [orderProcesses, setOrderProcesses] = useState<OrderProcess[] | null>(null);
     const { data } = useSession();
     const [loading, setLoading] = useState(true);
-    const formattedTime = FormatRefreshTime(new Date())
-    const [lastUpdate, setLastUpdate] = useState<string>(formattedTime);
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     
     const fetchData = useCallback(async (id: string) => {
         if (!data?.user.access_token) return;

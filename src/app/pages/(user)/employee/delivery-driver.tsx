@@ -4,42 +4,42 @@ import DeliveryDriverForm from "@/app/forms/delivery-driver/form";
 import PageTitle from '@/app/components/PageTitle';
 import CrudLayout from "@/app/components/crud/crud-layout";
 import CrudTable from "@/app/components/crud/table";
-import Refresh from "@/app/components/crud/refresh";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { TextField } from "@/app/components/modal/field";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DeliveryDriverColumns from "@/app/entities/delivery-driver/table-columns";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
-import { fetchDeliveryDrivers } from "@/redux/slices/delivery-drivers";
-import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
-import { FetchItemsArgs } from "@/redux/slices/generics";
+import { useQuery } from "@tanstack/react-query";
+import GetAllDeliveryDrivers from "@/app/api/delivery-driver/delivery-driver";
+import { notifyError } from "@/app/utils/notifications";
 
 const PageDeliveryDriver = () => {
     const [nome, setNome] = useState<string>("");
-    const deliveryDriversSlice = useSelector((state: RootState) => state.deliveryDrivers);
-    const [drivers, setDrivers] = useState<DeliveryDriver[]>([]);
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
-    const defaultPageSize = 10;
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+
+    const { isPending, error, data: response, refetch } = useQuery({
+        queryKey: ['delivery-drivers', pagination.pageIndex, pagination.pageSize],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetAllDeliveryDrivers(data!, pagination.pageIndex, pagination.pageSize);
+        },
+        enabled: !!data?.user?.access_token,
+    });
+
     useEffect(() => {
-        const token = data?.user?.access_token;
-        const hasDeliveryDrivers = deliveryDriversSlice.ids.length > 0;
+        if (error) notifyError('Erro ao carregar motoboys');
+    }, [error]);
 
-        if (token && !hasDeliveryDrivers) {
-            dispatch(fetchDeliveryDrivers({ session: data, page: 1, perPage: defaultPageSize } as FetchItemsArgs));
-        }
-    }, [data?.user?.access_token, deliveryDriversSlice.ids.length]);
+    const drivers = useMemo(() => (response?.items || []).filter((driver) => !!driver.employee), [response?.items]);
+    const totalCount = useMemo(() => response?.headers.get('x-total-count') || '0', [response?.headers]); 
 
-    useEffect(() => {
-        const driversFound = Object.values(deliveryDriversSlice.entities).filter((driver) => !!driver.employee);
-        setDrivers(driversFound);
-    }, [deliveryDriversSlice.entities]);
-
-    const filteredDrivers = drivers.filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))
-        .sort((a, b) => a.employee.name.localeCompare(b.employee.name));
+    const filteredDrivers = useMemo(() => drivers
+        .filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))
+        .sort((a, b) => a.employee.name.localeCompare(b.employee.name)), [drivers, nome]);
 
     return (
         <>
@@ -59,18 +59,18 @@ const PageDeliveryDriver = () => {
                 }
                 refreshButton={
                     <Refresh
-                        slice={deliveryDriversSlice}
-                        fetchItems={fetchDeliveryDrivers}
+                        onRefresh={refetch}
+                        isPending={isPending}
+                        lastUpdate={lastUpdate}
                     />
                 }
                 tableChildren={
                     <CrudTable
                         columns={DeliveryDriverColumns()}
                         data={filteredDrivers}
-                        totalCount={deliveryDriversSlice.totalCount}
-                        onPageChange={(newPage, newSize) => {
-                            if (!data) return;
-                            dispatch(fetchDeliveryDrivers({ session: data, page: newPage + 1, perPage: newSize } as FetchItemsArgs));
+                        totalCount={totalCount}
+                        onPageChange={(pageIndex, pageSize) => {
+                            setPagination({ pageIndex, pageSize });
                         }}
                     />
                 }
@@ -78,4 +78,5 @@ const PageDeliveryDriver = () => {
         </>
     )
 }
+
 export default PageDeliveryDriver;

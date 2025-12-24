@@ -12,23 +12,51 @@ import NewStock from '@/app/api/stock/new/stock';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
 import { SelectField } from '@/app/components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Decimal from 'decimal.js';
-import { addStock, fetchReportStocks, updateStock } from '@/redux/slices/stock';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import GetCategories from '@/app/api/category/category';
 
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
     const modalHandler = useModal();
-    const categoriesSlice = useSelector((state: RootState) => state.categories);
     const [stock, setStock] = useState<Stock>(item || new Stock());
     const [products, setProducts] = useState<Product[]>([]);
     const [recordProducts, setRecordProducts] = useState<{ id: string; name: string; }[]>([]);
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
+
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => GetCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const createMutation = useMutation({
+        mutationFn: (newStock: Stock) => NewStock(newStock, data!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['stock-report'] });
+            notifySuccess(`Controle de estoque criado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar estoque');
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (updatedStock: Stock) => UpdateStock(updatedStock, data!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['stock-report'] });
+            notifySuccess(`Estoque atualizado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar estoque');
+        }
+    });
 
     const handleInputChange = (field: keyof Stock, value: any) => {
         setStock(prev => ({ ...prev, [field]: value }));
@@ -45,34 +73,20 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
         const validationErrors = ValidateStockForm(stock);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            if (isUpdate) {
-                await UpdateStock(stock, data);
-                dispatch(updateStock({ type: "UPDATE", payload: {id: stock.id, changes: stock}}));
-                dispatch(fetchReportStocks({ session: data }))
-                notifySuccess(`Estoque atualizado com sucesso`);
-            } else {
-                await NewStock(stock, data);
-                dispatch(addStock({...stock}));
-                dispatch(fetchReportStocks({ session: data }))
-                notifySuccess(`Controle de estoque criado com sucesso`);
-            }
-            
-            modalHandler.hideModal(modalName);
-
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao salvar estoque');
+        if (isUpdate) {
+            updateMutation.mutate(stock);
+        } else {
+            createMutation.mutate(stock);
         }
     }
 
     useEffect(() => {
         const LoadProducts = async () => {
-            if (!data) return;
+            if (!data || !categoriesResponse?.items) return;
 
             try {
                 // Buscar produtos de todas as categorias
-                const allProducts = Object.values(categoriesSlice.entities)
+                const allProducts = categoriesResponse.items
                     .map((category) => {
                         return category.products?.map(product => ({
                             ...product,
@@ -100,7 +114,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
         }
 
         LoadProducts();
-    }, [data?.user.access_token, categoriesSlice.entities]);
+    }, [data, categoriesResponse]);
 
     return (
         <div className="text-black space-y-6">
@@ -186,4 +200,4 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     )
 }
 
-export default StockForm 
+export default StockForm; 
