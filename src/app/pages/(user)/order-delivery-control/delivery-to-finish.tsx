@@ -48,11 +48,11 @@ const DeliveryOrderToFinish = () => {
         enabled: !!data?.user?.access_token,
     });
 
-    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
+    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse]);
 
     const deliveryDrivers = useMemo(() => {
         return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
-    }, [deliveryDriversResponse?.items]);
+    }, [deliveryDriversResponse]);
 
     const handleRefresh = async () => {
         await refetch();

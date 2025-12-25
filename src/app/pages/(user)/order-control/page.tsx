@@ -17,7 +17,7 @@ const PageOrder = () => {
     const modalHandler = useModal();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: response, refetch } = useQuery({
+    const { isPending, error, data: ordersResponse, refetch } = useQuery({
         queryKey: ['orders'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -31,7 +31,7 @@ const PageOrder = () => {
         if (error) notifyError('Erro ao carregar pedidos');
     }, [error]);
 
-    const orders = useMemo(() => response?.items || [], [response?.items]);
+    const orders = useMemo(() => ordersResponse?.items || [], [ordersResponse]);
     const stagingOrders = useMemo(() => orders.filter((order) => order.status === "Staging"), [orders]);
 
     const openStagingOrders = () => {

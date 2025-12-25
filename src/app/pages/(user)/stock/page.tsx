@@ -88,7 +88,7 @@ const PageStock = () => {
     }
 
     // Preparar produtos para o filtro
-    const products = useMemo(() => (categoriesResponse?.items || []), [categoriesResponse?.items]);
+    const products = useMemo(() => (categoriesResponse?.items || []), [categoriesResponse]);
     const filteredProducts = useMemo(() => products
         .map((category) => {
             if (!category.products || !Array.isArray(category.products)) return [];

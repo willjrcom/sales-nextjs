@@ -21,7 +21,7 @@ const PageClient = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: response, refetch } = useQuery({
+    const { isPending, error, data: clientsResponse, refetch } = useQuery({
         queryKey: ['clients', pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -35,8 +35,8 @@ const PageClient = () => {
             notifyError('Erro ao carregar clientes');
         }
     }, [error]);
-    
-    const clients = useMemo(() => response?.items || [], [response?.items]);
+        
+    const clients = useMemo(() => clientsResponse?.items || [], [clientsResponse]);
     const sortedClients = useMemo(() => {
         return clients.sort((a, b) => a.name.localeCompare(b.name));
     }, [clients]);

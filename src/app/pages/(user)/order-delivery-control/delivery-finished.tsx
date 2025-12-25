@@ -36,14 +36,14 @@ const DeliveryOrderFinished = () => {
 
     const deliveryDrivers = useMemo(() => {
         return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
-    }, [deliveryDriversResponse?.items]);
+    }, [deliveryDriversResponse]);
 
     const handleRefresh = async () => {
         await refetch();
         setLastUpdate(new Date().toLocaleTimeString());
     };
 
-    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
+    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse]);
 
     const { deliveryOrders, ordersNotFinished } = useMemo(() => {
         const deliveredOrders = allOrders.filter((order) => order.delivery?.status === 'Delivered');

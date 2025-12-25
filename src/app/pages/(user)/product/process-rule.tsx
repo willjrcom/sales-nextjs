@@ -29,7 +29,7 @@ export default function PageProcessRules() {
         setLastUpdate(new Date().toLocaleTimeString());
     };
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
 
     const processRules = useMemo(() => {
         return categories.map((category) => category.process_rules || []).flat();

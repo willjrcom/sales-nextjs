@@ -90,8 +90,8 @@ const DragAndDropGrid = () => {
         refetchInterval: 30000,
     });
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
-    const tableOrders = useMemo(() => tableOrdersResponse?.items || [], [tableOrdersResponse?.items]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
+    const tableOrders = useMemo(() => tableOrdersResponse?.items || [], [tableOrdersResponse]);
 
     useEffect(() => {
         if (places.length > 0 && placeSelectedID === "") {

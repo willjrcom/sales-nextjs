@@ -48,8 +48,8 @@ const PageEmployee = () => {
         if (employeesDeletedError) notifyError('Erro ao carregar funcionários demitidos');
     }, [employeesDeletedError]);
 
-    const employeesDeleted = useMemo(() => employeesDeletedResponse?.items || [], [employeesDeletedResponse?.items]);
-    const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse?.items]);
+    const employeesDeleted = useMemo(() => employeesDeletedResponse?.items || [], [employeesDeletedResponse]);
+    const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse]);
 
     const items = useMemo(() => showDeleted ? employeesDeleted : employees, [showDeleted, employeesDeleted, employees]);
 
@@ -61,7 +61,7 @@ const PageEmployee = () => {
         .filter(employee => employee.name.includes(nome))
         .sort((a, b) => a.name.localeCompare(b.name)), [items, nome]);
 
-    const isPending = useMemo(() => employeesPending || employeesDeletedPending, [employeesPending, employeesDeletedPending]); const employeesPendingOrDeleted = useMemo(() => showDeleted ? employeesDeletedPending : employeesPending, [showDeleted, employeesDeletedPending, employeesPending]);
+    const isPending = useMemo(() => employeesPending || employeesDeletedPending, [employeesPending, employeesDeletedPending]); 
     const refetch = useMemo(() => showDeleted ? refetchEmployeesDeleted : refetchEmployees, [showDeleted, refetchEmployeesDeleted, refetchEmployees]);
 
     return (

@@ -64,7 +64,7 @@ const DragAndDropGrid = () => {
         setLastUpdate(new Date().toLocaleTimeString());
     };
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
 
     useEffect(() => {
         if (places.length > 0 && placeSelectedID === "") {

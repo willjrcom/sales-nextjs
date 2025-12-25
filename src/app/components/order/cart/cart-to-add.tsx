@@ -34,7 +34,7 @@ export const CartToAdd = () => {
 
     const allCategories = useMemo(
         () => categoriesResponse?.items || [],
-        [categoriesResponse?.items]
+        [categoriesResponse]
     );
 
     const categories = useMemo(() => {

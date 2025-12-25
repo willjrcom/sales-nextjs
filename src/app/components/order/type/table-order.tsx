@@ -30,7 +30,7 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
         enabled: !!data?.user?.access_token,
     });
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
 
     useEffect(() => {
         if (!placeID) return;

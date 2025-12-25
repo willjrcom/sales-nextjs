@@ -205,7 +205,7 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
     enabled: !!data?.user?.access_token,
   });
 
-  const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+  const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
 
   useEffect(() => {
     const category = categories.find(c => c.id === categoryID);

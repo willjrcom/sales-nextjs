@@ -16,7 +16,7 @@ const PickupOrderPage = () => {
     const [activeTab, setActiveTab] = useState<'Prontas' | 'Últimos 10'>('Prontas');
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: response, refetch } = useQuery({
+    const { isPending, error, data: pickupOrdersResponse, refetch } = useQuery({
         queryKey: ['pickup-orders'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -30,7 +30,7 @@ const PickupOrderPage = () => {
         if (error) notifyError('Erro ao carregar pedidos de retirada');
     }, [error]);
 
-    const allOrders = useMemo(() => response?.items || [], [response]);
+    const allOrders = useMemo(() => pickupOrdersResponse?.items || [], [pickupOrdersResponse]);
 
     const last10 = useMemo(() => [...allOrders].sort((a, b) => {
         const da = a.pickup?.ready_at || '';

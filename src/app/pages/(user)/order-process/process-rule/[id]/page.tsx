@@ -51,8 +51,8 @@ const Component = () => {
         setLastUpdate(new Date().toLocaleTimeString());
     };
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
-    const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
+    const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse]);
 
     const updateParam = (newId: string) => {
         router.replace(`/pages/order-process/process-rule/${newId}`);

@@ -32,7 +32,7 @@ const PageCategories = () => {
         if (error) notifyError('Erro ao carregar categorias');
     }, [error]);
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
     const categoriesSorted = useMemo(() => categories.sort((a, b) => a.name.localeCompare(b.name)), [categories]);
 
     return (

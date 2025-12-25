@@ -25,7 +25,7 @@ const PageNewOrderTable = () => {
         enabled: !!data?.user?.access_token,
     });
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
     const selectedPlace = useMemo(() => {
         return places.find(p => p.id === placeID);
     }, [placeID, places]);

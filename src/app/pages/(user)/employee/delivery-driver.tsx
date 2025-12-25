@@ -21,7 +21,7 @@ const PageDeliveryDriver = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: response, refetch } = useQuery({
+    const { isPending, error, data: deliveryDriversResponse, refetch } = useQuery({
         queryKey: ['delivery-drivers', pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -34,8 +34,8 @@ const PageDeliveryDriver = () => {
         if (error) notifyError('Erro ao carregar motoboys');
     }, [error]);
 
-    const drivers = useMemo(() => (response?.items || []).filter((driver) => !!driver.employee), [response?.items]);
-    const totalCount = useMemo(() => parseInt(response?.headers.get('x-total-count') || '0'), [response?.headers]); 
+    const drivers = useMemo(() => (deliveryDriversResponse?.items || []).filter((driver) => !!driver.employee), [deliveryDriversResponse]);
+    const totalCount = useMemo(() => parseInt(deliveryDriversResponse?.headers.get('x-total-count') || '0'), [deliveryDriversResponse]); 
 
     const filteredDrivers = useMemo(() => drivers
         .filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))

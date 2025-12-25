@@ -32,7 +32,7 @@ const PageProducts = () => {
         if (error) notifyError('Erro ao carregar categorias');
     }, [error]);
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
     const productsByCategories = useMemo(() => {
         return categories.map((category) => {
             return category.products?.map(product => {

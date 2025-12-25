@@ -15,7 +15,7 @@ const OrderProcess = () => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, data: categories = [], refetch } = useQuery({
+    const { isPending, data: categoriesResponse = [], refetch } = useQuery({
         queryKey: ['categoriesWithOrderProcess'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -25,8 +25,8 @@ const OrderProcess = () => {
         refetchInterval: 30000,
     });
 
-    const noRuleCategories = useMemo(() => categories.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement), [categories]);
-    const validCategories = useMemo(() => categories.filter(c => c.use_process_rule), [categories]);
+    const noRuleCategories = useMemo(() => categoriesResponse.filter(c => !c.use_process_rule && !c.is_additional && !c.is_complement), [categoriesResponse]);
+    const validCategories = useMemo(() => categoriesResponse.filter(c => c.use_process_rule), [categoriesResponse]);
 
     return (
         <div className='max-w-[85vw] flex-auto h-full'>
