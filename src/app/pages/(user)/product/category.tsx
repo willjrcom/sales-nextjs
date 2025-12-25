@@ -10,7 +10,6 @@ import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
-import "./style.css";
 import { useQuery } from "@tanstack/react-query";
 import GetCategories from "@/app/api/category/category";
 import { notifyError } from "@/app/utils/notifications";
