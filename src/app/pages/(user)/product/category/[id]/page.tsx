@@ -13,6 +13,14 @@ import CategoryForm from "@/app/forms/category/form";
 import { notifyError } from "@/app/utils/notifications";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { FaEdit } from "react-icons/fa";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
@@ -41,7 +49,19 @@ const PageCategoryEdit = () => {
     }
 
     return (
-        <div >
+        <div>
+            <Breadcrumb className="mb-4">
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/pages/product">Categorias</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>{category.name}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <CategoryForm isUpdate={true} item={category} setItem={setCategory} />
 
             <ButtonIconTextFloat title="Tamanhos e quantidades" modalName="edit-size-and-quantity" size="xl" icon={FaEdit} position="bottom-right">
