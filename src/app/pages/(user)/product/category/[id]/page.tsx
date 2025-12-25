@@ -53,7 +53,7 @@ const PageCategoryEdit = () => {
             <Breadcrumb className="mb-4">
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/pages/product">Categorias</BreadcrumbLink>
+                        <BreadcrumbLink href="/pages/product?tab=categorias">Categorias</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
