@@ -11,9 +11,6 @@ import UpdateClient from '@/app/api/client/update/client';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DateField, HiddenField, ImageField, TextField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
@@ -29,7 +26,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const [contact, setContact] = useState<Contact>(client.contact || new Contact())
     const [address, setAddress] = useState<Address>(client.address || new Address())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const queryClient = useQueryClient();
 
@@ -100,36 +96,16 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         const validationErrors = ValidateClientForm(newClient);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            const response = isUpdate ? await UpdateClient(newClient, data) : await NewClient(newClient, data)
-
-            if (!isUpdate) {
-                newClient.id = response
-                dispatch(addClient({ ...newClient }));
-                notifySuccess(`Cliente ${client.name} criado com sucesso`);
-            } else {
-                dispatch(updateClient({ type: "UPDATE", payload: { id: newClient.id, changes: newClient } }));
-                notifySuccess(`Cliente ${client.name} atualizado com sucesso`);
-            }
-
-            modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao salvar cliente');
+        if (!isUpdate) {
+            createMutation.mutate(newClient);
+        } else {
+            updateMutation.mutate(newClient);
         }
     }
 
     const onDelete = async () => {
-        if (!data) return;
-
-        try {
-            await DeleteClient(client.id, data);
-            dispatch(removeClient(client.id));
-            notifySuccess(`Cliente ${client.name} removido com sucesso`);
-            modalHandler.hideModal(modalName)
-        } catch (error: RequestError | any) {
-            notifyError(error.message || `Erro ao remover cliente ${client.name}`);
-        }
+        if (!data || !client?.id) return;
+        deleteMutation.mutate(client.id);
     }
 
     return (
@@ -198,6 +174,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                     item={client}
                     name="Cliente"
                     onSubmit={submit}
+                    deleteItem={onDelete}
                 />
             </div>
         </div>

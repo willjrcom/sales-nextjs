@@ -36,7 +36,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
         
         try {
-            await UpdateClient(client as unknown as ClientFormData, data);
+            await UpdateClient(client, data);
             await UpdateAddressOrderDelivery(deliveryOrderId, data)
 
             queryClient.invalidateQueries({ queryKey: ['clients'] });
