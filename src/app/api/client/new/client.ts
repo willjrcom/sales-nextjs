@@ -1,9 +1,9 @@
-import Client, { ClientFormData } from "@/app/entities/client/client";
+import Client from "@/app/entities/client/client";
 import { Session } from "next-auth";
 import RequestApi, { AddAccessToken } from "../../request";
 
-const NewClient = async (client: ClientFormData, session: Session): Promise<string> => {
-    const response = await RequestApi<ClientFormData,string>({
+const NewClient = async (client: Client, session: Session): Promise<string> => {
+    const response = await RequestApi<Client,string>({
         path: "/client/new", 
         method: "POST",
         body: client,

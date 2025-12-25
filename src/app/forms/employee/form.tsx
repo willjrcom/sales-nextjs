@@ -163,12 +163,6 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
                 </div>
             </div>
 
-        </div>
-    );
-
-    return (
-        <div className="text-black">
-
             <HiddenField
                 name="user_id"
                 setValue={(value) => handleInputChange("user_id", value)}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
-import Client, { ValidateClientForm } from '@/app/entities/client/client';
+import Client, { ClientFormData, ValidateClientForm } from '@/app/entities/client/client';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import UpdateClient from '@/app/api/client/update/client';
@@ -36,7 +36,7 @@ const ClientAddressForm = ({ item, deliveryOrderId }: ClientAddressFormProps) =>
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
         
         try {
-            await UpdateClient(client, data);
+            await UpdateClient(client as unknown as ClientFormData, data);
             await UpdateAddressOrderDelivery(deliveryOrderId, data)
 
             queryClient.invalidateQueries({ queryKey: ['clients'] });

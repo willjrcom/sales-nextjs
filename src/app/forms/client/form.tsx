@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
-import { ClientFormData, SchemaClient } from '@/app/entities/client/client';
+import Client, { ValidateClientForm } from '@/app/entities/client/client';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { ToIsoDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
@@ -9,61 +9,47 @@ import DeleteClient from '@/app/api/client/delete/client';
 import NewClient from '@/app/api/client/new/client';
 import UpdateClient from '@/app/api/client/update/client';
 import { useModal } from '@/app/context/modal/context';
+import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
+import { addClient, removeClient, updateClient } from '@/redux/slices/clients';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DateField, ImageField, TextField } from '@/app/components/modal/field';
+import { DateField, HiddenField, ImageField, TextField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
-import AddressClientForm from '../address/client-form';
+import Contact from '@/app/entities/contact/contact';
+import Address from '@/app/entities/address/address';
 import ContactForm from '../contact/form';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ContactType } from '@/app/entities/contact/contact';
+import AddressForm from '../address/form';
 
-const ClientForm = ({ item: client }: CreateFormsProps<ClientFormData | null>) => {
-    const isUpdate = !!client?.id;
-    const modalName = isUpdate ? 'edit-client-' + client?.id : 'new-client'
+const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
+    const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
+    const [client, setClient] = useState<Client>(item || new Client())
+    const [contact, setContact] = useState<Contact>(client.contact || new Contact())
+    const [address, setAddress] = useState<Address>(client.address || new Address())
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const dispatch = useDispatch<AppDispatch>();
     const { data } = useSession();
     const queryClient = useQueryClient();
 
-    const form = useForm<ClientFormData>({
-        resolver: zodResolver(SchemaClient),
-        defaultValues: {
-            name: '',
-            email: '',
-            cpf: '',
-            birthday: '',
-            image_path: '',
-            contact: {
-                ddd: '',
-                number: '',
-                type: ContactType.Client,
-            },
-            address: {
-                street: '',
-                number: '',
-                neighborhood: '',
-                complement: '',
-                reference: '',
-                city: '',
-                uf: 'SP',
-                cep: '',
-                address_type: '',
-                delivery_tax: 0,
-            },
-        },
-    })
-
-    const { control, handleSubmit, reset, formState: { errors } } = form;
+    const handleInputChange = useCallback((field: keyof Client, value: any) => {
+        setClient(prev => ({
+            ...prev,
+            [field]: value
+        } as Client));
+    }, [setClient]);
 
     useEffect(() => {
-        if (client) {
-            reset(client)
-        }
-    }, [client, reset])
+        handleInputChange('address', address);
+    }, [address]);
+
+    useEffect(() => {
+        handleInputChange('contact', contact);
+    }, [contact]);
 
     const createMutation = useMutation({
-        mutationFn: (newClient: ClientFormData) => NewClient(newClient, data!),
+        mutationFn: (newClient: Client) => NewClient(newClient, data!),
         onSuccess: (response, newClient) => {
             newClient.id = response;
             queryClient.invalidateQueries({ queryKey: ['clients'] });
@@ -76,7 +62,7 @@ const ClientForm = ({ item: client }: CreateFormsProps<ClientFormData | null>) =
     });
 
     const updateMutation = useMutation({
-        mutationFn: (updatedClient: ClientFormData) => UpdateClient(updatedClient, data!),
+        mutationFn: (updatedClient: Client) => UpdateClient(updatedClient, data!),
         onSuccess: (_, updatedClient) => {
             queryClient.invalidateQueries({ queryKey: ['clients'] });
             notifySuccess(`Cliente ${updatedClient.name} atualizado com sucesso`);
@@ -99,162 +85,123 @@ const ClientForm = ({ item: client }: CreateFormsProps<ClientFormData | null>) =
         }
     });
 
-    const onSubmit = (formData: ClientFormData) => {
+    const submit = async () => {
         if (!data) return;
 
-        const processedData = { ...formData };
-        
-        if (processedData.birthday) {
-            processedData.birthday = ToIsoDate(processedData.birthday);
+        const newClient = { ...client };
+
+        if (newClient.birthday) {
+            newClient.birthday = ToIsoDate(newClient.birthday)
         } else {
-            delete processedData.birthday;
+            // Remove o campo birthday se estiver vazio, pois o backend usa ponteiro
+            delete newClient.birthday;
         }
 
-        if (isUpdate) {
-            updateMutation.mutate(processedData);
-        } else {
-            createMutation.mutate(processedData);
-        }
-    }
+        const validationErrors = ValidateClientForm(newClient);
+        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-    const onError = (errors: any) => {
-        console.log('Erros de validação:', errors);
-        notifyError('Preencha os campos obrigatórios corretamente');
+        try {
+            const response = isUpdate ? await UpdateClient(newClient, data) : await NewClient(newClient, data)
+
+            if (!isUpdate) {
+                newClient.id = response
+                dispatch(addClient({ ...newClient }));
+                notifySuccess(`Cliente ${client.name} criado com sucesso`);
+            } else {
+                dispatch(updateClient({ type: "UPDATE", payload: { id: newClient.id, changes: newClient } }));
+                notifySuccess(`Cliente ${client.name} atualizado com sucesso`);
+            }
+
+            modalHandler.hideModal(modalName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao salvar cliente');
+        }
     }
 
     const onDelete = async () => {
-        if (!data || !client?.id) return;
-        deleteMutation.mutate(client.id);
+        if (!data) return;
+
+        try {
+            await DeleteClient(client.id, data);
+            dispatch(removeClient(client.id));
+            notifySuccess(`Cliente ${client.name} removido com sucesso`);
+            modalHandler.hideModal(modalName)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || `Erro ao remover cliente ${client.name}`);
+        }
     }
 
     return (
-        <FormProvider {...form}>
-            <form onSubmit={handleSubmit(onSubmit, onError)}>
-                <h2>{isUpdate ? 'Editar Pessoa' : 'Cadastrar Pessoa'}</h2>
+        <div className="text-black space-y-6">
+            {/* Seção: Informações Básicas */}
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
+                <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={client.name} />
+            </div>
 
-                {/* Seção: Informações Básicas */}
-                <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
-                    <Controller
-                        name="name"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                name="name"
-                                friendlyName="Nome"
-                                placeholder="Digite seu nome"
-                                setValue={field.onChange}
-                                value={field.value}
-                                error={errors.name?.message}
-                            />
-                        )}
-                    />
-                </div>
-                
-                {/* Seção: Contato */}
-                <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Contato</h3>
-                    <ContactForm />
-                </div>
+            {/* Seção: Contato */}
+            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Contato</h3>
+                <ContactForm contactParent={contact} setContactParent={setContact} />
+            </div>
 
-                {/* Seção: Endereço */}
-                <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Endereço</h3>
-                    <AddressClientForm />
-                </div>
+            {/* Seção: Endereço */}
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Endereço</h3>
+                <AddressForm addressParent={address} setAddressParent={setAddress} />
+            </div>
 
-                {/* Seção: Dados Adicionais */}
-                <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Dados Adicionais</h3>
-                    <div className="space-y-4">
+            {/* Seção: Dados Adicionais */}
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Dados Adicionais</h3>
+                <div className="space-y-4">
 
-                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <Controller
-                                    name="email"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            name="email"
-                                            friendlyName="Email"
-                                            placeholder="Digite seu e-mail"
-                                            setValue={field.onChange}
-                                            value={field.value || ''}
-                                            optional={true}
-                                            error={errors.email?.message}
-                                        />
-                                    )}
-                                />
-                            </div>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <Controller
-                                    name="image_path"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <ImageField
-                                            friendlyName='Imagem'
-                                            name='image_path'
-                                            setValue={field.onChange}
-                                            value={field.value || ''}
-                                            optional
-                                            onUploadError={(error) => notifyError(error)}
-                                        />
-                                    )}
-                                />
-                            </div>
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={client.email} optional={false} />
+
                         </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <ImageField
+                                friendlyName='Imagem'
+                                name='image_path'
+                                setValue={value => handleInputChange('image_path', value)}
+                                value={client.image_path}
+                                optional
+                                onUploadError={(error) => notifyError(error)}
+                            />
+                        </div>
+                    </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <Controller
-                                    name="cpf"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <PatternField
-                                            patternName="cpf"
-                                            name="cpf"
-                                            friendlyName="CPF"
-                                            placeholder="Digite seu cpf"
-                                            setValue={field.onChange}
-                                            value={field.value || ''}
-                                            optional={true}
-                                            formatted={true}
-                                        />
-                                    )}
-                                />
-                            </div>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <Controller
-                                    name="birthday"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <DateField
-                                            name="birthday"
-                                            friendlyName="Nascimento"
-                                            setValue={field.onChange}
-                                            value={field.value || ''}
-                                            optional={true}
-                                        />
-                                    )}
-                                />
-                            </div>
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={client.cpf || ''} optional={false} formatted={true} />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday} optional={false} />
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <button type="submit">
-                    {isUpdate ? 'Atualizar' : 'Cadastrar'}
-                </button>
+            <HiddenField
+                name="id"
+                setValue={(value) => handleInputChange("id", value)}
+                value={client.id}
+            />
+            <ErrorForms errors={errors} setErrors={setErrors} />
+
+            {/* Botões de Ação */}
+            <div className="mt-6">
                 <ButtonsModal
-                    item={{ id: client?.id ?? '', name: client?.name }}
+                    item={client}
                     name="Cliente"
-                    onSubmit={handleSubmit(onSubmit)}
-                    deleteItem={onDelete}
+                    onSubmit={submit}
                 />
-            </form>
-        </FormProvider>
+            </div>
+        </div>
     );
-
 };
 
 export default ClientForm;

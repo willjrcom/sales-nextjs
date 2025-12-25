@@ -1,84 +1,74 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { HiddenField, SelectField, TextField } from '../../components/modal/field';
 import PriceField from '@/app/components/modal/fields/price';
+import Address from '@/app/entities/address/address';
 import { addressUFsWithId, AddressTypesWithId } from '@/app/entities/address/utils';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
 import { FaSearch } from 'react-icons/fa';
 import GetCompany from '@/app/api/company/company';
-import { useFormContext, Controller } from 'react-hook-form';
 
-interface AddressClientFormProps {
-    prefix?: string;
+export interface AddressClientFormProps {
+    addressParent: Address;
+    setAddressParent: React.Dispatch<React.SetStateAction<Address>>;
+    isHidden?: boolean;
 }
 
-const AddressClientForm = ({ prefix = 'address' }: AddressClientFormProps) => {
-    const { control, formState: { errors }, watch, setValue } = useFormContext();
+const AddressClientForm = ({ addressParent, setAddressParent, isHidden }: AddressClientFormProps) => {
+    const [address, setAddress] = useState<Address>(addressParent || new Address());
     const { data } = useSession();
 
-    const getFieldName = (field: string) => `${prefix}.${field}`;
-    const getError = (field: string) => {
-        const prefixErrors = errors[prefix] as Record<string, { message?: string }> | undefined;
-        return prefixErrors?.[field]?.message;
-    };
-
-    const cep = watch(getFieldName('cep'));
-    const uf = watch(getFieldName('uf'));
-
     useEffect(() => {
-        getUfFromCompany();
-    }, [data]);
+        getUfFromCompany()
+    }, [data?.user.access_token]);
 
     const getUfFromCompany = async () => {
-        if (uf || !data) return;
+        if (address.uf || !data) return;
 
-        const company = await GetCompany(data);
+        const company = await GetCompany(data)
         if (!company) return;
 
         const companyAddress = company.address;
         if (!companyAddress) return;
 
-        setValue(getFieldName('uf'), companyAddress.uf);
+        handleInputChange('uf', companyAddress.uf);
+    }
+
+    const handleInputChange = (field: keyof Address, value: any) => {
+        const newAddress = Object.assign({}, { ...address, [field]: value }) as Address;
+        setAddress(newAddress);
+        setAddressParent(newAddress);
     };
 
     const getAddress = async () => {
         try {
-            const addressFound = await GetAddressByCEP(cep);
+            const addressFound = await GetAddressByCEP(address.cep)
 
-            if (addressFound.cep.replace("-", "") === cep.replace("-", "")) {
-                setValue(getFieldName('street'), addressFound.logradouro);
-                setValue(getFieldName('neighborhood'), addressFound.bairro);
-                setValue(getFieldName('city'), addressFound.localidade);
-                setValue(getFieldName('uf'), addressFound.uf);
+            if (addressFound.cep.replace("-", "") === address.cep.replace("-", "")) {
+                const newAddress = Object.assign({},
+                    {
+                        ...address,
+                        street: addressFound.logradouro,
+                        neighborhood: addressFound.bairro,
+                        city: addressFound.localidade,
+                        uf: addressFound.uf
+                    }
+                ) as Address;
+                setAddress(newAddress);
+                setAddressParent(newAddress);
+
             }
         } catch (error) { }
-    };
+    }
 
     return (
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 items-end">
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('cep')}
-                        control={control}
-                        render={({ field }) => (
-                            <PatternField
-                                patternName='cep'
-                                name="cep"
-                                friendlyName="Cep"
-                                placeholder="Digite o cep"
-                                setValue={field.onChange}
-                                value={field.value || ''}
-                                optional
-                                formatted={true}
-                                error={getError('cep')}
-                            />
-                        )}
-                    />
+                    <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} formatted={true} />
                 </div>
                 <button
-                    type="button"
                     className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md'
                     onClick={getAddress}
                 >
@@ -88,174 +78,53 @@ const AddressClientForm = ({ prefix = 'address' }: AddressClientFormProps) => {
 
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('street')}
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                name="street"
-                                friendlyName="Rua"
-                                placeholder="Digite sua rua"
-                                setValue={field.onChange}
-                                value={field.value || ''}
-                                error={getError('street')}
-                            />
-                        )}
-                    />
+                    <TextField name="street" friendlyName="Rua" placeholder="Digite sua rua" setValue={value => handleInputChange('street', value)} value={address.street} disabled={isHidden} />
                 </div>
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('number')}
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                name="number"
-                                friendlyName="Numero"
-                                placeholder="Digite o numero"
-                                setValue={field.onChange}
-                                value={field.value || ''}
-                                error={getError('number')}
-                            />
-                        )}
-                    />
+                    <TextField name="number" friendlyName="Numero" placeholder="Digite o numero" setValue={value => handleInputChange('number', value)} value={address.number} disabled={isHidden} />
                 </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('neighborhood')}
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                name="neighborhood"
-                                friendlyName="Bairro"
-                                placeholder="Digite o bairro"
-                                setValue={field.onChange}
-                                value={field.value || ''}
-                                error={getError('neighborhood')}
-                            />
-                        )}
-                    />
+                    <TextField name="neighborhood" friendlyName="Bairro" placeholder="Digite o bairro" setValue={value => handleInputChange('neighborhood', value)} value={address.neighborhood} disabled={isHidden} />
                 </div>
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('complement')}
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                name="complement"
-                                friendlyName="Complemento"
-                                placeholder="Digite o complemento"
-                                setValue={field.onChange}
-                                value={field.value || ''}
-                                optional
-                                error={getError('complement')}
-                            />
-                        )}
-                    />
+                    <TextField name="complement" friendlyName="Complemento" placeholder="Digite o complemento" setValue={value => handleInputChange('complement', value)} value={address.complement} optional disabled={isHidden} />
                 </div>
             </div>
 
             <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                <Controller
-                    name={getFieldName('reference')}
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            name="reference"
-                            friendlyName="Referência"
-                            placeholder="Digite a referência"
-                            setValue={field.onChange}
-                            value={field.value || ''}
-                            optional
-                            error={getError('reference')}
-                        />
-                    )}
-                />
+                <TextField name="reference" friendlyName="Referência" placeholder="Digite a referência" setValue={value => handleInputChange('reference', value)} value={address.reference} optional disabled={isHidden} />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('city')}
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                name="city"
-                                friendlyName="Cidade"
-                                placeholder="Digite a cidade"
-                                setValue={field.onChange}
-                                value={field.value || ''}
-                                error={getError('city')}
-                            />
-                        )}
-                    />
+                    <TextField name="city" friendlyName="Cidade" placeholder="Digite a cidade" setValue={value => handleInputChange('city', value)} value={address.city} disabled={isHidden} />
                 </div>
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('uf')}
-                        control={control}
-                        render={({ field }) => (
-                            <SelectField
-                                name="state"
-                                friendlyName="Estado"
-                                setSelectedValue={field.onChange}
-                                selectedValue={field.value || ''}
-                                values={addressUFsWithId}
-                            />
-                        )}
-                    />
+                    <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
                 </div>
             </div>
-
+            
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('address_type')}
-                        control={control}
-                        render={({ field }) => (
-                            <SelectField
-                                name="address_type"
-                                friendlyName="Tipo de endereço"
-                                setSelectedValue={field.onChange}
-                                selectedValue={field.value || ''}
-                                values={AddressTypesWithId}
-                            />
-                        )}
-                    />
+                    <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />
                 </div>
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <Controller
-                        name={getFieldName('delivery_tax')}
-                        control={control}
-                        render={({ field }) => (
-                            <PriceField
-                                name="delivery_tax"
-                                friendlyName="Taxa de entrega"
-                                placeholder="Digite a taxa de entrega"
-                                setValue={field.onChange}
-                                value={field.value || 0}
-                            />
-                        )}
+                    <PriceField
+                        name="delivery_tax"
+                        friendlyName="Taxa de entrega"
+                        placeholder="Digite a taxa de entrega"
+                        setValue={value => handleInputChange('delivery_tax', value)}
+                        value={address.delivery_tax}
+                        disabled={isHidden}
                     />
                 </div>
             </div>
 
-            <Controller
-                name={getFieldName('object_id')}
-                control={control}
-                render={({ field }) => (
-                    <HiddenField name="object_id" setValue={field.onChange} value={field.value || ''} />
-                )}
-            />
-            <Controller
-                name={getFieldName('id')}
-                control={control}
-                render={({ field }) => (
-                    <HiddenField name="id" setValue={field.onChange} value={field.value || ''} />
-                )}
-            />
+            <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id} />
+            <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id} />
         </div>
     );
 };

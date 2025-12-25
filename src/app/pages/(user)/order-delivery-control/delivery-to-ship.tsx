@@ -42,7 +42,7 @@ const DeliveryOrderToShip = () => {
 
     const orders = useMemo(() => {
         return (deliveryOrdersResponse?.items || []).filter((order) => order.delivery?.status === 'Ready');
-    }, [deliveryOrdersResponse?.items]);
+    }, [deliveryOrdersResponse]);
 
     const handleRefresh = async () => {
         await refetch();
