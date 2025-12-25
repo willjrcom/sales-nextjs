@@ -17,7 +17,7 @@ import PatternField from '@/app/components/modal/fields/pattern';
 import Contact from '@/app/entities/contact/contact';
 import Address from '@/app/entities/address/address';
 import ContactForm from '../contact/form';
-import AddressForm from '../address/form';
+import AddressClientForm from '../address/client-form';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
@@ -125,7 +125,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             {/* Seção: Endereço */}
             <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Endereço</h3>
-                <AddressForm addressParent={address} setAddressParent={setAddress} />
+                <AddressClientForm addressParent={address} setAddressParent={setAddress} />
             </div>
 
             {/* Seção: Dados Adicionais */}
@@ -135,7 +135,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={client.email} optional={false} />
+                            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={client.email} optional={true} />
 
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
@@ -152,10 +152,10 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={client.cpf || ''} optional={false} formatted={true} />
+                            <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={client.cpf || ''} optional={true} formatted={true} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday} optional={false} />
+                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday} optional={true} />
                         </div>
                     </div>
                 </div>
