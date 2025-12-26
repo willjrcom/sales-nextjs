@@ -93,7 +93,7 @@ const GroupItemCard = () => {
             {/* Produto Selecionado */}
             <div className="space-y-2">
                 {(!groupItem || groupItem?.items?.length === 0) && <p>Nenhum produto selecionado</p>}
-                {groupItem?.items?.map((item) => (
+                {groupItem?.items.sort((a, b) => a.id.localeCompare(b.id))?.map((item) => (
                     <ItemCard item={item} key={item.id} />
                 ))}
             </div>

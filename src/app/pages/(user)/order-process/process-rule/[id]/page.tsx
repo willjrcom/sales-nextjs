@@ -1,29 +1,19 @@
 "use client";
 
-import OrderProcess from "@/app/entities/order-process/order-process";
 import ProcessRule from "@/app/entities/process-rule/process-rule";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CurrentProcessRuleProvider } from "@/app/context/current-process-rule/context";
 import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import { SelectField } from "@/app/components/modal/field";
 import OrderProcessCard from "./order-process";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import GetCategories from '@/app/api/category/category';
 import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const PageProcessRule = () => {
-    return (
-        <CurrentProcessRuleProvider>
-            <Component />
-        </CurrentProcessRuleProvider>
-    )
-}
-
-const Component = () => {
     const { id } = useParams();
     const { data } = useSession();
     const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>("");

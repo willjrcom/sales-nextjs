@@ -1,75 +1,134 @@
- 'use client';
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+'use client';
+import React, { createContext, useContext, ReactNode, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import RequestError from '@/app/utils/error';
 import { FormatRefreshTime } from '@/app/components/crud/refresh';
 import GroupItem from '@/app/entities/order/group-item';
 import Item from '@/app/entities/order/item';
 import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
 import { notifyError } from '@/app/utils/notifications';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-interface GroupItemContextProps<T> {
-    groupItem: T | null;
+interface GroupItemContextProps {
+    groupItem: GroupItem | null;
     getItemByID: (id: string) => Item[] | undefined;
     fetchData: (id: string) => Promise<GroupItem | null | undefined>;
     resetGroupItem: () => void;
     addItem: (item: Item) => void;
     removeItem: (id: string) => void;
-    updateGroupItem: (item: T) => void;
+    updateGroupItem: (item: GroupItem) => void;
     updateLastUpdate: () => void;
     getLoading: () => boolean;
     getLastUpdate: () => string;
+    refetch: () => void;
 }
 
-const ContextGroupItem = createContext<GroupItemContextProps<GroupItem> | undefined>(undefined);
+const ContextGroupItem = createContext<GroupItemContextProps | undefined>(undefined);
 
 export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
-    const [groupItem, setgroupItem] = useState<GroupItem | null>(null);
-    const { data } = useSession();
-    const [loading, setLoading] = useState(true);
+    const [groupItemId, setGroupItemId] = useState<string | null>(null);
+    const [localGroupItem, setLocalGroupItem] = useState<GroupItem | null>(null);
+    const { data: session } = useSession();
+    const queryClient = useQueryClient();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    
-    const fetchData = async (id: string) => {
-        if (!data?.user?.access_token || !id) return;
-        try {
-            const groupItem = await GetGroupItemByID(id, data);
-            setgroupItem(groupItem);
-            return groupItem;
-        } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao buscar group item");
-            return null;
+
+    const { data: fetchedGroupItem, isLoading, refetch } = useQuery({
+        queryKey: ['groupItem', groupItemId],
+        queryFn: async () => {
+            if (!groupItemId || !session?.user?.access_token) return null;
+            try {
+                const result = await GetGroupItemByID(groupItemId, session);
+                setLastUpdate(FormatRefreshTime(new Date()));
+                return result;
+            } catch (error: any) {
+                notifyError(error.message || "Erro ao buscar group item");
+                return null;
+            }
+        },
+        enabled: !!groupItemId && !!session?.user?.access_token,
+        staleTime: 0,
+    });
+
+    // Usa o localGroupItem se existir, senão usa o fetchedGroupItem
+    const groupItem = localGroupItem ?? fetchedGroupItem ?? null;
+
+    const fetchData = useCallback(async (id: string) => {
+        if (!session?.user?.access_token || !id) return;
+        setGroupItemId(id);
+        setLocalGroupItem(null); // Reset local state para usar os dados da query
+        
+        // Invalida e refetch
+        await queryClient.invalidateQueries({ queryKey: ['groupItem', id] });
+        const result = await queryClient.fetchQuery({
+            queryKey: ['groupItem', id],
+            queryFn: () => GetGroupItemByID(id, session),
+        });
+        return result;
+    }, [session, queryClient]);
+
+    const resetGroupItem = useCallback(() => {
+        setGroupItemId(null);
+        setLocalGroupItem(null);
+    }, []);
+
+    const getItemByID = useCallback((id: string) => {
+        return groupItem?.items.filter((item) => item.id === id);
+    }, [groupItem]);
+
+    const addItem = useCallback((item: Item) => {
+        if (!groupItem) return;
+        const updated = { ...groupItem, items: [...groupItem.items, item] };
+        setLocalGroupItem(updated as GroupItem);
+        // Atualiza o cache do React Query também
+        if (groupItemId) {
+            queryClient.setQueryData(['groupItem', groupItemId], updated);
         }
-    };
+    }, [groupItem, groupItemId, queryClient]);
 
-    const resetGroupItem = () => {
-        setgroupItem(null);
-    }
-
-    const getItemByID = (id: string) => {
-        return groupItem?.items.filter((groupItem) => groupItem.id === id);
-    }
-
-    const addItem = (item: Item) => {
+    const removeItem = useCallback((id: string) => {
         if (!groupItem) return;
-        setgroupItem({...groupItem, items: [...groupItem.items, item]});
-    }
+        const updated = { ...groupItem, items: groupItem.items.filter((item) => item.id !== id) };
+        setLocalGroupItem(updated as GroupItem);
+        if (groupItemId) {
+            queryClient.setQueryData(['groupItem', groupItemId], updated);
+        }
+    }, [groupItem, groupItemId, queryClient]);
 
-    const removeItem = (id: string) => {
-        if (!groupItem) return;
-        setgroupItem({...groupItem, items: groupItem.items.filter((item) => item.id !== id)});
-    }
+    const updateGroupItem = useCallback((newGroupItem: GroupItem) => {
+        setLocalGroupItem(newGroupItem);
+        if (newGroupItem.id) {
+            setGroupItemId(newGroupItem.id);
+            queryClient.setQueryData(['groupItem', newGroupItem.id], newGroupItem);
+        }
+    }, [queryClient]);
 
-    const updateGroupItem = (groupItem: GroupItem) => {
-        setgroupItem(groupItem);
-    }
+    const updateLastUpdate = useCallback(() => {
+        setLastUpdate(FormatRefreshTime(new Date()));
+    }, []);
 
-    const updateLastUpdate = () => setLastUpdate(FormatRefreshTime(new Date()));
+    const getLoading = useCallback(() => isLoading, [isLoading]);
+    const getLastUpdate = useCallback(() => lastUpdate, [lastUpdate]);
 
-    const getLoading = () => loading;
-    const getLastUpdate = () => lastUpdate;
+    const handleRefetch = useCallback(() => {
+        if (groupItemId) {
+            queryClient.invalidateQueries({ queryKey: ['groupItem', groupItemId] });
+            refetch();
+        }
+    }, [groupItemId, queryClient, refetch]);
 
     return (
-        <ContextGroupItem.Provider value={{ groupItem, fetchData, resetGroupItem, getItemByID, addItem, removeItem, updateGroupItem: updateGroupItem, updateLastUpdate, getLoading, getLastUpdate }}>
+        <ContextGroupItem.Provider value={{ 
+            groupItem, 
+            fetchData, 
+            resetGroupItem, 
+            getItemByID, 
+            addItem, 
+            removeItem, 
+            updateGroupItem, 
+            updateLastUpdate, 
+            getLoading, 
+            getLastUpdate,
+            refetch: handleRefetch,
+        }}>
             {children}
         </ContextGroupItem.Provider>
     );
