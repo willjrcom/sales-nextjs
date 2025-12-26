@@ -19,7 +19,6 @@ import AddressForm from '../address/form';
 import ContactForm from '../contact/form';
 import Contact from '@/app/entities/contact/contact';
 import Address from '@/app/entities/address/address';
-import DeleteEmployee from '@/app/api/employee/delete/employee';
 
 interface EmployeeFormProps extends CreateFormsProps<Employee> {
     isDisabledPerson?: boolean;

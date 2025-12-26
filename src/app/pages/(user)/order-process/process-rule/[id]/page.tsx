@@ -30,7 +30,6 @@ const Component = () => {
     const [processRule, setProcessRule] = useState<ProcessRule | null>(null);
     const [processRules, setProcessRules] = useState<ProcessRule[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const queryClient = useQueryClient();
     const router = useRouter();
 
     const { data: categoriesResponse } = useQuery({

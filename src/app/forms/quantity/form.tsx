@@ -29,7 +29,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-
+    
     const createMutation = useMutation({
         mutationFn: (newQuantity: Quantity) => NewQuantity(newQuantity, data!),
 
@@ -80,42 +80,16 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
         const validationErrors = ValidateQuantityForm(quantity);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            const response = isUpdate ? await UpdateQuantity(quantity, data) : await NewQuantity(quantity, data)
-            if (isUpdate) {
-                const index = category.quantities.findIndex(q => q.id === quantity.id);
-                if (index !== -1) {
-                    category.quantities[index] = quantity;
-                }
-                notifySuccess(`Quantidade ${quantity.quantity} atualizada com sucesso`);
-            } else {
-                quantity.id = response;
-                category.quantities.push(quantity);
-                notifySuccess(`Quantidade ${quantity.quantity} adicionada com sucesso`);
-            }
-
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao salvar quantidade');
+        if (isUpdate) {
+            updateMutation.mutate(quantity);
+        } else {
+            createMutation.mutate(quantity);
         }
     }
 
     const onDelete = async () => {
-        if (!data) return;
-        try {
-            await DeleteQuantity(quantity.id, data);
-            if (category) {
-                const newQuantities = category.quantities.filter(q => q.id !== quantity.id);
-            }
-            
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
-            modalHandler.hideModal(modalName);
-        } catch (error: RequestError | any) {
-            notifyError(error.message || 'Erro ao remover quantidade');
-        }
+        if (!data || !quantity.id) return;
+        deleteMutation.mutate(quantity.id);
     }
 
     const isDefaultCategory = !category.is_additional && !category.is_complement;

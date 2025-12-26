@@ -22,7 +22,6 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
     const modalHandler = useModal();
     const [stock, setStock] = useState<Stock>(item || new Stock());
-    const [products, setProducts] = useState<Product[]>([]);
     const [recordProducts, setRecordProducts] = useState<{ id: string; name: string; }[]>([]);
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -93,8 +92,6 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                             category: category,
                         } as Product)) || []
                     }).flat();
-
-                setProducts(allProducts);
 
                 let records: { id: string; name: string; }[] = [];
 

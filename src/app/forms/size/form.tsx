@@ -79,45 +79,16 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
         const validationErrors = ValidateSizeForm(size);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            const response = isUpdate ? await UpdateSize(size, data) : await NewSize(size, data)
-
-            if (isUpdate) {
-                const index = category.sizes.findIndex(s => s.id === size.id);
-                if (index !== -1) {
-                    category.sizes[index] = size;
-                }
-                notifySuccess(`Tamanho ${size.name} atualizado com sucesso`);
-            } else {
-                size.id = response;
-                category.sizes.push(size);
-                notifySuccess(`Tamanho ${size.name} criado com sucesso`);
-            }
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-
-            modalHandler.hideModal(modalName);
-
-        } catch (error: RequestError | any) {
-            notifyError(error.message || 'Erro ao salvar tamanho');
+        if (isUpdate) {
+            updateMutation.mutate(size);
+        } else {
+            createMutation.mutate(size);
         }
     }
 
     const onDelete = async () => {
-        if (!data) return;
-
-        try {
-            await DeleteSize(size.id, data);
-
-            if (category) {
-                const newSizes = category.sizes.filter(q => q.id !== size.id);
-            }
-
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            modalHandler.hideModal(modalName);
-            notifySuccess(`Tamanho ${size.name} removido com sucesso`);
-        } catch (error: RequestError | any) {
-            notifyError(error.message || 'Erro ao remover tamanho');
-        }
+        if (!data || !size.id) return;
+        deleteMutation.mutate(size.id);
     }
     
     const isDefaultCategory = !category.is_additional && !category.is_complement;

@@ -27,13 +27,13 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         setTable(prev => ({ ...prev, [field]: value }));
     };
 
-
     const createMutation = useMutation({
         mutationFn: (newTable: Table) => NewTable(newTable, data!),
 
         onSuccess: (response, newTable) => {
             newTable.id = response;
             queryClient.invalidateQueries({ queryKey: ['tables'] });
+            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
             notifySuccess(`Mesa ${newTable.name} criada com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -46,6 +46,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         mutationFn: (updatedTable: Table) => UpdateTable(updatedTable, data!),
         onSuccess: (_, updatedTable) => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
+            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
             notifySuccess(`Mesa ${updatedTable.name} atualizada com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -58,6 +59,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         mutationFn: (tableId: string) => DeleteTable(tableId, data!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
+            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
             notifySuccess(`Mesa ${table.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -72,35 +74,16 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         const validationErrors = ValidateTableForm(table);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            const response = isUpdate ? await UpdateTable(table, data) : await NewTable(table, data)
-
-            if (!isUpdate) {
-                table.id = response
-                notifySuccess(`Mesa ${table.name} criada com sucesso`);
-            } else {
-                notifySuccess(`Mesa ${table.name} atualizada com sucesso`);
-            }
-
-            queryClient.invalidateQueries({ queryKey: ['tables'] });
-            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
-            modalHandler.hideModal(modalName);
-        } catch (error: RequestError | any) {
-            notifyError(error.message || 'Erro ao salvar mesa');
+        if (isUpdate) {
+            updateMutation.mutate(table);
+        } else {
+            createMutation.mutate(table);
         }
     }
 
     const onDelete = async () => {
-        if (!data) return;
-
-        try {
-            await DeleteTable(table.id, data);
-            queryClient.invalidateQueries({ queryKey: ['tables'] });
-            modalHandler.hideModal(modalName);
-            notifySuccess(`Mesa ${table.name} removida com sucesso`);
-        } catch (error: RequestError | any) {
-            notifyError(error.message || 'Erro ao remover mesa');
-        }
+        if (!data || !table.id) return;
+        deleteMutation.mutate(table.id);
     }
 
     return (

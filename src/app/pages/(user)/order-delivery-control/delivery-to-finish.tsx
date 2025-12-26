@@ -11,7 +11,6 @@ import Decimal from 'decimal.js';
 import CardOrder from "@/app/components/order/card-order";
 import { useModal } from "@/app/context/modal/context";
 import Address from "@/app/entities/address/address";
-import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
@@ -25,7 +24,6 @@ import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const DeliveryOrderToFinish = () => {
-    const queryClient = useQueryClient();
     const [centerPoint, setCenterPoint] = useState<Point | null>(null);
     const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [points, setPoints] = useState<Point[]>([]);

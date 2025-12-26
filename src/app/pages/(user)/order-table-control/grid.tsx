@@ -69,7 +69,6 @@ const generateGrid = (rows: number, cols: number) => {
 };
 
 const DragAndDropGrid = () => {
-    const queryClient = useQueryClient();
     const [totalRows, setTotalRows] = useState(INITIAL_GRID_SIZE);
     const [totalCols, setTotalCols] = useState(INITIAL_GRID_SIZE);
     const [grid, setGrid] = useState(generateGrid(totalRows, totalCols));
@@ -177,7 +176,6 @@ const DragAndDropGrid = () => {
 };
 
 const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ordersForTable: OrderTable[] }) => {
-    const queryClient = useQueryClient();
     const { data } = useSession();
     const router = useRouter();
     const modalHandler = useModal();

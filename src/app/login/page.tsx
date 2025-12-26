@@ -8,7 +8,7 @@ import { useState } from 'react';
 import Loading from '../components/loading/Loading';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
-import Button from '../components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { notifyError } from '../utils/notifications';
 
 const LoginForm = () => {
