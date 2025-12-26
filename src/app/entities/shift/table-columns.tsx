@@ -11,7 +11,7 @@ const ShiftColumns = (): ColumnDef<Shift>[] => [
     header: 'Aberto as',
     accessorFn: row => {
       const date = new Date(row.opened_at)
-      return date.toLocaleDateString('pt-BR')
+      return date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
     }
   },
   {
@@ -19,8 +19,9 @@ const ShiftColumns = (): ColumnDef<Shift>[] => [
     accessorKey: 'closed_at',
     header: 'Fechado as',
     accessorFn: row => {
+      if (!row.closed_at) return 'Em aberto'
       const date = new Date(row.closed_at)
-      return date.toLocaleDateString('pt-BR')
+      return date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
     }
   },
   {

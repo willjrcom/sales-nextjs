@@ -1,20 +1,27 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from 'next/navigation';
 import PageTitle from '@/app/components/PageTitle';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import { useSession } from "next-auth/react";
 import PickupOrderColumns from "@/app/entities/order/pickup-table-columns";
-import "./style.css";
 import { useQuery } from "@tanstack/react-query";
 import GetOrdersWithPickup from "@/app/api/order/all/pickup/order";
 import { notifyError } from "@/app/utils/notifications";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const PickupOrderPage = () => {
     const { data } = useSession();
-    const [activeTab, setActiveTab] = useState<'Prontas' | 'Últimos 10'>('Prontas');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const currentTab = searchParams.get('tab') || 'prontas';
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+
+    const handleTabChange = (value: string) => {
+        router.push(`?tab=${value}`, { scroll: false });
+    };
 
     const { isPending, error, data: pickupOrdersResponse, refetch } = useQuery({
         queryKey: ['pickup-orders'],
@@ -38,34 +45,35 @@ const PickupOrderPage = () => {
         return db.localeCompare(da);
     }).slice(0, 10), [allOrders]);
 
-    const renderContent = () => {
-        const dataToShow = activeTab === 'Prontas' ? allOrders : last10;
-        if (dataToShow.length === 0) {
-            return <p className="text-gray-500">Nenhum pedido disponível</p>;
-        }
-        return <CrudTable columns={PickupOrderColumns()} data={dataToShow} />;
-    };
-
     return (
-        <div className="container">
+        <div className="max-w-7xl mx-auto p-6">
             <PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />
-            <div className="tabs">
-                <button className={`tab ${activeTab === 'Prontas' ? 'active' : ''}`} onClick={() => setActiveTab('Prontas')}>Prontas</button>
-                <button className={`tab ${activeTab === 'Últimos 10' ? 'active' : ''}`} onClick={() => setActiveTab('Últimos 10')}>Últimos 10</button>
-            </div>
-            <div className="content">
-                <div className="flex justify-end items-center mb-2">
-                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
-                </div>
-                {renderContent()}
-            </div>
+            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="prontas">Prontas</TabsTrigger>
+                    <TabsTrigger value="ultimos-10">Últimos 10</TabsTrigger>
+                </TabsList>
+                <TabsContent value="prontas">
+                    <div className="flex justify-end items-center mb-2">
+                        <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                    </div>
+                    {allOrders.length === 0 
+                        ? <p className="text-gray-500">Nenhum pedido disponível</p>
+                        : <CrudTable columns={PickupOrderColumns(true)} data={allOrders} />
+                    }
+                </TabsContent>
+                <TabsContent value="ultimos-10">
+                    <div className="flex justify-end items-center mb-2">
+                        <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                    </div>
+                    {last10.length === 0 
+                        ? <p className="text-gray-500">Nenhum pedido disponível</p>
+                        : <CrudTable columns={PickupOrderColumns(false)} data={last10} />
+                    }
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };
-
-interface ModalData {
-    pickupIDs: string[];
-    orderIDs: string[];
-}
 
 export default PickupOrderPage

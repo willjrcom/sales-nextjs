@@ -9,16 +9,29 @@ import ListOrderCard from './finished-order';
 import CategorySummary from './category-summary';
 import ListDeliveryDriversTax from './delivery-drivers-tax';
 import ProductionAnalyticsCard from '@/app/components/report/production-analytics-card';
+import { useQuery } from '@tanstack/react-query';
+import GetShiftByID from '@/app/api/shift/[id]/shift';
+import { useSession } from 'next-auth/react';
 
 interface SalesDashboardProps {
     shift?: Shift | null
     isUpdate?: boolean
 }
 
-const ShiftDashboard = ({ shift, isUpdate }: SalesDashboardProps) => {
-    if (!shift) return
+const ShiftDashboard = ({ shift: initialShift, isUpdate }: SalesDashboardProps) => {
+    const { data: session } = useSession();
 
-    shift = Object.assign(new Shift(), shift);
+    // Busca os dados completos do shift quando isUpdate for true
+    const { data: fetchedShift } = useQuery({
+        queryKey: ['shift', initialShift?.id],
+        queryFn: () => GetShiftByID(initialShift!.id, session!),
+        enabled: !!isUpdate && !!initialShift?.id && !!session,
+        initialData: initialShift ? Object.assign(new Shift(), initialShift) : undefined,
+    });
+
+    const shift = isUpdate && fetchedShift ? Object.assign(new Shift(), fetchedShift) : initialShift ? Object.assign(new Shift(), initialShift) : null;
+
+    if (!shift) return null;
     return (
         <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">

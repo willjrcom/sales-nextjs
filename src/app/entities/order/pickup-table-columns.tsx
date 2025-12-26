@@ -6,35 +6,42 @@ import ButtonIcon from "@/app/components/button/button-icon";
 import { FaSeedling } from "react-icons/fa";
 import { BsSend } from "react-icons/bs";
 
-const PickupOrderColumns = (): ColumnDef<Order>[] => [
-  {
-    id: 'Comanda',
-    accessorKey: 'order_number',
-    header: 'Comanda',
-  },
-  {
-    id: 'Nome',
-    accessorKey: 'name',
-    header: 'Nome',
-    accessorFn: row => {
-      const name = row.pickup?.name
-      if (!name) return 'Sem cliente'
-
-      return name.substring(0, 15);
+const PickupOrderColumns = (showActions: boolean = true): ColumnDef<Order>[] => {
+  const columns: ColumnDef<Order>[] = [
+    {
+      id: 'Comanda',
+      accessorKey: 'order_number',
+      header: 'Comanda',
     },
-  },
-  {
-    id: 'Entregar',
-    accessorKey: 'delivery',
-    cell: ({ row }) => {
-      return (
-        <ButtonIcon modalName={"show-order-" + row.original.id}
-          title={"Ver Pedido"} size="xl" icon={BsSend}>
-          <CardOrder key={row.original.id} orderId={row.original.id} />
-        </ButtonIcon>
-      )
-    }
+    {
+      id: 'Nome',
+      accessorKey: 'name',
+      header: 'Nome',
+      accessorFn: row => {
+        const name = row.pickup?.name
+        if (!name) return 'Sem cliente'
+
+        return name.substring(0, 15);
+      },
+    },
+  ];
+
+  if (showActions) {
+    columns.push({
+      id: 'Entregar',
+      accessorKey: 'Entregar',
+      cell: ({ row }) => {
+        return (
+          <ButtonIcon modalName={"show-order-" + row.original.id}
+            title={"Ver Pedido"} size="xl" icon={BsSend}>
+            <CardOrder key={row.original.id} orderId={row.original.id} />
+          </ButtonIcon>
+        )
+      }
+    });
   }
-];
+
+  return columns;
+};
 
 export default PickupOrderColumns
