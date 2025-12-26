@@ -13,12 +13,13 @@ import { ToIsoDate } from '@/app/utils/date';
 import { DateField, HiddenField, ImageField, TextField } from '@/app/components/modal/field';
 import NewUser from '@/app/api/user/new/user';
 import AddUserToCompany from '@/app/api/company/add/company';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PatternField from '@/app/components/modal/fields/pattern';
 import AddressForm from '../address/form';
 import ContactForm from '../contact/form';
 import Contact from '@/app/entities/contact/contact';
 import Address from '@/app/entities/address/address';
+import DeleteEmployee from '@/app/api/employee/delete/employee';
 
 interface EmployeeFormProps extends CreateFormsProps<Employee> {
     isDisabledPerson?: boolean;
@@ -33,7 +34,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
     const { data } = useSession();
-
+ 
     const handleInputChange = useCallback((field: keyof Employee, value: any) => {
         setEmployee(prev => ({
             ...prev,
@@ -48,6 +49,34 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     useEffect(() => {
         handleInputChange('contact', contact);
     }, [contact]);
+
+    const createMutation = useMutation({
+        mutationFn: async (newEmployee: Employee) => { 
+            const responseUser = await NewUser(newEmployee, "", true)
+            await AddUserToCompany(newEmployee.email, data!)
+            NewEmployee(responseUser, data!)
+        },
+        onSuccess: (_, newEmployee) => {
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            notifySuccess(`Funcionário ${newEmployee.name} criado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao criar cliente');
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (updatedEmployee: Employee) => UpdateEmployee(updatedEmployee, data!),
+        onSuccess: (_, updatedEmployee) => {
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            notifySuccess(`Funcionário ${updatedEmployee.name} atualizado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar funcionário');
+        }
+    });
 
     const submitEmployee = async () => {
         if (isUpdate) {
@@ -72,15 +101,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         const validationErrors = ValidateEmployeeForm(newEmployee);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            await UpdateEmployee(newEmployee, data)
-            notifySuccess(`Funcionário ${employee.name} atualizado com sucesso`);
-
-            modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao atualizar funcionário');
-        }
+        updateMutation.mutate(newEmployee);
     }
 
     const createUserAndEmployee = async () => {
@@ -95,19 +116,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
         const validationErrors = ValidateEmployeeForm(newEmployee);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
-        try {
-            const responseUser = await NewUser(newEmployee, "", true)
-            await AddUserToCompany(newEmployee.email, data)
-            const responseEmployee = await NewEmployee(responseUser, data)
-
-            newEmployee.id = responseEmployee
-            notifySuccess(`Funcionário ${employee.name} criado com sucesso`);
-
-            modalHandler.hideModal(modalName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || `Erro ao criar funcionário ${employee.name}`);
-        }
+        createMutation.mutate(newEmployee);
     }
 
     return (

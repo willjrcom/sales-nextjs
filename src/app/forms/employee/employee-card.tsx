@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Employee from "@/app/entities/employee/employee";
 import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
@@ -19,7 +19,7 @@ import SalaryHistoryModal from "./SalaryHistoryModal";
 import PaymentModal from "./PaymentModal";
 import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface EmployeeCardProps {
     item: Employee;
@@ -60,7 +60,7 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                 .catch((error) => {
                     notifyError('Erro ao carregar histórico salarial');
                 });
-            
+
             getEmployeePayments(item.id, data)
                 .then((payments) => setPayments(payments.map((p: any) => new EmployeePayment(p))))
                 .catch((error) => {
@@ -83,10 +83,10 @@ function EmployeeCard({ item }: EmployeeCardProps) {
             await UpdateEmployee(employeeWithPermissions, data);
         } catch (error: RequestError | any) {
             console.error('Erro ao atualizar permissões:', error);
-            
+
             // Extrai a mensagem de erro de forma mais robusta
             let errorMessage = "Erro ao atualizar permissões";
-            
+
             if (error && typeof error === 'object') {
                 if (error.message) {
                     errorMessage = error.message;
@@ -98,24 +98,29 @@ function EmployeeCard({ item }: EmployeeCardProps) {
             } else if (typeof error === 'string') {
                 errorMessage = error;
             }
-            
+
             notifyError(errorMessage);
         }
     }
 
-    const onDelete = async () => {
-        if (!data) return;
-        try {
-            await DeleteEmployee(item.id, data);
+    const deleteMutation = useMutation({
+        mutationFn: async (employeeId: string) => {
+            await DeleteEmployee(employeeId, data!);
 
-            await RemoveUserFromCompany(item.email, data)
-
-            notifySuccess('Funcionário removido com sucesso');
+            await RemoveUserFromCompany(item.email, data!)
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employees'] });
+            notifySuccess(`Funcionário ${item?.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
-        } catch (error: RequestError | any) {
-            notifyError(error.message || `Erro ao remover funcionário ${item.name}`);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || `Erro ao remover funcionário ${item?.name}`);
         }
+    });
+
+    const onDelete = async () => {
+        deleteMutation.mutate(item.id);
     }
 
     const handleSalaryHistorySuccess = (newHistory: any) => {
