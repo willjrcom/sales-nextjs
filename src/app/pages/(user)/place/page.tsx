@@ -1,6 +1,6 @@
 "use client";
 
-import React, { CSSProperties, useEffect, useMemo, useState } from "react";
+import React, { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import PageTitle from '@/app/components/PageTitle';
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
 import { useSession } from "next-auth/react";
@@ -46,6 +46,7 @@ const DragAndDropGrid = () => {
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const queryClient = useQueryClient();
+    const lastLoadedPlaceID = useRef<string>("");  // Rastreia o último ambiente carregado
 
     const { data: placesResponse, refetch: refetchPlaces, isPending: isPendingPlaces } = useQuery({
         queryKey: ['places'],
@@ -81,7 +82,12 @@ const DragAndDropGrid = () => {
         if (!place) return;
 
         setDroppedTables(place.tables || []);
-        reloadGrid(place.tables);
+        
+        // Só recalcula o grid quando trocar de ambiente, não quando mover mesas
+        if (lastLoadedPlaceID.current !== placeSelectedID) {
+            reloadGrid(place.tables);
+            lastLoadedPlaceID.current = placeSelectedID;
+        }
     }, [placeSelectedID, places]);
 
     const reloadGrid = (tables: PlaceTable[]) => {
@@ -193,6 +199,11 @@ const DragAndDropGrid = () => {
     };
 
     const removeRow = () => {
+        if (totalRows <= 5) {
+            notifyError("Não é possível ter menos de 5 linhas");
+            return;
+        }
+
         const lastRowUsed = [...droppedTables || []].find((item) => item.row === totalRows - 1);
 
         if (lastRowUsed) {
@@ -200,10 +211,8 @@ const DragAndDropGrid = () => {
             return;
         }
 
-        if (totalRows > 1) {
-            setGrid(generateGrid(totalRows - 1, totalCols));
-            setTotalRows((prev) => prev - 1);
-        }
+        setGrid(generateGrid(totalRows - 1, totalCols));
+        setTotalRows((prev) => prev - 1);
     };
 
     const addColumn = () => {
@@ -212,6 +221,11 @@ const DragAndDropGrid = () => {
     };
 
     const removeColumn = () => {
+        if (totalCols <= 5) {
+            notifyError("Não é possível ter menos de 5 colunas");
+            return;
+        }
+
         const lastColumnUsed = [...droppedTables || []].find((item) => item.column === totalCols - 1);
 
         if (lastColumnUsed) {
@@ -219,10 +233,8 @@ const DragAndDropGrid = () => {
             return;
         }
 
-        if (totalCols > 1) {
-            setGrid(generateGrid(totalRows, totalCols - 1));
-            setTotalCols((prev) => prev - 1);
-        }
+        setGrid(generateGrid(totalRows, totalCols - 1));
+        setTotalCols((prev) => prev - 1);
     };
 
     return (
