@@ -66,17 +66,11 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     },
   },
   {
-    id: 'Histórico',
-    accessorKey: 'id',
-    header: 'Histórico',
+    id: 'Editar',
+    header: 'Editar',
     cell: ({ row }) => {
       return (
         <div style={{ display: 'flex', gap: 8 }}>
-          <ButtonIcon icon={FaSearch} modalName={"stock-movements-" + row.original.id}
-            title={"Histórico de movimentos de " + (row.original.product?.name || "estoque")}>
-            <StockMovements stockID={row.original.id} />
-          </ButtonIcon>
-
           <ButtonIcon icon={FaPlus} modalName={"add-stock-" + row.original.id}
             title={"Adicionar estoque " + (row.original.product?.name || "")}>
             <AddStockForm key={"add:"+ row.original.id} stock={row.original} />
@@ -96,17 +90,16 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     },
   },
   {
-    id: 'Editar',
-    accessorKey: 'id',
-    header: 'Editar',
+    id: 'Historico',
+    header: 'Historico',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-stock-" + row.original.id}
-          title={"Editar estoque de " + (row.original.product?.name || "produto")}>
-          <StockForm
-            item={row.original}
-            isUpdate={true} />
-        </ButtonIcon>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <ButtonIcon icon={FaSearch} modalName={"stock-movements-" + row.original.id}
+            title={"Histórico de movimentos de " + (row.original.product?.name || "estoque")}>
+            <StockMovements stockID={row.original.id} />
+          </ButtonIcon>
+        </div>
       )
     },
   },

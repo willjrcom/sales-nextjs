@@ -36,7 +36,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const createMutation = useMutation({
         mutationFn: (newStock: Stock) => NewStock(newStock, data!),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['stock-report'] });
+            queryClient.invalidateQueries({ queryKey: ['stocks'] });
             notifySuccess(`Controle de estoque criado com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -48,7 +48,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const updateMutation = useMutation({
         mutationFn: (updatedStock: Stock) => UpdateStock(updatedStock, data!),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['stock-report'] });
+            queryClient.invalidateQueries({ queryKey: ['stocks'] });
             notifySuccess(`Estoque atualizado com sucesso`);
             modalHandler.hideModal(modalName);
         },

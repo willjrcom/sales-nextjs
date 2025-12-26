@@ -13,7 +13,7 @@ import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import RemoveStock from '@/app/api/stock/movement/remove';
 import Decimal from 'decimal.js';
 import { RemoveStockRequest } from '@/app/api/stock/movement/remove';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface RemoveStockFormProps {
     stock?: Stock;
@@ -41,19 +41,21 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
         setMovement(prev => ({ ...prev, [field]: value }));
     };
 
-    const submit = async () => {
-        if (!data || !stock?.id) return;
-        
-        try {
-            await RemoveStock(stock.id, movement, data);
+    const createMutation = useMutation({
+        mutationFn: (movement: RemoveStockRequest) => RemoveStock(stock?.id!, movement, data!),
+        onSuccess: () => {
             notifySuccess(`Estoque removido com sucesso`);
             queryClient.invalidateQueries({ queryKey: ['stocks'] });
             modalHandler.hideModal(modalName);
-
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover estoque');
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao remover estoque');
         }
+    });
+
+    const submit = async () => {
+        if (!data || !stock?.id) return;
+        createMutation.mutate(movement);
     }
 
     return (

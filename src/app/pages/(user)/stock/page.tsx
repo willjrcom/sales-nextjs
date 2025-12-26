@@ -34,7 +34,7 @@ const PageStock = () => {
     });
 
     const { isPending: stockPending, error: stockError, data: report, refetch } = useQuery({
-        queryKey: ['stock-report'],
+        queryKey: ['stocks'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetStockReport(data!);

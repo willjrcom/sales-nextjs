@@ -116,7 +116,6 @@ const DeliveryOrderToFinish = () => {
     return (
         <>
             <div className="flex justify-between items-center gap-4">
-                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
                 <SelectField
                     friendlyName=""
                     name="name"
@@ -125,6 +124,7 @@ const DeliveryOrderToFinish = () => {
                     values={deliveryDrivers}
                     optional
                 />
+                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
             <div className="flex flex-col md:flex-row gap-4 items-start">
                 {/* Tabela */}

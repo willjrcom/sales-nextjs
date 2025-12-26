@@ -13,7 +13,7 @@ import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import AddStock, { AddStockRequest } from '@/app/api/stock/movement/add';
 import Decimal from 'decimal.js';
 import PriceField from '@/app/components/modal/fields/price';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface AddStockFormProps {
     stock?: Stock;
@@ -41,19 +41,21 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
         setMovement(prev => ({ ...prev, [field]: value }));
     };
 
-    const submit = async () => {
-        if (!data || !stock?.id) return;
-
-        try {
-            await AddStock(stock?.id, movement, data);
+    const createMutation = useMutation({
+        mutationFn: (movement: AddStockRequest) => AddStock(stock?.id!, movement, data!),
+        onSuccess: () => {
             notifySuccess(`Estoque adicionado com sucesso`);
             queryClient.invalidateQueries({ queryKey: ['stocks'] });
             modalHandler.hideModal(modalName);
-
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao adicionar estoque');
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao adicionar estoque');
         }
+    });
+
+    const submit = async () => {
+        if (!data || !stock?.id) return;
+        createMutation.mutate(movement);
     }
 
     return (

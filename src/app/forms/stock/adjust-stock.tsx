@@ -11,7 +11,7 @@ import RequestError from '@/app/utils/error';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import AdjustStock, { AdjustStockRequest } from '@/app/api/stock/movement/adjust';
 import Decimal from 'decimal.js';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface AdjustStockFormProps {
     stock?: Stock;
@@ -39,19 +39,21 @@ const AdjustStockForm = ({ stock }: AdjustStockFormProps) => {
         setMovement(prev => ({ ...prev, [field]: value }));
     };
 
-    const submit = async () => {
-        if (!data || !stock?.id) return;
-
-        try {
-            await AdjustStock(stock.id, movement, data);
-            notifySuccess(`Estoque removido com sucesso`);
+    const createMutation = useMutation({
+        mutationFn: (movement: AdjustStockRequest) => AdjustStock(stock?.id!, movement, data!),
+        onSuccess: () => {
+            notifySuccess(`Estoque ajustado com sucesso`);
             queryClient.invalidateQueries({ queryKey: ['stocks'] });
             modalHandler.hideModal(modalName);
-
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Erro ao remover estoque');
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao ajustar estoque');
         }
+    });
+
+    const submit = async () => {
+        if (!data || !stock?.id) return;
+        createMutation.mutate(movement);
     }
 
     return (

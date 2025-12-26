@@ -152,7 +152,7 @@ function CompanySelection() {
 
             {!loadingCompanies && companies.length > 0 && <div className='flex justify-center items-center gap-4 mb-10'>
                 <h2 className="text-2xl">Selecione uma Empresa</h2>
-                <Refresh onRefresh={refetch} isPending={loadingCompanies} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isPending={loadingCompanies} lastUpdate={lastUpdate} removeText={true} />
             </div>}
 
             {!loadingCompanies && (companies.length === 0 ? (

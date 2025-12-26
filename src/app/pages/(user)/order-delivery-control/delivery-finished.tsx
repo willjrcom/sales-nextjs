@@ -67,7 +67,6 @@ const DeliveryOrderFinished = () => {
     return (
         <>
             <div className="flex justify-between items-center gap-4">
-                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
                 <SelectField
                     friendlyName=""
                     name="name"
@@ -76,6 +75,7 @@ const DeliveryOrderFinished = () => {
                     values={deliveryDrivers}
                     optional
                 />
+                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
             {ordersNotFinished.length > 0 &&
                 <div className="mt-4">

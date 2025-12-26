@@ -136,8 +136,9 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
     const { data } = useSession();
     const modalHandler = useModal();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { data: deliveryDriversResponse } = useQuery({
+    const { data: deliveryDriversResponse, refetch, isPending } = useQuery({
         queryKey: ['deliveryDrivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
         enabled: !!data?.user?.access_token,
@@ -145,6 +146,11 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     });
 
     const deliveryDrivers = deliveryDriversResponse?.items || [];
+
+    const handleRefresh = async () => {
+        await refetch();
+        setLastUpdate(FormatRefreshTime(new Date()));
+    };
 
     const submit = async () => {
         if (!data) return;
@@ -192,7 +198,10 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     return (
         <>
             <div className="items-center mb-4">
-                <h3 className="text-lg font-semibold mb-2">Selecione um entregador:</h3>
+                <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-lg font-semibold">Selecione um entregador:</h3>
+                    <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
+                </div>
                 {deliveryDrivers.length === 0 && <p className="text-gray-500">Nenhum entregador cadastrado</p>}
 
                 <Carousel items={deliveryDrivers}>
