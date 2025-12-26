@@ -30,8 +30,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const createMutation = useMutation({
         mutationFn: (newTable: Table) => NewTable(newTable, data!),
 
-        onSuccess: (response, newTable) => {
-            newTable.id = response;
+        onSuccess: (_, newTable) => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
             queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
             notifySuccess(`Mesa ${newTable.name} criada com sucesso`);

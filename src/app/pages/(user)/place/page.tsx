@@ -130,6 +130,7 @@ const DragAndDropGrid = () => {
                 setUnusedTables(newUnusedTables);
 
                 queryClient.invalidateQueries({ queryKey: ['places'] });
+                queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
                 return
             }
 
@@ -155,6 +156,7 @@ const DragAndDropGrid = () => {
                 setUnusedTables(newUnusedTables);
                 setDroppedTables(newDroppedTables);
                 queryClient.invalidateQueries({ queryKey: ['places'] });
+                queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
                 return
             }
 
@@ -178,6 +180,7 @@ const DragAndDropGrid = () => {
                 }
 
                 queryClient.invalidateQueries({ queryKey: ['places'] });
+                queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
                 setDroppedTables(newDroppedTables);
                 return
             }
