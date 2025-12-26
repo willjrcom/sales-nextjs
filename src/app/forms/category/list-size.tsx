@@ -1,64 +1,92 @@
-import ButtonIconText from "@/app/components/button/button-icon-text";
+import { useState } from "react";
 import Size from "@/app/entities/size/size";
 import SizeForm from "@/app/forms/size/form";
-import { useModal } from "@/app/context/modal/context";
 import Category from "@/app/entities/category/category";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import GetCategoryByID from "@/app/api/category/[id]/category";
 import { useSession } from "next-auth/react";
+import { FaPlus } from "react-icons/fa";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ListSizeProps {
     category: Category;
 }
 
 const ListSize = ({ category: initialCategory }: ListSizeProps) => {
-    const modalHandler = useModal();
-    const queryClient = useQueryClient();
     const { data: session } = useSession();
+    const [editingSize, setEditingSize] = useState<Size | null>(null);
+    const [isNewOpen, setIsNewOpen] = useState(false);
 
     // Usa useQuery para manter os dados sincronizados
-    const { data: category } = useQuery({
+    const { data: category, refetch } = useQuery({
         queryKey: ['category', initialCategory.id],
         queryFn: () => GetCategoryByID(initialCategory.id, session!),
         enabled: !!session && !!initialCategory.id,
-        initialData: initialCategory, // Usa os dados iniciais enquanto não recarrega
+        initialData: initialCategory,
     });
 
     const currentCategory = category || initialCategory;
-    if (currentCategory?.sizes === undefined || currentCategory?.sizes.length === 0) currentCategory!.sizes = [];
-
-    const onClose = (id?: string) => {
-        if (id) modalHandler.hideModal("edit-size-" + id);
-        else modalHandler.hideModal("new-size");
-    }
-
-    const onEdit = (size: Size) => {
-        const modalName = "edit-size-" + size.id;
-        const title = "Editar tamanho: " + size.name;
-        const elem = <SizeForm category={currentCategory} isUpdate={true} item={size} />
-        modalHandler.showModal(modalName, title, elem, "md", () => onClose(size.id))
-    }
-
-    const sizes = [...(currentCategory?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name))
+    const sizes = [...(currentCategory?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name));
     const isDefaultCategory = !currentCategory.is_additional && !currentCategory.is_complement;
+
+    const handleSuccess = () => {
+        refetch();
+        setEditingSize(null);
+        setIsNewOpen(false);
+    };
 
     return (
         <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
             <div className="flex flex-wrap gap-4">
                 {sizes.map((size) => (
-                    <div
-                        onClick={() => onEdit(size)}
-                        key={size.id}
-                        className="border p-2 rounded-md text-center bg-white w-32 cursor-pointer"
-                    >
-                        {size.name}
-                    </div>
+                    <Dialog key={size.id} open={editingSize?.id === size.id} onOpenChange={(open) => !open && setEditingSize(null)}>
+                        <DialogTrigger asChild>
+                            <div
+                                onClick={() => setEditingSize(size)}
+                                className="border p-2 rounded-md text-center bg-white w-32 cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                                {size.name}
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Editar tamanho: {size.name}</DialogTitle>
+                            </DialogHeader>
+                            <SizeForm 
+                                category={currentCategory} 
+                                isUpdate={true} 
+                                item={size} 
+                                onSuccess={handleSuccess}
+                            />
+                        </DialogContent>
+                    </Dialog>
                 ))}
+
                 {isDefaultCategory && (
-                    <ButtonIconText modalName="new-size" title="Tamanho">
-                        <SizeForm category={currentCategory} />
-                    </ButtonIconText>
+                    <Dialog open={isNewOpen} onOpenChange={setIsNewOpen}>
+                        <DialogTrigger asChild>
+                            <div className="border p-2 rounded-md text-center bg-blue-500 text-white w-32 cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                                <FaPlus size={12} />
+                                Tamanho
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Novo Tamanho</DialogTitle>
+                            </DialogHeader>
+                            <SizeForm 
+                                category={currentCategory} 
+                                onSuccess={handleSuccess}
+                            />
+                        </DialogContent>
+                    </Dialog>
                 )}
             </div>
         </div>

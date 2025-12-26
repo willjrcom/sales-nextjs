@@ -19,9 +19,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
     category: Category
+    onSuccess?: () => void
 }
 
-const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
+const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity';
     const modalHandler = useModal();
     const queryClient = useQueryClient();
@@ -41,6 +42,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
             notifySuccess(`Quantidade ${newQuantity.quantity} criada com sucesso`);
             modalHandler.hideModal(modalName);
+            onSuccess?.();
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar quantitye');
@@ -55,6 +57,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
             
             notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
             modalHandler.hideModal(modalName);
+            onSuccess?.();
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar quantitye');
@@ -69,6 +72,7 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
             
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
+            onSuccess?.();
         },
         onError: (error: RequestError) => {
             notifyError(error.message || `Erro ao remover quantitye ${quantity.quantity}`);

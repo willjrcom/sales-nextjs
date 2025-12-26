@@ -10,9 +10,14 @@ const CategoryColumns = (): ColumnDef<Category>[] => [
     header: 'Nome',
   },
   {
-    id: 'Imagem',
-    accessorKey: 'image_path',
-    header: 'Imagem',
+    id: 'Tipo',
+    header: 'Tipo',
+    cell: ({ row }) => {
+      const category = row.original;
+      if (category.is_additional) return 'Adicional';
+      if (category.is_complement) return 'Complemento';
+      return 'Padrão';
+    }
   },
   {
     id: 'Editar',

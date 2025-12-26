@@ -19,9 +19,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
     category: Category
+    onSuccess?: () => void
 }
 
-const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
+const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
@@ -43,6 +44,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
             
             notifySuccess(`Tamanho ${newSize.name} criado com sucesso`);
             modalHandler.hideModal(modalName);
+            onSuccess?.();
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar tamanho');
@@ -57,6 +59,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             notifySuccess(`Tamanho ${updatedSize.name} atualizado com sucesso`);
             modalHandler.hideModal(modalName);
+            onSuccess?.();
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar tamanho');
@@ -71,6 +74,7 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
             notifySuccess(`Tamanho ${size.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
+            onSuccess?.();
         },
         onError: (error: RequestError) => {
             notifyError(error.message || `Erro ao remover tamanho ${size.name}`);
