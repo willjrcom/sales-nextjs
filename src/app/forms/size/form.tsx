@@ -38,7 +38,9 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
 
         onSuccess: (response, newSize) => {
             newSize.id = response;
-            queryClient.invalidateQueries({ queryKey: ['sizes'] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            
             notifySuccess(`Tamanho ${newSize.name} criado com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -50,7 +52,9 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const updateMutation = useMutation({
         mutationFn: (updatedSize: Size) => UpdateSize(updatedSize, data!),
         onSuccess: (_, updatedSize) => {
-            queryClient.invalidateQueries({ queryKey: ['sizes'] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+
             notifySuccess(`Tamanho ${updatedSize.name} atualizado com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -62,7 +66,9 @@ const SizeForm = ({ item, isUpdate, category }: SizeFormProps) => {
     const deleteMutation = useMutation({
         mutationFn: (sizeId: string) => DeleteSize(sizeId, data!),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['sizes'] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+
             notifySuccess(`Tamanho ${size.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         },

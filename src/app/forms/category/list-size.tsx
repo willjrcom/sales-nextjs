@@ -3,14 +3,29 @@ import Size from "@/app/entities/size/size";
 import SizeForm from "@/app/forms/size/form";
 import { useModal } from "@/app/context/modal/context";
 import Category from "@/app/entities/category/category";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import GetCategoryByID from "@/app/api/category/[id]/category";
+import { useSession } from "next-auth/react";
 
 interface ListSizeProps {
     category: Category;
 }
 
-const ListSize = ({ category }: ListSizeProps) => {
+const ListSize = ({ category: initialCategory }: ListSizeProps) => {
     const modalHandler = useModal();
-    if (category?.sizes === undefined || category?.sizes.length === 0) category!.sizes = [];
+    const queryClient = useQueryClient();
+    const { data: session } = useSession();
+
+    // Usa useQuery para manter os dados sincronizados
+    const { data: category } = useQuery({
+        queryKey: ['category', initialCategory.id],
+        queryFn: () => GetCategoryByID(initialCategory.id, session!),
+        enabled: !!session && !!initialCategory.id,
+        initialData: initialCategory, // Usa os dados iniciais enquanto não recarrega
+    });
+
+    const currentCategory = category || initialCategory;
+    if (currentCategory?.sizes === undefined || currentCategory?.sizes.length === 0) currentCategory!.sizes = [];
 
     const onClose = (id?: string) => {
         if (id) modalHandler.hideModal("edit-size-" + id);
@@ -20,12 +35,12 @@ const ListSize = ({ category }: ListSizeProps) => {
     const onEdit = (size: Size) => {
         const modalName = "edit-size-" + size.id;
         const title = "Editar tamanho: " + size.name;
-        const elem = <SizeForm category={category} isUpdate={true} item={size} />
+        const elem = <SizeForm category={currentCategory} isUpdate={true} item={size} />
         modalHandler.showModal(modalName, title, elem, "md", () => onClose(size.id))
     }
 
-    const sizes = [...(category?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name))
-    const isDefaultCategory = !category.is_additional && !category.is_complement;
+    const sizes = [...(currentCategory?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name))
+    const isDefaultCategory = !currentCategory.is_additional && !currentCategory.is_complement;
 
     return (
         <div className="mb-8">
@@ -42,7 +57,7 @@ const ListSize = ({ category }: ListSizeProps) => {
                 ))}
                 {isDefaultCategory && (
                     <ButtonIconText modalName="new-size" title="Tamanho">
-                        <SizeForm category={category} />
+                        <SizeForm category={currentCategory} />
                     </ButtonIconText>
                 )}
             </div>

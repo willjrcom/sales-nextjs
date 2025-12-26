@@ -35,7 +35,10 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
 
         onSuccess: (response, newQuantity) => {
             newQuantity.id = response;
-            queryClient.invalidateQueries({ queryKey: ['quantities'] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            
+
             notifySuccess(`Quantidade ${newQuantity.quantity} criada com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -47,7 +50,9 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const updateMutation = useMutation({
         mutationFn: (updatedQuantity: Quantity) => UpdateQuantity(updatedQuantity, data!),
         onSuccess: (_, updatedQuantity) => {
-            queryClient.invalidateQueries({ queryKey: ['quantities'] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            
             notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -59,7 +64,9 @@ const QuantityForm = ({ item, isUpdate, category }: QuantityFormProps) => {
     const deleteMutation = useMutation({
         mutationFn: (quantityId: string) => DeleteQuantity(quantityId, data!),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['quantities'] });
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
         },

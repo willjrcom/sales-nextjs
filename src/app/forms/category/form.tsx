@@ -21,10 +21,7 @@ import printService from '@/app/utils/print-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import GetCategories from '@/app/api/category/category';
 
-interface CategoryFormProps extends CreateFormsProps<Category> {
-    setItem?: (item: Category) => void
-}
-const CategoryForm = ({ item, setItem, isUpdate }: CategoryFormProps) => {
+const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
     const [category, setCategory] = useState<Category>(item || new Category());
