@@ -12,6 +12,7 @@ import { FaSearch } from 'react-icons/fa';
 import { useQuery } from "@tanstack/react-query";
 import GetCategories from "@/app/api/category/category";
 import { useSession } from "next-auth/react";
+import { CardOrderResume } from "../resume/resume";
 
 export const CartAdded = () => {
     const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
@@ -23,7 +24,7 @@ export const CartAdded = () => {
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
         queryFn: () => GetCategories(session!),
-        enabled: !!session?.user?.access_token,
+        enabled: !!session,
     });
 
     const categories = categoriesResponse?.items || [];
@@ -43,7 +44,10 @@ export const CartAdded = () => {
     return (
         <div className="box-border bg-white h-full flex flex-col overflow-x-hidden">
             <div className="mb-2">
-                <h1 className="text-xl font-bold mb-1">Meus Itens</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-xl font-bold">Meus Itens</h1>
+                    <CardOrderResume />
+                </div>
                 {order.status !== "Canceled" &&
                     <div onClick={() => contextGroupItem.resetGroupItem()}>
                         <ButtonIconTextFloat size="xl"

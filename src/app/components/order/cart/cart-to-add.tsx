@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Carousel from "../../carousel/carousel";
 import ProductCard from "../product/card-product";
 import { TextField } from "../../modal/field";
-import Button from "../../ui/Button";
 import GetProductByCode from "@/app/api/product/code/[code]";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/utils/error";
@@ -14,6 +13,71 @@ import AddProductCard from "@/app/forms/item/form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import GetCategories from "@/app/api/category/category";
 import { FiRefreshCw } from "react-icons/fi";
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart, X } from "lucide-react";
+import Decimal from "decimal.js";
+import { GroupItemCard } from "../group-item/edit-group-item";
+
+const CartDrawerButton = () => {
+    const contextGroupItem = useGroupItem();
+    const itemCount = contextGroupItem.groupItem?.items?.length || 0;
+    const total = new Decimal(contextGroupItem.groupItem?.total_price || "0").toFixed(2);
+
+    return (
+        <Drawer direction="right">
+            <DrawerTrigger asChild>
+                <Button
+                    variant="default"
+                    className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white gap-2"
+                >
+                    <div className="relative">
+                        <ShoppingCart className="h-4 w-4" />
+                        {itemCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold text-[10px]">
+                                {itemCount}
+                            </span>
+                        )}
+                    </div>
+                    <span>Carrinho</span>
+                </Button>
+            </DrawerTrigger>
+            <DrawerContent direction="right" className="w-[450px]">
+                <DrawerHeader className="border-b bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-tl-[10px]">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <ShoppingCart className="h-5 w-5" />
+                            <div>
+                                <DrawerTitle className="text-white text-lg">
+                                    Carrinho
+                                </DrawerTitle>
+                                <p className="text-yellow-100 text-sm">
+                                    {itemCount} item(ns) • R$ {total}
+                                </p>
+                            </div>
+                        </div>
+                        <DrawerClose asChild>
+                            <Button variant="ghost" size="icon" className="text-white hover:bg-yellow-600/50">
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </DrawerClose>
+                    </div>
+                </DrawerHeader>
+                
+                <div className="flex-1 overflow-y-auto">
+                    <GroupItemCard />
+                </div>
+            </DrawerContent>
+        </Drawer>
+    );
+};
 
 export const CartToAdd = () => {
     const contextGroupItem = useGroupItem();
@@ -84,17 +148,21 @@ export const CartToAdd = () => {
                         onEnter={onSearch}
                         optional
                     />
-                    <Button onClick={onSearch}>Buscar</Button>
+                    <Button onClick={onSearch} variant="outline">Buscar</Button>
                 </div>
 
-                <button
-                    onClick={refreshCategories}
-                    disabled={isFetching}
-                    className="p-2 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
-                    title="Atualizar categorias"
-                >
-                    <FiRefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
-                </button>
+                <div className="flex items-center space-x-2">
+                    <CartDrawerButton />
+                    
+                    <button
+                        onClick={refreshCategories}
+                        disabled={isFetching}
+                        className="p-2 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
+                        title="Atualizar categorias"
+                    >
+                        <FiRefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
+                    </button>
+                </div>
             </div>
 
             <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">

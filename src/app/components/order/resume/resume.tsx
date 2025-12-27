@@ -20,40 +20,81 @@ import printGroupItem from "../../print/print-group-item";
 import AddTableTax from "@/app/api/order-table/update/add-tax/order-table";
 import RemoveTableTax from "@/app/api/order-table/update/remove-tax/order-table";
 import GetCompany from "@/app/api/company/company";
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Receipt, X, Truck, Package, UtensilsCrossed } from "lucide-react";
 
 export const CardOrderResume = () => {
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
-    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
     }, [contextCurrentOrder.order])
 
-    return (
-        <>
-            <button
-                type="button"
-                onClick={() => setIsOpen(prev => !prev)}
-                className={`fixed top-1/2 transform -translate-y-1/2 z-50 [writing-mode:vertical-rl] rotate-180 cursor-pointer focus:outline-none bg-green-500 text-white p-2 rounded-r-md transition-all duration-300 ${isOpen ? 'right-[30vw]' : 'right-0'}`}
-            >
-                Resumo
-            </button>
+    const getOrderTypeIcon = () => {
+        if (order?.delivery) return <Truck className="h-4 w-4" />;
+        if (order?.pickup) return <Package className="h-4 w-4" />;
+        if (order?.table) return <UtensilsCrossed className="h-4 w-4" />;
+        return <Receipt className="h-4 w-4" />;
+    };
 
-            <div className="fixed right-0 top-0 h-full z-40">
-                <div className={`h-full bg-gray-200 text-white overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-[30vw]' : 'w-0'} origin-right`}>
-                    {isOpen && (
-                        <div className="p-4 text-black">
-                            <h2 className="text-lg font-bold text-black">Resumo</h2>
-                            <OrderPaymentsResume />
-                            {order?.delivery && <DeliveryCard />}
-                            {order?.pickup && <PickupCard />}
-                            {order?.table && <TableCard />}
+    const getOrderTypeName = () => {
+        if (order?.delivery) return "Delivery";
+        if (order?.pickup) return "Retirada";
+        if (order?.table) return `Mesa ${order.table.name}`;
+        return "Pedido";
+    };
+
+    return (
+        <Drawer direction="right">
+            <DrawerTrigger asChild>
+                <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-sm flex items-center gap-2"
+                >
+                    <Receipt className="h-4 w-4" />
+                    Resumo
+                </Button>
+            </DrawerTrigger>
+            <DrawerContent direction="right" className="w-[420px]">
+                <DrawerHeader className="border-b bg-gradient-to-r from-green-500 to-green-600 text-white rounded-tl-[10px]">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            {getOrderTypeIcon()}
+                            <div>
+                                <DrawerTitle className="text-white text-lg">
+                                    Resumo do Pedido
+                                </DrawerTitle>
+                                <p className="text-green-100 text-sm">
+                                    {getOrderTypeName()} • #{order?.order_number || "—"}
+                                </p>
+                            </div>
                         </div>
-                    )}
+                        <DrawerClose asChild>
+                            <Button variant="ghost" size="icon" className="text-white hover:bg-green-700/50">
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </DrawerClose>
+                    </div>
+                </DrawerHeader>
+                
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    <OrderPaymentsResume />
+                    {order?.delivery && <DeliveryCard />}
+                    {order?.pickup && <PickupCard />}
+                    {order?.table && <TableCard />}
                 </div>
-            </div>
-        </>
+            </DrawerContent>
+        </Drawer>
     );
 };
 
@@ -147,53 +188,118 @@ export const OrderPaymentsResume = () => {
     const tableTaxDecimal = new Decimal((order?.table?.tax_rate || "0"))
     
     return (
-        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-            <h3 className="text-lg font-semibold mb-2">Comanda N° {order?.order_number}</h3>
-            {order?.status && <p><StatusComponent status={order?.status} /></p>}
-
-            <br />
-            {/* Total do pedido */}
-            {order?.delivery &&
-                <div>
-                    <hr className="my-2" />
-                    <PriceField friendlyName="Troco" name="change" value={change} setValue={setChange} optional />
-                    <SelectField friendlyName="Forma de pagamento" name="payment_method" values={payMethodsWithId} selectedValue={paymentMethod} setSelectedValue={setPaymentMethod} optional />
-                    
-                    {(change.toNumber() !== (new Decimal(order.delivery.change || "0").toNumber() || 0) || paymentMethod !== order.delivery.payment_method) &&
-                        <button className="ml-4 text-red-500" onClick={updateChange}>Alterar troco</button>
-                    }
+        <div className="space-y-4">
+            {/* Status Card */}
+            <div className="bg-white rounded-xl shadow-sm border p-4">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-gray-800">Status do Pedido</h3>
+                    {order?.status && <StatusComponent status={order?.status} />}
                 </div>
-            }
-
-            {order?.table &&
-
-                <div className="flex items-center gap-2 mb-2">
-                    <p><strong>Taxa da mesa:</strong> {tableTaxDecimal.toFixed(2)} %</p>
-                    {tableTaxDecimal.gt(0)
-                        ? <button className="text-red-500" onClick={handleRemoveTax}>Remover</button>
-                        : <button className="text-green-500" onClick={handleAddTax}>Adicionar</button>
-                    }
-                </div>
-            }
-            <hr className="my-2" />
-            {order?.delivery?.delivery_tax && !order?.delivery?.is_delivery_free && (
-                <p><strong>Taxa de entrega:</strong> R$ {deliveryTaxDecimal.toFixed(2)}</p>
-            )}
-            {order?.delivery?.is_delivery_free && (
-                <p>
-                    <strong>Taxa de entrega:</strong> <span style={{ textDecoration: 'line-through', color: '#888' }}>R$ {deliveryTaxDecimal.toFixed(2)}</span> <span className="text-green-600 font-bold">Parabéns, você tem entrega grátis!</span>
+                <p className="text-sm text-gray-500">
+                    {order?.group_items?.length || 0} item(ns) no pedido
                 </p>
+            </div>
+
+            {/* Delivery Payment Section */}
+            {order?.delivery && (
+                <div className="bg-white rounded-xl shadow-sm border p-4">
+                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <Truck className="h-4 w-4 text-green-600" />
+                        Pagamento na Entrega
+                    </h4>
+                    <div className="space-y-3">
+                        <PriceField friendlyName="Troco para" name="change" value={change} setValue={setChange} optional />
+                        <SelectField friendlyName="Forma de pagamento" name="payment_method" values={payMethodsWithId} selectedValue={paymentMethod} setSelectedValue={setPaymentMethod} optional />
+                        
+                        {(change.toNumber() !== (new Decimal(order.delivery.change || "0").toNumber() || 0) || paymentMethod !== order.delivery.payment_method) && (
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full text-orange-600 border-orange-300 hover:bg-orange-50"
+                                onClick={updateChange}
+                            >
+                                Salvar alterações
+                            </Button>
+                        )}
+                    </div>
+                </div>
             )}
 
-            {/* <p>Desconto: R$ 5,00</p> */}
-            <hr className="my-2" />
-            <p><strong>Total:</strong> R$ {totalPayableDecimal.toFixed(2)}</p>
-            <br />
+            {/* Table Tax Section */}
+            {order?.table && (
+                <div className="bg-white rounded-xl shadow-sm border p-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                                <UtensilsCrossed className="h-4 w-4 text-blue-600" />
+                                Taxa de Serviço
+                            </h4>
+                            <p className="text-2xl font-bold text-gray-900 mt-1">
+                                {tableTaxDecimal.toFixed(0)}%
+                            </p>
+                        </div>
+                        {tableTaxDecimal.gt(0) ? (
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-red-600 border-red-300 hover:bg-red-50"
+                                onClick={handleRemoveTax}
+                            >
+                                Remover
+                            </Button>
+                        ) : (
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-green-600 border-green-300 hover:bg-green-50"
+                                onClick={handleAddTax}
+                            >
+                                Adicionar
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            )}
 
-            {/* Lançar Pedido */}
-            {isThrowButton && <button className="w-full bg-yellow-500 text-white py-2 rounded-lg mb-4" onClick={onSubmit}>
-                Lançar Pedido
-            </button>}
+            {/* Total Section */}
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl shadow-lg p-4 text-white">
+                <div className="space-y-2">
+                    {order?.delivery?.delivery_tax && (
+                        <div className="flex justify-between text-sm text-gray-300">
+                            <span>Taxa de entrega</span>
+                            {order.delivery.is_delivery_free ? (
+                                <div className="flex items-center gap-2">
+                                    <span className="line-through text-gray-500">
+                                        R$ {deliveryTaxDecimal.toFixed(2)}
+                                    </span>
+                                    <span className="text-green-400 font-medium">Grátis!</span>
+                                </div>
+                            ) : (
+                                <span>R$ {deliveryTaxDecimal.toFixed(2)}</span>
+                            )}
+                        </div>
+                    )}
+                    
+                    <div className="border-t border-gray-700 pt-3 mt-3">
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-400">Total a pagar</span>
+                            <span className="text-3xl font-bold">
+                                R$ {totalPayableDecimal.toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Launch Order Button */}
+            {isThrowButton && (
+                <Button 
+                    className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold text-lg shadow-lg"
+                    onClick={onSubmit}
+                >
+                    🚀 Lançar Pedido
+                </Button>
+            )}
         </div>
     )
 }

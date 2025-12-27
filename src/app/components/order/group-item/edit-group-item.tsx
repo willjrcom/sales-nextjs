@@ -23,42 +23,14 @@ export default function EditGroupItem() {
 
     if (!contextGroupItem.groupItem || contextGroupItem.groupItem?.status === "Staging") {
         return (
-            <div >
-                {/* Componente à esquerda: ocupa 70% da tela */}
+            <div>
                 <CartToAdd />
-                <ShowGroupItem isOpened={false} />
             </div>
         );
     }
 
     return (
         <GroupItemCard />
-    );
-}
-
-interface ShowGroupItemProps {
-    isOpened: boolean
-}
-
-const ShowGroupItem = ({ isOpened }: ShowGroupItemProps) => {
-    const [isOpen, setIsOpen] = useState(isOpened || false);
-
-    return (
-        <div>
-            <button
-                type="button"
-                onClick={() => setIsOpen(prev => !prev)}
-                className={`fixed top-1/3 transform -translate-y-1/2 z-50 [writing-mode:vertical-rl] rotate-180 cursor-pointer focus:outline-none bg-yellow-500 text-white p-2 rounded-r-md transition-all duration-300 ${isOpen ? 'right-[40vw]' : 'right-0'}`}
-            >
-                Carrinho
-            </button>
-
-            <div className={`fixed bg-gray-200 right-0 inset-y-8 border border-gray-300 rounded-l-md z-40 transition-all duration-300 ease-in-out ${isOpen ? 'w-[40vw]' : 'w-0'} origin-right`}>
-                <div className="h-full p-4 overflow-y-auto flex flex-col">
-                    {isOpen && <GroupItemCard />}
-                </div>
-            </div>
-        </div>
     );
 }
 
@@ -152,3 +124,5 @@ const GroupItemCard = () => {
         </div>
     );
 };
+
+export { GroupItemCard };
