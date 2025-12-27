@@ -16,7 +16,7 @@ const PickupOrderPage = () => {
     const { data } = useSession();
     const searchParams = useSearchParams();
     const router = useRouter();
-    const currentTab = searchParams.get('tab') || 'prontas';
+    const currentTab = searchParams.get('tab') || 'ready';
     const [lastUpdateReady, setLastUpdateReady] = useState<string>(FormatRefreshTime(new Date()));
     const [lastUpdateDelivered, setLastUpdateDelivered] = useState<string>(FormatRefreshTime(new Date()));
 
@@ -62,10 +62,10 @@ const PickupOrderPage = () => {
             <PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="prontas">Prontas</TabsTrigger>
-                    <TabsTrigger value="ultimos-10">Últimos 10</TabsTrigger>
+                    <TabsTrigger value="ready">Prontas</TabsTrigger>
+                    <TabsTrigger value="last-10">Últimos 10</TabsTrigger>
                 </TabsList>
-                <TabsContent value="prontas">
+                <TabsContent value="ready">
                     <div className="flex justify-end items-center mb-2">
                         <Refresh onRefresh={refetchReady} isPending={isPendingReady} lastUpdate={lastUpdateReady} />
                     </div>
@@ -74,7 +74,7 @@ const PickupOrderPage = () => {
                         : <CrudTable columns={PickupOrderColumns(true)} data={readyOrders} />
                     }
                 </TabsContent>
-                <TabsContent value="ultimos-10">
+                <TabsContent value="last-10">
                     <div className="flex justify-end items-center mb-2">
                         <Refresh onRefresh={refetchDelivered} isPending={isPendingDelivered} lastUpdate={lastUpdateDelivered} />
                     </div>

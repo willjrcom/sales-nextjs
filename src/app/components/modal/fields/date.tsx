@@ -1,31 +1,74 @@
+"use client";
+
 import { Dispatch, SetStateAction } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface DateFieldProps {
     friendlyName: string;
     name: string;
     disabled?: boolean;
-    value?: string | null | undefined; // Permitir undefined além de Date e null
-    setValue: Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
+    value?: string | null | undefined;
+    setValue: Dispatch<SetStateAction<string | null | undefined>>;
     optional?: boolean;
 }
 
-const DateField = ({ friendlyName, name, disabled, setValue, value, optional}: DateFieldProps) => {
+const DateField = ({ friendlyName, name, disabled, setValue, value, optional }: DateFieldProps) => {
+    const date = value ? new Date(value) : undefined;
+
+    const handleSelect = (selectedDate: Date | undefined) => {
+        if (selectedDate) {
+            setValue(selectedDate.toISOString());
+        } else {
+            setValue(null);
+        }
+    };
+
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
                 {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
-            <input
-                className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                id={name}
-                type="date"
-                disabled={disabled}
-                value={value ? new Date(value).toISOString().split('T')[0] : ""}
-                onChange={e => setValue(e.target.value)}
-            />
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button
+                        id={name}
+                        variant="outline"
+                        disabled={disabled}
+                        className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                        )}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? format(date, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={handleSelect}
+                        initialFocus
+                        locale={ptBR}
+                        captionLayout="dropdown"
+                        fromYear={1950}
+                        toYear={2050}
+                    />
+                </PopoverContent>
+            </Popover>
         </div>
     );
 };
 
-export default DateField
+export default DateField;

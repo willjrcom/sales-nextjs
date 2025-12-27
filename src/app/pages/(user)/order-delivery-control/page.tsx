@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const PageDeliveryOrder = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const currentTab = searchParams.get('tab') || 'a-enviar';
+    const currentTab = searchParams.get('tab') || 'to-ship';
 
     const handleTabChange = (value: string) => {
         router.push(`?tab=${value}`, { scroll: false });
@@ -21,17 +21,17 @@ const PageDeliveryOrder = () => {
             <PageTitle title="Controle de Entregas" tooltip="Gerencie pedidos de entrega por status: A enviar, Na rua ou Finalizadas." />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="a-enviar">A enviar</TabsTrigger>
-                    <TabsTrigger value="na-rua">Na rua</TabsTrigger>
-                    <TabsTrigger value="finalizadas">Finalizadas</TabsTrigger>
+                    <TabsTrigger value="to-ship">A enviar</TabsTrigger>
+                    <TabsTrigger value="to-finish">Na rua</TabsTrigger>
+                    <TabsTrigger value="finished">Finalizadas</TabsTrigger>
                 </TabsList>
-                <TabsContent value="a-enviar">
+                <TabsContent value="to-ship">
                     <DeliveryOrderToShip />
                 </TabsContent>
-                <TabsContent value="na-rua">
+                <TabsContent value="to-finish">
                     <DeliveryOrderToFinish />
                 </TabsContent>
-                <TabsContent value="finalizadas">
+                <TabsContent value="finished">
                     <DeliveryOrderFinished />
                 </TabsContent>
             </Tabs>
