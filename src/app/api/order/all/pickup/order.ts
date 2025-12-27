@@ -2,9 +2,9 @@ import Order from "@/app/entities/order/order";
 import RequestApi, { AddAccessToken, GetAllResponse } from "../../../request";
 import { Session } from "next-auth";
 
-const GetOrdersWithPickup = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Order>> => {
+export const GetOrdersWithPickupReady = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Order>> => {
     const response = await RequestApi<null, Order[]>({
-        path: "/order/all/pickup", 
+        path: "/order/all/pickup/ready", 
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -12,4 +12,12 @@ const GetOrdersWithPickup = async (session: Session, page?: number, perPage?: nu
     return {items: response.data, headers: response.headers}
 };
 
-export default GetOrdersWithPickup
+export const GetOrdersWithPickupDelivered = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Order>> => {
+    const response = await RequestApi<null, Order[]>({
+        path: "/order/all/pickup/delivered", 
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+    
+    return {items: response.data, headers: response.headers}
+};
