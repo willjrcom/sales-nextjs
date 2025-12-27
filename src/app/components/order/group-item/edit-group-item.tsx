@@ -9,7 +9,9 @@ import ItemCard from "../item/card-item";
 import GroupItem from "@/app/entities/order/group-item";
 import GroupItemForm from "@/app/forms/group-item/form";
 import StatusComponent from "../../button/show-status";
-import ButtonIconText from "../../button/button-icon-text";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { FaPlus } from "react-icons/fa";
 import ComplementItemList from "./list-complement-item";
 import ComplementItemCard from "./complement-item";
 import Item from "@/app/entities/order/item";
@@ -78,9 +80,26 @@ const GroupItemCard = () => {
                     <p className="text-lg font-semibold">Complemento</p>
                 </>
             )}
-            {containItems && !complementItem && isGroupItemStaging && <ButtonIconText size="xl" title="Adicionar complemento" modalName={"add-complement-item-group-item-" + groupItem?.id} onCloseModal={() => contextGroupItem.fetchData(groupItem?.id || "")}>
-                <ComplementItemList groupItem={groupItem} />
-            </ButtonIconText>}
+
+            {containItems && !complementItem && isGroupItemStaging && (
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="default" className="gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:from-blue-600 hover:to-purple-600">
+                            <FaPlus className="h-4 w-4" />
+                            Adicionar complemento
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>Adicionar complemento</DialogTitle>
+                        </DialogHeader>
+                        <ComplementItemList groupItem={groupItem} />
+                        <DialogClose asChild>
+                            <Button variant="outline" className="mt-4 w-full">Fechar</Button>
+                        </DialogClose>
+                    </DialogContent>
+                </Dialog>
+            )}
 
             {containItems && complementItem &&
                 <ComplementItemCard groupItem={groupItem} />

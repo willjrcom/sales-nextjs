@@ -5,15 +5,27 @@ import RequestError from '@/app/utils/error';
 import GroupItem from '@/app/entities/order/group-item';
 import { DateTimeField, TextField } from '@/app/components/modal/field';
 import ScheduleGroupItem from '@/app/api/group-item/update/schedule/group-item';
-import { FaCalendarTimes, FaSave, FaTrash } from 'react-icons/fa';
+import { FaCalendarAlt, FaSave, FaTrash, FaComment } from 'react-icons/fa';
 import { useGroupItem } from '@/app/context/group-item/context';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ObservationGroupItem from '@/app/api/group-item/update/observation/group-item';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+    DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
     const [groupItem, setGroupItem] = useState<GroupItem>(item as GroupItem);
     const [observation, setObservation] = useState<string>(item?.observation || '');
     const [startAt, setStartAt] = useState<string | null | undefined>(item?.start_at);
+    const [observationOpen, setObservationOpen] = useState(false);
+    const [scheduleOpen, setScheduleOpen] = useState(false);
     const { data } = useSession();
     const contextGroupItem = useGroupItem();
 
@@ -46,11 +58,12 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
         if (observation === null) observation = "";
 
         try {
-            const prev = groupItem.start_at;
+            const prev = groupItem.observation;
             await ObservationGroupItem(groupItem, data, observation);
             setGroupItem({ ...groupItem, observation: observation });
             setObservation(observation);
             contextGroupItem.fetchData(groupItem.id);
+            setObservationOpen(false);
 
             // Notificação de sucesso conforme ação
             let msg = '';
@@ -65,17 +78,45 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
         }
     };
 
-    const showScheduleButton = !groupItem.start_at && startAt;
-    const showUpdateButton = groupItem.start_at && groupItem.start_at !== startAt;
-    const showRemoveButton = groupItem.start_at && !showUpdateButton;
+    const handleSaveSchedule = async () => {
+        await onSaveSchedule(startAt);
+        setScheduleOpen(false);
+    };
+
+    const handleRemoveSchedule = async () => {
+        await onSaveSchedule(null);
+        setScheduleOpen(false);
+    };
+
+    const handleScheduleDialogOpen = (open: boolean) => {
+        if (open && !groupItem.start_at) {
+            // Se não tem agendamento, inicia com a data de hoje (sem hora definida)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            setStartAt(today.toISOString());
+        }
+        setScheduleOpen(open);
+    };
 
     return (
-        <div className="text-black space-y-6">
-            {/* Seção: Observação */}
-            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Observação</h3>
-                <div className="flex flex-col sm:flex-row gap-4 items-end">
-                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+        <div className="flex gap-2 flex-wrap">
+            {/* Botão Observação */}
+            <Dialog open={observationOpen} onOpenChange={setObservationOpen}>
+                <DialogTrigger asChild>
+                    <Button 
+                        variant="outline" 
+                        className={`gap-2 ${groupItem.observation ? 'border-blue-500 text-blue-600' : ''}`}
+                    >
+                        <FaComment className="h-4 w-4" />
+                        Observação
+                        {groupItem.observation && <span className="w-2 h-2 bg-blue-500 rounded-full" />}
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Observação</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
                         <TextField
                             name='Observation'
                             setValue={setObservation}
@@ -84,59 +125,59 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
                             placeholder='Digite a observação'
                         />
                     </div>
-                    <button
-                        className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
-                        onClick={() => onSaveObservation(observation)}
-                    >
-                        <FaSave className="mr-2" />
-                        Salvar
-                    </button>
-                </div>
-            </div>
+                    <DialogFooter className="gap-2">
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancelar</Button>
+                        </DialogClose>
+                        <Button onClick={() => onSaveObservation(observation)}>
+                            <FaSave className="mr-2 h-4 w-4" />
+                            Salvar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
-            {/* Seção: Agendamento */}
-            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Agendamento</h3>
-                <div className="flex flex-col sm:flex-row gap-4 items-end">
-                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+            {/* Botão Agendamento */}
+            <Dialog open={scheduleOpen} onOpenChange={handleScheduleDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button 
+                        variant="outline" 
+                        className={`gap-2 ${groupItem.start_at ? 'border-purple-500 text-purple-600' : ''}`}
+                    >
+                        <FaCalendarAlt className="h-4 w-4" />
+                        Agendar
+                        {groupItem.start_at && <span className="w-2 h-2 bg-purple-500 rounded-full" />}
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Agendamento</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
                         <DateTimeField
-                            friendlyName="Agendar"
+                            friendlyName="Data e Hora"
                             name="schedule"
                             value={startAt}
                             setValue={setStartAt}
                         />
                     </div>
-                    {showScheduleButton && (
-                        <button
-                            className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
-                            onClick={() => onSaveSchedule(startAt)}
-                        >
-                            <FaCalendarTimes className="mr-2" />
-                            Agendar
-                        </button>
-                    )}
-
-                    {showUpdateButton && (
-                        <button
-                            className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
-                            onClick={() => onSaveSchedule(startAt)}
-                        >
-                            <FaCalendarTimes className="mr-2" />
-                            Atualizar
-                        </button>
-                    )}
-
-                    {showRemoveButton && (
-                        <button
-                            className="flex items-center justify-center px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-all duration-200 transform hover:scale-105"
-                            onClick={() => onSaveSchedule(null)}
-                        >
-                            <FaTrash className="mr-2" />
-                            Remover
-                        </button>
-                    )}
-                </div>
-            </div>
+                    <DialogFooter className="gap-2">
+                        {groupItem.start_at && (
+                            <Button variant="destructive" onClick={handleRemoveSchedule}>
+                                <FaTrash className="mr-2 h-4 w-4" />
+                                Remover
+                            </Button>
+                        )}
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancelar</Button>
+                        </DialogClose>
+                        <Button onClick={handleSaveSchedule}>
+                            <FaSave className="mr-2 h-4 w-4" />
+                            Salvar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
