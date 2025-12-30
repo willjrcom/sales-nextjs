@@ -19,6 +19,7 @@ import { CartToAdd } from "../cart/cart-to-add";
 import Decimal from "decimal.js";
 import { FaTimes } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
+import ButtonIconText from "../../button/button-icon-text";
 
 export default function EditGroupItem() {
     const contextGroupItem = useGroupItem();
