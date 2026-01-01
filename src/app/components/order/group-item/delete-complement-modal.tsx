@@ -4,7 +4,6 @@ import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
 import { notifyError } from "@/app/utils/notifications";
 
 interface DeleteComplementItemModalProps {
