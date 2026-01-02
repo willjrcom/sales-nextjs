@@ -1,86 +1,71 @@
-# syntax=docker.io/docker/dockerfile:1
+# =========================
+# 1️⃣ STAGE: dependencies
+# =========================
+FROM node:18-alpine AS deps
+WORKDIR /app
 
-FROM node:20-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+# Dependências do sistema (necessárias para algumas libs)
 RUN apk add --no-cache libc6-compat
-WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+# Copiar arquivos de dependência
+COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
+
+# Instalar dependências
 RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
+  if [ -f package-lock.json ]; then npm ci; \
+  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install --frozen-lockfile; \
+  else echo "Nenhum lockfile encontrado" && exit 1; \
   fi
 
-
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# Normalize build output dir: some projects set `distDir` (e.g. 'build'),
-# but the Dockerfile expects `.next/standalone`. If `build` exists, move it to `.next`.
-RUN if [ -d "./build/standalone" ]; then \
-      echo "standalone build exists in build/"; \
-      mv build .next; \
-    elif [ -d "./.next/standalone" ]; then \
-      echo ".next/standalone exists"; \
-    elif [ -d "./build" ]; then \
-      echo "moving build -> .next"; \
-      mv build .next; \
-    elif [ -d "./.next" ]; then \
-      echo ".next exists"; \
-    else \
-      echo "Warning: no build dir found after build"; \
-    fi
-
-# Production image, copy all the files and run next
-FROM base AS runner
+# =========================
+# 2️⃣ STAGE: builder
+# =========================
+FROM node:18-alpine AS builder
 WORKDIR /app
 
 ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN apk add --no-cache libc6-compat
 
-# Copy standalone build
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Copiar dependências
+COPY --from=deps /app/node_modules ./node_modules
 
-# Copy next.config.mjs for image optimization configuration
-COPY --from=builder --chown=nextjs:nodejs /app/next.config.mjs ./next.config.mjs
+# Copiar código
+COPY . .
 
-# Entrypoint: use standalone server.js
-# Create the entrypoint as root so the file can be written to `/`.
-RUN printf '#!/bin/sh\nif [ -f server.js ]; then exec node server.js; else exec npm run start; fi\n' > /entrypoint.sh \
-  && chmod +x /entrypoint.sh
+# Build do Next
+RUN npm run build
+
+# =========================
+# 3️⃣ STAGE: runner
+# =========================
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+RUN apk add --no-cache libc6-compat
+
+# Criar usuário não-root
+RUN addgroup -g 1001 -S nodejs \
+  && adduser -S nextjs -u 1001
+
+# Copiar servidor standalone
+COPY --from=builder /app/build/standalone ./
+
+# 👉 ESSENCIAL: copiar assets estáticos
+COPY --from=builder /app/build/static ./build/static
+COPY --from=builder /app/public ./public
+
+# Permissões
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT=3000
-
-ENV HOSTNAME="0.0.0.0"
-CMD ["/entrypoint.sh"]
+# Start do Next standalone
+CMD ["node", "server.js"]
