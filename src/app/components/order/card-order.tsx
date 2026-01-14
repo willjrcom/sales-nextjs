@@ -14,7 +14,7 @@ import PaymentForm from "@/app/forms/order-payment/form";
 import {
     FaCheck, FaClipboardCheck, FaEdit, FaTimes, FaMoneyBillWave, FaCreditCard, FaTicketAlt, FaDollarSign, FaPrint,
     FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
-    FaHourglassHalf
+    FaHourglassHalf, FaFileInvoiceDollar
 } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import { useCurrentOrder } from "@/app/context/current-order/context";
@@ -51,6 +51,7 @@ import ObservationCard from "./observation";
 import GroupItem from "@/app/entities/order/group-item";
 import AdditionalItem from "@/app/components/order/additional-item";
 import RemovedItem from "@/app/components/order/removed-item";
+import EmitNFCeModal from "@/app/components/order/emit-nfce-modal";
 import Item from "@/app/entities/order/item";
 
 interface CardOrderProps {
@@ -478,6 +479,18 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <FaPrint />
                             <span>Imprimir</span>
                         </button>
+                    }
+                    {/* Botão de gerar nota fiscal */}
+                    {isOrderStatusFinished && !isOrderStatusCanceled &&
+                        <ButtonIconText
+                            modalName={"emit-nfce-" + order.id}
+                            title="Gerar NFC-e"
+                            size="md"
+                            color="purple"
+                            icon={FaFileInvoiceDollar}
+                        >
+                            <EmitNFCeModal orderId={order.id} onSuccess={fetchOrder} />
+                        </ButtonIconText>
                     }
                 </div>
             </div>

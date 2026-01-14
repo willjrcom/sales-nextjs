@@ -152,6 +152,11 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
         href="/pages/company-payment"
       />
       <SidebarLinkItem
+        icon={MdOutlineAttachMoney}
+        label="Billing & NFC-e"
+        href="/pages/company-billing"
+      />
+      <SidebarLinkItem
         icon={FaRedo}
         label="Trocar de empresa"
         onClick={async () => {

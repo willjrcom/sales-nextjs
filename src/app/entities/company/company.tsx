@@ -13,11 +13,19 @@ export default class Company {
   preferences: Record<string, string> = {};
   subscription_expires_at?: string | null;
   is_blocked: boolean = false;
+  // Fiscal fields
+  fiscal_enabled: boolean = false;
+  inscricao_estadual?: string;
+  regime_tributario?: number;
+  cnae?: string;
+  crt?: number;
 
   constructor(data: Partial<Company> = {}) {
     Object.assign(this, data);
   }
 }
+
+
 
 const SchemaCompany = z.object({
   cnpj: z.string().min(14, "Cnpj inválido").max(18, "Cnpj inválido"),
