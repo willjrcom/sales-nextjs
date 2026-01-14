@@ -3,7 +3,7 @@ import Client from "../client/client";
 import DeliveryDriver from "../delivery-driver/delivery-driver";
 import Decimal from 'decimal.js';
 
-type StatusOrderDelivery = "Staging" | "Pending" | "Ready" | "Shipped" | "Delivered";
+type StatusOrderDelivery = "Staging" | "Pending" | "Ready" | "Shipped" | "Delivered" | "Canceled";
 
 export default class OrderDelivery {
     id: string = '';

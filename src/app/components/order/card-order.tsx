@@ -481,17 +481,16 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                         </button>
                     }
                     {/* Botão de gerar nota fiscal */}
-                    {isOrderStatusFinished && !isOrderStatusCanceled &&
-                        <ButtonIconText
-                            modalName={"emit-nfce-" + order.id}
-                            title="Gerar NFC-e"
-                            size="md"
-                            color="purple"
-                            icon={FaFileInvoiceDollar}
-                        >
-                            <EmitNFCeModal orderId={order.id} onSuccess={fetchOrder} />
-                        </ButtonIconText>
-                    }
+                    <ButtonIconText
+                        modalName={"emit-nfce-" + order.id}
+                        title="Gerar NFC-e"
+                        size="md"
+                        color="purple"
+                        icon={FaFileInvoiceDollar}
+                        isDisabled={!isOrderStatusFinished || isOrderStatusCanceled}
+                    >
+                        <EmitNFCeModal orderId={order.id} onSuccess={fetchOrder} />
+                    </ButtonIconText>
                 </div>
             </div>
         </div>

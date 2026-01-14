@@ -11,6 +11,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import GetOrders from "@/app/api/order/order";
 import { notifyError } from "@/app/utils/notifications";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import { FaList } from "react-icons/fa";
 
 const PageOrder = () => {
     const { data } = useSession();
@@ -33,6 +35,7 @@ const PageOrder = () => {
 
     const orders = useMemo(() => ordersResponse?.items || [], [ordersResponse]);
     const stagingOrders = useMemo(() => orders.filter((order) => order.status === "Staging"), [orders]);
+    const finishedOrders = useMemo(() => orders.filter((order) => order.status === "Finished"), [orders]);
 
     const openStagingOrders = () => {
         const onClose = () => {
@@ -45,6 +48,10 @@ const PageOrder = () => {
 
     return (
         <>
+            <ButtonIconTextFloat modalName="show-finished-orders" icon={FaList} position="bottom-right" title="Pedidos finalizados">
+                <CardOrderListItem orders={finishedOrders} />
+            </ButtonIconTextFloat>
+
             <CrudLayout
                 title={<PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />}
                 searchButtonChildren={

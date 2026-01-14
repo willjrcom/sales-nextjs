@@ -1,4 +1,4 @@
-type StatusOrderPickup = "Staging" | "Pending" | "Ready";
+type StatusOrderPickup = "Staging" | "Pending" | "Ready" | "Delivered" | "Canceled";
 
 export default class OrderPickup {
     id: string = '';
@@ -11,7 +11,7 @@ export default class OrderPickup {
     delivered_at?: string = '';
     canceled_at?: string = '';
 
-    
+
     constructor(data: Partial<OrderPickup> = {}) {
         Object.assign(this, data);
     }

@@ -24,8 +24,8 @@ const ButtonIconText = ({ icon: Icon = FaPlus, size = 'md', modalName, title = "
 
     if (isDisabled) {
         return (
-            <button disabled className={`flex items-center space-x-2 p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 w-max`}>
-                Indisponível
+            <button disabled className={`flex items-center space-x-2 p-2 bg-gray-500 text-white rounded-md w-max`}>
+                <Icon /> {title && <span>{title}</span>}
             </button>
         )
     }
