@@ -1,5 +1,7 @@
 'use client';
 
+import { CheckboxField } from "@/app/components/modal/field";
+
 import CategoryForm from "@/app/forms/category/form";
 import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
@@ -16,13 +18,15 @@ import { notifyError } from "@/app/utils/notifications";
 
 const PageCategories = () => {
     const { data } = useSession();
+    const [showInactive, setShowInactive] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     const { isPending, error, data: categoriesResponse, refetch } = useQuery({
-        queryKey: ['categories'],
+        queryKey: ['categories', pagination.pageIndex, pagination.pageSize, showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetCategories(data!);
+            return GetCategories(data!, !showInactive);
         },
         enabled: !!data?.user?.access_token,
     });
@@ -31,8 +35,9 @@ const PageCategories = () => {
         if (error) notifyError('Erro ao carregar categorias');
     }, [error]);
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
-    const categoriesSorted = useMemo(() => categories.sort((a, b) => a.name.localeCompare(b.name)), [categories]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const categoriesSorted = useMemo(() => categories
+        .sort((a, b) => a.name.localeCompare(b.name)), [categories]);
 
     return (
         <>
@@ -43,6 +48,9 @@ const PageCategories = () => {
             </ButtonIconTextFloat>
 
             <CrudLayout title={<PageTitle title="Categorias" tooltip="Gerencie categorias de produtos, permitindo adicionar, editar ou remover." />}
+                searchButtonChildren={
+                    <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
+                }
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
@@ -53,8 +61,12 @@ const PageCategories = () => {
                 tableChildren={
                     <CrudTable
                         columns={CategoryColumns()}
-                        data={categoriesSorted}>
-                    </CrudTable>
+                        data={categoriesSorted}
+                        totalCount={categories.length}
+                        onPageChange={(pageIndex, pageSize) => {
+                            setPagination({ pageIndex, pageSize });
+                        }}
+                    />
                 }
             />
         </>

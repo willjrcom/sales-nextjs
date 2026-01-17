@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, HiddenField, ImageField } from '../../components/modal/field';
+import { TextField, HiddenField, ImageField, CheckboxField } from '../../components/modal/field';
 import Place, { ValidatePlaceForm } from '@/app/entities/place/place';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -22,7 +22,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
-    
+
     const handleInputChange = (field: keyof Place, value: any) => {
         setPlace(prev => ({ ...prev, [field]: value }));
     };
@@ -69,25 +69,30 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações do Local</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={place.name}/>
+                        <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={place.name} />
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <ImageField 
-                            friendlyName='Imagem' 
-                            name='image_path' 
-                            setValue={value => handleInputChange('image_path', value)} 
-                            value={place.image_path} 
+                        <ImageField
+                            friendlyName='Imagem'
+                            name='image_path'
+                            setValue={value => handleInputChange('image_path', value)}
+                            value={place.image_path}
                             optional
                             onUploadError={(error) => notifyError(error)}
                         />
                     </div>
+                    {isUpdate && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={place.is_active} />
+                        </div>
+                    )}
                 </div>
             </div>
 
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={place} name="Local" onSubmit={submit} deleteItem={onDelete} />
+            <ButtonsModal item={place} name="Local" onSubmit={submit} />
         </div>
     );
 };

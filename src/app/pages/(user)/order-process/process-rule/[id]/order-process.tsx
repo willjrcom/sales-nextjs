@@ -8,10 +8,8 @@ import { useEffect, useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle, HiX } from 'react-icons/hi';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
-import CancelOrderProcess from './cancel-process-order';
 import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
-import StatusComponent from '@/app/components/button/show-status';
 import Item from '@/app/entities/order/item';
 import ObservationCard from '@/app/components/order/observation';
 import AdditionalItem from '../../../../../components/order/additional-item';
@@ -46,7 +44,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
 
         try {
             await StartOrderProcess(id, data)
-            queryClient.invalidateQueries({queryKey: ['orderProcesses']});
+            queryClient.invalidateQueries({ queryKey: ['orderProcesses'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
         }
@@ -61,10 +59,10 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             const company = await GetCompany(data);
             if (!nextProcessID && company.preferences?.["enable_print_items_on_finish_process"]) {
 
-                await printGroupItem({groupItemID: groupItem.id,printerName: groupItem.printer_name, session: data})
+                await printGroupItem({ groupItemID: groupItem.id, printerName: groupItem.printer_name, session: data })
             }
 
-            queryClient.invalidateQueries({queryKey: ['orderProcesses']});
+            queryClient.invalidateQueries({ queryKey: ['orderProcesses'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');
         }

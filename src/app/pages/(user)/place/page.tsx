@@ -55,7 +55,7 @@ const DragAndDropGrid = () => {
     });
 
     const { data: unusedTablesResponse, refetch: refetchUnusedTables } = useQuery({
-        queryKey: ['unusedTables'],
+        queryKey: ['unused-tables'],
         queryFn: () => GetUnusedTables(data!),
         enabled: !!data?.user?.access_token,
     });
@@ -65,7 +65,7 @@ const DragAndDropGrid = () => {
         setLastUpdate(new Date().toLocaleTimeString());
     };
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
 
     useEffect(() => {
         if (places.length > 0 && placeSelectedID === "") {
@@ -77,18 +77,17 @@ const DragAndDropGrid = () => {
         setUnusedTables(unusedTablesResponse?.items || []);
     }, [unusedTablesResponse?.items]);
 
-    useEffect(() => {
-        const place = places.find(p => p.id === placeSelectedID);
-        if (!place) return;
+    const place = useMemo(() => places.find(p => p.id === placeSelectedID), [places, placeSelectedID]);
 
-        setDroppedTables(place.tables || []);
-        
+    useEffect(() => {
+        setDroppedTables(place?.tables || []);
+
         // Só recalcula o grid quando trocar de ambiente, não quando mover mesas
         if (lastLoadedPlaceID.current !== placeSelectedID) {
-            reloadGrid(place.tables);
+            reloadGrid(place?.tables || []);
             lastLoadedPlaceID.current = placeSelectedID;
         }
-    }, [placeSelectedID, places]);
+    }, [place]);
 
     const reloadGrid = (tables: PlaceTable[]) => {
         if (!tables || tables.length === 0) return;
@@ -442,8 +441,8 @@ const DraggableUnusedTable = ({ id, table }: { id: string; table: Table }) => {
         modalHandler.showModal(
             `edit-table-${table.id}`,
             `Editar Mesa ${table.name}`,
-            <TableForm item={table} isUpdate />, 
-            'md', 
+            <TableForm item={table} isUpdate />,
+            'md',
             () => modalHandler.hideModal(`edit-table-${table.id}`)
         );
     };

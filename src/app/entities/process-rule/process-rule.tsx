@@ -10,6 +10,7 @@ export default class ProcessRule {
     category_id: string = '';
     total_order_process_late: number = 0;
     total_order_queue: number = 0;
+    is_active: boolean = true;
 
     constructor(data: Partial<ProcessRule> = {}) {
         Object.assign(this, data);
@@ -36,6 +37,6 @@ export const ValidateProcessRuleForm = (category: ProcessRule) => {
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return validatedFields.error.flatten().fieldErrors;
-    } 
+    }
     return {}
 };

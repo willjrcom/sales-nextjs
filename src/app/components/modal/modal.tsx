@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import styles from "./form.module.css";
 
 interface ModalProps {
@@ -12,9 +13,10 @@ interface ModalProps {
     children: React.ReactNode;
 }
 
-
-
 const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children }: ModalProps) => {
+
+
+
     if (!show) return null;
 
     const sizeClasses = {
@@ -26,39 +28,40 @@ const Modal = ({ title, show, size = 'md', onClose, withoutBackground, children 
 
     const backgroundClasses = withoutBackground ? "" : "fixed inset-0  bg-black bg-opacity-50"
 
-    return (
-        <>
-            {/* Modal background */}
-            <div className={backgroundClasses + " flex items-center justify-center"} style={{ zIndex: 10000 }}>
+    const modalContent = (
+        <div className={backgroundClasses + " flex items-center justify-center"} style={{ zIndex: 999999 }}>
 
-                {/* Modal */}
-                <div
-                    className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="p-1">
-                        {/* Cabeçalho do Modal */}
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-md font-bold">{title}</h2>
-                            {onClose && (
-                                <button
-                                    onClick={onClose}
-                                    className="text-gray-500 hover:text-gray-700"
-                                >
-                                    &#10005;
-                                </button>
-                            )}
-                        </div>
-
-                        <hr className="my-4" />
-
-                        {/* Conteúdo */}
-                        <div>{children}</div>
+            {/* Modal */}
+            <div
+                className={`${styles.modalContent} w-full ${sizeClasses[size]} bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="p-1">
+                    {/* Cabeçalho do Modal */}
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-md font-bold">{title}</h2>
+                        {onClose && (
+                            <button
+                                onClick={onClose}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                &#10005;
+                            </button>
+                        )}
                     </div>
+
+                    <hr className="my-4" />
+
+                    {/* Conteúdo */}
+                    <div>{children}</div>
                 </div>
             </div>
-        </>
+        </div>
     );
+
+    if (typeof document === 'undefined') return null;
+    const modalRoot = document.getElementById('modal-root') || document.body;
+    return createPortal(modalContent, modalRoot);
 };
 
 export default Modal;

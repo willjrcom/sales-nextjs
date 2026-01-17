@@ -18,10 +18,6 @@ const LoginForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [remember, setRemember] = useState<boolean>(false);
 
-
-  // Sempre renderiza para evitar problemas de hidratação
-  // Os campos só serão preenchidos após o mount (no useEffect acima)
-
   const handleSubmit = async () => {
     setLoading(true);
 
@@ -54,10 +50,10 @@ const LoginForm = () => {
   return (
     <div className="flex flex-col sm:flex-row h-screen overflow-hidden" suppressHydrationWarning>
       <div className="w-full sm:w-1/2 bg-yellow-500 relative h-[40vh] sm:h-screen flex-shrink-0">
-        <Image 
+        <Image
           src="/icons/logo.png"
           alt="Login"
-          fill 
+          fill
           style={{ objectFit: 'cover', objectPosition: 'center' }}
           unoptimized
           priority

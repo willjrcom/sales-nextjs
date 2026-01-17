@@ -5,7 +5,7 @@ import PageTitle from '@/app/components/PageTitle';
 import ClientForm from "@/app/forms/client/form";
 import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
-import { TextField } from "@/app/components/modal/field";
+import { TextField, CheckboxField } from "@/app/components/modal/field";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { FaFilter } from "react-icons/fa";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
@@ -17,15 +17,16 @@ import { notifyError } from "@/app/utils/notifications";
 
 const PageClient = () => {
     const [nome, setNome] = useState<string>("");
+    const [showInactive, setShowInactive] = useState(false);
     const { data } = useSession();
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, error, data: clientsResponse, refetch } = useQuery({
-        queryKey: ['clients', pagination.pageIndex, pagination.pageSize],
+        queryKey: ['clients', pagination.pageIndex, pagination.pageSize, showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetClients(data!, pagination.pageIndex, pagination.pageSize);
+            return GetClients(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
     })
@@ -35,11 +36,13 @@ const PageClient = () => {
             notifyError('Erro ao carregar clientes');
         }
     }, [error]);
-        
+
     const clients = useMemo(() => clientsResponse?.items || [], [clientsResponse]);
     const sortedClients = useMemo(() => {
-        return clients.sort((a, b) => a.name.localeCompare(b.name));
-    }, [clients]);
+        return clients
+            .filter(client => showInactive ? true : client.is_active)
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }, [clients, showInactive]);
 
     return (
         <>
@@ -53,7 +56,10 @@ const PageClient = () => {
 
             <CrudLayout title={<PageTitle title="Clientes" tooltip="Gerencie o cadastro de clientes, incluindo busca e filtro por nome." />}
                 searchButtonChildren={
-                    <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional />
+                    <>
+                        <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional />
+                        <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
+                    </>
                 }
 
                 refreshButton={

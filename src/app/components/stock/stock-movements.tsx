@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { GetMovementsByStockID } from '@/app/api/stock/movements';
-import StockMovement from '@/app/entities/stock/stock-movement';
-import { notifyError } from '@/app/utils/notifications';
-import RequestError from '@/app/utils/error';
 import Decimal from 'decimal.js';
+import { useQuery } from '@tanstack/react-query';
 
 interface StockMovementsProps {
     stockID: string;
@@ -14,27 +12,16 @@ interface StockMovementsProps {
 
 const StockMovements = ({ stockID }: StockMovementsProps) => {
     const { data } = useSession();
-    const [movements, setMovements] = useState<StockMovement[]>([]);
-    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const loadMovements = async () => {
-            if (!data || !stockID) return;
-            setLoading(true);
+    const { isPending, data: stockMovementsResponse } = useQuery({
+        queryKey: ['stock-movements'],
+        queryFn: async () => {
+            return GetMovementsByStockID(data!, stockID);
+        },
+        enabled: !!data?.user?.access_token,
+    });
 
-            try {
-                const movementsData = await GetMovementsByStockID(stockID, data);
-                setMovements(movementsData);
-            } catch (error) {
-                const err = error as RequestError;
-                notifyError(err.message || 'Erro ao carregar movimentos');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadMovements();
-    }, [data?.user.access_token, stockID]);
+    const movements = useMemo(() => stockMovementsResponse || [], [stockMovementsResponse]);
 
     const getMovementTypeLabel = (type: string) => {
         switch (type) {
@@ -66,7 +53,7 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
         }
     };
 
-    if (loading) {
+    if (isPending) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Histórico de Movimentos</h2>
@@ -78,7 +65,7 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
     return (
         <div className="p-6">
             <h2 className="text-xl font-bold mb-6">Histórico de Movimentos</h2>
-            
+
             {movements.length === 0 ? (
                 <p className="text-gray-500">Nenhum movimento encontrado</p>
             ) : (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Employee from "@/app/entities/employee/employee";
 import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
@@ -19,7 +19,7 @@ import SalaryHistoryModal from "./SalaryHistoryModal";
 import PaymentModal from "./PaymentModal";
 import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface EmployeeCardProps {
     item: Employee;
@@ -39,8 +39,6 @@ function EmployeeCard({ item }: EmployeeCardProps) {
     const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
-    const [salaryHistory, setSalaryHistory] = useState<EmployeeSalaryHistory[]>([]);
-    const [payments, setPayments] = useState<EmployeePayment[]>([]);
     const [tab, setTab] = useState<'info' | 'salary' | 'payments' | 'permissions'>('info');
     const [showSalaryModal, setShowSalaryModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -53,21 +51,20 @@ function EmployeeCard({ item }: EmployeeCardProps) {
         { key: 'manage_users', label: 'Gerenciar Usuários' },
     ];
 
-    useEffect(() => {
-        if (item.id && data) {
-            getEmployeeSalaryHistory(item.id, data)
-                .then((history) => setSalaryHistory(history.map((h: any) => new EmployeeSalaryHistory(h))))
-                .catch((error) => {
-                    notifyError('Erro ao carregar histórico salarial');
-                });
+    const { data: employeeSalaryResponse } = useQuery({
+        queryKey: ['employee-salary', item.id],
+        queryFn: () => getEmployeeSalaryHistory(item.id, data!),
+        enabled: !!data?.user?.access_token,
+    });
 
-            getEmployeePayments(item.id, data)
-                .then((payments) => setPayments(payments.map((p: any) => new EmployeePayment(p))))
-                .catch((error) => {
-                    notifyError('Erro ao carregar pagamentos');
-                });
-        }
-    }, [item.id, data]);
+    const { data: employeePaymentsResponse } = useQuery({
+        queryKey: ['employee-payments', item.id],
+        queryFn: () => getEmployeePayments(item.id, data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const salaryHistory = useMemo(() => employeeSalaryResponse || [], [employeeSalaryResponse]);
+    const payments = useMemo(() => employeePaymentsResponse || [], [employeePaymentsResponse]);
 
     useEffect(() => {
         if (permissions && Object.keys(permissions).length > 0) {
@@ -124,12 +121,14 @@ function EmployeeCard({ item }: EmployeeCardProps) {
     }
 
     const handleSalaryHistorySuccess = (newHistory: any) => {
-        setSalaryHistory([new EmployeeSalaryHistory(newHistory), ...salaryHistory]);
+        queryClient.invalidateQueries({ queryKey: ['employee-salary', item.id] });
+        notifySuccess('Histórico salarial atualizado com sucesso');
         setShowSalaryModal(false);
     };
 
     const handlePaymentSuccess = (newPayment: any) => {
-        setPayments([new EmployeePayment(newPayment), ...payments]);
+        queryClient.invalidateQueries({ queryKey: ['employee-payments', item.id] });
+        notifySuccess('Pagamento atualizado com sucesso');
         setShowPaymentModal(false);
     };
 

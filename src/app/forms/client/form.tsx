@@ -12,7 +12,7 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DateField, HiddenField, ImageField, TextField } from '@/app/components/modal/field';
+import { DateField, HiddenField, ImageField, TextField, CheckboxField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
 import Contact from '@/app/entities/contact/contact';
 import Address from '@/app/entities/address/address';
@@ -158,6 +158,11 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                             <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday} optional={true} />
                         </div>
                     </div>
+                    {isUpdate && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={client.is_active} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -174,7 +179,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                     item={client}
                     name="Cliente"
                     onSubmit={submit}
-                    deleteItem={onDelete}
                 />
             </div>
         </div>

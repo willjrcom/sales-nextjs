@@ -94,15 +94,20 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                         <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
+                        <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
                     </div>
+                    {isUpdate && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={table.is_active} />
+                        </div>
+                    )}
                 </div>
             </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={table} name="Table" onSubmit={submit} deleteItem={onDelete} />
+            <ButtonsModal item={table} name="Table" onSubmit={submit} />
         </div>
     );
 };

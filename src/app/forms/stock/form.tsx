@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { TextField, CheckboxField } from '../../components/modal/field';
 import Stock, { ValidateStockForm } from '@/app/entities/stock/stock';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
-import Product from '@/app/entities/product/product';
 import CreateFormsProps from '../create-forms-props';
 import UpdateStock from '@/app/api/stock/update/stock';
 import NewStock from '@/app/api/stock/new/stock';
@@ -16,22 +15,24 @@ import { SelectField } from '@/app/components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Decimal from 'decimal.js';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
+import GetProducts from '@/app/api/product/product';
 
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
     const modalHandler = useModal();
     const [stock, setStock] = useState<Stock>(item || new Stock());
-    const [recordProducts, setRecordProducts] = useState<{ id: string; name: string; }[]>([]);
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
 
-    const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+    const { data: productsResponse } = useQuery({
+        queryKey: ['products', true],
+        queryFn: () => GetProducts(data!, true),
         enabled: !!data?.user?.access_token,
     });
+
+    const products = useMemo(() => productsResponse?.items || [], [productsResponse]);
+    const recordProducts = useMemo(() => products.map(product => ({ id: product.id, name: product.name + " - " + product.size.name })), [products]);
 
     const createMutation = useMutation({
         mutationFn: (newStock: Stock) => NewStock(newStock, data!),
@@ -78,40 +79,6 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             createMutation.mutate(stock);
         }
     }
-
-    useEffect(() => {
-        const LoadProducts = async () => {
-            if (!data || !categoriesResponse?.items) return;
-
-            try {
-                // Buscar produtos de todas as categorias
-                const allProducts = categoriesResponse.items
-                    .map((category) => {
-                        return category.products?.map(product => ({
-                            ...product,
-                            category: category,
-                        } as Product)) || []
-                    }).flat();
-
-                let records: { id: string; name: string; }[] = [];
-
-                if (allProducts.length === 0) {
-                    setRecordProducts([]);
-                    return;
-                }
-
-                for (const product of allProducts) {
-                    records.push({ id: product.id, name: product.name + " - " + product.size.name })
-                }
-                setRecordProducts(records);
-
-            } catch (error: RequestError | any) {
-                notifyError(error);
-            }
-        }
-
-        LoadProducts();
-    }, [data, categoriesResponse]);
 
     return (
         <div className="text-black space-y-6">

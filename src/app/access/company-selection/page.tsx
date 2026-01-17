@@ -7,7 +7,7 @@ import CompanyForm from '@/app/forms/company/form';
 import Loading from '@/app/components/loading/Loading';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import Company from '@/app/entities/company/company';
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
@@ -30,7 +30,6 @@ export default function Page() {
 function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
-    const [companies, setCompanies] = useState<Company[]>([]);
     const [user, setUser] = useState<User | null>(null);
     const modalHandler = useModal();
     const [selecting, setSelecting] = useState<boolean>(false);
@@ -46,15 +45,11 @@ function CompanySelection() {
         enabled: !!data?.user?.access_token,
     });
 
+    const companies = useMemo(() => companiesResponse?.items.sort((a, b) => a.trade_name.localeCompare(b.trade_name)) || [], [companiesResponse?.items]);
+
     useEffect(() => {
         if (error) notifyError('Erro ao carregar empresas');
     }, [error]);
-
-    useEffect(() => {
-        const companiesFound = companiesResponse?.items || [];
-        const sortedCompanies = companiesFound.sort((a, b) => a.trade_name.localeCompare(b.trade_name));
-        setCompanies(sortedCompanies);
-    }, [companiesResponse]);
 
     useEffect(() => {
         getUser();
@@ -98,11 +93,11 @@ function CompanySelection() {
             data.user.access_token = response;
 
             // Prefetch data for next page
-            queryClient.prefetchQuery({ queryKey: ['clients'], queryFn: () => ({items: [], headers: {}}) });
-            queryClient.prefetchQuery({ queryKey: ['employees'], queryFn: () => ({items: [], headers: {}}) });
-            queryClient.prefetchQuery({ queryKey: ['categories'], queryFn: () => ({items: [], headers: {}}) });
-            queryClient.prefetchQuery({ queryKey: ['delivery-drivers'], queryFn: () => ({items: [], headers: {}}) });
-            queryClient.prefetchQuery({ queryKey: ['places'], queryFn: () => ({items: [], headers: {}}) });
+            queryClient.prefetchQuery({ queryKey: ['clients'], queryFn: () => ({ items: [], headers: {} }) });
+            queryClient.prefetchQuery({ queryKey: ['employees'], queryFn: () => ({ items: [], headers: {} }) });
+            queryClient.prefetchQuery({ queryKey: ['categories'], queryFn: () => ({ items: [], headers: {} }) });
+            queryClient.prefetchQuery({ queryKey: ['delivery-drivers'], queryFn: () => ({ items: [], headers: {} }) });
+            queryClient.prefetchQuery({ queryKey: ['places'], queryFn: () => ({ items: [], headers: {} }) });
 
             router.push('/pages/new-order');
             setSelecting(false);
@@ -186,7 +181,7 @@ function CompanySelection() {
                 </div>
             </button>
 
-            <button 
+            <button
                 onClick={() => signOut({ callbackUrl: '/login', redirect: true })}
                 className="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
             >

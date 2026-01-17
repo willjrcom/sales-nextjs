@@ -4,7 +4,6 @@ import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
-import Place from "@/app/entities/place/place";
 import RequestError from "@/app/utils/error";
 import { useModal } from "@/app/context/modal/context";
 import CardOrder from "@/app/components/order/card-order";
@@ -13,7 +12,7 @@ import { FaPlus, FaList } from "react-icons/fa";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import { useRouter } from "next/navigation";
 import { notifyError } from "@/app/utils/notifications";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
 import GetOrderTables from '@/app/api/order-table/order-table';
 
@@ -72,7 +71,6 @@ const DragAndDropGrid = () => {
     const [totalRows, setTotalRows] = useState(INITIAL_GRID_SIZE);
     const [totalCols, setTotalCols] = useState(INITIAL_GRID_SIZE);
     const [grid, setGrid] = useState(generateGrid(totalRows, totalCols));
-    const [droppedTables, setDroppedTables] = useState<PlaceTable[]>([]);
     const { data } = useSession();
     const [placeSelectedID, setPlaceSelectedID] = useState<string>("");
 
@@ -83,14 +81,14 @@ const DragAndDropGrid = () => {
     });
 
     const { data: tableOrdersResponse } = useQuery({
-        queryKey: ['tableOrders'],
+        queryKey: ['table-orders'],
         queryFn: () => GetOrderTables(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
-    const tableOrders = useMemo(() => tableOrdersResponse?.items || [], [tableOrdersResponse]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
+    const tableOrders = useMemo(() => tableOrdersResponse?.items || [], [tableOrdersResponse?.items]);
 
     useEffect(() => {
         if (places.length > 0 && placeSelectedID === "") {
@@ -98,13 +96,12 @@ const DragAndDropGrid = () => {
         }
     }, [places, placeSelectedID]);
 
-    useEffect(() => {
-        const place = places.find(p => p.id === placeSelectedID);
-        if (!place) return;
+    const place = useMemo(() => places.find(p => p.id === placeSelectedID), [places, placeSelectedID]);
+    const droppedTables = useMemo(() => place?.tables || [], [place]);
 
-        setDroppedTables(place.tables || []);
-        reloadGrid(place.tables);
-    }, [placeSelectedID, places]);
+    useEffect(() => {
+        reloadGrid(droppedTables);
+    }, [droppedTables]);
 
     const reloadGrid = (tables: PlaceTable[]) => {
         if (!tables || tables.length === 0) return;

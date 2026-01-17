@@ -34,7 +34,7 @@ const DeliveryOrderToShip = () => {
     const { data, status } = useSession();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['deliveryOrdersWithDelivery'],
+        queryKey: ['delivery-orders-with-delivery'],
         queryFn: () => GetOrdersWithDelivery(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
@@ -42,7 +42,7 @@ const DeliveryOrderToShip = () => {
 
     const orders = useMemo(() => {
         return (deliveryOrdersResponse?.items || []).filter((order) => order.delivery?.status === 'Ready');
-    }, [deliveryOrdersResponse]);
+    }, [deliveryOrdersResponse?.items]);
 
     const handleRefresh = async () => {
         await refetch();
@@ -139,13 +139,13 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { data: deliveryDriversResponse, refetch, isPending } = useQuery({
-        queryKey: ['deliveryDrivers'],
+        queryKey: ['delivery-drivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
 
-    const deliveryDrivers = deliveryDriversResponse?.items || [];
+    const deliveryDrivers = useMemo(() => deliveryDriversResponse?.items || [], [deliveryDriversResponse?.items]);
 
     const handleRefresh = async () => {
         await refetch();
@@ -169,7 +169,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
 
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
-            queryClient.invalidateQueries({ queryKey: ['deliveryOrdersWithDelivery'] });
+            queryClient.invalidateQueries({ queryKey: ['delivery-orders-with-delivery'] });
 
             if (orderIDs.length > 1) {
                 notifySuccess("Entregas enviadas com sucesso");

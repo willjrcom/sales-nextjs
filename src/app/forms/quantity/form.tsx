@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { HiddenField } from '../../components/modal/field';
+import { HiddenField, CheckboxField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -30,7 +30,7 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
 
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    
+
     const createMutation = useMutation({
         mutationFn: (newQuantity: Quantity) => NewQuantity(newQuantity, data!),
 
@@ -38,7 +38,7 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
             newQuantity.id = response;
             queryClient.invalidateQueries({ queryKey: ['categories'] });
             queryClient.invalidateQueries({ queryKey: ['category', category.id] });
-            
+
 
             notifySuccess(`Quantidade ${newQuantity.quantity} criada com sucesso`);
             modalHandler.hideModal(modalName);
@@ -54,7 +54,7 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
         onSuccess: (_, updatedQuantity) => {
             queryClient.invalidateQueries({ queryKey: ['categories'] });
             queryClient.invalidateQueries({ queryKey: ['category', category.id] });
-            
+
             notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
             modalHandler.hideModal(modalName);
             onSuccess?.();
@@ -69,7 +69,7 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categories'] });
             queryClient.invalidateQueries({ queryKey: ['category', category.id] });
-            
+
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
             modalHandler.hideModal(modalName);
             onSuccess?.();
@@ -109,8 +109,15 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
         <div className="text-black space-y-6">
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações da Quantidade</h3>
-                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity} disabled={isUpdate} />
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <NumericField friendlyName='Quantidade' name='quantity' setValue={value => handleInputChange('quantity', value)} value={quantity.quantity} disabled={isUpdate} />
+                    </div>
+                    {isUpdate && isDefaultCategory && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={quantity.is_active} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -119,7 +126,7 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             {!isUpdate && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" onSubmit={submit} />}
-            {isUpdate && isDefaultCategory && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" deleteItem={onDelete} />}
+            {isUpdate && isDefaultCategory && <ButtonsModal item={{ ...quantity, name: quantity.quantity.toString() }} name="quantity" onSubmit={submit} />}
         </div>
     );
 };

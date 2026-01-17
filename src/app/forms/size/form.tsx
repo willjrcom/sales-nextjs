@@ -41,7 +41,7 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
             newSize.id = response;
             queryClient.invalidateQueries({ queryKey: ['categories'] });
             queryClient.invalidateQueries({ queryKey: ['category', category.id] });
-            
+
             notifySuccess(`Tamanho ${newSize.name} criado com sucesso`);
             modalHandler.hideModal(modalName);
             onSuccess?.();
@@ -100,7 +100,7 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
         if (!data || !size.id) return;
         deleteMutation.mutate(size.id);
     }
-    
+
     const isDefaultCategory = !category.is_additional && !category.is_complement;
 
     return (
@@ -123,8 +123,7 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            {isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} deleteItem={onDelete} />}
-            {!isDefaultCategory && <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />}
+            <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />
         </div>
     );
 };

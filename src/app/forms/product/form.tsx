@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { TextField, CheckboxField, RadioField, HiddenField, ImageField } from '../../components/modal/field';
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
-import Category from '@/app/entities/category/category';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProduct from '@/app/api/product/delete/product';
 import UpdateProduct from '@/app/api/product/update/product';
@@ -13,7 +12,6 @@ import NewProduct from '@/app/api/product/new/product';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import Size from '@/app/entities/size/size';
 import PriceField from '@/app/components/modal/fields/price';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -26,6 +24,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const { data } = useSession();
     const [product, setProduct] = useState<Product>(item || new Product());
     const [flavorsInput, setFlavorsInput] = useState<string>(item?.flavors?.join(', ') || '');
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
@@ -33,24 +32,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         enabled: !!data?.user?.access_token,
     });
 
-    const categories = categoriesResponse?.items || [];
-    const [category, setCategory] = useState<Category>(new Category());
-    const [size, setSize] = useState<Size>(item?.size || new Size());
-    const [recordCategories, setRecordCategories] = useState<Record<string, string>[]>([]);
-    const [recordSizes, setRecordSizes] = useState<Record<string, string>[]>([]);
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-    useEffect(() => {
-        const category = categories.find(c => c.id === product.category_id);
-        if (!category) return
-        setCategory(category)
-    }, [product.category_id, categories])
 
-    useEffect(() => {
-        const size = category.sizes.find(size => size.id === product.size_id);
-        if (!size) return
-        setSize(size)
-    }, [product.size_id]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     const handleInputChange = (field: keyof Product, value: any) => {
         setProduct(prev => ({ ...prev, [field]: value }));
@@ -70,10 +54,15 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
         try {
-            const response = isUpdate ? await UpdateProduct(product, data) : await NewProduct(product, data);
-            
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            notifySuccess(isUpdate ? `Produto ${product.name} atualizado com sucesso` : `Produto ${product.name} criado com sucesso`);
+            if (isUpdate) {
+                await UpdateProduct(product, data);
+                notifySuccess(`Produto ${product.name} atualizado com sucesso`);
+            } else {
+                await NewProduct(product, data);
+                notifySuccess(`Produto ${product.name} criado com sucesso`);
+            }
+
+            queryClient.invalidateQueries({ queryKey: ['products'] });
             modalHandler.hideModal(modalName);
 
         } catch (error) {
@@ -87,7 +76,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
         try {
             await DeleteProduct(product.id, data);
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
             modalHandler.hideModal(modalName);
             notifySuccess(`Produto ${product.name} removido com sucesso`);
         } catch (error: RequestError | any) {
@@ -95,49 +84,14 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         }
     }
 
-    useEffect(() => {
-        const LoadCategories = async () => {
-            if (!data || categories.length === 0) {
-                setRecordCategories([]);
-                return;
-            }
+    const recordCategories = useMemo(() => categories.map(category => ({ id: category.id, name: category.name })), [categories]);
 
-            const records = categories.map(cat => ({ id: cat.id, name: cat.name }));
-            setRecordCategories(records);
-        }
+    const category = useMemo(() => categories.find(category => category.id === product.category_id), [product.category_id, categories]);
 
-        LoadCategories();
-    }, [data?.user.access_token, categories]);
-
-    useEffect(() => {
-        const LoadSizes = async () => {
-            if (!data) return;
-
-            try {
-                const category = categories.find(category => category.id === product.category_id);
-                if (!category) return;
-
-                let records: Record<string, string>[] = [];
-
-                if (!category.sizes) {
-                    setRecordSizes([]);
-                    return;
-                }
-
-                for (const size of category.sizes) {
-                    records.push({ id: size.id, name: size.name })
-                }
-
-                setRecordSizes(records);
-
-            } catch (error: RequestError | any) {
-                notifyError(error);
-            }
-        }
-
-        LoadSizes();
-
-    }, [categories, product.category_id, data?.user.access_token])
+    const recordSizes = useMemo(() => {
+        if (!category) return [];
+        return category.sizes.map(size => ({ id: size.id, name: size.name }));
+    }, [category]);
 
     return (
         <div className="text-black space-y-6">
@@ -188,11 +142,11 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Imagem e Disponibilidade</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <ImageField 
-                            friendlyName='Imagem' 
-                            name='image_path' 
-                            setValue={value => handleInputChange('image_path', value)} 
-                            value={product.image_path} 
+                        <ImageField
+                            friendlyName='Imagem'
+                            name='image_path'
+                            setValue={value => handleInputChange('image_path', value)}
+                            value={product.image_path}
                             optional
                             onUploadError={(error) => notifyError(error)}
                         />
@@ -200,6 +154,11 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available} />
                     </div>
+                    {isUpdate && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={product.is_active} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -219,7 +178,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={product} name='produto' onSubmit={submit} deleteItem={onDelete} />
+            <ButtonsModal item={product} name='produto' onSubmit={submit} />
         </div>
     );
 };

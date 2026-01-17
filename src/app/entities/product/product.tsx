@@ -17,8 +17,9 @@ export default class Product {
     size_id: string = '';
     size: Size = new Size();
     is_available: boolean = true;
+    is_active: boolean = true;
 
-    
+
     constructor(data: Partial<Product> = {}) {
         Object.assign(this, data);
     }
@@ -35,6 +36,7 @@ const SchemaProduct = z.object({
     category_id: z.string().uuid("Categoria inválida"),
     size_id: z.string().uuid("Tamanho inválido"),
     is_available: z.boolean(),
+    is_active: z.boolean(),
 });
 
 export const ValidateProductForm = (product: Product) => {
@@ -47,12 +49,13 @@ export const ValidateProductForm = (product: Product) => {
         cost: new Decimal(product.cost).toNumber(),
         category_id: product.category_id,
         size_id: product.size_id,
-        is_available: product.is_available
+        is_available: product.is_available,
+        is_active: product.is_active
     });
 
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return validatedFields.error.flatten().fieldErrors;
-    } 
+    }
     return {}
 };

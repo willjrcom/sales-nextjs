@@ -3,7 +3,7 @@ import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import ShiftColumns from "@/app/entities/shift/table-columns";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ const ListShift = () => {
         if (error) notifyError('Erro ao carregar turnos');
     }, [error]);
 
-    const shifts = shiftsResponse?.items || [];
+    const shifts = useMemo(() => shiftsResponse?.items || [], [shiftsResponse?.items]);
 
     return (
         <>

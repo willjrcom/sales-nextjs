@@ -35,8 +35,9 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
     fetchProduct();
   }, [data?.user.access_token, reloadProduct]);
 
+  const availableFlavors = useMemo(() => product.flavors || [], [product.flavors]);
+
   useEffect(() => {
-    const availableFlavors = product.flavors || [];
     if (!availableFlavors.length) {
       setSelectedFlavor(null);
       return;
@@ -48,7 +49,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       }
       return availableFlavors[0];
     });
-  }, [product.id, product.flavors]);
+  }, [product.id, availableFlavors]);
 
   const fetchProduct = async () => {
     setReloadProduct(false);
@@ -63,7 +64,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const submit = async () => {
     if (!contextCurrentOrder.order || !quantity || !data) return;
 
-    const requiresFlavorSelection = product.flavors && product.flavors.length > 0;
+    const requiresFlavorSelection = availableFlavors && availableFlavors.length > 0;
     if (requiresFlavorSelection && !selectedFlavor) {
       notifyError("Selecione um sabor para continuar");
       return;
@@ -196,7 +197,6 @@ interface QuantitySelectorProps {
 }
 
 const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }: QuantitySelectorProps) => {
-  const [quantities, setQuantities] = useState<Quantity[]>([]);
   const { data } = useSession();
 
   const { data: categoriesResponse } = useQuery({
@@ -207,13 +207,8 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
 
   const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
 
-  useEffect(() => {
-    const category = categories.find(c => c.id === categoryID);
-    if (!category || !category.quantities) return setQuantities([]);
-
-    const sortedQuantities = [...category?.quantities || []].sort((a, b) => a.quantity - b.quantity);
-    setQuantities(sortedQuantities);
-  }, [categoryID, categories]);
+  const category = useMemo(() => categories.find(c => c.id === categoryID), [categories, categoryID]);
+  const quantities = useMemo(() => category?.quantities.sort((a, b) => a.quantity - b.quantity) || [], [category]);
 
   useEffect(() => {
     quantities.forEach((quantity) => {

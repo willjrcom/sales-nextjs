@@ -4,6 +4,7 @@ import User, { ValidateUserForm } from "../user/user";
 export default class Employee extends User {
     id: string = '';
     user_id: string = '';
+    is_active: boolean = true;
     permissions: Record<string, boolean> = {};
 
     constructor(data: Partial<Employee> = {}) {
@@ -31,7 +32,7 @@ export const ValidateEmployeeForm = (employee: Employee) => {
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return { ...errors, ...validatedFields.error.flatten().fieldErrors };
-    } 
-    
+    }
+
     return {}
 };

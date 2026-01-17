@@ -34,23 +34,23 @@ const DeliveryOrderToFinish = () => {
     const { data } = useSession();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['deliveryOrdersWithDelivery'],
+        queryKey: ['delivery-orders-with-delivery'],
         queryFn: () => GetOrdersWithDelivery(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
 
     const { data: deliveryDriversResponse } = useQuery({
-        queryKey: ['deliveryDrivers'],
+        queryKey: ['delivery-drivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
         enabled: !!data?.user?.access_token,
     });
 
-    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse]);
+    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
 
     const deliveryDrivers = useMemo(() => {
         return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
-    }, [deliveryDriversResponse]);
+    }, [deliveryDriversResponse?.items]);
 
     const handleRefresh = async () => {
         await refetch();

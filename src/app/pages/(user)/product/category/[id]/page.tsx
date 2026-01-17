@@ -17,7 +17,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
@@ -40,7 +40,7 @@ const PageCategoryEdit = () => {
             <Breadcrumb className="mb-4">
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/pages/product?tab=categorias">Categorias</BreadcrumbLink>
+                        <BreadcrumbLink href="/pages/product?tab=categories">Categorias</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { TextField, NumberField, HiddenField, TimeField, SelectField, ImageField } from '../../components/modal/field';
+import React, { useMemo, useState } from 'react';
+import { TextField, NumberField, HiddenField, TimeField, SelectField, ImageField, CheckboxField } from '../../components/modal/field';
 import ProcessRule, { ValidateProcessRuleForm } from '@/app/entities/process-rule/process-rule';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -13,7 +13,6 @@ import UpdateProcessRule from '@/app/api/process-rule/update/process-rule';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import Category from '@/app/entities/category/category';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetCategories from '@/app/api/category/category';
 
@@ -21,7 +20,6 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
     const modalHandler = useModal();
     const [processRule, setProcessRule] = useState<ProcessRule>(item || new ProcessRule());
-    const [category, setCategory] = useState<Category>(new Category());
     const queryClient = useQueryClient();
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -32,13 +30,8 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         enabled: !!data?.user?.access_token,
     });
 
-    const categories = categoriesResponse?.items || [];
-
-    useEffect(() => {
-        const category = categories.find(c => c.id === processRule.category_id);
-        if (!category) return;
-        setCategory(category)
-    }, [item?.id, processRule.category_id, categories])
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const category = useMemo(() => categories.find(c => c.id === processRule.category_id), [categories, processRule.category_id]);
 
     const handleInputChange = (field: keyof ProcessRule, value: any) => {
         setProcessRule(prev => ({ ...prev, [field]: value }));
@@ -57,11 +50,10 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 processRule.id = response
                 notifySuccess(`Regra de processo ${processRule.name} criada com sucesso`);
             } else {
-                const updatedProcessRules = category.process_rules.map(rule => rule.id === processRule.id ? processRule : rule)
                 notifySuccess(`Regra de processo ${processRule.name} atualizada com sucesso`);
             }
 
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['process-rules'] });
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
@@ -74,7 +66,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         try {
             await DeleteProcessRule(processRule.id, data);
             notifySuccess(`Regra de processo ${processRule.name} removida com sucesso`);
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({ queryKey: ['process-rules'] });
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || `Erro ao remover regra de processo ${processRule.name}`);
@@ -108,11 +100,11 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Imagem e Tempo</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <ImageField 
-                            friendlyName='Imagem' 
-                            name='image_path' 
-                            setValue={value => handleInputChange('image_path', value)} 
-                            value={processRule.image_path || ""} 
+                        <ImageField
+                            friendlyName='Imagem'
+                            name='image_path'
+                            setValue={value => handleInputChange('image_path', value)}
+                            value={processRule.image_path || ""}
                             optional
                             onUploadError={(error) => notifyError(error)}
                         />
@@ -127,7 +119,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
                 <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    {isUpdate && <TextField friendlyName='Categoria' name='category' value={category.name} setValue={() => { }} disabled />}
+                    {isUpdate && <TextField friendlyName='Categoria' name='category' value={category?.name || ""} setValue={() => { }} disabled />}
                     {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={validCategories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
                 </div>
             </div>
@@ -135,7 +127,21 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={processRule.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} deleteItem={onDelete} />
+
+            {/* Seção: Status */}
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Status</h3>
+                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    <CheckboxField
+                        friendlyName="Ativo"
+                        name="is_active"
+                        setValue={value => handleInputChange('is_active', value)}
+                        value={processRule.is_active}
+                    />
+                </div>
+            </div>
+
+            <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} />
         </div>
     );
 };

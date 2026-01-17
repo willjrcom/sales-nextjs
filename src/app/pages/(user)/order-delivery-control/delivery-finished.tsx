@@ -1,13 +1,12 @@
 "use client";
+
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudTable from "@/app/components/crud/table";
 import { SelectField } from "@/app/components/modal/field";
 import CardOrder from "@/app/components/order/card-order";
-import Employee from "@/app/entities/employee/employee";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
-import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FaBoxOpen } from "react-icons/fa";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
@@ -22,28 +21,28 @@ const DeliveryOrderFinished = () => {
     const { data } = useSession();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['deliveryOrdersWithDelivery'],
+        queryKey: ['delivery-orders-with-delivery'],
         queryFn: () => GetOrdersWithDelivery(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });
 
     const { data: deliveryDriversResponse } = useQuery({
-        queryKey: ['deliveryDrivers'],
+        queryKey: ['delivery-drivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
         enabled: !!data?.user?.access_token,
     });
 
     const deliveryDrivers = useMemo(() => {
         return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
-    }, [deliveryDriversResponse]);
+    }, [deliveryDriversResponse?.items]);
 
     const handleRefresh = async () => {
         await refetch();
         setLastUpdate(new Date().toLocaleTimeString());
     };
 
-    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse]);
+    const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
 
     const { deliveryOrders, ordersNotFinished } = useMemo(() => {
         const deliveredOrders = allOrders.filter((order) => order.delivery?.status === 'Delivered');

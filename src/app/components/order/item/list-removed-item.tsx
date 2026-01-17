@@ -4,7 +4,7 @@ import RemoveRemovedItem from '@/app/api/item/update/removed-item/remove/item';
 import { useGroupItem } from '@/app/context/group-item/context';
 import Item from '@/app/entities/order/item';
 import { useSession } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
 import { useQuery } from '@tanstack/react-query';
 import GetCategories from '@/app/api/category/category';
@@ -14,7 +14,6 @@ interface ItemListProps {
 }
 
 const RemovedItemList = ({ item }: ItemListProps) => {
-    const [removableItems, setRemovableItems] = useState<string[]>([]);
     const [removedItems, setRemovedItems] = useState<string[]>(item.removed_items || []);
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
@@ -26,19 +25,9 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         enabled: !!data?.user?.access_token,
     });
 
-    const categories = categoriesResponse?.items || [];
-
-    useEffect(() => {
-        try {
-            const category = categories.find(c => c.id === item.category_id);
-            if (!category) {
-                return setRemovableItems([]);
-            }
-            setRemovableItems(category.removable_ingredients);
-        } catch (error: RequestError | any) {
-            notifyError(error);
-        }
-    }, [item.category_id, categories]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const category = useMemo(() => categories.find(c => c.id === item.category_id), [categories, item.category_id]);
+    const removableItems = useMemo(() => category?.removable_ingredients || [], [category]);
 
     const addRemovedItem = async (name: string) => {
         if (!data) return;
@@ -67,8 +56,8 @@ const RemovedItemList = ({ item }: ItemListProps) => {
         const disabledClass = isRemoved ? "bg-red-300" : "";
 
         return (
-            <div key={item} 
-            className={disabledClass + ` flex items-center space-x-4 p-2 rounded`}>
+            <div key={item}
+                className={disabledClass + ` flex items-center space-x-4 p-2 rounded`}>
                 <div className="flex-1">
                     {item}
                 </div>

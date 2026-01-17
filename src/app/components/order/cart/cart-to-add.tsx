@@ -70,7 +70,7 @@ const CartDrawerButton = () => {
                         </DrawerClose>
                     </div>
                 </DrawerHeader>
-                
+
                 <div className="flex-1 overflow-y-auto">
                     <GroupItemCard />
                 </div>
@@ -96,26 +96,20 @@ export const CartToAdd = () => {
         queryClient.invalidateQueries({ queryKey: ['categories'] });
     };
 
-    const allCategories = useMemo(
-        () => categoriesResponse?.items || [],
-        [categoriesResponse]
-    );
+    const allCategories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
 
     const categories = useMemo(() => {
         if (!allCategories.length) return [];
 
         if (contextGroupItem.groupItem?.category_id) {
-            return allCategories.filter(
-                (category) => category.id === contextGroupItem.groupItem?.category_id
-            );
+            return allCategories.filter((category) => category.id === contextGroupItem.groupItem?.category_id);
         }
 
-        return allCategories.filter(
-            (category) =>
-                category.products &&
-                category.products.length > 0 &&
-                !category.is_additional &&
-                !category.is_complement
+        return allCategories.filter((category) =>
+            category.products &&
+            category.products.length > 0 &&
+            !category.is_additional &&
+            !category.is_complement
         );
     }, [allCategories, contextGroupItem.groupItem?.category_id]);
 
@@ -153,7 +147,7 @@ export const CartToAdd = () => {
 
                 <div className="flex items-center space-x-2">
                     <CartDrawerButton />
-                    
+
                     <button
                         onClick={refreshCategories}
                         disabled={isFetching}

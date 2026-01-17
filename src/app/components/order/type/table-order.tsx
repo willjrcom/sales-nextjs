@@ -8,7 +8,6 @@ import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import RequestError from "@/app/utils/error";
 import ChangeTable from "@/app/api/order-table/update/change-table/order-table";
-import Table from "@/app/entities/table/table";
 import { FaExchangeAlt } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -17,7 +16,6 @@ import GetPlaces from '@/app/api/place/place';
 const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
-    const [tables, setTables] = useState<Table[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const queryClient = useQueryClient();
     const { data } = useSession();
@@ -31,36 +29,26 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
     });
 
     const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
-
-    useEffect(() => {
-        if (!placeID) return;
-        const selectedPlace = places.find(p => p.id === placeID);
-        if (!selectedPlace) return;
-
-        const filteredTables: Table[] = [];
-        for (const placeTable of selectedPlace.tables) {
-            filteredTables.push(placeTable.table);
-        }
-        setTables(filteredTables);
-    }, [placeID, places]);
+    const selectedPlace = useMemo(() => places.find(p => p.id === placeID), [places, placeID]);
+    const tables = useMemo(() => selectedPlace?.tables.map(t => t.table) || [], [selectedPlace]);
 
     const changeTable = async () => {
         if (!data || !tableID) return;
-        
+
         setIsLoading(true);
         try {
             await ChangeTable(orderTableId, tableID, data);
             notifySuccess('Mesa alterada com sucesso');
-            
+
             // Recarregar dados
             queryClient.invalidateQueries({ queryKey: ['places'] });
             queryClient.invalidateQueries({ queryKey: ['tableOrders'] });
-            
+
             // Recarregar dados do pedido atual
             if (contextCurrentOrder.order) {
                 await contextCurrentOrder.fetchData(contextCurrentOrder.order.id);
             }
-            
+
             // Fechar modal
             modalHandler.hideModal("change-table-" + orderTableId);
         } catch (error: RequestError | any) {
@@ -87,7 +75,7 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
                 setSelectedValue={setTableID}
                 values={tables}
             />
-            
+
             <button
                 disabled={!tableID || isLoading}
                 onClick={changeTable}
@@ -110,14 +98,14 @@ const TableCard = () => {
 
     if (!order || !order.table) return null
     const table = order?.table;
-    
+
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
             <div className="flex justify-between items-center">
                 <h2 className="font-bold mb-2">{table?.name}</h2>
-                <ButtonIcon 
-                    modalName={"change-table-" + order?.table?.id} 
-                    title="Alterar mesa" 
+                <ButtonIcon
+                    modalName={"change-table-" + order?.table?.id}
+                    title="Alterar mesa"
                     size="md"
                     icon={FaExchangeAlt}
                 >

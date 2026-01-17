@@ -97,7 +97,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
             handleInputChange('need_print', false);
         }
     }, [selectedType])
-    
+
     useEffect(() => {
         if (category.need_print) {
             (async () => {
@@ -130,7 +130,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
         const validationErrors = ValidateCategoryForm(category);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
-        
+
         if (isUpdate) {
             updateMutation.mutate(category)
         } else {
@@ -183,6 +183,11 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     {/* Bloco de Tipo de Categoria */}
                     {!isUpdate && (
                         <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
+                    )}
+                    {isUpdate && (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={category.is_active} />
+                        </div>
                     )}
                 </div>
             </div>
@@ -266,9 +271,9 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
             {/* Botões para Atualizar ou Excluir */}
             {isUpdated ? (
-                <ButtonsModal item={category} name="quantity" onSubmit={submit} deleteItem={onDelete} />
+                <ButtonsModal item={category} name="quantity" onSubmit={submit} />
             ) : (
-                <ButtonsModal item={category} name="quantity" deleteItem={onDelete} />
+                <ButtonsModal item={category} name="quantity" />
             )}
         </div>
     );

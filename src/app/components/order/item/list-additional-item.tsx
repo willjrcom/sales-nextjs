@@ -6,10 +6,11 @@ import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';
 import { useSession } from 'next-auth/react';
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
 import { useQuery } from '@tanstack/react-query';
 import GetCategories from '@/app/api/category/category';
+import { GetAdditionalProducts } from '@/app/api/product/product';
 
 interface ItemAdditional {
     name: string;
@@ -43,7 +44,7 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
 }
 
 const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
-    const [additionalItemsToAdd, setAdditionalItems] = useState<ItemAdditional[]>([]);
+    const [additionalItemsToAdd, setAdditionalItemsToAdd] = useState<ItemAdditional[]>([]);
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
     const isStaging = contextGroupItem.groupItem?.status === "Staging";
@@ -53,36 +54,25 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         queryFn: () => GetCategories(data!),
         enabled: !!data?.user?.access_token,
     });
+    const { data: additionalProductsResponse } = useQuery({
+        queryKey: ['additional-products', item.category_id],
+        queryFn: () => GetAdditionalProducts(data!, item.category_id || ""),
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 60 * 1000, // 60 seconds
+    });
 
-    const categories = categoriesResponse?.items || [];
+    const additionalItems = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse?.items]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     useEffect(() => {
         try {
-            const category = categories.find(c => c.id === item.category_id);
-            if (!category) {
-                return setAdditionalItems([]);
-            }
-
-            const additionalCategories = category.additional_categories;
-            if (!additionalCategories || additionalCategories.length === 0) {
-                return setAdditionalItems([]);
-            }
-
-            const productsFound = additionalCategories
-                .map((additionalCategory) => categories.find(c => c.id === additionalCategory.id)?.products)
-                .flat().filter(item => item != null && item !== undefined);
-
-            if (!productsFound || productsFound.length === 0) {
-                return setAdditionalItems([]);
-            }
-
-            const items = convertProductToItem(productsFound as Product[], item.additional_items || []);
+            const items = convertProductToItem(additionalItems, item.additional_items || []);
             if (!items || items.length === 0) {
-                return setAdditionalItems([]);
+                return setAdditionalItemsToAdd([]);
             }
 
-            setAdditionalItems(items);
-        } catch (error : RequestError | any) {
+            setAdditionalItemsToAdd(items);
+        } catch (error: RequestError | any) {
             notifyError(error);
         }
     }, [item.id, categories]);
@@ -106,7 +96,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         const newAdditionalItemsToAdd = additionalItemsToAdd?.filter(item => item.product_id !== clickedItem.product_id) || [];
         newAdditionalItemsToAdd.push({ ...clickedItem, additional_item_id: clickedItem.additional_item_id });
 
-        setAdditionalItems(newAdditionalItemsToAdd.sort((a, b) => a.name.localeCompare(b.name)));
+        setAdditionalItemsToAdd(newAdditionalItemsToAdd.sort((a, b) => a.name.localeCompare(b.name)));
     }
 
     const handleIncrement = (clickedItem: ItemAdditional) => {

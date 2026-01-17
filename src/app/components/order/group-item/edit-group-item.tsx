@@ -3,10 +3,9 @@
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useSession } from 'next-auth/react';
 import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { notifyError, notifySuccess } from '@/app/utils/notifications';
 import ItemCard from "../item/card-item";
-import GroupItem from "@/app/entities/order/group-item";
 import GroupItemForm from "@/app/forms/group-item/form";
 import StatusComponent from "../../button/show-status";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
@@ -14,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { FaPlus } from "react-icons/fa";
 import ComplementItemList from "./list-complement-item";
 import ComplementItemCard from "./complement-item";
-import Item from "@/app/entities/order/item";
 import { CartToAdd } from "../cart/cart-to-add";
 import Decimal from "decimal.js";
 import { FaTimes } from "react-icons/fa";
@@ -40,20 +38,9 @@ export default function EditGroupItem() {
 const GroupItemCard = () => {
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
-    const [groupItem, setGroupItem] = useState<GroupItem | null>(contextGroupItem.groupItem);
-    const [complementItem, setComplementItem] = useState<Item | null>();
     const modalHandler = useModal();
-
-    useEffect(() => {
-        setGroupItem(contextGroupItem.groupItem);
-
-        if (contextGroupItem.groupItem?.complement_item) {
-            setComplementItem(contextGroupItem.groupItem.complement_item)
-        } else {
-            setComplementItem(null)
-        }
-    }, [contextGroupItem.groupItem]);
-
+    const groupItem = useMemo(() => contextGroupItem.groupItem, [contextGroupItem.groupItem]);
+    const complementItem = useMemo(() => groupItem?.complement_item, [groupItem?.complement_item]);
     const containItems = groupItem?.items && groupItem?.items.length > 0
     const isGroupItemStaging = groupItem?.status === "Staging"
 

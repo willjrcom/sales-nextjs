@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ButtonIconTextFloat from "../../button/button-float";
 import EditGroupItem from "../group-item/edit-group-item";
 import { useCurrentOrder } from "@/app/context/current-order/context";
@@ -15,29 +15,24 @@ import { useSession } from "next-auth/react";
 import { CardOrderResume } from "../resume/resume";
 
 export const CartAdded = () => {
-    const [groupedItems, setGroupedItems] = useState<Record<string, GroupItem[]>>({})
     const contextGroupItem = useGroupItem();
     const contextCurrentOrder = useCurrentOrder();
     const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const { data: session } = useSession();
-    
+
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
         queryFn: () => GetCategories(session!),
-        enabled: !!session,
+        enabled: !!session?.user.access_token,
     });
 
-    const categories = categoriesResponse?.items || [];
+    const categories = useMemo(() => categoriesResponse?.items.sort((a, b) => a.name.localeCompare(b.name)) || [], [categoriesResponse?.items]);
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
     }, [contextCurrentOrder.order])
 
-    useEffect(() => {
-        if (!order) return
-        const items = groupBy(order.group_items, "category_id");
-        setGroupedItems(items);
-    }, [order?.group_items]);
+    const groupedItems = useMemo(() => groupBy(order?.group_items || [], "category_id"), [order?.group_items]);
 
     if (!order) return null
 

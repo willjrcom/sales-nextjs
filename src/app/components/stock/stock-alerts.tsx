@@ -1,48 +1,33 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { GetAllAlerts, ResolveAlert, DeleteAlert } from '@/app/api/stock/alerts';
-import StockAlert from '@/app/entities/stock/stock-alert';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import RequestError from '@/app/utils/error';
 import { FaCheck, FaTrash } from 'react-icons/fa';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const StockAlerts = () => {
     const { data } = useSession();
-    const [alerts, setAlerts] = useState<StockAlert[]>([]);
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        const loadAlerts = async () => {
-            if (!data) return;
-            setLoading(true);
+    const { isPending, data: stockAlertsResponse } = useQuery({
+        queryKey: ['stock-alerts'],
+        queryFn: async () => {
+            return GetAllAlerts(data!);
+        },
+        enabled: !!data?.user?.access_token,
+    });
 
-            try {
-                const alertsData = await GetAllAlerts(data);
-                setAlerts(alertsData || []);
-            } catch (error) {
-                const err = error as RequestError;
-                notifyError(err.message || 'Erro ao carregar alertas');
-                setAlerts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadAlerts();
-    }, [data?.user.access_token]);
+    const alerts = useMemo(() => stockAlertsResponse || [], [stockAlertsResponse]);
 
     const handleResolveAlert = async (alertId: string) => {
         if (!data) return;
 
         try {
             await ResolveAlert(alertId, data);
-            setAlerts(prev => prev.map(alert => 
-                alert.id === alertId 
-                    ? { ...alert, is_resolved: true, resolved_at: new Date().toISOString() }
-                    : alert
-            ));
+            queryClient.invalidateQueries({ queryKey: ['stock-alerts'] });
             notifySuccess('Alerta resolvido com sucesso');
         } catch (error) {
             const err = error as RequestError;
@@ -55,7 +40,7 @@ const StockAlerts = () => {
 
         try {
             await DeleteAlert(alertId, data);
-            setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+            queryClient.invalidateQueries({ queryKey: ['stock-alerts'] });
             notifySuccess('Alerta removido com sucesso');
         } catch (error) {
             const err = error as RequestError;
@@ -89,7 +74,7 @@ const StockAlerts = () => {
         }
     };
 
-    if (loading) {
+    if (isPending) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
@@ -99,14 +84,14 @@ const StockAlerts = () => {
     }
 
     // Ensure alerts is always an array
-    const safeAlerts = Array.isArray(alerts) ? alerts : [];
-    const activeAlerts = safeAlerts.filter(alert => !alert.is_resolved);
-    const resolvedAlerts = safeAlerts.filter(alert => alert.is_resolved);
+    const safeAlerts = useMemo(() => Array.isArray(alerts) ? alerts : [], [alerts]);
+    const activeAlerts = useMemo(() => safeAlerts.filter(alert => !alert.is_resolved), [safeAlerts]);
+    const resolvedAlerts = useMemo(() => safeAlerts.filter(alert => alert.is_resolved), [safeAlerts]);
 
     return (
         <div className="p-6">
             <h2 className="text-xl font-bold mb-6">Alertas de Estoque</h2>
-            
+
             {/* Alertas Ativos */}
             <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">Alertas Ativos ({activeAlerts.length})</h3>

@@ -6,7 +6,7 @@ import Table from "@/app/entities/table/table";
 import { SelectField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import PageTitle from "@/app/components/PageTitle";
 import { notifyError } from "@/app/utils/notifications";

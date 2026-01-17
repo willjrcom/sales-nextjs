@@ -24,6 +24,7 @@ export default function RootLayout({
       <body className={inter.className + " text-black bg-gray-100"} suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
         <Toaster position="top-right" />
+        <div id="modal-root"></div>
       </body>
     </html>
   );

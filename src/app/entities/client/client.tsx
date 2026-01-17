@@ -6,6 +6,7 @@ import { SchemaContact } from "../contact/contact";
 
 export default class Client extends Person {
     id: string = '';
+    is_active: boolean = true;
     constructor(data: Partial<Client> = {}) {
         super({ address: { delivery_tax: new Decimal(0) } as Address });
         Object.assign(this, data);
@@ -19,6 +20,7 @@ export const SchemaClient = z.object({
     email: z.string().email('Email inválido').optional().or(z.literal('')),
     cpf: z.string().min(11, 'CPF inválido').max(14, 'CPF inválido').optional().or(z.literal('')),
     birthday: z.string().optional(),
+    is_active: z.boolean(),
     contact: SchemaContact,
     address: SchemaAddressClient,
 });
