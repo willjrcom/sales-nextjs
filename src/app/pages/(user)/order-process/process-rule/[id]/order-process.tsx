@@ -4,7 +4,7 @@ import StartOrderProcess from '@/app/api/order-process/start/order-process';
 import { useModal } from '@/app/context/modal/context';
 import OrderProcess from '@/app/entities/order-process/order-process';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { HiEye, HiPlay, HiCheckCircle, HiX } from 'react-icons/hi';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
@@ -36,15 +36,17 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         }
     }, [orderProcess.status]);
 
-    const groupItem = orderProcess.group_item;
-    if (!groupItem) return null;
+    const groupItem = useMemo(() => orderProcess.group_item, [orderProcess.group_item]);
+    if (!groupItem) {
+        return <p className="text-gray-500 mt-4">Nenhum item no pedido</p>
+    };
 
     const startProcess = async (id: string) => {
         if (!data) return
 
         try {
             await StartOrderProcess(id, data)
-            queryClient.invalidateQueries({ queryKey: ['orderProcesses'] });
+            queryClient.invalidateQueries({ queryKey: ['order-processes'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
         }
@@ -62,7 +64,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                 await printGroupItem({ groupItemID: groupItem.id, printerName: groupItem.printer_name, session: data })
             }
 
-            queryClient.invalidateQueries({ queryKey: ['orderProcesses'] });
+            queryClient.invalidateQueries({ queryKey: ['order-processes'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');
         }
@@ -100,7 +102,6 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                 <div className="md:col-span-2 space-y-4">
                     <ul className="space-y-2">
                         {groupItem.items.map((item) => {
-                            const product = orderProcess.products.find(p => p.id === item.product_id);
                             return <ItemProcessCard item={item} key={item.id} />;
                         })}
                     </ul>

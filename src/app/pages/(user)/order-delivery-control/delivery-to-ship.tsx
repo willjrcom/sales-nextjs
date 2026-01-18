@@ -34,7 +34,7 @@ const DeliveryOrderToShip = () => {
     const { data, status } = useSession();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['delivery-orders-with-delivery'],
+        queryKey: ['delivery-orders'],
         queryFn: () => GetOrdersWithDelivery(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
@@ -169,7 +169,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
 
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
-            queryClient.invalidateQueries({ queryKey: ['delivery-orders-with-delivery'] });
+            queryClient.invalidateQueries({ queryKey: ['delivery-orders'] });
 
             if (orderIDs.length > 1) {
                 notifySuccess("Entregas enviadas com sucesso");

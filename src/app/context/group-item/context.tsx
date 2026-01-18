@@ -55,11 +55,11 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
         if (!session?.user?.access_token || !id) return;
         setGroupItemId(id);
         setLocalGroupItem(null); // Reset local state para usar os dados da query
-        
+
         // Invalida e refetch
-        await queryClient.invalidateQueries({ queryKey: ['groupItem', id] });
+        await queryClient.invalidateQueries({ queryKey: ['group-item', id] });
         const result = await queryClient.fetchQuery({
-            queryKey: ['groupItem', id],
+            queryKey: ['group-item', id],
             queryFn: () => GetGroupItemByID(id, session),
         });
         return result;
@@ -110,22 +110,22 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
 
     const handleRefetch = useCallback(() => {
         if (groupItemId) {
-            queryClient.invalidateQueries({ queryKey: ['groupItem', groupItemId] });
+            queryClient.invalidateQueries({ queryKey: ['group-item', groupItemId] });
             refetch();
         }
     }, [groupItemId, queryClient, refetch]);
 
     return (
-        <ContextGroupItem.Provider value={{ 
-            groupItem, 
-            fetchData, 
-            resetGroupItem, 
-            getItemByID, 
-            addItem, 
-            removeItem, 
-            updateGroupItem, 
-            updateLastUpdate, 
-            getLoading, 
+        <ContextGroupItem.Provider value={{
+            groupItem,
+            fetchData,
+            resetGroupItem,
+            getItemByID,
+            addItem,
+            removeItem,
+            updateGroupItem,
+            updateLastUpdate,
+            getLoading,
             getLastUpdate,
             refetch: handleRefetch,
         }}>

@@ -10,11 +10,6 @@ interface OrderProcessDetailsProps {
 
 const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
     const groupItem = orderProcess.group_item;
-    const queue = orderProcess.queue;
-    const leftAt = queue?.left_at ? queue?.left_at : new Date().toISOString();
-    const epochLeftAt = new Date(leftAt).getTime()
-    const epochjoinedAt = new Date(queue?.joined_at ?? new Date()).getTime()
-    const queueTotalTime = new Date(epochLeftAt - epochjoinedAt);
     const modalHandler = useModal();
 
     const openCancelOrderProcess = (orderProcess: OrderProcess) => {
@@ -50,7 +45,7 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
 
             {/* Content */}
             {/* <div className="grid grid-cols-2 gap-6"> */}
-                {/* Tempo de Processo
+            {/* Tempo de Processo
                 <div className="bg-gray-50 rounded-lg shadow p-4">
                     <h2 className="font-semibold text-lg mb-4">Tempo de processo</h2>
                     <ul className="space-y-2">
@@ -60,8 +55,8 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                     </ul>
                 </div> */}
 
-                {/* Fila Anterior */}
-                {/* <div className="bg-gray-50 rounded-lg shadow p-4">
+            {/* Fila Anterior */}
+            {/* <div className="bg-gray-50 rounded-lg shadow p-4">
                     <h2 className="font-semibold text-lg mb-4">Fila anterior</h2>
                     <ul className="space-y-2">
                         <li>Entrou na fila às: {queue?.joined_at ? ToUtcTimeWithSeconds(queue.joined_at) : "--:--:--"}</li>
@@ -70,7 +65,7 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                     </ul>
                 </div> */}
             {/* </div> */}
-            
+
             {/* Footer - Botões alinhados abaixo */}
             <div className="flex justify-between items-end mt-8">
                 <button className="flex items-center justify-center gap-2 bg-gray-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-gray-700"

@@ -32,7 +32,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
         onSuccess: (_, newTable) => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
-            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
+            queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
             notifySuccess(`Mesa ${newTable.name} criada com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -45,7 +45,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         mutationFn: (updatedTable: Table) => UpdateTable(updatedTable, data!),
         onSuccess: (_, updatedTable) => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
-            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
+            queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
             notifySuccess(`Mesa ${updatedTable.name} atualizada com sucesso`);
             modalHandler.hideModal(modalName);
         },
@@ -58,7 +58,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         mutationFn: (tableId: string) => DeleteTable(tableId, data!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
-            queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
+            queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
             notifySuccess(`Mesa ${table.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         },

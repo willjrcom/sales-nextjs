@@ -35,7 +35,7 @@ export default function PageProcessRules() {
 
     const handleRefresh = async () => {
         await refetch();
-        setLastUpdate(new Date().toLocaleTimeString());
+        setLastUpdate(FormatRefreshTime(new Date()));
     };
 
     const processRules = useMemo(() => processRulesResponse?.items || [], [processRulesResponse]);

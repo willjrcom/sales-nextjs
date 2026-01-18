@@ -18,6 +18,11 @@ import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetUserCompanies from '@/app/api/user/companies/user';
+import GetCategories from '@/app/api/category/category';
+import GetEmployees from '@/app/api/employee/employee';
+import GetClients from '@/app/api/client/client';
+import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
+import GetPlaces from '@/app/api/place/place';
 
 export default function Page() {
     return (
@@ -93,11 +98,11 @@ function CompanySelection() {
             data.user.access_token = response;
 
             // Prefetch data for next page
-            queryClient.prefetchQuery({ queryKey: ['clients'], queryFn: () => ({ items: [], headers: {} }) });
-            queryClient.prefetchQuery({ queryKey: ['employees'], queryFn: () => ({ items: [], headers: {} }) });
-            queryClient.prefetchQuery({ queryKey: ['categories'], queryFn: () => ({ items: [], headers: {} }) });
-            queryClient.prefetchQuery({ queryKey: ['delivery-drivers'], queryFn: () => ({ items: [], headers: {} }) });
-            queryClient.prefetchQuery({ queryKey: ['places'], queryFn: () => ({ items: [], headers: {} }) });
+            queryClient.prefetchQuery({ queryKey: ['clients'], queryFn: () => GetClients(data!) });
+            queryClient.prefetchQuery({ queryKey: ['employees'], queryFn: () => GetEmployees(data!) });
+            queryClient.prefetchQuery({ queryKey: ['categories'], queryFn: () => GetCategories(data!) });
+            queryClient.prefetchQuery({ queryKey: ['delivery-drivers'], queryFn: () => GetAllDeliveryDrivers(data!) });
+            queryClient.prefetchQuery({ queryKey: ['places'], queryFn: () => GetPlaces(data!) });
 
             router.push('/pages/new-order');
             setSelecting(false);

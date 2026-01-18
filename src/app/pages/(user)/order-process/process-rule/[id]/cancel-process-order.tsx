@@ -34,7 +34,7 @@ const CancelOrderProcess = ({ orderProcess }: CancelOrderProcessProps) => {
         setIsLoading(true);
         try {
             await CancelGroupItem(groupItem.id, selectedReason, data);
-            queryClient.invalidateQueries({queryKey: ['orderProcesses']});
+            queryClient.invalidateQueries({queryKey: ['order-processes']});
             notifySuccess("Item cancelado com sucesso!");
             modalHandler.hideModal("order-process-cancel-" + orderProcess.id);
         } catch (error: RequestError | any) {

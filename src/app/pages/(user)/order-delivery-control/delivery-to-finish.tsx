@@ -34,7 +34,7 @@ const DeliveryOrderToFinish = () => {
     const { data } = useSession();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['delivery-orders-with-delivery'],
+        queryKey: ['delivery-orders'],
         queryFn: () => GetOrdersWithDelivery(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
@@ -54,7 +54,7 @@ const DeliveryOrderToFinish = () => {
 
     const handleRefresh = async () => {
         await refetch();
-        setLastUpdate(new Date().toLocaleTimeString());
+        setLastUpdate(FormatRefreshTime(new Date()));
     };
 
     const deliveryOrders = useMemo(() => {
@@ -178,7 +178,7 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
             await DeliveryOrderDelivery(deliveryID, data);
 
             notifySuccess("Entrega recebida com sucesso");
-            queryClient.invalidateQueries({ queryKey: ['deliveryOrders'] });
+            queryClient.invalidateQueries({ queryKey: ['delivery-orders'] });
 
             modalHandler.hideModal("finish-delivery");
             showOrder(order.id);

@@ -8,6 +8,7 @@ type orderType = "Delivery" | "Pickup" | "Table";
 
 export default class OrderProcess {
     id: string = '';
+    created_at: string = '';
     order_number: number = 0;
     order_type: orderType = "Delivery";
     employee_id?: string = '';
@@ -28,7 +29,7 @@ export default class OrderProcess {
     duration_formatted: string = '';
     total_paused: number = 0;
 
-    
+
     constructor(data: Partial<OrderProcess> = {}) {
         Object.assign(this, data);
     }

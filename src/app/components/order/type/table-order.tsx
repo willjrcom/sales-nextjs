@@ -42,7 +42,7 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
 
             // Recarregar dados
             queryClient.invalidateQueries({ queryKey: ['places'] });
-            queryClient.invalidateQueries({ queryKey: ['tableOrders'] });
+            queryClient.invalidateQueries({ queryKey: ['table-orders'] });
 
             // Recarregar dados do pedido atual
             if (contextCurrentOrder.order) {

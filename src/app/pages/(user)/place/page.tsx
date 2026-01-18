@@ -62,7 +62,7 @@ const DragAndDropGrid = () => {
 
     const handleRefresh = async () => {
         await Promise.all([refetchPlaces(), refetchUnusedTables()]);
-        setLastUpdate(new Date().toLocaleTimeString());
+        setLastUpdate(FormatRefreshTime(new Date()));
     };
 
     const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
@@ -135,7 +135,7 @@ const DragAndDropGrid = () => {
                 setUnusedTables(newUnusedTables);
 
                 queryClient.invalidateQueries({ queryKey: ['places'] });
-                queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
+                queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
                 return
             }
 
@@ -161,7 +161,7 @@ const DragAndDropGrid = () => {
                 setUnusedTables(newUnusedTables);
                 setDroppedTables(newDroppedTables);
                 queryClient.invalidateQueries({ queryKey: ['places'] });
-                queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
+                queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
                 return
             }
 
@@ -185,7 +185,7 @@ const DragAndDropGrid = () => {
                 }
 
                 queryClient.invalidateQueries({ queryKey: ['places'] });
-                queryClient.invalidateQueries({ queryKey: ['unusedTables'] });
+                queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
                 setDroppedTables(newDroppedTables);
                 return
             }

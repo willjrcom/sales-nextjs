@@ -16,7 +16,7 @@ import Loading from "@/app/pages/loading";
 const PageProcessRule = () => {
     const { id } = useParams();
     const { data } = useSession();
-    const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>("");
+    const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>(id as string);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const router = useRouter();
 
@@ -35,16 +35,19 @@ const PageProcessRule = () => {
 
     const handleRefresh = async () => {
         await refetch();
-        setLastUpdate(new Date().toLocaleTimeString());
+        setLastUpdate(FormatRefreshTime(new Date()));
     };
 
     const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
     const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse?.items]);
-    const category = useMemo(() => categories.find((cat) => cat.process_rules?.some((pr) => pr.id === id)), [categories, id]);
+    const category = useMemo(() => categories.find((cat) => cat.process_rules?.some((pr) => pr.id === currentProcessRuleID)), [categories, currentProcessRuleID]);
     const processRules = useMemo(() => category?.process_rules.sort((a, b) => a.order - b.order) || [], [category]);
-    const processRule = useMemo(() => processRules.find((pr) => pr.id === id), [processRules, id]);
+    const processRule = useMemo(() => processRules.find((pr) => pr.id === currentProcessRuleID), [processRules, currentProcessRuleID]);
 
-    useEffect(() => router.replace(`/pages/order-process/process-rule/${id}`), [id]);
+    useEffect(() => router.replace(`/pages/order-process/process-rule/${currentProcessRuleID}`), [currentProcessRuleID]);
+    useEffect(() => {
+        setCurrentProcessRuleID(id as string);
+    }, [id]);
 
     if (isPending || !processRule) {
         return <>
@@ -54,12 +57,17 @@ const PageProcessRule = () => {
 
     const body = (
         <>
-            <p>Tempo ideal de produção: {processRule.ideal_time}</p>
+            <div className="flex justify-between">
+                <p>Tempo ideal de produção: {processRule.ideal_time}</p>
+                <p>Total de processos: {orderProcesses.length}</p>
+            </div>
+
             {(!orderProcesses || orderProcesses.length === 0) ? (
                 <p className="text-gray-500 mt-4">Nenhum processo na fila</p>
             ) : (
                 orderProcesses
                     .sort((a, b) => a.status === "Started" ? -1 : 1)
+                    .sort((a, b) => a.created_at.localeCompare(b.created_at))
                     .map((process) => <OrderProcessCard key={process.id} orderProcess={process} />)
             )}
         </>
@@ -73,7 +81,7 @@ const PageProcessRule = () => {
                     "Carregando..."
             }
                 searchButtonChildren={
-                    <SelectField friendlyName="Processos" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional />
+                    <SelectField friendlyName="Processo Atual" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional />
                 }
                 refreshButton={
                     <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />

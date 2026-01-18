@@ -21,7 +21,7 @@ const DeliveryOrderFinished = () => {
     const { data } = useSession();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['delivery-orders-with-delivery'],
+        queryKey: ['delivery-orders'],
         queryFn: () => GetOrdersWithDelivery(data!),
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
@@ -39,7 +39,7 @@ const DeliveryOrderFinished = () => {
 
     const handleRefresh = async () => {
         await refetch();
-        setLastUpdate(new Date().toLocaleTimeString());
+        setLastUpdate(FormatRefreshTime(new Date()));
     };
 
     const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
@@ -86,7 +86,7 @@ const DeliveryOrderFinished = () => {
                 <h3 className="text-lg font-semibold mb-2">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
-            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => queryClient.invalidateQueries({ queryKey: ['deliveryOrdersWithDelivery'] })}>
+            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => queryClient.invalidateQueries({ queryKey: ['delivery-orders'] })}>
                 <CardOrder orderId={orderID} />
             </ButtonIconTextFloat>}
         </>
