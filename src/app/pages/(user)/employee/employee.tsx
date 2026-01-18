@@ -23,10 +23,10 @@ const PageEmployee = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, error, data: employeesResponse, refetch } = useQuery({
-        queryKey: ['employees', pagination.pageIndex, pagination.pageSize],
+        queryKey: ['employees', pagination.pageIndex, pagination.pageSize, showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetEmployees(data!, pagination.pageIndex, pagination.pageSize);
+            return GetEmployees(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
     });
