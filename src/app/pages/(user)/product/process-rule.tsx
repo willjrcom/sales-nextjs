@@ -38,8 +38,8 @@ export default function PageProcessRules() {
         setLastUpdate(FormatRefreshTime(new Date()));
     };
 
-    const processRules = useMemo(() => processRulesResponse?.items || [], [processRulesResponse]);
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
+    const processRules = useMemo(() => processRulesResponse?.items || [], [processRulesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     const validCategories = useMemo(() =>
         categories.filter((c: any) => !c.is_additional && !c.is_complement),

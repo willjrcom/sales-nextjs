@@ -28,7 +28,7 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
         enabled: !!data?.user?.access_token,
     });
 
-    const places = useMemo(() => placesResponse?.items || [], [placesResponse]);
+    const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
     const selectedPlace = useMemo(() => places.find(p => p.id === placeID), [places, placeID]);
     const tables = useMemo(() => selectedPlace?.tables.map(t => t.table) || [], [selectedPlace]);
 

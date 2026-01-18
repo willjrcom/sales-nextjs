@@ -31,7 +31,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
         enabled: !!data?.user?.access_token,
     });
 
-    const products = useMemo(() => productsResponse?.items || [], [productsResponse]);
+    const products = useMemo(() => productsResponse?.items || [], [productsResponse?.items]);
     const recordProducts = useMemo(() => products.map(product => ({ id: product.id, name: product.name + " - " + product.size.name })), [products]);
 
     const createMutation = useMutation({

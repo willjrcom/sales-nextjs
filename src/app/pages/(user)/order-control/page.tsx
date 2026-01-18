@@ -33,7 +33,7 @@ const PageOrder = () => {
         if (error) notifyError('Erro ao carregar pedidos');
     }, [error]);
 
-    const orders = useMemo(() => ordersResponse?.items || [], [ordersResponse]);
+    const orders = useMemo(() => ordersResponse?.items || [], [ordersResponse?.items]);
     const stagingOrders = useMemo(() => orders.filter((order) => order.status === "Staging"), [orders]);
     const finishedOrders = useMemo(() => orders.filter((order) => order.status === "Finished"), [orders]);
 

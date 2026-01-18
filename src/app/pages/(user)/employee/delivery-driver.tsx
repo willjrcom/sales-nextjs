@@ -35,8 +35,8 @@ const PageDeliveryDriver = () => {
         if (error) notifyError('Erro ao carregar motoboys');
     }, [error]);
 
-    const drivers = useMemo(() => (deliveryDriversResponse?.items || []).filter((driver) => !!driver.employee), [deliveryDriversResponse]);
-    const totalCount = useMemo(() => parseInt(deliveryDriversResponse?.headers.get('x-total-count') || '0'), [deliveryDriversResponse]);
+    const drivers = useMemo(() => (deliveryDriversResponse?.items || []).filter((driver) => !!driver.employee), [deliveryDriversResponse?.items]);
+    const totalCount = useMemo(() => parseInt(deliveryDriversResponse?.headers.get('x-total-count') || '0'), [deliveryDriversResponse?.items]);
 
     const filteredDrivers = useMemo(() => drivers
         .filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))

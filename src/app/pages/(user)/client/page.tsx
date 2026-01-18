@@ -37,7 +37,7 @@ const PageClient = () => {
         }
     }, [error]);
 
-    const clients = useMemo(() => clientsResponse?.items || [], [clientsResponse]);
+    const clients = useMemo(() => clientsResponse?.items || [], [clientsResponse?.items]);
     const sortedClients = useMemo(() => {
         return clients
             .filter(client => showInactive ? true : client.is_active)

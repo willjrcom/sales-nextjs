@@ -75,7 +75,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
         }
     });
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
+    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     useEffect(() => {
         if (item?.is_additional) setSelectedType("Adicional");

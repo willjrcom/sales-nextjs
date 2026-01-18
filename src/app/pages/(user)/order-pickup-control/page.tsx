@@ -54,8 +54,8 @@ const PickupOrderPage = () => {
         if (errorDelivered) notifyError('Erro ao carregar últimos pedidos entregues');
     }, [errorDelivered]);
 
-    const readyOrders = useMemo(() => readyOrdersResponse?.items || [], [readyOrdersResponse]);
-    const deliveredOrders = useMemo(() => (deliveredOrdersResponse?.items || []).sort((a, b) => new Date(b.pickup?.delivered_at || 0).getTime() - new Date(a.pickup?.delivered_at || 0).getTime()), [deliveredOrdersResponse]);
+    const readyOrders = useMemo(() => readyOrdersResponse?.items || [], [readyOrdersResponse?.items]);
+    const deliveredOrders = useMemo(() => (deliveredOrdersResponse?.items || []).sort((a, b) => new Date(b.pickup?.delivered_at || 0).getTime() - new Date(a.pickup?.delivered_at || 0).getTime()), [deliveredOrdersResponse?.items]);
 
     return (
         <div className="max-w-7xl mx-auto p-6">
@@ -69,7 +69,7 @@ const PickupOrderPage = () => {
                     <div className="flex justify-end items-center mb-2">
                         <Refresh onRefresh={refetchReady} isPending={isPendingReady} lastUpdate={lastUpdateReady} />
                     </div>
-                    {readyOrders.length === 0 
+                    {readyOrders.length === 0
                         ? <p className="text-gray-500">Nenhum pedido pronto para retirada</p>
                         : <CrudTable columns={PickupOrderColumns(true)} data={readyOrders} />
                     }
@@ -78,7 +78,7 @@ const PickupOrderPage = () => {
                     <div className="flex justify-end items-center mb-2">
                         <Refresh onRefresh={refetchDelivered} isPending={isPendingDelivered} lastUpdate={lastUpdateDelivered} />
                     </div>
-                    {deliveredOrders.length === 0 
+                    {deliveredOrders.length === 0
                         ? <p className="text-gray-500">Nenhum pedido entregue recentemente</p>
                         : <CrudTable columns={PickupOrderColumns(false)} data={deliveredOrders} />
                     }

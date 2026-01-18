@@ -96,7 +96,7 @@ export const CartToAdd = () => {
         queryClient.invalidateQueries({ queryKey: ['categories'] });
     };
 
-    const allCategories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
+    const allCategories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     const categories = useMemo(() => {
         if (!allCategories.length) return [];

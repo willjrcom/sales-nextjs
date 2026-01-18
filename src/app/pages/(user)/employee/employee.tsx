@@ -35,8 +35,8 @@ const PageEmployee = () => {
         if (error) notifyError('Erro ao carregar funcionários');
     }, [error]);
 
-    const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse]);
-    const totalCount = useMemo(() => parseInt(employeesResponse?.headers.get('x-total-count') || '0'), [employeesResponse]);
+    const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse?.items]);
+    const totalCount = useMemo(() => parseInt(employeesResponse?.headers.get('x-total-count') || '0'), [employeesResponse?.items]);
 
     const filteredEmployees = useMemo(() => employees
         .filter(employee => employee.name.includes(nome))
