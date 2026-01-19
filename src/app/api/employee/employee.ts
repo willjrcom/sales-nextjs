@@ -11,9 +11,9 @@ const GetEmployees = async (session: Session, page?: number, perPage?: number, i
     return { items: response.data, headers: response.headers }
 };
 
-export const GetEmployeesDeleted = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Employee>> => {
+export const GetEmployeesWithoutDeliveryDrivers = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Employee>> => {
     const response = await RequestApi<null, Employee[]>({
-        path: `/employee/deleted?page=${page}&per_page=${perPage}`,
+        path: `/employee/without-delivery-drivers?page=${page}&per_page=${perPage}`,
         method: "GET",
         headers: AddAccessToken(session),
     });

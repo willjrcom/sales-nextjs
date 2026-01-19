@@ -12,36 +12,28 @@ import RequestError from '@/app/utils/error';
 import { SelectField, CheckboxField } from '@/app/components/modal/field';
 import Employee from '@/app/entities/employee/employee';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import GetEmployees from '@/app/api/employee/employee';
-import GetDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
+import { GetEmployeesWithoutDeliveryDrivers } from '@/app/api/employee/employee';
 
 const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>) => {
     const modalName = isUpdate ? 'edit-delivery-driver-' + item?.id : 'new-delivery-driver'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
-    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>(item?.employee_id || "");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
     const { data } = useSession();
 
-    const { data: employeesResponse } = useQuery({
+    const { data: employeesWithoutDriversResponse } = useQuery({
         queryKey: ['employees', true],
-        queryFn: () => GetEmployees(data!, 0, 1000, true),
+        queryFn: () => GetEmployeesWithoutDeliveryDrivers(data!, 0, 1000),
         enabled: !!data?.user?.access_token,
     });
 
-    const { data: deliveryDriversResponse } = useQuery({
-        queryKey: ['delivery-drivers'],
-        queryFn: () => GetDeliveryDrivers(data!),
-        enabled: !!data?.user?.access_token,
-    });
-
-    const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse?.items]);
-    const drivers = useMemo(() => deliveryDriversResponse?.items || [], [deliveryDriversResponse?.items]);
-    const employeesWithoutDrivers = useMemo(() => employees.filter(employee => !drivers.some(driver => driver.employee_id === employee.id)), [drivers, employees]);
+    const employeesWithoutDrivers = useMemo(() => employeesWithoutDriversResponse?.items || [], [employeesWithoutDriversResponse?.items]);
+    const selectedEmployee = useMemo(() => employeesWithoutDrivers.find(employee => employee.id === selectedEmployeeId), [employeesWithoutDrivers, selectedEmployeeId]);
 
     const submit = async () => {
         if (!data) return;
-        if (selectedEmployeeId == "") {
+        if (selectedEmployee || selectedEmployeeId == "") {
             notifyError('Selecione um motoboy');
             return
         }
@@ -50,7 +42,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             deliveryDriver.employee_id = selectedEmployeeId
             const response = isUpdate ? await UpdateDeliveryDriver(deliveryDriver, data) : await NewDeliveryDriver(deliveryDriver.employee_id, data)
 
-            deliveryDriver.employee = employees.find(employee => employee.id === selectedEmployeeId) || new Employee();
+            deliveryDriver.employee = selectedEmployee || new Employee();
 
             if (!isUpdate) {
                 deliveryDriver.id = response

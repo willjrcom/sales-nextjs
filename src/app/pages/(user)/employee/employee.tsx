@@ -40,8 +40,7 @@ const PageEmployee = () => {
 
     const filteredEmployees = useMemo(() => employees
         .filter(employee => employee.name.includes(nome))
-        .filter(employee => showInactive ? true : employee.is_active)
-        .sort((a, b) => a.name.localeCompare(b.name)), [employees, nome, showInactive]);
+        .sort((a, b) => a.name.localeCompare(b.name)), [employees, nome]);
 
     return (
         <>

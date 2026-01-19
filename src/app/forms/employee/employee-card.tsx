@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Employee from "@/app/entities/employee/employee";
 import Contact from "@/app/entities/contact/contact";
 import Address from "@/app/entities/address/address";
 import { HiOutlineUser, HiOutlinePhone, HiOutlineHome, HiOutlineIdentification, HiOutlineMail, HiOutlineCalendar } from "react-icons/hi";
-import ButtonsModal from "@/app/components/modal/buttons-modal";
-import DeleteEmployee from "@/app/api/employee/delete/employee";
-import RemoveUserFromCompany from "@/app/api/company/remove/company";
+
 import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useModal } from "@/app/context/modal/context";
@@ -14,12 +12,12 @@ import { getEmployeeSalaryHistory } from "@/app/api/employee/salary-history";
 import { getEmployeePayments } from "@/app/api/employee/payments";
 import EmployeeSalaryHistoryList from "./EmployeeSalaryHistoryList";
 import EmployeePaymentsList from "./EmployeePaymentsList";
-import { EmployeePayment, EmployeeSalaryHistory } from "@/app/entities/employee/employee-payment";
 import SalaryHistoryModal from "./SalaryHistoryModal";
 import PaymentModal from "./PaymentModal";
 import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import ButtonsModal from "@/app/components/modal/buttons-modal";
 
 interface EmployeeCardProps {
     item: Employee;
@@ -34,6 +32,7 @@ function formatDate(dateString?: string) {
 
 function EmployeeCard({ item }: EmployeeCardProps) {
     const modalName = "view-employee-" + item.id;
+    const [employee, setEmployee] = useState<Employee>(item || new Employee())
     const contact = item.contact as Contact;
     const address = item.address as Address;
     const queryClient = useQueryClient();
@@ -72,6 +71,18 @@ function EmployeeCard({ item }: EmployeeCardProps) {
         }
     }, [permissions, data, item]);
 
+    const updateMutation = useMutation({
+        mutationFn: (updatedEmployee: Employee) => UpdateEmployee(updatedEmployee, data!),
+        onSuccess: (_, updatedEmployee) => {
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            notifySuccess(`Funcionário ${updatedEmployee.name} atualizado com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao atualizar funcionário');
+        }
+    });
+
     const updatePermissions = async () => {
         if (!data) return;
 
@@ -100,25 +111,18 @@ function EmployeeCard({ item }: EmployeeCardProps) {
         }
     }
 
-    const deleteMutation = useMutation({
-        mutationFn: async (employeeId: string) => {
-            await DeleteEmployee(employeeId, data!);
+    const handleInputChange = useCallback((field: keyof Employee, value: any) => {
+        setEmployee(prev => ({
+            ...prev,
+            [field]: value
+        } as Employee));
+    }, [setEmployee]);
 
-            await RemoveUserFromCompany(item.email, data!)
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['employees'] });
-            notifySuccess(`Funcionário ${item?.name} removido com sucesso`);
-            modalHandler.hideModal(modalName);
-        },
-        onError: (error: RequestError) => {
-            notifyError(error.message || `Erro ao remover funcionário ${item?.name}`);
-        }
-    });
-
-    const onDelete = async () => {
-        deleteMutation.mutate(item.id);
+    const onUpdate = async () => {
+        if (!data) return;
+        updateMutation.mutate(employee);
     }
+
 
     const handleSalaryHistorySuccess = (newHistory: any) => {
         queryClient.invalidateQueries({ queryKey: ['employee-salary', item.id] });
@@ -189,73 +193,82 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-6">
-                        <ButtonsModal
-                            item={item}
-                            name="Funcionário"
-                            deleteItem={onDelete}
-                            deleteLabel="Demitir"
-                        />
+                    <div className="mt-6 flex justify-end items-center gap-4">
+                        <div className="w-48">
+                            <CheckboxField
+                                friendlyName="Ativo"
+                                name="is_active"
+                                value={employee.is_active}
+                                setValue={value => handleInputChange('is_active', value)}
+                            />
+                        </div>
                     </div>
+                    <ButtonsModal item={employee} name="Funcionário" onSubmit={onUpdate} />
                 </>
             )}
-            {tab === 'salary' && (
-                <>
-                    <div className="flex justify-end mb-4">
-                        <button
-                            className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition"
-                            onClick={() => setShowSalaryModal(true)}
-                        >
-                            Alterar Salário
-                        </button>
+            {
+                tab === 'salary' && (
+                    <>
+                        <div className="flex justify-end mb-4">
+                            <button
+                                className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition"
+                                onClick={() => setShowSalaryModal(true)}
+                            >
+                                Alterar Salário
+                            </button>
+                        </div>
+                        <EmployeeSalaryHistoryList history={salaryHistory} />
+                        {showSalaryModal && (
+                            <SalaryHistoryModal
+                                employeeId={item.id}
+                                onClose={() => setShowSalaryModal(false)}
+                                onSuccess={handleSalaryHistorySuccess}
+                            />
+                        )}
+                    </>
+                )
+            }
+            {
+                tab === 'payments' && (
+                    <>
+                        <div className="flex justify-end mb-4">
+                            <button
+                                className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+                                onClick={() => setShowPaymentModal(true)}
+                            >
+                                Novo Pagamento
+                            </button>
+                        </div>
+                        <EmployeePaymentsList payments={payments} />
+                        {showPaymentModal && (
+                            <PaymentModal
+                                employeeId={item.id}
+                                onClose={() => setShowPaymentModal(false)}
+                                onSuccess={handlePaymentSuccess}
+                            />
+                        )}
+                    </>
+                )
+            }
+            {
+                tab === 'permissions' && (
+                    <div className="flex flex-col gap-4">
+                        {availablePermissions.map((perm) => (
+                            <CheckboxField
+                                key={perm.key}
+                                friendlyName={perm.label}
+                                name={perm.key}
+                                value={permissions[perm.key] || false}
+                                setValue={(val) => {
+                                    const boolVal = typeof val === 'function' ? val(permissions[perm.key] || false) : val;
+                                    setPermissions(prev => ({ ...prev, [perm.key]: boolVal }));
+                                }}
+                            />
+                        ))}
                     </div>
-                    <EmployeeSalaryHistoryList history={salaryHistory} />
-                    {showSalaryModal && (
-                        <SalaryHistoryModal
-                            employeeId={item.id}
-                            onClose={() => setShowSalaryModal(false)}
-                            onSuccess={handleSalaryHistorySuccess}
-                        />
-                    )}
-                </>
-            )}
-            {tab === 'payments' && (
-                <>
-                    <div className="flex justify-end mb-4">
-                        <button
-                            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
-                            onClick={() => setShowPaymentModal(true)}
-                        >
-                            Novo Pagamento
-                        </button>
-                    </div>
-                    <EmployeePaymentsList payments={payments} />
-                    {showPaymentModal && (
-                        <PaymentModal
-                            employeeId={item.id}
-                            onClose={() => setShowPaymentModal(false)}
-                            onSuccess={handlePaymentSuccess}
-                        />
-                    )}
-                </>
-            )}
-            {tab === 'permissions' && (
-                <div className="flex flex-col gap-4">
-                    {availablePermissions.map((perm) => (
-                        <CheckboxField
-                            key={perm.key}
-                            friendlyName={perm.label}
-                            name={perm.key}
-                            value={permissions[perm.key] || false}
-                            setValue={(val) => {
-                                const boolVal = typeof val === 'function' ? val(permissions[perm.key] || false) : val;
-                                setPermissions(prev => ({ ...prev, [perm.key]: boolVal }));
-                            }}
-                        />
-                    ))}
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
 
