@@ -16,6 +16,10 @@ const EditItem = ({ item }: EditItemProps) => {
     const isStaging = contextGroupItem.groupItem?.status === "Staging"
     const [itemState, setItemState] = React.useState<Item>(item);
 
+    React.useEffect(() => {
+        setItemState(item);
+    }, [item]);
+
     if (!itemState) return
 
     const totalAdditionalsDecimal = itemState.additional_items?.reduce(
@@ -37,7 +41,7 @@ const EditItem = ({ item }: EditItemProps) => {
             {itemState.observation && <p className="text-sm text-gray-600">{itemState.observation}</p>}
             <AdditionalItemList item={itemState} setItem={setItemState} />
             <RemovedItemList item={itemState} />
-            
+
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-md">Produto</p>

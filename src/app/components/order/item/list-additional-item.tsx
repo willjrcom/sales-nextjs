@@ -1,4 +1,5 @@
 import RequestError from '@/app/utils/error';
+import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import DeleteAdditionalItem from '@/app/api/item/delete/additional/item';
 import NewAdditionalItem from '@/app/api/item/update/additional/item';
 import { useGroupItem } from '@/app/context/group-item/context';
@@ -47,10 +48,13 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
     const isStaging = contextGroupItem.groupItem?.status === "Staging";
-
-    const { data: additionalProductsResponse } = useQuery({
+    const [lastUpdate, setLastUpdate] = useState<string>("");
+    const { data: additionalProductsResponse, refetch, isRefetching, dataUpdatedAt } = useQuery({
         queryKey: ['additional-products', item.category_id],
-        queryFn: () => GetAdditionalProducts(data!, item.category_id || ""),
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()))
+            return GetAdditionalProducts(data!, item.category_id);
+        },
         enabled: !!data?.user?.access_token,
         refetchInterval: 60 * 1000, // 60 seconds
     });
@@ -68,7 +72,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         } catch (error: RequestError | any) {
             notifyError(error);
         }
-    }, [item.id]);
+    }, [item.id, item.additional_items]);
 
     const updateAdditionalItem = async (clickedItem: ItemAdditional) => {
         if (!data) return
@@ -179,7 +183,10 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     return (
         <div>
             <br className="my-4" />
-            <h4 className="text-2md font-bold">Itens adicionais</h4>
+            <div className="flex justify-between items-center mb-4">
+                <h4 className="text-2md font-bold">Itens adicionais</h4>
+                <Refresh onRefresh={refetch} isPending={isRefetching} lastUpdate={lastUpdate} />
+            </div>
             <hr className='my-4' />
             <div className="space-y-4">
                 {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}

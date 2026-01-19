@@ -32,7 +32,7 @@ export const GroupItemProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { data: fetchedGroupItem, isLoading, refetch } = useQuery({
-        queryKey: ['groupItem', groupItemId],
+        queryKey: ['group-item', groupItemId],
         queryFn: async () => {
             if (!groupItemId || !session?.user?.access_token) return null;
             try {

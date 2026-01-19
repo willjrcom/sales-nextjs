@@ -15,6 +15,10 @@ interface ItemListProps {
 
 const RemovedItemList = ({ item }: ItemListProps) => {
     const [removedItems, setRemovedItems] = useState<string[]>(item.removed_items || []);
+
+    React.useEffect(() => {
+        setRemovedItems(item.removed_items || []);
+    }, [item.removed_items]);
     const contextGroupItem = useGroupItem();
     const { data } = useSession();
     const isStaging = contextGroupItem.groupItem?.status === "Staging";
