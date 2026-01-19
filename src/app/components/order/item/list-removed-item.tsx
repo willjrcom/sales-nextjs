@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import React, { useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
 import { useQuery } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
+import GetCategoryByID from '@/app/api/category/[id]/category';
 
 interface ItemListProps {
     item: Item;
@@ -19,14 +19,13 @@ const RemovedItemList = ({ item }: ItemListProps) => {
     const { data } = useSession();
     const isStaging = contextGroupItem.groupItem?.status === "Staging";
 
-    const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!, 0, 1000, true),
+    const { data: categoryResponse } = useQuery({
+        queryKey: ['categories', item.category_id],
+        queryFn: () => GetCategoryByID(data!, item.category_id),
         enabled: !!data?.user?.access_token,
     });
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
-    const category = useMemo(() => categories.find(c => c.id === item.category_id), [categories, item.category_id]);
+    const category = useMemo(() => categoryResponse, [categoryResponse]);
     const removableItems = useMemo(() => category?.removable_ingredients || [], [category]);
 
     const addRemovedItem = async (name: string) => {

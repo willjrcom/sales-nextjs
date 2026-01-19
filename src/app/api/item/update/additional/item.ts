@@ -3,12 +3,12 @@ import { Session } from "next-auth";
 
 export interface NewItemProps {
     product_id: string;
-    quantity_id: string;
+    quantity: number;
 }
 
 const NewAdditionalItem = async (itemId: string, body: NewItemProps, session: Session): Promise<string> => {
     const response = await RequestApi<NewItemProps, string>({
-        path: "/item/update/" + itemId + "/additional", 
+        path: "/item/update/" + itemId + "/additional",
         method: "POST",
         body: body,
         headers: AddAccessToken(session),

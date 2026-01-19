@@ -25,7 +25,7 @@ const PageCategoryEdit = () => {
 
     const { data: category } = useQuery({
         queryKey: ['category', id],
-        queryFn: () => GetCategoryByID(id as string, session!),
+        queryFn: () => GetCategoryByID(session!, id as string),
         enabled: !!id && !!session,
     });
 

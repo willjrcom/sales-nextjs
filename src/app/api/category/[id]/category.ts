@@ -2,9 +2,9 @@ import Category from "@/app/entities/category/category";
 import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
-const GetCategoryByID = async (id: string, session: Session): Promise<Category> => {
+const GetCategoryByID = async (session: Session, id: string): Promise<Category> => {
     const response = await RequestApi<string, Category>({
-        path: "/product-category/" + id, 
+        path: "/product-category/" + id,
         method: "GET",
         headers: AddAccessToken(session),
     });

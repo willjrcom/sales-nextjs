@@ -9,7 +9,6 @@ import { useSession } from 'next-auth/react';
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
 import { useQuery } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
 import { GetAdditionalProducts } from '@/app/api/product/product';
 
 interface ItemAdditional {
@@ -49,11 +48,6 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     const { data } = useSession();
     const isStaging = contextGroupItem.groupItem?.status === "Staging";
 
-    const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!, 0, 1000, true),
-        enabled: !!data?.user?.access_token,
-    });
     const { data: additionalProductsResponse } = useQuery({
         queryKey: ['additional-products', item.category_id],
         queryFn: () => GetAdditionalProducts(data!, item.category_id || ""),
@@ -62,7 +56,6 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     });
 
     const additionalItems = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse?.items]);
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     useEffect(() => {
         try {
@@ -75,19 +68,13 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         } catch (error: RequestError | any) {
             notifyError(error);
         }
-    }, [item.id, categories]);
+    }, [item.id]);
 
     const updateAdditionalItem = async (clickedItem: ItemAdditional) => {
         if (!data) return
 
-        const categoryFound = categories.find(c => c.id === clickedItem.category_id);
-        if (!categoryFound) return notifyError("Categoria indisponivel")
-
-        const quantityFound = categoryFound?.quantities.find(quantity => quantity.quantity === clickedItem.quantity)
-        if (!quantityFound) return notifyError("Quantidade indisponivel")
-
         try {
-            clickedItem.additional_item_id = await NewAdditionalItem(item.id, { product_id: clickedItem.product_id, quantity_id: quantityFound?.id }, data)
+            clickedItem.additional_item_id = await NewAdditionalItem(item.id, { product_id: clickedItem.product_id, quantity: clickedItem.quantity }, data)
         } catch (error: RequestError | any) {
             notifyError(error)
         }

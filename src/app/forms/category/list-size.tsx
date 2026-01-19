@@ -26,7 +26,7 @@ const ListSize = ({ category: initialCategory }: ListSizeProps) => {
     // Usa useQuery para manter os dados sincronizados
     const { data: category, refetch } = useQuery({
         queryKey: ['category', initialCategory.id],
-        queryFn: () => GetCategoryByID(initialCategory.id, session!),
+        queryFn: () => GetCategoryByID(session!, initialCategory.id),
         enabled: !!session && !!initialCategory.id,
         initialData: initialCategory,
     });
@@ -59,10 +59,10 @@ const ListSize = ({ category: initialCategory }: ListSizeProps) => {
                             <DialogHeader>
                                 <DialogTitle>Editar tamanho: {size.name}</DialogTitle>
                             </DialogHeader>
-                            <SizeForm 
-                                category={currentCategory} 
-                                isUpdate={true} 
-                                item={size} 
+                            <SizeForm
+                                category={currentCategory}
+                                isUpdate={true}
+                                item={size}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>
@@ -81,8 +81,8 @@ const ListSize = ({ category: initialCategory }: ListSizeProps) => {
                             <DialogHeader>
                                 <DialogTitle>Novo Tamanho</DialogTitle>
                             </DialogHeader>
-                            <SizeForm 
-                                category={currentCategory} 
+                            <SizeForm
+                                category={currentCategory}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>

@@ -26,7 +26,7 @@ const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
     // Usa useQuery para manter os dados sincronizados
     const { data: category, refetch } = useQuery({
         queryKey: ['category', initialCategory.id],
-        queryFn: () => GetCategoryByID(initialCategory.id, session!),
+        queryFn: () => GetCategoryByID(session!, initialCategory.id),
         enabled: !!session && !!initialCategory.id,
         initialData: initialCategory,
     });
@@ -59,10 +59,10 @@ const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
                             <DialogHeader>
                                 <DialogTitle>Editar quantidade: {quantity.quantity}</DialogTitle>
                             </DialogHeader>
-                            <QuantityForm 
-                                category={currentCategory} 
-                                isUpdate={true} 
-                                item={quantity} 
+                            <QuantityForm
+                                category={currentCategory}
+                                isUpdate={true}
+                                item={quantity}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>
@@ -81,8 +81,8 @@ const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
                             <DialogHeader>
                                 <DialogTitle>Nova Quantidade</DialogTitle>
                             </DialogHeader>
-                            <QuantityForm 
-                                category={currentCategory} 
+                            <QuantityForm
+                                category={currentCategory}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>
