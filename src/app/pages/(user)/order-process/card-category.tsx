@@ -15,10 +15,10 @@ const CardCategory = ({ category }: CardCategoryProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { isPending, data: processRulesResponse = [], refetch } = useQuery({
-        queryKey: ['process-rules', category.id],
+        queryKey: ['process-rules-with-processes', category.id],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetProcessRulesByCategoryID(data!, category.id);
+            return GetProcessRulesByCategoryID(data!, category.id, true);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,

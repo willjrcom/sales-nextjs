@@ -90,14 +90,6 @@ function CompanySelection() {
             });
 
             data.user.access_token = response;
-
-            // Prefetch data for next page
-            // queryClient.prefetchQuery({ queryKey: ['clients'], queryFn: () => GetClients(data!, 0, 10, true) });
-            // queryClient.prefetchQuery({ queryKey: ['employees'], queryFn: () => GetEmployees(data!, 0, 10, true) });
-            // queryClient.prefetchQuery({ queryKey: ['categories'], queryFn: () => GetCategories(data!, 0, 1000, true) });
-            // queryClient.prefetchQuery({ queryKey: ['delivery-drivers'], queryFn: () => GetAllDeliveryDrivers(data!, 0, 10, true) });
-            // queryClient.prefetchQuery({ queryKey: ['places'], queryFn: () => GetPlaces(data!) });
-
             router.push('/pages/new-order');
             setSelecting(false);
         } catch (error) {
