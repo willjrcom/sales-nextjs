@@ -2,13 +2,12 @@
 
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import { SelectField } from "@/app/components/modal/field";
 import OrderProcessCard from "./order-process";
 import { useQuery } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
 import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import Loading from "@/app/pages/loading";

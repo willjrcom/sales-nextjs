@@ -1,16 +1,31 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import Category from "@/app/entities/category/category";
 import Carousel from "@/app/components/carousel/carousel";
-import { FaPlusCircle } from 'react-icons/fa';
+import { FaPlusCircle, FaRedo } from 'react-icons/fa';
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import { GetCategoriesComplement } from "@/app/api/category/category";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 interface CategorySelectorProps {
-    complementCategories: Category[];
     selectedCategory: Category; // Categoria que possui o produto
     setSelectedCategory: Dispatch<SetStateAction<Category>>; // Função para atualizar a categoria
 }
 
-const ComplementCategorySelector = ({ complementCategories, selectedCategory, setSelectedCategory }: CategorySelectorProps) => {
+const ComplementCategorySelector = ({ selectedCategory, setSelectedCategory }: CategorySelectorProps) => {
+    const { data } = useSession();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const { isPending, data: complementCategoriesResponse, refetch } = useQuery({
+        queryKey: ['complement-categories'],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetCategoriesComplement(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
+    });
+
     const [selectedCategories, setSelectedCategories] = useState<Category[]>(selectedCategory.complement_categories);
 
     const handleCategorySelection = (category: Category) => {
@@ -35,12 +50,19 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
         }
     };
 
-    const filteredCategories = complementCategories.filter(cat => cat.is_complement)
+    const complementCategories = useMemo(() => complementCategoriesResponse || [], [complementCategoriesResponse]);
 
     return (
         <div>
-            <h4 className="text-md font-medium mb-4">Categorias complemento</h4>
-            <Carousel items={filteredCategories}>
+            <div className="flex items-center mb-4 space-x-2">
+                <h4 className="text-md font-medium">Categorias complemento</h4>
+                <Refresh removeText
+                    onRefresh={refetch}
+                    isPending={isPending}
+                    lastUpdate={lastUpdate}
+                />
+            </div>
+            <Carousel items={complementCategories}>
                 {(category) => {
                     const isSelected = selectedCategories?.some(cat => cat.id === category.id);
                     return (
@@ -71,7 +93,7 @@ const ComplementCategorySelector = ({ complementCategories, selectedCategory, se
                     );
                 }}
             </Carousel>
-            {filteredCategories?.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria complemento encontrada.</p>}
+            {complementCategories?.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria complemento encontrada.</p>}
         </div>
     );
 };

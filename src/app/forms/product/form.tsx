@@ -15,7 +15,8 @@ import RequestError from '@/app/utils/error';
 import PriceField from '@/app/components/modal/fields/price';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
+import { GetCategoriesMap } from '@/app/api/category/category';
+import GetSizesByCategoryID from '@/app/api/size/size';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
@@ -27,12 +28,21 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!, 0, 1000, true),
+        queryKey: ['categories-map'],
+        queryFn: () => GetCategoriesMap(data!),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
     });
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const { data: sizesResponse } = useQuery({
+        queryKey: ['sizes', product.category_id],
+        queryFn: () => GetSizesByCategoryID(data!, product.category_id),
+        enabled: !!data?.user?.access_token && !!product.category_id,
+        refetchInterval: 60000,
+    });
+
+    const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
+    const sizes = useMemo(() => sizesResponse || [], [sizesResponse]);
 
     const handleInputChange = (field: keyof Product, value: any) => {
         setProduct(prev => ({ ...prev, [field]: value }));
@@ -81,15 +91,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             notifyError(error.message || 'Erro ao remover produto');
         }
     }
-
-    const recordCategories = useMemo(() => categories.map(category => ({ id: category.id, name: category.name })), [categories]);
-
-    const category = useMemo(() => categories.find(category => category.id === product.category_id), [product.category_id, categories]);
-
-    const recordSizes = useMemo(() => {
-        if (!category) return [];
-        return category.sizes.map(size => ({ id: size.id, name: size.name }));
-    }, [category]);
 
     return (
         <div className="text-black space-y-6">
@@ -165,10 +166,10 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria e Tamanho</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={recordCategories} />
+                        <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={categories} />
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={recordSizes} />
+                        <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={sizes} />
                     </div>
                 </div>
             </div>

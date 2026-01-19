@@ -4,7 +4,7 @@ interface RadioFieldProps {
     friendlyName: string;
     name: string;
     disabled?: boolean;
-    values: Record<string, string>[];
+    values: { id: string, name: string }[];
     selectedValue: string;
     setSelectedValue: Dispatch<SetStateAction<string>>;
     optional?: boolean;

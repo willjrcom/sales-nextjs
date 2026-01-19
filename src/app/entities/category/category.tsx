@@ -52,3 +52,13 @@ export const ValidateCategoryForm = (category: Category) => {
     }
     return {}
 };
+
+export class CategoryMap {
+    id: string = '';
+    name: string = '';
+
+    constructor(data: Partial<CategoryMap> = {}) {
+        Object.assign(this, data);
+    }
+}
+

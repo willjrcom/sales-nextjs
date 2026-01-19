@@ -14,7 +14,7 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
+import { GetCategoriesMap } from '@/app/api/category/category';
 
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
@@ -25,12 +25,13 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+        queryKey: ['categories-map'],
+        queryFn: () => GetCategoriesMap(data!),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
     });
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
     const category = useMemo(() => categories.find(c => c.id === processRule.category_id), [categories, processRule.category_id]);
 
     const handleInputChange = (field: keyof ProcessRule, value: any) => {
@@ -72,8 +73,6 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             notifyError(error.message || `Erro ao remover regra de processo ${processRule.name}`);
         }
     }
-
-    const validCategories = categories.filter(c => !c.is_additional && !c.is_complement);
 
     return (
         <div className="text-black space-y-6">
@@ -120,7 +119,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
                 <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                     {isUpdate && <TextField friendlyName='Categoria' name='category' value={category?.name || ""} setValue={() => { }} disabled />}
-                    {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={validCategories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
+                    {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={categories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
                 </div>
             </div>
 

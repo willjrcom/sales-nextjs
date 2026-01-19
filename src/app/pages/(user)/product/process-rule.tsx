@@ -11,7 +11,7 @@ import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import GetProcessRules from "@/app/api/process-rule/process-rule";
-import GetCategories from "@/app/api/category/category";
+import { GetCategoriesMap } from "@/app/api/category/category";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 export default function PageProcessRules() {
@@ -28,9 +28,10 @@ export default function PageProcessRules() {
     });
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!, 0, 1000, true),
+        queryKey: ['categories-map'],
+        queryFn: () => GetCategoriesMap(data!),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
     });
 
     const handleRefresh = async () => {
@@ -39,12 +40,7 @@ export default function PageProcessRules() {
     };
 
     const processRules = useMemo(() => processRulesResponse?.items || [], [processRulesResponse?.items]);
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
-
-    const validCategories = useMemo(() =>
-        categories.filter((c: any) => !c.is_additional && !c.is_complement),
-        [categories]
-    );
+    const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
 
     const validProcessRules = useMemo(() =>
         processRules
@@ -68,7 +64,7 @@ export default function PageProcessRules() {
                             name="categoria"
                             selectedValue={categoryID}
                             setSelectedValue={setCategoryID}
-                            values={validCategories}
+                            values={categories}
                             optional
                         />
                         <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />

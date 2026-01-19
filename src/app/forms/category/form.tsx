@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, CheckboxField, SelectField, HiddenField, ImageField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -18,8 +18,7 @@ import ComplementCategorySelector from './complement-category';
 import RemovableItensComponent from './removable-ingredients';
 import { useRouter } from 'next/navigation';
 import printService from '@/app/utils/print-service';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
@@ -31,12 +30,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
     const queryClient = useQueryClient();
     const router = useRouter();
-
-    const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
-        enabled: !!data?.user?.access_token,
-    });
 
     const createMutation = useMutation({
         mutationFn: (newCategory: Category) => NewCategory(newCategory, data!),
@@ -74,8 +67,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
             notifyError(error.message || `Erro ao remover categoria ${category.name}`);
         }
     });
-
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 
     useEffect(() => {
         if (item?.is_additional) setSelectedType("Adicional");
@@ -235,7 +226,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Categorias Adicionais</h3>
                         <AdditionalCategorySelector
-                            additionalCategories={categories}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />
@@ -245,7 +235,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Complementos</h3>
                         <ComplementCategorySelector
-                            complementCategories={categories}
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
                         />

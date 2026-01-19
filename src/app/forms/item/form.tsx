@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import { useQuery } from '@tanstack/react-query';
-import GetCategories from '@/app/api/category/category';
+import GetQuantitiesByCategoryID from "@/app/api/quantity/quantity";
 
 interface AddProductCardProps {
   product: Product;
@@ -199,16 +199,14 @@ interface QuantitySelectorProps {
 const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }: QuantitySelectorProps) => {
   const { data } = useSession();
 
-  const { data: categoriesResponse } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => GetCategories(data!),
+  const { data: quantitiesResponse } = useQuery({
+    queryKey: ['quantities', categoryID],
+    queryFn: () => GetQuantitiesByCategoryID(data!, categoryID),
     enabled: !!data?.user?.access_token,
+    refetchInterval: 60000,
   });
 
-  const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse]);
-
-  const category = useMemo(() => categories.find(c => c.id === categoryID), [categories, categoryID]);
-  const quantities = useMemo(() => category?.quantities.sort((a, b) => a.quantity - b.quantity) || [], [category]);
+  const quantities = useMemo(() => quantitiesResponse || [], [quantitiesResponse]);
 
   useEffect(() => {
     quantities.forEach((quantity) => {

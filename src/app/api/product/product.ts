@@ -32,5 +32,15 @@ const GetAdditionalProducts = async (session: Session, categoryId: string): Prom
     return { items: response.data, headers: response.headers }
 };
 
-export { GetAdditionalProducts, GetComplementProducts }
+const GetProductsMap = async (session: Session): Promise<Product[]> => {
+    const response = await RequestApi<null, Product[]>({
+        path: `/product-category/all-map`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data
+};
+
+export { GetAdditionalProducts, GetComplementProducts, GetProductsMap }
 export default GetProducts

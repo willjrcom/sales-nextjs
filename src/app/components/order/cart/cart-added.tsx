@@ -34,7 +34,14 @@ export const CartAdded = () => {
 
     const groupedItems = useMemo(() => groupBy(order?.group_items || [], "category_id"), [order?.group_items]);
 
-    if (!order) return null
+    if (!order) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full p-4 text-gray-500">
+                <FaSearch className="text-4xl mb-2" />
+                <h2>Nenhum pedido encontrado</h2>
+            </div>
+        )
+    }
 
     return (
         <div className="box-border bg-white h-full flex flex-col overflow-x-hidden">

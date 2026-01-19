@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { notifyError } from "@/app/utils/notifications";
 import GetProducts from "@/app/api/product/product";
-import GetCategories from "@/app/api/category/category";
+import { GetCategoriesMap } from "@/app/api/category/category";
 
 const PageProducts = () => {
     const [categoryID, setCategoryID] = useState("");
@@ -22,11 +22,10 @@ const PageProducts = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: async () => {
-            return GetCategories(data!, 0, 1000, true);
-        },
+        queryKey: ['categories-map'],
+        queryFn: () => GetCategoriesMap(data!),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
     });
 
     const { isPending, error, data: productsResponse, refetch } = useQuery({
@@ -42,7 +41,7 @@ const PageProducts = () => {
         if (error) notifyError('Erro ao carregar categorias');
     }, [error]);
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
+    const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
 
     const products = useMemo(() => productsResponse?.items || [], [productsResponse?.items]);
 
