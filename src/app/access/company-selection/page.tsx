@@ -9,7 +9,6 @@ import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import Company from '@/app/entities/company/company';
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import { notifyError } from '@/app/utils/notifications';
 import EmployeeUserProfile from '@/app/components/profile/profile';
@@ -18,11 +17,6 @@ import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetUserCompanies from '@/app/api/user/companies/user';
-import GetCategories from '@/app/api/category/category';
-import GetEmployees from '@/app/api/employee/employee';
-import GetClients from '@/app/api/client/client';
-import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
-import GetPlaces from '@/app/api/place/place';
 
 export default function Page() {
     return (

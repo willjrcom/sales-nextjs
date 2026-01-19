@@ -6,11 +6,10 @@ import EditGroupItem from "../group-item/edit-group-item";
 import { useCurrentOrder } from "@/app/context/current-order/context";
 import Order from "@/app/entities/order/order";
 import { useGroupItem } from "@/app/context/group-item/context";
-import GroupItem from "@/app/entities/order/group-item";
 import CategoryOrder from "../category/category";
 import { FaSearch } from 'react-icons/fa';
 import { useQuery } from "@tanstack/react-query";
-import GetCategories from "@/app/api/category/category";
+import { GetCategoriesMap } from "@/app/api/category/category";
 import { useSession } from "next-auth/react";
 import { CardOrderResume } from "../resume/resume";
 
@@ -21,12 +20,13 @@ export const CartAdded = () => {
     const { data: session } = useSession();
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(session!, 0, 1000, true),
+        queryKey: ['categories-map'],
+        queryFn: () => GetCategoriesMap(session!, true),
         enabled: !!session?.user.access_token,
+        refetchInterval: 60000,
     });
 
-    const categories = useMemo(() => categoriesResponse?.items.sort((a, b) => a.name.localeCompare(b.name)) || [], [categoriesResponse?.items]);
+    const categoriesMap = useMemo(() => categoriesResponse?.sort((a, b) => a.name.localeCompare(b.name)) || [], [categoriesResponse]);
 
     useEffect(() => {
         setOrder(contextCurrentOrder.order)
@@ -71,8 +71,8 @@ export const CartAdded = () => {
                     </div>
                 ) : (
                     Object.entries(groupedItems).map(([key, groupItems]) => {
-                        if (categories.length === 0) return null;
-                        const category = categories.find(cat => cat.id === key);
+                        if (categoriesMap.length === 0) return null;
+                        const category = categoriesMap.find(cat => cat.id === key);
                         if (!category) return null;
                         return (
                             <CategoryOrder key={key} category={category} groupItems={groupItems} />

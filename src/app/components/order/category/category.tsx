@@ -1,12 +1,12 @@
 "use client";
 import GroupItem from "@/app/entities/order/group-item"
-import Category from "@/app/entities/category/category";
+import { CategoryMap } from "@/app/entities/category/category";
 import Decimal from 'decimal.js';
 import GroupItemCard from "../group-item/card-group-item";
 import Carousel from "../../carousel/carousel";
 
 interface CategoryOrderProps {
-    category: Category;
+    category: CategoryMap;
     groupItems: GroupItem[];
 }
 

@@ -57,21 +57,29 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 )}
             </div>
 
-            {/* Tamanhos e botão */}
-            <div className="flex items-center justify-between space-x-2">
-                {/* Tamanhos */}
-                {product.size && (
-                    <div className="flex space-x-1">
+            <div className="mt-4 flex items-end justify-between gap-3 border-t pt-3">
+                {/* Chips */}
+                <div className="flex flex-wrap gap-2">
+                    {product.category?.name && (
                         <span
-                            className="px-2 py-1 text-xs bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 focus:ring-2 focus:ring-blue-400 transition"
+                            className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full border border-blue-200"
+                            aria-label={`Categoria: ${product.category.name}`}
+                        >
+                            {product.category.name}
+                        </span>
+                    )}
+
+                    {product.size?.name && (
+                        <span
+                            className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-300"
                             aria-label={`Tamanho disponível: ${product.size.name}`}
                         >
                             {product.size.name}
                         </span>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {/* Botão para adicionar */}
+                {/* Botão */}
                 <ButtonIconText modalName={`add-item-${product.id}`} isDisabled={!product.is_available}>
                     <AddProductCard product={product} />
                 </ButtonIconText>

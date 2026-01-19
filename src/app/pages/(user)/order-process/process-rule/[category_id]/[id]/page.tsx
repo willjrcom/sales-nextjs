@@ -14,15 +14,15 @@ import Loading from "@/app/pages/loading";
 import { GetProcessRulesByCategoryID } from "@/app/api/process-rule/process-rule";
 
 const PageProcessRule = () => {
-    const { id } = useParams();
+    const { category_id, id } = useParams();
     const { data } = useSession();
     const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>(id as string);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const router = useRouter();
 
     const { data: processRulesResponse } = useQuery({
-        queryKey: ['process-rules', id],
-        queryFn: () => GetProcessRulesByCategoryID(data!, id as string),
+        queryKey: ['process-rules', category_id],
+        queryFn: () => GetProcessRulesByCategoryID(data!, category_id as string),
         enabled: !!data?.user?.access_token,
     });
 
@@ -43,7 +43,7 @@ const PageProcessRule = () => {
     const processRules = useMemo(() => processRulesResponse || [], [processRulesResponse]);
     const processRule = useMemo(() => processRules.find((pr) => pr.id === currentProcessRuleID), [processRules, currentProcessRuleID]);
 
-    useEffect(() => router.replace(`/pages/order-process/process-rule/${currentProcessRuleID}`), [currentProcessRuleID]);
+    useEffect(() => router.replace(`/pages/order-process/process-rule/${category_id}/${currentProcessRuleID}`), [category_id, currentProcessRuleID]);
     useEffect(() => {
         setCurrentProcessRuleID(id as string);
     }, [id]);
@@ -80,7 +80,7 @@ const PageProcessRule = () => {
                     "Carregando..."
             }
                 searchButtonChildren={
-                    <SelectField friendlyName="Processo Atual" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional />
+                    <SelectField friendlyName="Processo Atual" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional removeDefaultOption />
                 }
                 refreshButton={
                     <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />

@@ -9,13 +9,14 @@ interface RefreshProps {
     lastUpdate?: string;
     /** Loading state */
     isPending?: boolean;
+    optionalText?: string;
 }
 
-const Refresh = ({ onRefresh, removeText, lastUpdate, isPending }: RefreshProps) => {
+const Refresh = ({ onRefresh, removeText, lastUpdate, isPending, optionalText }: RefreshProps) => {
     return (
         <div className="flex items-center gap-3">
-            <button 
-                onClick={!isPending ? onRefresh : undefined} 
+            <button
+                onClick={!isPending ? onRefresh : undefined}
                 disabled={isPending}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:cursor-not-allowed"
             >
@@ -25,8 +26,14 @@ const Refresh = ({ onRefresh, removeText, lastUpdate, isPending }: RefreshProps)
                     <HiOutlineRefresh className="h-5 w-5 text-gray-800" />
                 )}
             </button>
-            {!removeText && lastUpdate && (
+            {!optionalText && !removeText && lastUpdate && (
                 <label className="text-gray-800">{`Atualizado em ${lastUpdate}`}</label>
+            )}
+            {optionalText && lastUpdate && (
+                <label className="text-gray-800">{optionalText} atualizado em {lastUpdate}</label>
+            )}
+            {optionalText && !lastUpdate && (
+                <label className="text-gray-800">{optionalText}</label>
             )}
         </div>
     );

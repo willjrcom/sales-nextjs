@@ -1,7 +1,7 @@
 import Item from '@/app/entities/order/item';
 import React from 'react';
-import AdditionalItem from '../../../../../components/order/additional-item';
-import RemovedItem from '../../../../../components/order/removed-item';
+import AdditionalItem from '../../../../../../components/order/additional-item';
+import RemovedItem from '../../../../../../components/order/removed-item';
 import Product from '@/app/entities/product/product';
 import { FaRegImage } from 'react-icons/fa';
 import { useModal } from '@/app/context/modal/context';
