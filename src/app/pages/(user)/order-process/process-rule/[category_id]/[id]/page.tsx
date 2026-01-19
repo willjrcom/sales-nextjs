@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import CrudLayout from "@/app/components/crud/crud-layout";
@@ -12,6 +13,14 @@ import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import Loading from "@/app/pages/loading";
 import { GetProcessRulesByCategoryID } from "@/app/api/process-rule/process-rule";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 const PageProcessRule = () => {
     const { category_id, id } = useParams();
@@ -74,6 +83,21 @@ const PageProcessRule = () => {
 
     return (
         <>
+            <div className="mb-4">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href="/pages/order-process">Processos</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>{processRule?.name || "Detalhes"}</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+            </div>
             <CrudLayout title={
                 processRule.name ?
                     <PageTitle title={processRule.name} tooltip="Exibe e gerencia os pedidos em execução nesta etapa do processo." /> :
