@@ -13,10 +13,10 @@ const OrderProcess = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, data: categoriesResponse = [], refetch } = useQuery({
-        queryKey: ['categories-with-order-process'],
+        queryKey: ['categories', 'map', 'order-process'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetCategoriesMap(data!);
+            return GetCategoriesMap(data!, true, false, false);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,

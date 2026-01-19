@@ -28,8 +28,8 @@ export default function PageProcessRules() {
     });
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories-map'],
-        queryFn: () => GetCategoriesMap(data!),
+        queryKey: ['categories', 'map', 'process-rule'],
+        queryFn: () => GetCategoriesMap(data!, true, false, false),
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });

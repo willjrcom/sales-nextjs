@@ -11,9 +11,13 @@ const GetCategories = async (session: Session, page: number = 0, perPage: number
     return { items: response.data, headers: response.headers }
 };
 
-export const GetCategoriesMap = async (session: Session, isActive: boolean = true): Promise<CategoryMap[]> => {
+export const GetCategoriesMap = async (session: Session, isActive: boolean = true, isAdditional?: boolean, isComplement?: boolean): Promise<CategoryMap[]> => {
+    let optionalParams = ""
+    if (isAdditional !== undefined) optionalParams += `&is_additional=${isAdditional}`
+    if (isComplement !== undefined) optionalParams += `&is_complement=${isComplement}`
+
     const response = await RequestApi<null, CategoryMap[]>({
-        path: `/product-category/all?is_active=${isActive}`,
+        path: `/product-category/all-map?is_active=${isActive}${optionalParams}`,
         method: "GET",
         headers: AddAccessToken(session),
     });

@@ -22,8 +22,8 @@ const PageProducts = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories-map'],
-        queryFn: () => GetCategoriesMap(data!),
+        queryKey: ['categories', 'map', 'product'],
+        queryFn: () => GetCategoriesMap(data!, true),
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });

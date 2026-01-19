@@ -25,8 +25,8 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories-map'],
-        queryFn: () => GetCategoriesMap(data!),
+        queryKey: ['categories', 'map', 'process-rule'],
+        queryFn: () => GetCategoriesMap(data!, true, false, false),
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });

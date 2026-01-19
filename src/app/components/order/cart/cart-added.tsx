@@ -20,7 +20,7 @@ export const CartAdded = () => {
     const { data: session } = useSession();
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories-map'],
+        queryKey: ['categories', 'map', 'product'],
         queryFn: () => GetCategoriesMap(session!, true),
         enabled: !!session?.user.access_token,
         refetchInterval: 60000,

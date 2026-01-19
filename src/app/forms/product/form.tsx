@@ -28,8 +28,8 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories-map'],
-        queryFn: () => GetCategoriesMap(data!),
+        queryKey: ['categories', 'map', 'product'],
+        queryFn: () => GetCategoriesMap(data!, true),
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });
