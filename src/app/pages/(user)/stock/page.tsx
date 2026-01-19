@@ -18,8 +18,8 @@ import { StockReportComplete } from "@/app/entities/stock/stock-report";
 import Decimal from "decimal.js";
 import { useQuery } from "@tanstack/react-query";
 import { GetStockReport } from "@/app/api/stock/stock";
-import GetCategories from "@/app/api/category/category";
 import { notifyError } from "@/app/utils/notifications";
+import GetProducts from "@/app/api/product/product";
 
 const PageStock = () => {
     const [productID, setProductID] = useState("");
@@ -28,9 +28,9 @@ const PageStock = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const { data } = useSession();
 
-    const { isPending: categoriesPending, error: categoriesError, data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+    const { isPending: productsPending, error: productsError, data: productsResponse } = useQuery({
+        queryKey: ['products', true],
+        queryFn: () => GetProducts(data!, 0, 1000, true),
         enabled: !!data?.user?.access_token,
     });
 
@@ -44,8 +44,8 @@ const PageStock = () => {
     });
 
     useEffect(() => {
-        if (categoriesError) notifyError('Erro ao carregar categorias');
-    }, [categoriesError]);
+        if (productsError) notifyError('Erro ao carregar produtos');
+    }, [productsError]);
 
     useEffect(() => {
         if (stockError) notifyError('Erro ao carregar relatório de estoque');
@@ -82,19 +82,7 @@ const PageStock = () => {
 
 
     // Preparar produtos para o filtro
-    const products = useMemo(() => (categoriesResponse?.items || []), [categoriesResponse?.items]);
-    const filteredProducts = useMemo(() => products
-        .map((category) => {
-            if (!category.products || !Array.isArray(category.products)) return [];
-            return category.products
-                .filter(product => product && product.size) // Garantir que product e size existam
-                .map(product => ({
-                    id: product.id,
-                    name: `${product.name} - ${product.size?.name || ''}`
-                }));
-        })
-        .flat()
-        .filter(p => p.id && p.name), [products]);
+    const products = useMemo(() => (productsResponse?.items || []), [productsResponse?.items]);
 
     return (
         <>
@@ -129,7 +117,7 @@ const PageStock = () => {
                             name="produto"
                             selectedValue={productID}
                             setSelectedValue={setProductID}
-                            values={filteredProducts}
+                            values={products}
                             optional
                         />
 
@@ -149,7 +137,7 @@ const PageStock = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={stockPending && categoriesPending}
+                        isPending={stockPending && productsPending}
                         lastUpdate={lastUpdate}
                     />
                 }

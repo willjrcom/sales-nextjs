@@ -12,6 +12,7 @@ import GetCategories from '@/app/api/category/category';
 import GetProcessesByProcessRuleID from '@/app/api/order-process/by-process-rule/order-process';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import Loading from "@/app/pages/loading";
+import { GetProcessRulesByCategoryID } from "@/app/api/process-rule/process-rule";
 
 const PageProcessRule = () => {
     const { id } = useParams();
@@ -20,9 +21,9 @@ const PageProcessRule = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const router = useRouter();
 
-    const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+    const { data: processRulesResponse } = useQuery({
+        queryKey: ['process-rules', id],
+        queryFn: () => GetProcessRulesByCategoryID(data!, id as string),
         enabled: !!data?.user?.access_token,
     });
 
@@ -38,10 +39,9 @@ const PageProcessRule = () => {
         setLastUpdate(FormatRefreshTime(new Date()));
     };
 
-    const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
     const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse?.items]);
-    const category = useMemo(() => categories.find((cat) => cat.process_rules?.some((pr) => pr.id === currentProcessRuleID)), [categories, currentProcessRuleID]);
-    const processRules = useMemo(() => category?.process_rules.sort((a, b) => a.order - b.order) || [], [category]);
+
+    const processRules = useMemo(() => processRulesResponse || [], [processRulesResponse]);
     const processRule = useMemo(() => processRules.find((pr) => pr.id === currentProcessRuleID), [processRules, currentProcessRuleID]);
 
     useEffect(() => router.replace(`/pages/order-process/process-rule/${currentProcessRuleID}`), [currentProcessRuleID]);

@@ -12,4 +12,13 @@ const GetProcessRules = async (session: Session, isActive: boolean): Promise<Get
     return { items: response.data, headers: response.headers }
 };
 
+export const GetProcessRulesByCategoryID = async (session: Session, categoryID: string): Promise<ProcessRule[]> => {
+    const response = await RequestApi<null, ProcessRule[]>({
+        path: `/product-category/process-rule/by-category-id/${categoryID}`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+    return response.data
+};
+
 export default GetProcessRules

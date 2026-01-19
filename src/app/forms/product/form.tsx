@@ -28,11 +28,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+        queryFn: () => GetCategories(data!, 0, 1000, true),
         enabled: !!data?.user?.access_token,
     });
-
-
 
     const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
 

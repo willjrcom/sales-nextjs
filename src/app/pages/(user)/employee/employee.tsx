@@ -23,7 +23,7 @@ const PageEmployee = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, error, data: employeesResponse, refetch } = useQuery({
-        queryKey: ['employees', pagination.pageIndex, pagination.pageSize, showInactive],
+        queryKey: ['employees', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetEmployees(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
@@ -44,9 +44,9 @@ const PageEmployee = () => {
 
     return (
         <>
-            <ButtonIconTextFloat modalName="filter-employee" icon={FaFilter}>
+            {/* <ButtonIconTextFloat modalName="filter-employee" icon={FaFilter}>
                 <h1>Filtro</h1>
-            </ButtonIconTextFloat>
+            </ButtonIconTextFloat> */}
 
             <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right" size="xl"
                 title="Novo funcionário">

@@ -21,7 +21,7 @@ const RemovedItemList = ({ item }: ItemListProps) => {
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+        queryFn: () => GetCategories(data!, 0, 1000, true),
         enabled: !!data?.user?.access_token,
     });
 

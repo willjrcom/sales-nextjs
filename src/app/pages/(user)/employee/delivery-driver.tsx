@@ -23,7 +23,7 @@ const PageDeliveryDriver = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, error, data: deliveryDriversResponse, refetch } = useQuery({
-        queryKey: ['delivery-drivers', pagination.pageIndex, pagination.pageSize, showInactive],
+        queryKey: ['delivery-drivers', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetAllDeliveryDrivers(data!, pagination.pageIndex, pagination.pageSize, !showInactive);

@@ -23,7 +23,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const { data } = useSession();
 
     const { data: employeesWithoutDriversResponse } = useQuery({
-        queryKey: ['employees', true],
+        queryKey: ['employees'],
         queryFn: () => GetEmployeesWithoutDeliveryDrivers(data!, 0, 1000),
         enabled: !!data?.user?.access_token,
     });

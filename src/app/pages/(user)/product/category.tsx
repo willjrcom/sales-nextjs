@@ -23,10 +23,10 @@ const PageCategories = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     const { isPending, error, data: categoriesResponse, refetch } = useQuery({
-        queryKey: ['categories', pagination.pageIndex, pagination.pageSize, showInactive],
+        queryKey: ['categories', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetCategories(data!, !showInactive);
+            return GetCategories(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
     });

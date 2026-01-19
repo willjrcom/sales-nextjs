@@ -23,7 +23,7 @@ const PageClient = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, error, data: clientsResponse, refetch } = useQuery({
-        queryKey: ['clients', pagination.pageIndex, pagination.pageSize, showInactive],
+        queryKey: ['clients', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetClients(data!, pagination.pageIndex, pagination.pageSize, !showInactive);

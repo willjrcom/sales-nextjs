@@ -39,7 +39,7 @@ const DateField = ({ friendlyName, name, disabled, setValue, value, optional }: 
                 {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
-            <Popover>
+            <Popover modal={true}>
                 <PopoverTrigger asChild>
                     <Button
                         id={name}

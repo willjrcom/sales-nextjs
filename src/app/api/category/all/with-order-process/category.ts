@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 
 const GetCategoriesWithOrderProcess = async (session: Session): Promise<Category[]> => {
     const response = await RequestApi<null, Category[]>({
-        path: "/product-category/all-with-order-process", 
+        path: "/product-category/all-with-order-process",
         method: "GET",
         headers: AddAccessToken(session),
     });

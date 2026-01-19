@@ -26,8 +26,8 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const queryClient = useQueryClient();
 
     const { data: productsResponse } = useQuery({
-        queryKey: ['products', true],
-        queryFn: () => GetProducts(data!, true),
+        queryKey: ['products'],
+        queryFn: () => GetProducts(data!, 0, 1000, true),
         enabled: !!data?.user?.access_token,
     });
 

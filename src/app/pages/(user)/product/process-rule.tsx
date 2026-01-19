@@ -22,14 +22,14 @@ export default function PageProcessRules() {
     const { data } = useSession();
 
     const { data: processRulesResponse, refetch, isPending } = useQuery({
-        queryKey: ['process-rules', pagination.pageIndex, pagination.pageSize, showInactive],
+        queryKey: ['process-rules', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: () => GetProcessRules(data!, !showInactive),
         enabled: !!data?.user?.access_token,
     });
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+        queryFn: () => GetCategories(data!, 0, 1000, true),
         enabled: !!data?.user?.access_token,
     });
 

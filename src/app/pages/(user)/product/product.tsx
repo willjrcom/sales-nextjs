@@ -24,16 +24,16 @@ const PageProducts = () => {
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
         queryFn: async () => {
-            return GetCategories(data!);
+            return GetCategories(data!, 0, 1000, true);
         },
         enabled: !!data?.user?.access_token,
     });
 
     const { isPending, error, data: productsResponse, refetch } = useQuery({
-        queryKey: ['products', pagination.pageIndex, pagination.pageSize, showInactive],
+        queryKey: ['products', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetProducts(data!, !showInactive);
+            return GetProducts(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
     });

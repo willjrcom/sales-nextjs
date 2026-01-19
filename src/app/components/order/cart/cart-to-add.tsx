@@ -88,7 +88,7 @@ export const CartToAdd = () => {
 
     const { data: categoriesResponse, isFetching } = useQuery({
         queryKey: ['categories'],
-        queryFn: () => GetCategories(data!),
+        queryFn: () => GetCategories(data!, 0, 1000, true),
         enabled: !!data?.user?.access_token,
     });
 

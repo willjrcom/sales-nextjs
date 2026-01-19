@@ -22,7 +22,7 @@ export const CartAdded = () => {
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories'],
-        queryFn: () => GetCategories(session!),
+        queryFn: () => GetCategories(session!, 0, 1000, true),
         enabled: !!session?.user.access_token,
     });
 
