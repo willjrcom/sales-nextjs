@@ -46,9 +46,9 @@ const PageClient = () => {
 
     return (
         <>
-            <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}>
+            {/* <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}>
                 <h1>Filtro</h1>
-            </ButtonIconTextFloat>
+            </ButtonIconTextFloat> */}
 
             <ButtonIconTextFloat title="Novo cliente" modalName="new-client" position="bottom-right">
                 <ClientForm />

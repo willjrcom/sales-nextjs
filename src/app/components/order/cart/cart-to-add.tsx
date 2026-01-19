@@ -9,8 +9,7 @@ import RequestError from "@/app/utils/error";
 import { notifyError } from "@/app/utils/notifications";
 import { useModal } from "@/app/context/modal/context";
 import AddProductCard from "@/app/forms/item/form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { GetCategoriesMap } from "@/app/api/category/category";
+import { useQuery } from "@tanstack/react-query";
 import {
     Drawer,
     DrawerClose,
@@ -23,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X } from "lucide-react";
 import Decimal from "decimal.js";
 import { GroupItemCard } from "../group-item/edit-group-item";
-import GetProducts from "@/app/api/product/product";
+import GetProducts, { GetDefaultProducts } from "@/app/api/product/product";
 import Refresh from "../../crud/refresh";
 
 const CartDrawerButton = () => {
@@ -84,16 +83,11 @@ export const CartToAdd = () => {
     const [searchCode, setSearchCode] = useState("");
     const { data } = useSession();
     const modalHandler = useModal();
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     const { isPending, data: productsResponse, refetch } = useQuery({
-        queryKey: ['products'],
-        queryFn: () => GetProducts(data!, 0, 1000, true),
-        enabled: !!data?.user?.access_token,
-    });
-
-    const { data: categoriesMapResponse, refetch: refetchCategoriesMap } = useQuery({
-        queryKey: ['categories-map'],
-        queryFn: () => GetCategoriesMap(data!),
+        queryKey: ['products', 'default', pagination.pageIndex, pagination.pageSize],
+        queryFn: () => GetDefaultProducts(data!, pagination.pageIndex, pagination.pageSize, true),
         enabled: !!data?.user?.access_token,
     });
 
@@ -108,8 +102,6 @@ export const CartToAdd = () => {
 
         return products;
     }, [products, contextGroupItem.groupItem?.category_id]);
-
-    const categoriesMap = useMemo(() => categoriesMapResponse || [], [categoriesMapResponse]);
 
     const onSearch = async () => {
         if (!data) return

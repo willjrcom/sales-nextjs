@@ -234,7 +234,22 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>
                             <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>
                         </ul>
-                        {order.table.status === "Pending" && <button onClick={closeTable}
+                        {order.table.status === "Pending" && <button onClick={() => {
+                            const onConfirm = async () => {
+                                await closeTable();
+                                modalHandler.hideModal('close-table-' + order.id);
+                            }
+                            modalHandler.showModal(
+                                'close-table-' + order.id,
+                                'Fechar Mesa',
+                                <>
+                                    <div className="text-center mb-4"><h2>Tem certeza que deseja fechar a mesa?</h2></div>
+                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onConfirm}>Fechar Mesa</button>
+                                </>,
+                                'md',
+                                () => modalHandler.hideModal('close-table-' + order.id)
+                            )
+                        }}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Fechar Mesa</button>
                         }
                     </div>
@@ -269,7 +284,22 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                             <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>
                         </ul>
 
-                        {order.pickup.status === "Ready" && <button onClick={deliveryPickup}
+                        {order.pickup.status === "Ready" && <button onClick={() => {
+                            const onConfirm = async () => {
+                                await deliveryPickup();
+                                modalHandler.hideModal('delivery-pickup-' + order.id);
+                            }
+                            modalHandler.showModal(
+                                'delivery-pickup-' + order.id,
+                                'Entregar pedido',
+                                <>
+                                    <div className="text-center mb-4"><h2>Tem certeza que deseja entregar o pedido?</h2></div>
+                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onConfirm}>Entregar pedido</button>
+                                </>,
+                                'md',
+                                () => modalHandler.hideModal('delivery-pickup-' + order.id)
+                            )
+                        }}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Entregar pedido</button>
                         }
                     </div>

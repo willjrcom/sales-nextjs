@@ -12,6 +12,16 @@ const GetProducts = async (session: Session, page: number = 0, pageSize: number 
     return { items: response.data, headers: response.headers }
 };
 
+const GetDefaultProducts = async (session: Session, page: number = 0, pageSize: number = 10, isActive: boolean = true): Promise<GetAllResponse<Product>> => {
+    const response = await RequestApi<null, Product[]>({
+        path: `/product/all/default?page=${page}&page_size=${pageSize}&is_active=${isActive}`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+
+    return { items: response.data, headers: response.headers }
+};
+
 const GetComplementProducts = async (session: Session, categoryId: string): Promise<GetAllResponse<Product>> => {
     const response = await RequestApi<null, Product[]>({
         path: `/product-category/${categoryId}/complements`,
@@ -42,5 +52,5 @@ const GetProductsMap = async (session: Session): Promise<Product[]> => {
     return response.data
 };
 
-export { GetAdditionalProducts, GetComplementProducts, GetProductsMap }
+export { GetDefaultProducts, GetAdditionalProducts, GetComplementProducts, GetProductsMap }
 export default GetProducts
