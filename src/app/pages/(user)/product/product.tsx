@@ -59,22 +59,22 @@ const PageProducts = () => {
 
             <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
                 searchButtonChildren={
-                    <>
+                    <div className="flex gap-4 items-center">
                         <SelectField
                             friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={categories} optional />
                         <CheckboxField
                             friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
-                    </>
+                    </div>
                 }
                 refreshButton={
-                    <Refresh
+                    < Refresh
                         onRefresh={refetch}
                         isPending={isPending}
                         lastUpdate={lastUpdate}
                     />
                 }
                 tableChildren={
-                    <CrudTable
+                    < CrudTable
                         columns={ProductColumns()}
                         data={validProducts}
                         totalCount={products.length}

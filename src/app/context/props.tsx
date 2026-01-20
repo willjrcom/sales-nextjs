@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { FormatRefreshTime } from "../components/crud/refresh";
 import FetchData from "../api/fetch-data";
 import { Session } from "next-auth";
-import RequestError from "../utils/error";
 
 export interface ItemsContextProps<T> {
     items: T[];
@@ -31,7 +30,7 @@ const GenericProvider = <T extends { id: string },>({ getItems }: GenericProvide
     const { data } = useSession();
 
     const fetchData = useCallback(async () => {
-        if (!data?.user?.access_token) return; 
+        if (!data?.user?.access_token) return;
         FetchData({ getItems, setItems, data, setLoading });
     }, [data, getItems]);
 

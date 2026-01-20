@@ -1,6 +1,7 @@
- 'use client';
-import Modal from "@/app/components/modal/modal";
-import React, { createContext, useContext, ReactNode, useState, useEffect } from "react";
+'use client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import React, { createContext, useContext, ReactNode, useState } from "react";
 
 // Interface para as propriedades de um modal
 interface ModalData {
@@ -25,14 +26,15 @@ interface ModalContextProps {
 
 const ContextModal = createContext<ModalContextProps | undefined>(undefined);
 
+const sizeClasses = {
+    sm: 'max-w-[25vw] h-auto',
+    md: 'max-w-[50vw] h-auto',
+    lg: 'max-w-[75vw] h-[75vh]',
+    xl: 'max-w-[90vw] h-[90vh]',
+};
+
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [modals, setModals] = useState<Record<string, ModalData>>({});
-    const [isClient, setIsClient] = useState(false);
-
-    // Garantir que o componente só renderize após o lado do cliente estar disponível
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
 
     const showModal = (
         modalName: string,
@@ -62,23 +64,32 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
     const isModalOpen = (modalName: string) => !!modals[modalName];
 
-    // Sempre retorna a estrutura para evitar problemas de hidratação
-    // Apenas os modais são renderizados condicionalmente baseado em isClient
     return (
         <ContextModal.Provider value={{ modals, showModal, hideModal, isModalOpen }}>
             {children}
 
-            {/* Renderizar modais dinâmicos apenas no cliente para evitar problemas de hidratação */}
-            {isClient && Object.entries(modals).map(([modalName, { title, content, size, onClose }]) => (
-                <Modal
+            {/* Renderizar modais dinâmicos usando shadcn/ui Dialog */}
+            {Object.entries(modals).map(([modalName, { title, content, size = 'md', onClose }]) => (
+                <Dialog
                     key={modalName}
-                    title={title}
-                    show={true}
-                    size={size}
-                    onClose={onClose} // Garante o fechamento dinâmico
+                    open={true}
+                    onOpenChange={(open: boolean) => !open && hideModal(modalName)}
                 >
-                    {content}
-                </Modal>
+                    <DialogContent
+                        className={cn(
+                            'max-h-[90vh] overflow-y-auto bg-white p-5 rounded-lg shadow-lg',
+                            sizeClasses[size]
+                        )}
+                    >
+                        <DialogHeader className="mb-4">
+                            <DialogTitle>{title}</DialogTitle>
+                        </DialogHeader>
+                        <div>
+                            <hr className="mb-4" />
+                            {content}
+                        </div>
+                    </DialogContent>
+                </Dialog>
             ))}
         </ContextModal.Provider>
     );

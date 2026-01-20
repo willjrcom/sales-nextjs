@@ -1,6 +1,5 @@
 'use client';
 
-import Modal from "@/app/components/modal/modal";
 import { FaTrash } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 

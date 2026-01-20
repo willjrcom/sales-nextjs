@@ -18,16 +18,15 @@ const CheckboxField = ({
     optional,
 }: CheckboxFieldProps) => {
     return (
-        <div className="mb-4">
+        <div className="mb-4 mr-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
                 {friendlyName} {!optional && <span className="text-red-500">*</span>}
             </label>
 
             {/* Toggle Switch */}
             <div
-                className={`relative inline-block w-12 h-6 ${
-                    disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-                }`}
+                className={`relative inline-block w-12 h-6 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                    }`}
                 onClick={() => !disabled && setValue(!value)} // Altera o estado ao clicar
             >
                 <input
@@ -40,15 +39,13 @@ const CheckboxField = ({
                 />
                 {/* Fundo do toggle */}
                 <span
-                    className={`absolute top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${
-                        value ? "bg-blue-500" : "bg-gray-300"
-                    }`}
+                    className={`absolute top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${value ? "bg-blue-500" : "bg-gray-300"
+                        }`}
                 ></span>
                 {/* Botão do toggle */}
                 <span
-                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-                        value ? "transform translate-x-6" : ""
-                    }`}
+                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${value ? "transform translate-x-6" : ""
+                        }`}
                 ></span>
             </div>
         </div>
