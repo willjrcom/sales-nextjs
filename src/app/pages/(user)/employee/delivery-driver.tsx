@@ -44,9 +44,9 @@ const PageDeliveryDriver = () => {
 
     return (
         <>
-            <ButtonIconTextFloat modalName="filter-delivery-driver" icon={FaFilter}>
+            {/* <ButtonIconTextFloat modalName="filter-delivery-driver" icon={FaFilter}>
                 <h1>Filtro</h1>
-            </ButtonIconTextFloat>
+            </ButtonIconTextFloat> */}
 
             <ButtonIconTextFloat modalName="new-delivery-driver" position="bottom-right"
                 title="Novo motoboy">

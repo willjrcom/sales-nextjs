@@ -22,17 +22,10 @@ import { notifyError } from "@/app/utils/notifications";
 import GetProducts from "@/app/api/product/product";
 
 const PageStock = () => {
-    const [productID, setProductID] = useState("");
     const [stockFilter, setStockFilter] = useState("all"); // all, low, out
     const [lastUpdate, setLastUpdate] = useState(FormatRefreshTime(new Date()));
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const { data } = useSession();
-
-    const { isPending: productsPending, error: productsError, data: productsResponse } = useQuery({
-        queryKey: ['products', true],
-        queryFn: () => GetProducts(data!, 0, 1000, true),
-        enabled: !!data?.user?.access_token,
-    });
 
     const { isPending: stockPending, error: stockError, data: report, refetch } = useQuery({
         queryKey: ['stocks', pagination.pageIndex, pagination.pageSize],
@@ -44,10 +37,6 @@ const PageStock = () => {
     });
 
     useEffect(() => {
-        if (productsError) notifyError('Erro ao carregar produtos');
-    }, [productsError]);
-
-    useEffect(() => {
         if (stockError) notifyError('Erro ao carregar relatório de estoque');
     }, [stockError]);
 
@@ -55,11 +44,6 @@ const PageStock = () => {
         if (!report?.all_stocks || !Array.isArray(report.all_stocks)) return [];
 
         let stocks = report.all_stocks;
-
-        // filtrar por produto
-        if (productID) {
-            stocks = stocks.filter(s => s.product_id === productID);
-        }
 
         // filtro de status
         if (stockFilter === "low") {
@@ -78,11 +62,7 @@ const PageStock = () => {
         return [...stocks].sort((a, b) =>
             (a.product?.name || '').localeCompare(b.product?.name || '')
         );
-    }, [report?.all_stocks, productID, stockFilter]);
-
-
-    // Preparar produtos para o filtro
-    const products = useMemo(() => (productsResponse?.items || []), [productsResponse?.items]);
+    }, [report?.all_stocks, stockFilter]);
 
     return (
         <>
@@ -128,7 +108,7 @@ const PageStock = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={stockPending && productsPending}
+                        isPending={stockPending}
                         lastUpdate={lastUpdate}
                     />
                 }

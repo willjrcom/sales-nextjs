@@ -51,7 +51,7 @@ const PageProducts = () => {
 
     return (
         <>
-            <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
+            {/* <ButtonIconTextFloat modalName="filter-product" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat> */}
 
             <ButtonIconTextFloat modalName="new-product" title="Novo produto" position="bottom-right">
                 <ProductForm />

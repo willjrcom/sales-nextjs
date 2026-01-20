@@ -41,7 +41,7 @@ const PageCategories = () => {
 
     return (
         <>
-            <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat>
+            {/* <ButtonIconTextFloat modalName="filter-category" icon={FaFilter}><h1>Filtro</h1></ButtonIconTextFloat> */}
 
             <ButtonIconTextFloat title="Nova categoria" modalName="new-category" position="bottom-right">
                 <CategoryForm />
