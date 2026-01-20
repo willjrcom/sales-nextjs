@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { TextField, CheckboxField } from '../../components/modal/field';
+import { useMemo, useState } from 'react';
+import { TextField, CheckboxField, RadioField } from '../../components/modal/field';
 import Stock, { ValidateStockForm } from '@/app/entities/stock/stock';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -11,11 +11,11 @@ import NewStock from '@/app/api/stock/new/stock';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { SelectField } from '@/app/components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Decimal from 'decimal.js';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import GetProducts from '@/app/api/product/product';
+import { GetDefaultProductsByCategory } from '@/app/api/product/product';
+import { GetCategoriesMap } from '@/app/api/category/category';
 
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
@@ -23,16 +23,25 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const [stock, setStock] = useState<Stock>(item || new Stock());
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [categoryID, setCategoryID] = useState<string>("");
     const queryClient = useQueryClient();
 
-    const { data: productsResponse } = useQuery({
-        queryKey: ['products'],
-        queryFn: () => GetProducts(data!, 0, 1000, true),
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['categories', 'map', 'product'],
+        queryFn: () => GetCategoriesMap(data!, true),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
     });
 
-    const products = useMemo(() => productsResponse?.items || [], [productsResponse?.items]);
-    const recordProducts = useMemo(() => products.map(product => ({ id: product.id, name: product.name + " - " + product.size.name })), [products]);
+    const { data: productsResponse } = useQuery({
+        queryKey: ['products', 'map', categoryID],
+        queryFn: () => GetDefaultProductsByCategory(data!, categoryID, true),
+        enabled: !!data?.user?.access_token && !!categoryID,
+    });
+
+    const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
+    const products = useMemo(() => productsResponse || [], [productsResponse]);
+    const recordProducts = useMemo(() => products.map(product => ({ id: product.id, name: product.name })), [products]);
 
     const createMutation = useMutation({
         mutationFn: (newStock: Stock) => NewStock(newStock, data!),
@@ -86,7 +95,15 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Produto</h3>
                 <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    <SelectField
+                    <RadioField
+                        friendlyName="Categoria"
+                        name="category_id"
+                        selectedValue={categoryID}
+                        setSelectedValue={setCategoryID}
+                        values={categories}
+                    />
+
+                    <RadioField
                         friendlyName="Produto"
                         name="product_id"
                         selectedValue={stock.product_id}

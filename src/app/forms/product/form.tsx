@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { TextField, CheckboxField, RadioField, HiddenField, ImageField } from '../../components/modal/field';
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';

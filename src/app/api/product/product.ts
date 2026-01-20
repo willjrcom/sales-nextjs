@@ -22,9 +22,19 @@ const GetDefaultProducts = async (session: Session, page: number = 0, pageSize: 
     return { items: response.data, headers: response.headers }
 };
 
+const GetDefaultProductsByCategory = async (session: Session, categoryId: string, isMap: boolean = false): Promise<Product[]> => {
+    const response = await RequestApi<null, Product[]>({
+        path: `/product-category/${categoryId}/default-products?is_map=${isMap}`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data
+};
+
 const GetComplementProducts = async (session: Session, categoryId: string): Promise<GetAllResponse<Product>> => {
     const response = await RequestApi<null, Product[]>({
-        path: `/product-category/${categoryId}/complements`,
+        path: `/product-category/${categoryId}/complement-products`,
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -34,7 +44,7 @@ const GetComplementProducts = async (session: Session, categoryId: string): Prom
 
 const GetAdditionalProducts = async (session: Session, categoryId: string): Promise<GetAllResponse<Product>> => {
     const response = await RequestApi<null, Product[]>({
-        path: `/product-category/${categoryId}/additionals`,
+        path: `/product-category/${categoryId}/additional-products`,
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -42,9 +52,12 @@ const GetAdditionalProducts = async (session: Session, categoryId: string): Prom
     return { items: response.data, headers: response.headers }
 };
 
-const GetProductsMap = async (session: Session): Promise<Product[]> => {
+const GetProductsMap = async (session: Session, categoryID?: string): Promise<Product[]> => {
+    let optionalParams = '';
+    if (categoryID) optionalParams = `?category_id=${categoryID}`;
+
     const response = await RequestApi<null, Product[]>({
-        path: `/product-category/all-map`,
+        path: `/product/all-map${optionalParams}`,
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -52,5 +65,5 @@ const GetProductsMap = async (session: Session): Promise<Product[]> => {
     return response.data
 };
 
-export { GetDefaultProducts, GetAdditionalProducts, GetComplementProducts, GetProductsMap }
+export { GetDefaultProducts, GetDefaultProductsByCategory, GetAdditionalProducts, GetComplementProducts, GetProductsMap }
 export default GetProducts

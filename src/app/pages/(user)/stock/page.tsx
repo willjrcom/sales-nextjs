@@ -86,7 +86,6 @@ const PageStock = () => {
 
     return (
         <>
-
             <div className="flex gap-2">
                 <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
                     <StockReport reportStock={report || {} as StockReportComplete} />
@@ -113,21 +112,13 @@ const PageStock = () => {
                 searchButtonChildren={
                     <>
                         <SelectField
-                            friendlyName="Produto"
-                            name="produto"
-                            selectedValue={productID}
-                            setSelectedValue={setProductID}
-                            values={products}
-                            optional
-                        />
-
-                        <SelectField
                             friendlyName="Status"
                             name="status"
+                            removeDefaultOption
                             selectedValue={stockFilter}
                             setSelectedValue={setStockFilter}
                             values={[
-                                { id: "all", name: "Todos" },
+                                { id: "all", name: "Mostrar Todos" },
                                 { id: "low", name: "Estoque Baixo" },
                                 { id: "out", name: "Sem Estoque" }
                             ]}
