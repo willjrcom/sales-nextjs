@@ -6,18 +6,20 @@ import { useModal } from "@/app/context/modal/context";
 interface NewButtonProps {
     size?: 'sm' | 'md' | 'lg' | 'xl';
     modalName: string
+    additionalModals?: string[]
     name: string;
     children: React.ReactNode;
     onCloseModal?: () => void
 }
 
-const ButtonDelete = ({ size = 'md', modalName, name, children, onCloseModal }: NewButtonProps) => {
+const ButtonDelete = ({ size = 'md', modalName, additionalModals, name, children, onCloseModal }: NewButtonProps) => {
     const modalHandler = useModal()
     const deleteButton = "Excluir " + name;
 
     const onClose = () => {
         if (onCloseModal) onCloseModal();
         modalHandler.hideModal(modalName)
+        additionalModals?.forEach(modal => modalHandler.hideModal(modal))
     }
 
     return (

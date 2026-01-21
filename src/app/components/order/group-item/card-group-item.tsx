@@ -35,7 +35,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
       {/* Header: Group title and actions */}
       <div className="flex items-center justify-between">
         <StatusComponent status={groupItem.status} />
-        <div>
+        <div onClick={() => queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] })}>
           <ButtonIcon
             title="Editar grupo"
             modalName={`edit-group-item-${groupItem.id}`}

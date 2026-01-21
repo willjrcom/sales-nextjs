@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
-import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../button/button-delete';
 import AdditionalItemList from './list-additional-item';
@@ -17,18 +17,18 @@ const EditItem = ({ item, itemsCount }: EditItemProps) => {
     const queryClient = useQueryClient();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const isStaging = groupItem?.status === "Staging"
-    const [itemState, setItemState] = React.useState<Item>(item);
+    const [itemState, setItemState] = useState<Item>(item);
 
-    React.useEffect(() => {
+    useEffect(() => {
         setItemState(item);
     }, [item]);
 
     if (!itemState) return
 
-    const totalAdditionalsDecimal = itemState.additional_items?.reduce(
+    const totalAdditionalsDecimal = useMemo(() => itemState.additional_items?.reduce(
         (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.price).times(it.quantity)),
         new Decimal(0)
-    ) || new Decimal(0);
+    ) || new Decimal(0), [itemState.additional_items]);
 
     return (
         <div
@@ -40,7 +40,7 @@ const EditItem = ({ item, itemsCount }: EditItemProps) => {
                     {itemState.quantity} x {itemState.name}
                 </div>
                 {isStaging &&
-                    <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name}>
+                    <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name} additionalModals={["edit-item-" + itemState.id]}>
                         <DeleteItemModal item={itemState} itemsCount={itemsCount} />
                     </ButtonDelete>
                 }

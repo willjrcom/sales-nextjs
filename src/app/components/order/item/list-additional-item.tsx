@@ -4,11 +4,10 @@ import DeleteAdditionalItem from '@/app/api/item/delete/additional/item';
 import NewAdditionalItem from '@/app/api/item/update/additional/item';
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
-import Product from '@/app/entities/product/product';
 import { useSession } from 'next-auth/react';
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GetAdditionalProducts } from '@/app/api/product/product';
 import GroupItem from '@/app/entities/order/group-item';
 
@@ -26,32 +25,14 @@ interface ItemListProps {
     setItem: Dispatch<SetStateAction<Item>>;
 }
 
-const convertProductToItem = (products: Product[], additionalItemsAdded: Item[]) => {
-    const items: ItemAdditional[] = products?.map((product) => {
-        const itemAdded = additionalItemsAdded.find(item => item.product_id === product.id)
-        const item: ItemAdditional = {
-            product_id: product.id,
-            name: product.name,
-            quantity: itemAdded?.quantity || 0,
-            additional_item_id: itemAdded?.id || "",
-            category_id: product.category_id,
-            price: product.price,
-        }
-        return item
-    })
-
-    return items.sort((a, b) => a.name.localeCompare(b.name))
-}
-
 const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
-    const [additionalItemsToAdd, setAdditionalItemsToAdd] = useState<ItemAdditional[]>([]);
     const { data } = useSession();
     const queryClient = useQueryClient();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
-
     const isStaging = groupItem?.status === "Staging";
     const [lastUpdate, setLastUpdate] = useState<string>("");
 
+    // Fetch additional products
     const { data: additionalProductsResponse, refetch, isRefetching, isLoading, error } = useQuery({
         queryKey: ['additional-products', item.category_id],
         queryFn: async () => {
@@ -60,131 +41,188 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             return result;
         },
         enabled: !!data?.user?.access_token && !!item.category_id,
-        refetchInterval: 60 * 1000, // 60 seconds
-        staleTime: 30 * 1000, // Consider data fresh for 30 seconds
+        refetchInterval: 60 * 1000,
+        staleTime: 30 * 1000,
     });
 
-    const additionalItems = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse?.items]);
+    // Derive additional items from products and current item state (no duplicate state!)
+    const additionalItemsToDisplay = useMemo(() => {
+        const products = additionalProductsResponse?.items || [];
+        const additionalItemsAdded = item.additional_items || [];
 
-    useEffect(() => {
-        try {
-            const items = convertProductToItem(additionalItems, item.additional_items || []);
-            if (!items || items.length === 0) {
-                return setAdditionalItemsToAdd([]);
+        const items: ItemAdditional[] = products.map((product) => {
+            const itemAdded = additionalItemsAdded.find(i => i.product_id === product.id);
+            return {
+                product_id: product.id,
+                name: product.name,
+                quantity: itemAdded?.quantity || 0,
+                additional_item_id: itemAdded?.id || "",
+                category_id: product.category_id,
+                price: product.price,
+            };
+        });
+
+        return items.sort((a, b) => a.name.localeCompare(b.name));
+    }, [additionalProductsResponse?.items, item.additional_items]);
+
+    // Mutation for adding/updating additional item
+    const addMutation = useMutation({
+        mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) => {
+            return await NewAdditionalItem(item.id, { product_id: productId, quantity }, data!);
+        },
+        onSuccess: (additionalItemId, variables) => {
+            const clickedItem = additionalItemsToDisplay.find(i => i.product_id === variables.productId);
+            if (!clickedItem) return;
+
+            setItem((prev) => {
+                const newAdditionalItems = prev.additional_items?.filter(i => i.product_id !== variables.productId) || [];
+                newAdditionalItems.push({
+                    ...clickedItem,
+                    id: additionalItemId,
+                    quantity: variables.quantity,
+                } as Item);
+
+                return {
+                    ...prev,
+                    total_price: new Decimal(prev.total_price).plus(clickedItem.price),
+                    additional_items: newAdditionalItems,
+                };
+            });
+
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+        },
+        onError: (error: RequestError | any) => {
+            notifyError(error.message || 'Erro ao adicionar item');
+        },
+    });
+
+    // Mutation for removing additional item
+    const removeMutation = useMutation({
+        mutationFn: async ({ additionalItemId, productId }: { additionalItemId: string; productId: string }) => {
+            await DeleteAdditionalItem(additionalItemId, data!);
+            return productId;
+        },
+        onSuccess: (productId) => {
+            const clickedItem = additionalItemsToDisplay.find(i => i.product_id === productId);
+            if (!clickedItem) return;
+
+            setItem((prev) => {
+                const newAdditionalItems = prev.additional_items?.filter(i => i.product_id !== productId) || [];
+
+                return {
+                    ...prev,
+                    total_price: new Decimal(prev.total_price).minus(clickedItem.price),
+                    additional_items: newAdditionalItems,
+                };
+            });
+
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+        },
+        onError: (error: RequestError | any) => {
+            notifyError(error.message || 'Erro ao remover item');
+        },
+    });
+
+    // Mutation for updating quantity (decrement without deleting)
+    const updateMutation = useMutation({
+        mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) => {
+            return await NewAdditionalItem(item.id, { product_id: productId, quantity }, data!);
+        },
+        onSuccess: (additionalItemId, variables) => {
+            const clickedItem = additionalItemsToDisplay.find(i => i.product_id === variables.productId);
+            if (!clickedItem) return;
+
+            setItem((prev) => {
+                const newAdditionalItems = prev.additional_items?.filter(i => i.product_id !== variables.productId) || [];
+                newAdditionalItems.push({
+                    ...clickedItem,
+                    id: additionalItemId,
+                    quantity: variables.quantity,
+                } as Item);
+
+                return {
+                    ...prev,
+                    total_price: new Decimal(prev.total_price).minus(clickedItem.price),
+                    additional_items: newAdditionalItems,
+                };
+            });
+
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+        },
+        onError: (error: RequestError | any) => {
+            notifyError(error.message || 'Erro ao atualizar item');
+        },
+    });
+
+    const handleIncrement = useCallback((clickedItem: ItemAdditional) => {
+        if (clickedItem.quantity >= 5) {
+            return notifyError("Máximo de 5 itens adicionais");
+        }
+
+        addMutation.mutate({
+            productId: clickedItem.product_id,
+            quantity: clickedItem.quantity + 1,
+        });
+    }, [addMutation]);
+
+    const handleDecrement = useCallback((clickedItem: ItemAdditional) => {
+        if (clickedItem.quantity === 0) {
+            return notifyError("Quantidade mínima atingida");
+        }
+
+        const newQuantity = clickedItem.quantity - 1;
+
+        if (newQuantity === 0) {
+            if (!clickedItem.additional_item_id) {
+                return notifyError("Item indisponível");
             }
-
-            setAdditionalItemsToAdd(items);
-        } catch (error: RequestError | any) {
-            notifyError(error);
+            removeMutation.mutate({
+                additionalItemId: clickedItem.additional_item_id,
+                productId: clickedItem.product_id,
+            });
+        } else {
+            updateMutation.mutate({
+                productId: clickedItem.product_id,
+                quantity: newQuantity,
+            });
         }
-    }, [item.id, item.additional_items, additionalItems]); // Added additionalItems dependency
+    }, [removeMutation, updateMutation]);
 
-    const updateAdditionalItem = async (clickedItem: ItemAdditional) => {
-        if (!data) return
+    const AdditionalItemCard = ({ item: cardItem }: { item: ItemAdditional }) => {
+        const isUpdating = addMutation.isPending || removeMutation.isPending || updateMutation.isPending;
 
-        try {
-            clickedItem.additional_item_id = await NewAdditionalItem(item.id, { product_id: clickedItem.product_id, quantity: clickedItem.quantity }, data)
-        } catch (error: RequestError | any) {
-            notifyError(error)
-        }
-
-        // Update additional items to add
-        const newAdditionalItemsToAdd = additionalItemsToAdd?.filter(item => item.product_id !== clickedItem.product_id) || [];
-        newAdditionalItemsToAdd.push({ ...clickedItem, additional_item_id: clickedItem.additional_item_id });
-
-        setAdditionalItemsToAdd(newAdditionalItemsToAdd.sort((a, b) => a.name.localeCompare(b.name)));
-    }
-
-    const handleIncrement = (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 5) return notifyError("Maximo de 5 itens adicionais")
-
-        clickedItem.quantity += 1
-
-        updateAdditionalItem(clickedItem)
-
-        // Update additional item from Item
-        const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
-        newAdditionalItems.push({ ...clickedItem, id: clickedItem.additional_item_id } as Item);
-
-        setItem((prev) => ({
-            ...prev,
-            total_price: new Decimal(prev.total_price).plus(new Decimal(clickedItem.price)),
-            additional_items: newAdditionalItems
-        }))
-    };
-
-    const handleDecrement = async (clickedItem: ItemAdditional) => {
-        if (clickedItem.quantity === 0 || !data) return notifyError("Quantidade mínima atingida")
-
-        // Decrementa quantidade localmente
-        clickedItem.quantity -= 1
-
-        // Se ainda restar quantidade, apenas atualiza
-        if (clickedItem.quantity !== 0) {
-            updateAdditionalItem(clickedItem)
-
-            // Atualiza lista de adicionais no item, mantendo a nova quantidade
-            const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
-            newAdditionalItems.push({ ...clickedItem, id: clickedItem.additional_item_id } as Item);
-
-            setItem((prev) => ({
-                ...prev,
-                total_price: new Decimal(prev.total_price).minus(new Decimal(clickedItem.price)),
-                additional_items: newAdditionalItems
-            }))
-
-            return
-        }
-
-        if (!clickedItem.additional_item_id) return notifyError("Item indisponivel")
-
-        // Delete additional item
-        try {
-            await DeleteAdditionalItem(clickedItem.additional_item_id, data)
-        } catch (error: RequestError | any) {
-            notifyError(error)
-        }
-
-        // Update additional item from Item
-        const newAdditionalItems = item.additional_items?.filter(i => i.product_id !== clickedItem.product_id) || [];
-
-        setItem((prev) => ({
-            ...prev,
-            total_price: new Decimal(prev.total_price).minus(new Decimal(clickedItem.price)),
-            additional_items: newAdditionalItems
-        }))
-    };
-
-    const AdditionalItemCard = ({ item }: { item: ItemAdditional }) => {
-        let name = item.name;
-
+        let name = cardItem.name;
         if (isStaging) {
-            name += "- R$" + new Decimal(item.price).toFixed(2)
+            name += " - R$" + new Decimal(cardItem.price).toFixed(2);
         }
+
         return (
-            <div key={item.product_id} className="flex items-center space-x-4">
-                <div className="flex-1">{name} </div>
+            <div key={cardItem.product_id} className="flex items-center space-x-4">
+                <div className="flex-1">{name}</div>
                 <div className="flex items-center space-x-2">
-                    {isStaging &&
+                    {isStaging && (
                         <button
-                            onClick={() => handleDecrement(item)}
-                            className="bg-red-500 text-white px-3 py-1 rounded"
+                            onClick={() => handleDecrement(cardItem)}
+                            disabled={isUpdating}
+                            className="bg-red-500 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 transition"
                         >
                             -
-                        </button>}
-                    <span>{item.quantity}</span>
-
-                    {isStaging &&
+                        </button>
+                    )}
+                    <span className="min-w-[20px] text-center">{cardItem.quantity}</span>
+                    {isStaging && (
                         <button
-                            onClick={() => handleIncrement(item)}
-                            className="bg-green-500 text-white px-3 py-1 rounded"
+                            onClick={() => handleIncrement(cardItem)}
+                            disabled={isUpdating}
+                            className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition"
                         >
                             +
-                        </button>}
+                        </button>
+                    )}
                 </div>
             </div>
         );
-    }
+    };
     return (
         <div>
             <br className="my-4" />
@@ -212,8 +250,12 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
             {/* Content */}
             {!isLoading && !error && (
                 <div className="space-y-4">
-                    {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}
-                    {additionalItemsToAdd.length === 0 && <p className="text-gray-500">Nenhum item disponível</p>}
+                    {additionalItemsToDisplay.map((item) => (
+                        <AdditionalItemCard key={item.product_id} item={item} />
+                    ))}
+                    {additionalItemsToDisplay.length === 0 && (
+                        <p className="text-gray-500">Nenhum item disponível</p>
+                    )}
                 </div>
             )}
         </div>
