@@ -2,15 +2,15 @@ import RequestError from '@/app/utils/error';
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import DeleteAdditionalItem from '@/app/api/item/delete/additional/item';
 import NewAdditionalItem from '@/app/api/item/update/additional/item';
-import { useGroupItem } from '@/app/context/group-item/context';
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import Product from '@/app/entities/product/product';
 import { useSession } from 'next-auth/react';
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetAdditionalProducts } from '@/app/api/product/product';
+import GroupItem from '@/app/entities/order/group-item';
 
 interface ItemAdditional {
     name: string;
@@ -23,7 +23,7 @@ interface ItemAdditional {
 
 interface ItemListProps {
     item: Item;
-    setItem: Dispatch<SetStateAction<Item>>
+    setItem: Dispatch<SetStateAction<Item>>;
 }
 
 const convertProductToItem = (products: Product[], additionalItemsAdded: Item[]) => {
@@ -45,17 +45,20 @@ const convertProductToItem = (products: Product[], additionalItemsAdded: Item[])
 
 const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     const [additionalItemsToAdd, setAdditionalItemsToAdd] = useState<ItemAdditional[]>([]);
-    const contextGroupItem = useGroupItem();
     const { data } = useSession();
-    const isStaging = contextGroupItem.groupItem?.status === "Staging";
+    const queryClient = useQueryClient();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+
+    const isStaging = groupItem?.status === "Staging";
     const [lastUpdate, setLastUpdate] = useState<string>("");
-    const { data: additionalProductsResponse, refetch, isRefetching, dataUpdatedAt } = useQuery({
+
+    const { data: additionalProductsResponse, refetch, isRefetching } = useQuery({
         queryKey: ['additional-products', item.category_id],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()))
             return GetAdditionalProducts(data!, item.category_id);
         },
-        enabled: !!data?.user?.access_token,
+        enabled: !!data?.user?.access_token && !!item.category_id,
         refetchInterval: 60 * 1000, // 60 seconds
     });
 

@@ -3,7 +3,6 @@ import Sidebar from '../sidebar/sidebar';
 import AdminSidebar from '../sidebar/admin-sidebar';
 import Topbar from '../topbar/topbar';
 import { ModalProvider } from '@/app/context/modal/context';
-import { GroupItemProvider } from '@/app/context/group-item/context';
 import { useRef } from 'react';
 import { useState } from 'react';
 
@@ -44,11 +43,9 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
 const ContextProviders = ({ children }: { children: React.ReactNode }) => {
   return (
-    <GroupItemProvider>
-      <ModalProvider>
-        {children}
-      </ModalProvider>
-    </GroupItemProvider>
+    <ModalProvider>
+      {children}
+    </ModalProvider>
   )
 }
 

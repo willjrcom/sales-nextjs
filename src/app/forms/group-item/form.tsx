@@ -6,9 +6,9 @@ import GroupItem from '@/app/entities/order/group-item';
 import { DateTimeField, TextField } from '@/app/components/modal/field';
 import ScheduleGroupItem from '@/app/api/group-item/update/schedule/group-item';
 import { FaCalendarAlt, FaSave, FaTrash, FaComment } from 'react-icons/fa';
-import { useGroupItem } from '@/app/context/group-item/context';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ObservationGroupItem from '@/app/api/group-item/update/observation/group-item';
+import { useQueryClient } from '@tanstack/react-query';
 import {
     Dialog,
     DialogContent,
@@ -27,7 +27,7 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
     const [observationOpen, setObservationOpen] = useState(false);
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const { data } = useSession();
-    const contextGroupItem = useGroupItem();
+    const queryClient = useQueryClient();
 
     const onSaveSchedule = async (newStartAt: string | null | undefined) => {
         if (!data) return;
@@ -38,7 +38,7 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
             await ScheduleGroupItem(groupItem, data, newStartAt);
             setGroupItem({ ...groupItem, start_at: newStartAt });
             setStartAt(newStartAt);
-            contextGroupItem.fetchData(groupItem.id);
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
 
             // Notificação de sucesso conforme ação
             let msg = '';
@@ -62,7 +62,7 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
             await ObservationGroupItem(groupItem, data, observation);
             setGroupItem({ ...groupItem, observation: observation });
             setObservation(observation);
-            contextGroupItem.fetchData(groupItem.id);
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
             setObservationOpen(false);
 
             // Notificação de sucesso conforme ação
@@ -103,8 +103,8 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
             {/* Botão Observação */}
             <Dialog open={observationOpen} onOpenChange={setObservationOpen}>
                 <DialogTrigger asChild>
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         className={`gap-2 ${groupItem.observation ? 'border-blue-500 text-blue-600' : ''}`}
                     >
                         <FaComment className="h-4 w-4" />
@@ -140,8 +140,8 @@ const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
             {/* Botão Agendamento */}
             <Dialog open={scheduleOpen} onOpenChange={handleScheduleDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         className={`gap-2 ${groupItem.start_at ? 'border-purple-500 text-purple-600' : ''}`}
                     >
                         <FaCalendarAlt className="h-4 w-4" />

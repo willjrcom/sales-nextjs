@@ -5,19 +5,23 @@ import { useModal } from '@/app/context/modal/context';
 import EditItem from './edit-item';
 import ButtonDelete from '../../button/button-delete';
 import DeleteItemModal from './delete-item-modal';
-import { useGroupItem } from '@/app/context/group-item/context';
+import { useQueryClient } from '@tanstack/react-query';
+import GroupItem from '@/app/entities/order/group-item';
 
 interface CardProps {
     item: Item;
 }
 
 const ItemCard = ({ item }: CardProps) => {
-    const contextGroupItem = useGroupItem();
+    const queryClient = useQueryClient();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const modalHandler = useModal();
     const modalName = "edit-item-" + item.id;
 
     const onClose = () => {
-        contextGroupItem.fetchData(contextGroupItem.groupItem?.id || "");
+        if (groupItem?.id) {
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+        }
         modalHandler.hideModal(modalName);
     };
 
@@ -28,7 +32,7 @@ const ItemCard = ({ item }: CardProps) => {
         new Decimal(0)
     ) || new Decimal(0);
     totalPriceDecimal = totalPriceDecimal.plus(totalAdditionalsDecimal);
-    const isGroupItemStaging = contextGroupItem.groupItem?.status === "Staging"
+    const isGroupItemStaging = groupItem?.status === "Staging"
 
     return (
         <div
@@ -37,7 +41,7 @@ const ItemCard = ({ item }: CardProps) => {
             {/* Estado padrão */}
             <div className="flex justify-between items-center">
                 <div className="flex justify-between items-center space-x-4 w-full h-full"
-                    onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}
+                    onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} itemsCount={1} />, "md", onClose)}
                 >
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
@@ -56,30 +60,18 @@ const ItemCard = ({ item }: CardProps) => {
                             {item.removed_items?.reduce((total) => total + 1, 0)}
                         </div>
                     )}
-                    
+
                     <div className="text-sm font-bold">R$ {totalPriceDecimal.toFixed(2)}</div>
                 </div>
                 &nbsp;
                 {isGroupItemStaging && (
                     <div className="bg-red-100 p-1 rounded-full">
                         <ButtonDelete modalName={"delete-item-" + item.id} name={item.name}>
-                            <DeleteItemModal item={item} />
+                            <DeleteItemModal item={item} itemsCount={1} />
                         </ButtonDelete>
                     </div>
                 )}
             </div>
-
-            {/* Hover para detalhes */}
-            {/* {isHovered && (
-                item.additional_items?.map((additionalItem, index) => (
-                    <AdditionalItemCard key={index} item={additionalItem} />
-                ))
-            )}
-            {isHovered && (
-                item.removed_items?.map((item, index) => (
-                    <RemovedItemCard key={index} item={item} />
-                ))
-            )} */}
         </div>
     );
 

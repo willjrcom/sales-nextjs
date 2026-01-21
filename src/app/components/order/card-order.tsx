@@ -1,25 +1,34 @@
-import Order from "@/app/entities/order/order";
 import Decimal from 'decimal.js';
 import StatusComponent from "../button/show-status";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/utils/error";
-import RoundComponent from "../button/round-component";
 import { ToUtcDatetime } from "@/app/utils/date";
 import ReadyOrder from "@/app/api/order/status/ready/order";
 import FinishOrder from "@/app/api/order/status/finish/order";
 import CancelOrder from "@/app/api/order/status/cancel/order";
 import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
+import { useModal } from "@/app/context/modal/context";
+import Link from "next/link";
+import Carousel from "../carousel/carousel";
+import type { IconType } from 'react-icons';
+const DefaultPaymentIcon = FaDollarSign;
+import CloseTable from "@/app/api/order-table/status/close/order-table";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { notifyError } from "@/app/utils/notifications";
+import printOrder from "@/app/components/print/print-order";
+import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
+import { SelectDeliveryDriver } from "@/app/pages/(user)/order-delivery-control/delivery-to-ship";
+import { FinishDelivery } from "@/app/pages/(user)/order-delivery-control/delivery-to-finish";
+import EmitNFCeModal from "@/app/components/order/emit-nfce-modal";
+import GetOrderByID from "@/app/api/order/[id]/order";
+import GroupItemCard from "./group-item-card";
 import {
     FaCheck, FaClipboardCheck, FaEdit, FaTimes, FaMoneyBillWave, FaCreditCard, FaTicketAlt, FaDollarSign, FaPrint,
     FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
     FaHourglassHalf, FaFileInvoiceDollar
 } from "react-icons/fa";
-import { useModal } from "@/app/context/modal/context";
-import Link from "next/link";
-import Carousel from "../carousel/carousel";
-import type { IconType } from 'react-icons';
 
 // Ícones para métodos de pagamento
 const paymentIcons: Record<string, IconType> = {
@@ -38,27 +47,12 @@ const paymentIcons: Record<string, IconType> = {
     PayPal: FaCcPaypal,
     Outros: FaDollarSign,
 };
-const DefaultPaymentIcon = FaDollarSign;
-import CloseTable from "@/app/api/order-table/status/close/order-table";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { notifyError } from "@/app/utils/notifications";
-import printOrder from "@/app/components/print/print-order";
-import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
-import { SelectDeliveryDriver } from "@/app/pages/(user)/order-delivery-control/delivery-to-ship";
-import { FinishDelivery } from "@/app/pages/(user)/order-delivery-control/delivery-to-finish";
-import ObservationCard from "./observation";
-import GroupItem from "@/app/entities/order/group-item";
-import AdditionalItem from "@/app/components/order/additional-item";
-import RemovedItem from "@/app/components/order/removed-item";
-import EmitNFCeModal from "@/app/components/order/emit-nfce-modal";
-import Item from "@/app/entities/order/item";
-import GetOrderByID from "@/app/api/order/[id]/order";
 
 interface CardOrderProps {
     orderId: string | null;
 }
 
-const CardOrder = ({ orderId }: CardOrderProps) => {
+export default function CardOrder({ orderId }: CardOrderProps) {
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
     const queryClient = useQueryClient();
     const { data } = useSession();
@@ -66,7 +60,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
     // Usar React Query diretamente
     const { data: order, refetch } = useQuery({
-        queryKey: ['order', 'current'],
+        queryKey: ['order', orderId],
         queryFn: async () => {
             if (!orderId || !data?.user?.access_token) return null;
             try {
@@ -348,7 +342,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                         {order.group_items
                             .sort((a, b) => a.category_id.localeCompare(b.category_id))
                             .map((group) => (
-                                <GroupItemCard group={group} key={group.id} />
+                                <GroupItemCard key={group.id} group={group} />
                             ))}
                     </ul>
                 ) : (
@@ -521,56 +515,3 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
         </div>
     );
 };
-
-
-interface GroupItemProps {
-    group: GroupItem;
-}
-
-const GroupItemCard = ({ group }: GroupItemProps) => {
-    return (
-        <li key={group.id} className="bg-gray-50 p-4 rounded-lg shadow-md mb-4">
-            <div className="flex justify-between items-center mb-2">
-                <p className="text-gray-700 font-semibold">
-                    <span className="ml-2">
-                        <StatusComponent status={group?.status} />
-                    </span>
-                </p>
-                <div className="flex space-x-2">
-                    <RoundComponent>Qtd: {group.quantity}</RoundComponent>
-                    <RoundComponent>
-                        Total: R$ {new Decimal(group.total_price).toFixed(2)}
-                    </RoundComponent>
-                </div>
-            </div>
-
-            {group.items?.map((item) => <ItemCard item={item} key={item.id} />)}
-        </li>
-    )
-}
-
-interface ItemCardProps {
-    item: Item;
-}
-
-const ItemCard = ({ item }: ItemCardProps) => {
-    return (
-        <div key={item.id} className="text-gray-700 ml-4 py-2 border shadow rounded-md p-2 m-2">
-            <div className="flex space-x-2 items-center justify-between">
-                <p className="font-semibold">{item.quantity} x {item.name}</p>
-                <RoundComponent>
-                    Total: R$ {new Decimal(item.total_price).toFixed(2)}
-                </RoundComponent>
-            </div>
-
-            {item.observation && <ObservationCard observation={item.observation} />}
-            {item.additional_items?.map((add) => (
-                <AdditionalItem item={add} key={add.id} />
-            ))}
-            {item.removed_items?.map((rem) => (
-                <RemovedItem item={rem} key={rem} />
-            ))}
-        </div>
-    )
-}
-export default CardOrder;

@@ -5,15 +5,18 @@ import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../button/button-delete';
 import AdditionalItemList from './list-additional-item';
 import RemovedItemList from './list-removed-item';
-import { useGroupItem } from '@/app/context/group-item/context';
+import GroupItem from '@/app/entities/order/group-item';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface EditItemProps {
     item: Item;
+    itemsCount?: number;
 }
 
-const EditItem = ({ item }: EditItemProps) => {
-    const contextGroupItem = useGroupItem();
-    const isStaging = contextGroupItem.groupItem?.status === "Staging"
+const EditItem = ({ item, itemsCount }: EditItemProps) => {
+    const queryClient = useQueryClient();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+    const isStaging = groupItem?.status === "Staging"
     const [itemState, setItemState] = React.useState<Item>(item);
 
     React.useEffect(() => {
@@ -36,7 +39,11 @@ const EditItem = ({ item }: EditItemProps) => {
                 <div className="text-sm font-medium">
                     {itemState.quantity} x {itemState.name}
                 </div>
-                {isStaging && <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name}><DeleteItemModal item={itemState} /></ButtonDelete>}
+                {isStaging &&
+                    <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name}>
+                        <DeleteItemModal item={itemState} itemsCount={itemsCount} />
+                    </ButtonDelete>
+                }
             </div>
             {itemState.observation && <p className="text-sm text-gray-600">{itemState.observation}</p>}
             <AdditionalItemList item={itemState} setItem={setItemState} />

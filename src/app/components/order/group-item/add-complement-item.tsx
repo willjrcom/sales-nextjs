@@ -1,6 +1,5 @@
 import RequestError from "@/app/utils/error";
 import NewComplementGroupItem from "@/app/api/group-item/update/complement/group-item";
-import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";
 import Product from "@/app/entities/product/product";
@@ -9,23 +8,25 @@ import Image from "next/image";
 import { FaPlus } from "react-icons/fa";
 import Decimal from "decimal.js";
 import { notifyError } from "@/app/utils/notifications";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ComplementCardProps {
-    groupItem?: GroupItem | null;
     product: Product;
 }
 
-const AddComplementCard = ({ groupItem, product }: ComplementCardProps) => {
+const AddComplementCard = ({ product }: ComplementCardProps) => {
     const { data } = useSession();
-    const contextGroupItem = useGroupItem();
+    const queryClient = useQueryClient();
     const modalHandler = useModal();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
     const submit = async () => {
         if (!data) return
+        if (!groupItem) return notifyError("Nenhum grupo de itens selecionado")
 
         try {
-            await NewComplementGroupItem(groupItem?.id || "", product.id, data)
-            contextGroupItem.fetchData(groupItem?.id || "")
+            await NewComplementGroupItem(groupItem.id, product.id, data)
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
             modalHandler.hideModal("add-complement-item-group-item-" + groupItem?.id)
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao adicionar complemento");

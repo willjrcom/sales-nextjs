@@ -1,10 +1,11 @@
+"use client"
+
 import RequestError from "@/app/utils/error";
 import NewItem, { NewItemProps } from "@/app/api/item/new/item";
 import GetProductByID from "@/app/api/product/[id]/product";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from "@/app/components/modal/field";
-import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import Product from "@/app/entities/product/product";
 import Quantity from "@/app/entities/quantity/quantity";
@@ -12,17 +13,18 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import GetQuantitiesByCategoryID from "@/app/api/quantity/quantity";
+import QuantitySelector from "./quantity-selector";
+import GroupItem from "@/app/entities/order/group-item";
+import Order from "@/app/entities/order/order";
+import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
 
 interface AddProductCardProps {
   product: Product;
-  orderId?: string;
 }
 
-const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
+const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const modalName = 'add-item-' + item.id
   const modalHandler = useModal();
-  const contextGroupItem = useGroupItem();
   const queryClient = useQueryClient();
   const { data } = useSession();
   const [product, setProduct] = useState<Product>(item || new Product());
@@ -30,6 +32,8 @@ const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);
   const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
+  const order = queryClient.getQueryData<Order>(['order', 'current']);
+  const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
   useEffect(() => {
     fetchProduct();
@@ -64,12 +68,7 @@ const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
   const submit = async () => {
     if (!data) return;
 
-    if (!orderId) {
-      notifyError("Nenhum pedido ativo encontrado. Por favor, inicie um pedido primeiro.");
-      return;
-    }
-
-    if (!quantity) return;
+    if (!quantity) return notifyError("Selecione uma quantidade para continuar");
 
     const requiresFlavorSelection = availableFlavors && availableFlavors.length > 0;
     if (requiresFlavorSelection && !selectedFlavor) {
@@ -81,17 +80,28 @@ const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
       const body = {
         product_id: product.id,
         quantity_id: quantity?.id,
-        order_id: orderId,
+        order_id: order?.id,
         observation: observation,
         flavor: selectedFlavor || undefined,
       } as NewItemProps
 
-      if (contextGroupItem.groupItem?.id) {
-        body.group_item_id = contextGroupItem.groupItem.id
+      if (groupItem) {
+        body.group_item_id = groupItem.id
       }
 
       const response = await NewItem(body, data)
-      contextGroupItem.fetchData(response.group_item_id);
+
+      // Invalidate and refetch the group-item query to update the cart
+      await queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+
+      // Optionally, you can also manually set the query data if the response contains the updated group item
+      if (response?.group_item_id) {
+        const updatedGroupItem = await GetGroupItemByID(response.group_item_id, data);
+        if (updatedGroupItem) {
+          queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+        }
+      }
+
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
       modalHandler.hideModal(modalName);
     } catch (error) {
@@ -106,8 +116,12 @@ const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
     }
   }, [])
 
-  if (!product.size || !product.category) {
-    return null;
+  if (!product.category) {
+    return notifyError("Produto sem categoria");
+  }
+
+  if (!product.size) {
+    return notifyError("Produto sem tamanho");
   }
 
   return (
@@ -196,55 +210,5 @@ const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
     </div>
   )
 }
-
-interface QuantitySelectorProps {
-  categoryID: string
-  selectedQuantity: Quantity
-  setSelectedQuantity: (quantity: Quantity) => void
-}
-
-const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }: QuantitySelectorProps) => {
-  const { data } = useSession();
-
-  const { data: quantitiesResponse } = useQuery({
-    queryKey: ['quantities', categoryID],
-    queryFn: () => GetQuantitiesByCategoryID(data!, categoryID),
-    enabled: !!data?.user?.access_token,
-    refetchInterval: 60000,
-  });
-
-  const quantities = useMemo(() => quantitiesResponse || [], [quantitiesResponse]);
-
-  useEffect(() => {
-    quantities.forEach((quantity) => {
-      if (quantity.quantity === 1) setSelectedQuantity(quantity);
-    })
-  }, [quantities])
-
-  return (
-    <div className="mb-4">
-      <div className="flex flex-col mt-2 space-y-2">
-        <label className="block text-gray-700 text-sm font-bold">
-          Selecione uma quantidade:
-        </label>
-
-        <div className="flex flex-wrap gap-2">
-          {quantities.map((quantity) => (
-            <button
-              key={quantity.id}
-              className={`w-10 h-10 ${selectedQuantity.id === quantity.id
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-black"
-                } rounded-lg flex items-center justify-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1`}
-              onClick={() => setSelectedQuantity(quantity)}
-            >
-              {quantity.quantity}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default AddProductCard

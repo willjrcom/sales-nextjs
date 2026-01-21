@@ -1,8 +1,7 @@
 "use client";
 import GroupItem from "@/app/entities/order/group-item";
-import { useGroupItem } from "@/app/context/group-item/context";
 import ButtonIcon from "../../button/button-icon";
-import EditGroupItem from "./edit-group-item";
+import SelectGroupItem from "./select-group-item";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { FaClock } from "react-icons/fa";
 import StatusComponent from "../../button/show-status";
@@ -14,8 +13,7 @@ interface GroupItemCardProps {
   groupItem: GroupItem;
 }
 
-const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
-  const contextGroupItem = useGroupItem();
+export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
   const queryClient = useQueryClient();
 
   // Map status to border color
@@ -27,11 +25,6 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     Canceled: 'border-red-400',
   };
 
-  const setGroupItem = (groupItem: GroupItem) => {
-    if (!contextGroupItem || !groupItem) return;
-    contextGroupItem.updateGroupItem(groupItem);
-  }
-
   const handleCloseModal = () => {
     // Invalidar queries do pedido
     queryClient.invalidateQueries({ queryKey: ['order'] });
@@ -42,14 +35,14 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
       {/* Header: Group title and actions */}
       <div className="flex items-center justify-between">
         <StatusComponent status={groupItem.status} />
-        <div onClick={() => setGroupItem(groupItem)}>
+        <div>
           <ButtonIcon
             title="Editar grupo"
             modalName={`edit-group-item-${groupItem.id}`}
             size={groupItem.status === 'Staging' ? 'xl' : 'md'}
             onCloseModal={handleCloseModal}
           >
-            <EditGroupItem key={groupItem.id} />
+            <SelectGroupItem key={groupItem.id} id={groupItem.id} />
           </ButtonIcon>
         </div>
       </div>
@@ -67,17 +60,21 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
       </dl>
 
       {/* Schedule */}
-      {groupItem.start_at && (
-        <p className="flex items-center text-sm text-gray-600">
-          <FaClock className="mr-2 text-gray-500" />
-          Agendado para: <span className="font-medium ml-1">{ToUtcDatetime(groupItem.start_at)}</span>
-        </p>
-      )}
+      {
+        groupItem.start_at && (
+          <p className="flex items-center text-sm text-gray-600">
+            <FaClock className="mr-2 text-gray-500" />
+            Agendado para: <span className="font-medium ml-1">{ToUtcDatetime(groupItem.start_at)}</span>
+          </p>
+        )
+      }
 
       {/* Observation */}
-      {groupItem.observation && (
-        <ObservationCard observation={groupItem.observation} />
-      )}
+      {
+        groupItem.observation && (
+          <ObservationCard observation={groupItem.observation} />
+        )
+      }
 
       {/* Items List */}
       <div className="space-y-2">
@@ -119,25 +116,22 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
       </div>
 
       {/* Complemento */}
-      {groupItem.complement_item && (
-        <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
-          <h3 className="text-md font-semibold border-b pb-2">Complemento</h3>
-          <div className="flex justify-between">
-            <div>
-              <p className="text-gray-700">{groupItem.complement_item.quantity} x {groupItem.complement_item.name}</p>
-              {groupItem.complement_item.flavor && (
-                <p className="text-xs text-orange-700">Sabor: {groupItem.complement_item.flavor}</p>
-              )}
+      {
+        groupItem.complement_item && (
+          <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
+            <h3 className="text-md font-semibold border-b pb-2">Complemento</h3>
+            <div className="flex justify-between">
+              <div>
+                <p className="text-gray-700">{groupItem.complement_item.quantity} x {groupItem.complement_item.name}</p>
+                {groupItem.complement_item.flavor && (
+                  <p className="text-xs text-orange-700">Sabor: {groupItem.complement_item.flavor}</p>
+                )}
+              </div>
+              <p className="font-semibold">R$ {new Decimal(groupItem.complement_item.price).toFixed(2)}</p>
             </div>
-            <p className="font-semibold">R$ {new Decimal(groupItem.complement_item.price).toFixed(2)}</p>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
-
-
-
-
-export default GroupItemCard;

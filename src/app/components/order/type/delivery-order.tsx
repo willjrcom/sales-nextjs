@@ -1,31 +1,12 @@
 import ClientAddressForm from "@/app/forms/client/update-address-order";
 import ButtonIcon from "../../button/button-icon";
 import StatusComponent from "../../button/show-status";
-import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-import GetOrderByID from "@/app/api/order/[id]/order";
-import { notifyError } from "@/app/utils/notifications";
+import { useQueryClient } from "@tanstack/react-query";
+import Order from "@/app/entities/order/order";
 
-interface DeliveryCardProps {
-    orderId: string;
-}
-
-const DeliveryCard = ({ orderId }: DeliveryCardProps) => {
-    const { data: session } = useSession();
-
-    const { data: order } = useQuery({
-        queryKey: ['order', 'current'],
-        queryFn: async () => {
-            if (!orderId || !session?.user?.access_token) return null;
-            try {
-                return await GetOrderByID(orderId, session);
-            } catch (error) {
-                notifyError('Erro ao buscar pedido');
-                return null;
-            }
-        },
-        enabled: !!orderId && !!session?.user?.access_token,
-    });
+const DeliveryCard = () => {
+    const queryClient = useQueryClient();
+    const order = queryClient.getQueryData<Order>(['order', 'current']);
 
     if (!order || !order.delivery) return null
     const delivery = order?.delivery;

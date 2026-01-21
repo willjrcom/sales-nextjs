@@ -1,13 +1,13 @@
 import RequestError from '@/app/utils/error';
 import AddRemovedItem from '@/app/api/item/update/removed-item/add/item';
 import RemoveRemovedItem from '@/app/api/item/update/removed-item/remove/item';
-import { useGroupItem } from '@/app/context/group-item/context';
 import Item from '@/app/entities/order/item';
 import { useSession } from 'next-auth/react';
 import React, { useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetCategoryByID from '@/app/api/category/[id]/category';
+import GroupItem from '@/app/entities/order/group-item';
 
 interface ItemListProps {
     item: Item;
@@ -15,13 +15,14 @@ interface ItemListProps {
 
 const RemovedItemList = ({ item }: ItemListProps) => {
     const [removedItems, setRemovedItems] = useState<string[]>(item.removed_items || []);
+    const queryClient = useQueryClient();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
     React.useEffect(() => {
         setRemovedItems(item.removed_items || []);
     }, [item.removed_items]);
-    const contextGroupItem = useGroupItem();
     const { data } = useSession();
-    const isStaging = contextGroupItem.groupItem?.status === "Staging";
+    const isStaging = groupItem?.status === "Staging";
 
     const { data: categoryResponse } = useQuery({
         queryKey: ['categories', item.category_id],

@@ -1,27 +1,24 @@
 import RequestError from "@/app/utils/error";
 import DeleteComplementGroupItem from "@/app/api/group-item/delete/complement/group-item";
-import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";
 import { useSession } from "next-auth/react";
 import { notifyError } from "@/app/utils/notifications";
+import { useQueryClient } from "@tanstack/react-query";
 
-interface DeleteComplementItemModalProps {
-    item: GroupItem;
-}
-
-const DeleteComplementItemModal = ({ item }: DeleteComplementItemModalProps) => {
-    const contextGroupItem = useGroupItem();
+const DeleteComplementItemModal = () => {
+    const queryClient = useQueryClient();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const modalHandler = useModal();
     const { data } = useSession();
-    const modalName = "delete-complement-item-" + item.id;
+    const modalName = "delete-complement-item-" + groupItem?.id;
 
     const onDelete = async () => {
-        if (!data || !contextGroupItem.groupItem) return;
+        if (!data || !groupItem?.id) return;
         try {
-            await DeleteComplementGroupItem(item.id, data)
+            await DeleteComplementGroupItem(groupItem.id, data)
 
-            contextGroupItem.fetchData(contextGroupItem.groupItem.id)
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
 
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {
@@ -31,7 +28,7 @@ const DeleteComplementItemModal = ({ item }: DeleteComplementItemModalProps) => 
 
     return (
         <>
-            <div className="text-center mb-4"><h2>Tem certeza que deseja excluir {item.complement_item?.name}?</h2></div>
+            <div className="text-center mb-4"><h2>Tem certeza que deseja excluir {groupItem?.complement_item?.name}?</h2></div>
             <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onDelete}>Excluir</button>
         </>
     )

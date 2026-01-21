@@ -154,10 +154,10 @@ function getSecondaryInfo(order: Order) {
         const flags: { label: string; variant: BadgeVariant }[] = [];
         const pickupStatus = order.pickup.status;
 
-        if (pickupStatus === "Pending") flags.push({ label: "Retirada Pendente", variant: "yellow" });
-        if (pickupStatus === "Ready") flags.push({ label: "Retirada Pronto", variant: "green" });
-        if (pickupStatus === "Delivered") flags.push({ label: "Retirada Retirado", variant: "blue" });
-        if (pickupStatus === "Canceled") flags.push({ label: "Retirada Cancelado", variant: "red" });
+        if (pickupStatus === "Pending") flags.push({ label: "Balcão Pendente", variant: "yellow" });
+        if (pickupStatus === "Ready") flags.push({ label: "Balcão Pronto", variant: "green" });
+        if (pickupStatus === "Delivered") flags.push({ label: "Balcão Retirado", variant: "blue" });
+        if (pickupStatus === "Canceled") flags.push({ label: "Balcão Cancelado", variant: "red" });
 
         const timeRef =
             formatTimeAgo(order.pickup.delivered_at) ||

@@ -1,14 +1,13 @@
-import React from 'react';
 import ButtonDelete from '../../button/button-delete';
 import DeleteComplementItemModal from './delete-complement-modal';
 import GroupItem from '@/app/entities/order/group-item';
 import Decimal from 'decimal.js';
+import { useQueryClient } from '@tanstack/react-query';
 
-interface ComplementItemCardProps {
-    groupItem: GroupItem | null;
-}
+const ComplementItemCard = () => {
+    const queryClient = useQueryClient();
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
-const ComplementItemCard = ({ groupItem }: ComplementItemCardProps) => {
     if (!groupItem?.complement_item) return
 
     const isGroupItemStaging = groupItem?.status === "Staging"
@@ -27,7 +26,7 @@ const ComplementItemCard = ({ groupItem }: ComplementItemCardProps) => {
                 {isGroupItemStaging &&
                     <div className='bg-red-100 p-1 rounded-full'>
                         <ButtonDelete modalName={"delete-complement-item-" + groupItem.id} name={groupItem.complement_item!.name}>
-                            <DeleteComplementItemModal item={groupItem} />
+                            <DeleteComplementItemModal />
                         </ButtonDelete>
                     </div>}
             </div>

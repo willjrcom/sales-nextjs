@@ -1,6 +1,3 @@
-"use client";
-
-import { useGroupItem } from "@/app/context/group-item/context";
 import { useSession } from 'next-auth/react';
 import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
 import { useMemo } from "react";
@@ -13,40 +10,22 @@ import { Button } from "@/components/ui/button";
 import { FaPlus } from "react-icons/fa";
 import ComplementItemList from "./list-complement-item";
 import ComplementItemCard from "./complement-item";
-import { CartToAdd } from "../cart/cart-to-add";
 import Decimal from "decimal.js";
 import { FaTimes } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import ButtonIconText from "../../button/button-icon-text";
+import { useQueryClient } from '@tanstack/react-query';
+import GroupItem from "@/app/entities/order/group-item";
 
-interface EditGroupItemProps {
-    orderId?: string;
-}
-
-export default function EditGroupItem({ orderId }: EditGroupItemProps) {
-    const contextGroupItem = useGroupItem();
-
-    if (!contextGroupItem.groupItem || contextGroupItem.groupItem?.status === "Staging") {
-        return (
-            <div>
-                <CartToAdd orderId={orderId || contextGroupItem.groupItem?.order_id} />
-            </div>
-        );
-    }
-
-    return (
-        <GroupItemCard />
-    );
-}
-
-const GroupItemCard = () => {
-    const contextGroupItem = useGroupItem();
-    const { data } = useSession();
+const GroupItemEdit = () => {
+    const { data: session } = useSession();
+    const queryClient = useQueryClient();
     const modalHandler = useModal();
-    const groupItem = useMemo(() => contextGroupItem.groupItem, [contextGroupItem.groupItem]);
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+
     const complementItem = useMemo(() => groupItem?.complement_item, [groupItem?.complement_item]);
-    const containItems = groupItem?.items && groupItem?.items.length > 0
-    const isGroupItemStaging = groupItem?.status === "Staging"
+    const containItems = useMemo(() => groupItem?.items && groupItem?.items.length > 0, [groupItem?.items]);
+    const isGroupItemStaging = useMemo(() => groupItem?.status === "Staging", [groupItem?.status]);
 
     return (
         <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
@@ -85,7 +64,7 @@ const GroupItemCard = () => {
                         <DialogHeader>
                             <DialogTitle>Adicionar complemento</DialogTitle>
                         </DialogHeader>
-                        <ComplementItemList groupItem={groupItem} />
+                        <ComplementItemList />
                         <DialogClose asChild>
                             <Button variant="outline" className="mt-4 w-full">Fechar</Button>
                         </DialogClose>
@@ -94,7 +73,7 @@ const GroupItemCard = () => {
             )}
 
             {containItems && complementItem &&
-                <ComplementItemCard groupItem={groupItem} />
+                <ComplementItemCard />
             }
 
             <hr className="my-4" />
@@ -114,12 +93,12 @@ const GroupItemCard = () => {
                         <p className="mb-2">tem certeza que deseja cancelar o item?</p>
                         <button
                             onClick={async () => {
-                                if (!data || !groupItem) return;
+                                if (!session || !groupItem) return;
                                 try {
-                                    await CancelGroupItem(groupItem.id, "cancelado pelo usuario", data);
+                                    await CancelGroupItem(groupItem.id, "cancelado pelo usuario", session);
                                     notifySuccess("Item cancelado com sucesso!");
 
-                                    contextGroupItem.fetchData(groupItem.id);
+                                    queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
                                     modalHandler.hideModal("cancel-group-item-" + groupItem.id);
                                 } catch (error: any) {
                                     notifyError(error.message || 'Erro ao cancelar grupo de itens');
@@ -136,4 +115,4 @@ const GroupItemCard = () => {
     );
 };
 
-export { GroupItemCard };
+export default GroupItemEdit;

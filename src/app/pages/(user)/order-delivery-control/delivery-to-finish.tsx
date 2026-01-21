@@ -133,7 +133,7 @@ const DeliveryOrderToFinish = () => {
                 </div>
                 {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
-                    <Map mapId="delivery-to-finish" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
+                    <Map key={"center-point"} mapId="delivery-to-finish" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>
             {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Receber entrega" position="bottom-right">
