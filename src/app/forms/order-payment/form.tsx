@@ -12,29 +12,28 @@ import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { PaymentOrder, payMethodsWithId, ValidatePaymentForm } from '@/app/entities/order/order-payment';
 import PayOrder from '@/app/api/order/payment/order';
-import { useCurrentOrder } from '@/app/context/current-order/context';
-import Order from '@/app/entities/order/order';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface PaymentFormProps extends CreateFormsProps<PaymentOrder> {
+    orderId?: string;
 }
 
-const PaymentForm = ({ item, isUpdate,  }: PaymentFormProps) => {
+const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
     const modalName = isUpdate ? 'edit-payment-' + item?.id : 'add-payment'
     const modalHandler = useModal();
     const [payment, setPayment] = useState<PaymentOrder>(item || new PaymentOrder());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+    const queryClient = useQueryClient();
     const { data } = useSession();
-    
+
     const handleInputChange = (field: keyof PaymentOrder, value: any) => {
         setPayment(prev => ({ ...prev, [field]: value }));
     };
 
     const submit = async () => {
-        if (!data || !order) return;
+        if (!data || !orderId) return;
 
-        payment.order_id = order.id
+        payment.order_id = orderId
 
         const validationErrors = ValidatePaymentForm(payment);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -42,7 +41,8 @@ const PaymentForm = ({ item, isUpdate,  }: PaymentFormProps) => {
         try {
             await PayOrder(payment, data)
 
-            contextCurrentOrder.fetchData(order.id);
+            // Invalidar queries do pedido
+            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
             notifySuccess('Pagamento realizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -57,16 +57,16 @@ const PaymentForm = ({ item, isUpdate,  }: PaymentFormProps) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Informações do Pagamento</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <PriceField friendlyName='Total Pago' name='total_paid' setValue={value => handleInputChange('total_paid', value)} value={payment.total_paid}/>
+                        <PriceField friendlyName='Total Pago' name='total_paid' setValue={value => handleInputChange('total_paid', value)} value={payment.total_paid} />
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <SelectField friendlyName='Método de pagamento' values={payMethodsWithId} name='method' setSelectedValue={value => handleInputChange('method', value)} selectedValue={payment.method}/>
+                        <SelectField friendlyName='Método de pagamento' values={payMethodsWithId} name='method' setSelectedValue={value => handleInputChange('method', value)} selectedValue={payment.method} />
                     </div>
                 </div>
             </div>
 
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={payment.id}/>
-            <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={order?.id}/>
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={payment.id} />
+            <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={orderId} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={payment} name="Tamanho" onSubmit={submit} isAddItem />

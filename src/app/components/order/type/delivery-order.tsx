@@ -1,17 +1,31 @@
 import ClientAddressForm from "@/app/forms/client/update-address-order";
 import ButtonIcon from "../../button/button-icon";
 import StatusComponent from "../../button/show-status";
-import { useCurrentOrder } from "@/app/context/current-order/context";
-import { useEffect, useState } from "react";
-import Order from "@/app/entities/order/order";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import GetOrderByID from "@/app/api/order/[id]/order";
+import { notifyError } from "@/app/utils/notifications";
 
-const DeliveryCard = () => {
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+interface DeliveryCardProps {
+    orderId: string;
+}
 
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order)
-    }, [contextCurrentOrder.order])
+const DeliveryCard = ({ orderId }: DeliveryCardProps) => {
+    const { data: session } = useSession();
+
+    const { data: order } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !session?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, session);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!session?.user?.access_token,
+    });
 
     if (!order || !order.delivery) return null
     const delivery = order?.delivery;

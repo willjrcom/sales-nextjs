@@ -8,7 +8,7 @@ import UpdatePickupOrderName from '@/app/api/order-pickup/update/name/[id]/order
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from '@/app/components/modal/field';
 import OrderPickup from '@/app/entities/order/order-pickup';
-import { useCurrentOrder } from '@/app/context/current-order/context';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface PickupNameFormProps extends CreateFormsProps<OrderPickup> {
     pickupOrderId?: string;
@@ -17,21 +17,22 @@ interface PickupNameFormProps extends CreateFormsProps<OrderPickup> {
 const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
     const modalName = 'edit-pickup-order-name-' + item?.id;
     const modalHandler = useModal();
-    const contextCurrentOrder = useCurrentOrder();
+    const queryClient = useQueryClient();
     const [name, setName] = useState<string>(item?.name || '');
     const { data } = useSession();
 
     const submit = async () => {
         if (!data || !pickupOrderId) return;
-        
+
         if (name.length < 3) {
-            notifyError('O nome deve ter no mínimo 3 caracteres');
+            notifyError('O nome deve ter no mínimo 3 caracteres');
             return;
         }
 
         try {
             await UpdatePickupOrderName(pickupOrderId, name, data);
-            contextCurrentOrder.fetchData();
+            // Invalidar queries do pedido
+            queryClient.invalidateQueries({ queryKey: ['order'] });
             notifySuccess('Nome atualizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {
@@ -42,7 +43,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
 
     return (
         <>
-            <TextField name='name' friendlyName='Nome' placeholder='Digite o nome' setValue={setName} value={name} optional/>
+            <TextField name='name' friendlyName='Nome' placeholder='Digite o nome' setValue={setName} value={name} optional />
             <ButtonsModal
                 item={item!}
                 name='Atualizar nome'
@@ -50,7 +51,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
             />
         </>
     );
-    
+
 };
 
 export default PickupNameForm;

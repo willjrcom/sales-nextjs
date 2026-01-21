@@ -78,7 +78,11 @@ const CartDrawerButton = () => {
     );
 };
 
-export const CartToAdd = () => {
+interface CartToAddProps {
+    orderId?: string;
+}
+
+export const CartToAdd = ({ orderId }: CartToAddProps) => {
     const contextGroupItem = useGroupItem();
     const [searchCode, setSearchCode] = useState("");
     const { data } = useSession();
@@ -106,6 +110,12 @@ export const CartToAdd = () => {
     const onSearch = async () => {
         if (!data) return
 
+        const orderId = contextGroupItem.groupItem?.order_id;
+        if (!orderId) {
+            notifyError('Nenhum pedido ativo encontrado');
+            return;
+        }
+
         try {
             const product = await GetProductByCode(searchCode, data);
             const modalName = `add-item-${product.id}`
@@ -113,7 +123,7 @@ export const CartToAdd = () => {
                 modalHandler.hideModal(modalName);
             }
 
-            modalHandler.showModal(modalName, "", <AddProductCard product={product} />, "md", onClose)
+            modalHandler.showModal(modalName, "", <AddProductCard product={product} orderId={orderId} />, "md", onClose)
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao buscar produto por codigo: " + searchCode);
         }
@@ -153,7 +163,7 @@ export const CartToAdd = () => {
             </div>
 
             <Carousel items={productsFiltered}>
-                {(product) => <ProductCard key={product.id} product={product} />}
+                {(product) => <ProductCard key={product.id} product={product} orderId={orderId} />}
             </Carousel>
         </div>
     );

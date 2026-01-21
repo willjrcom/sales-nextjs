@@ -5,11 +5,12 @@ import { IconType } from 'react-icons';
 import { IoIosNotifications } from 'react-icons/io';
 import { Toaster, toast } from 'react-hot-toast';
 import { FaExclamationCircle } from 'react-icons/fa';
-import { useCurrentOrder } from '@/app/context/current-order/context';
 import EmployeeUserProfile from '../profile/profile';
 import { useSession } from 'next-auth/react';
 import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
+import Order from '@/app/entities/order/order';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TopbarItemProps {
   label: string;
@@ -43,25 +44,32 @@ const TopbarItemAlert = ({ label, icon: Icon, href }: TopbarItemIconProps) => (
   </Link>
 );
 
-
 const Topbar = () => {
-  const contextCurrentOrder = useCurrentOrder();
-  const [showCurrentOrder, setCurrentOrder] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { data } = useSession();
+  const queryClient = useQueryClient();
+
+  // Ler o pedido atual do cache (sem localStorage!)
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+
+  useEffect(() => {
+    // Verificar cache periodicamente
+    const checkCache = () => {
+      const cachedOrder = queryClient.getQueryData<Order>(['order', 'current']);
+      setCurrentOrder(cachedOrder || null);
+    };
+
+    checkCache();
+
+    // Verificar a cada segundo se o cache mudou
+    const interval = setInterval(checkCache, 1000);
+    return () => clearInterval(interval);
+  }, [queryClient]);
 
   // Notificação: abre o toast com central de notificações
   const handleNotifications = () => {
     toast('Central de notificações', { icon: '🔔' });
   };
-
-  useEffect(() => {
-    if (contextCurrentOrder.order?.status === "Staging") {
-      setCurrentOrder(true);
-    } else {
-      setCurrentOrder(false);
-    }
-  }, [contextCurrentOrder.order?.status]);
 
   useEffect(() => {
     getUser();
@@ -82,7 +90,13 @@ const Topbar = () => {
           <TopbarItem label="Mesas" href="/pages/order-table-control" />
           <TopbarItem label="Entregas" href="/pages/order-delivery-control" />
           <TopbarItem label="Retiradas" href="/pages/order-pickup-control" />
-          {showCurrentOrder && <TopbarItemAlert label="Pedido em aberto" icon={FaExclamationCircle} href={"/pages/order-control/" + contextCurrentOrder.order?.id} />}
+          {currentOrder?.status === 'Staging' && (
+            <TopbarItemAlert
+              label="Pedido em aberto"
+              icon={FaExclamationCircle}
+              href={"/pages/order-control/" + currentOrder.id}
+            />
+          )}
         </div>
 
         <div className="flex space-x-4 items-center">
@@ -94,7 +108,7 @@ const Topbar = () => {
             <IoIosNotifications className="text-xl text-gray-300" />
           </button>
           <div className="absolute top-4 right-4">
-            {user && <EmployeeUserProfile user={user} setUser={setUser}/>}
+            {user && <EmployeeUserProfile user={user} setUser={setUser} />}
           </div>
         </div>
       </header>

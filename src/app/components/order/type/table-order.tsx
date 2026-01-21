@@ -1,8 +1,8 @@
 import ButtonIcon from "../../button/button-icon";
 import Order from "@/app/entities/order/order";
 import StatusComponent from "../../button/show-status";
-import { useEffect, useMemo, useState } from "react";
-import { useCurrentOrder } from "@/app/context/current-order/context";
+import { useMemo, useState } from "react";
+
 import { SelectField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
@@ -12,15 +12,15 @@ import { FaExchangeAlt } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
+import GetOrderByID from "@/app/api/order/[id]/order";
 
-const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
+const ChangeTableModal = ({ orderTableId, orderId, refetch }: { orderTableId: string, orderId: string, refetch: () => void }) => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
-    const contextCurrentOrder = useCurrentOrder();
 
     const { data: placesResponse } = useQuery({
         queryKey: ['places'],
@@ -45,9 +45,7 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
             queryClient.invalidateQueries({ queryKey: ['table-orders'] });
 
             // Recarregar dados do pedido atual
-            if (contextCurrentOrder.order) {
-                await contextCurrentOrder.fetchData(contextCurrentOrder.order.id);
-            }
+            refetch();
 
             // Fechar modal
             modalHandler.hideModal("change-table-" + orderTableId);
@@ -88,13 +86,26 @@ const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
     );
 };
 
-const TableCard = () => {
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+interface TableCardProps {
+    orderId: string;
+}
 
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order)
-    }, [contextCurrentOrder.order])
+const TableCard = ({ orderId }: TableCardProps) => {
+    const { data: session } = useSession();
+
+    const { data: order, refetch } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !session?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, session);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!session?.user?.access_token,
+    });
 
     if (!order || !order.table) return null
     const table = order?.table;
@@ -109,7 +120,7 @@ const TableCard = () => {
                     size="md"
                     icon={FaExchangeAlt}
                 >
-                    <ChangeTableModal orderTableId={order.table.id} />
+                    <ChangeTableModal orderTableId={order.table.id} orderId={orderId} refetch={refetch} />
                 </ButtonIcon>
             </div>
 

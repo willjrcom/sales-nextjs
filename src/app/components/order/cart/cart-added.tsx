@@ -1,23 +1,41 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import ButtonIconTextFloat from "../../button/button-float";
 import EditGroupItem from "../group-item/edit-group-item";
-import { useCurrentOrder } from "@/app/context/current-order/context";
-import Order from "@/app/entities/order/order";
 import { useGroupItem } from "@/app/context/group-item/context";
-import CategoryOrder from "../category/category";
 import { FaSearch } from 'react-icons/fa';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GetCategoriesMap } from "@/app/api/category/category";
 import { useSession } from "next-auth/react";
 import { CardOrderResume } from "../resume/resume";
+import CategoryOrder from "../category/category";
+import GetOrderByID from "@/app/api/order/[id]/order";
+import { notifyError } from "@/app/utils/notifications";
 
-export const CartAdded = () => {
+interface CartAddedProps {
+    orderId: string;
+}
+
+export const CartAdded = ({ orderId }: CartAddedProps) => {
     const contextGroupItem = useGroupItem();
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const { data: session } = useSession();
+    const queryClient = useQueryClient();
+
+    // Buscar pedido com React Query
+    const { data: order, refetch } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !session?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, session);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!session?.user?.access_token,
+    });
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories', 'map', 'product'],
@@ -27,10 +45,6 @@ export const CartAdded = () => {
     });
 
     const categoriesMap = useMemo(() => categoriesResponse?.sort((a, b) => a.name.localeCompare(b.name)) || [], [categoriesResponse]);
-
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order)
-    }, [contextCurrentOrder.order])
 
     const groupedItems = useMemo(() => groupBy(order?.group_items || [], "category_id"), [order?.group_items]);
 
@@ -48,7 +62,7 @@ export const CartAdded = () => {
             <div className="mb-2">
                 <div className="flex items-center justify-between">
                     <h1 className="text-xl font-bold">Meus Itens</h1>
-                    <CardOrderResume />
+                    <CardOrderResume orderId={orderId} />
                 </div>
                 {order.status !== "Canceled" &&
                     <div onClick={() => contextGroupItem.resetGroupItem()}>
@@ -56,8 +70,8 @@ export const CartAdded = () => {
                             position="bottom-right"
                             title="Novo grupo de itens"
                             modalName="edit-group-item"
-                            onCloseModal={() => contextCurrentOrder.fetchData(order.id)}>
-                            <EditGroupItem />
+                            onCloseModal={() => refetch()}>
+                            <EditGroupItem orderId={orderId} />
                         </ButtonIconTextFloat>
                     </div>
                 }

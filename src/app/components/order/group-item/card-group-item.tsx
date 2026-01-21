@@ -3,12 +3,12 @@ import GroupItem from "@/app/entities/order/group-item";
 import { useGroupItem } from "@/app/context/group-item/context";
 import ButtonIcon from "../../button/button-icon";
 import EditGroupItem from "./edit-group-item";
-import { useCurrentOrder } from "@/app/context/current-order/context";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { FaClock } from "react-icons/fa";
 import StatusComponent from "../../button/show-status";
 import Decimal from "decimal.js";
 import ObservationCard from "../observation";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -16,7 +16,8 @@ interface GroupItemCardProps {
 
 const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
   const contextGroupItem = useGroupItem();
-  const contextCurrentOrder = useCurrentOrder();
+  const queryClient = useQueryClient();
+
   // Map status to border color
   const statusStyles: Record<string, string> = {
     Staging: 'border-yellow-400',
@@ -31,6 +32,11 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
     contextGroupItem.updateGroupItem(groupItem);
   }
 
+  const handleCloseModal = () => {
+    // Invalidar queries do pedido
+    queryClient.invalidateQueries({ queryKey: ['order'] });
+  }
+
   return (
     <div className={`bg-white rounded-lg shadow-sm border-l-4 ${statusStyles[groupItem.status] || 'border-gray-200'} p-4 space-y-4 max-h-[50vh] overflow-y-auto`}>
       {/* Header: Group title and actions */}
@@ -41,7 +47,7 @@ const GroupItemCard = ({ groupItem }: GroupItemCardProps) => {
             title="Editar grupo"
             modalName={`edit-group-item-${groupItem.id}`}
             size={groupItem.status === 'Staging' ? 'xl' : 'md'}
-            onCloseModal={() => contextCurrentOrder.fetchData(contextCurrentOrder.order?.id)}
+            onCloseModal={handleCloseModal}
           >
             <EditGroupItem key={groupItem.id} />
           </ButtonIcon>

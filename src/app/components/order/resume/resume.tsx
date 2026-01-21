@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react"
-import { useCurrentOrder } from "@/app/context/current-order/context"
+import { useState } from "react"
 import Order from "@/app/entities/order/order"
 import { useSession } from "next-auth/react"
 import PendingOrder from "@/app/api/order/status/pending/order"
@@ -30,14 +29,29 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Receipt, X, Truck, Package, UtensilsCrossed } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import GetOrderByID from "@/app/api/order/[id]/order";
 
-export const CardOrderResume = () => {
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+interface CardOrderResumeProps {
+    orderId: string;
+}
 
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order)
-    }, [contextCurrentOrder.order])
+export const CardOrderResume = ({ orderId }: CardOrderResumeProps) => {
+    const { data: session } = useSession();
+
+    const { data: order } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !session?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, session);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!session?.user?.access_token,
+    });
 
     const getOrderTypeIcon = () => {
         if (order?.delivery) return <Truck className="h-4 w-4" />;
@@ -86,30 +100,42 @@ export const CardOrderResume = () => {
                         </DrawerClose>
                     </div>
                 </DrawerHeader>
-                
+
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    <OrderPaymentsResume />
-                    {order?.delivery && <DeliveryCard />}
-                    {order?.pickup && <PickupCard />}
-                    {order?.table && <TableCard />}
+                    <OrderPaymentsResume orderId={orderId} />
+                    {order?.delivery && <DeliveryCard orderId={orderId} />}
+                    {order?.pickup && <PickupCard orderId={orderId} />}
+                    {order?.table && <TableCard orderId={orderId} />}
                 </div>
             </DrawerContent>
         </Drawer>
     );
 };
 
-export const OrderPaymentsResume = () => {
+interface OrderPaymentsResumeProps {
+    orderId: string;
+}
+
+export const OrderPaymentsResume = ({ orderId }: OrderPaymentsResumeProps) => {
     const { data } = useSession();
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+    const queryClient = useQueryClient();
+
+    const { data: order, refetch } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !data?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, data);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!data?.user?.access_token,
+    });
+
     const [change, setChange] = useState<Decimal>(new Decimal(order?.delivery?.change || 0));
     const [paymentMethod, setPaymentMethod] = useState<string>(order?.delivery?.payment_method || "");
-
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order)
-        setChange(new Decimal(contextCurrentOrder.order?.delivery?.change || 0))
-        setPaymentMethod(contextCurrentOrder.order?.delivery?.payment_method || "")
-    }, [contextCurrentOrder.order])
 
     const onSubmit = async () => {
         if (!order || !data) return
@@ -139,7 +165,9 @@ export const OrderPaymentsResume = () => {
             }
 
             // Must be after printGroupItem
-            contextCurrentOrder.fetchData(order.id);
+            refetch();
+            // Invalidar query de pedidos em staging para atualizar o topbar
+            queryClient.invalidateQueries({ queryKey: ['orders', 'staging'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao lançar pedido");
         }
@@ -150,7 +178,7 @@ export const OrderPaymentsResume = () => {
 
         try {
             await UpdateChangeOrderDelivery(order.delivery.id, change.toNumber(), paymentMethod, data)
-            contextCurrentOrder.fetchData(order.id);
+            refetch();
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao atualizar troco");
         }
@@ -162,7 +190,7 @@ export const OrderPaymentsResume = () => {
         try {
             await AddTableTax(order.table.id, data);
             notifySuccess("Taxa adicionada com sucesso");
-            contextCurrentOrder.fetchData(order.id);
+            refetch();
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao adicionar taxa");
         }
@@ -173,7 +201,7 @@ export const OrderPaymentsResume = () => {
         try {
             await RemoveTableTax(order.table.id, data);
             notifySuccess("Taxa removida com sucesso");
-            contextCurrentOrder.fetchData(order.id);
+            refetch();
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao remover taxa");
         }
@@ -186,7 +214,7 @@ export const OrderPaymentsResume = () => {
     const totalPayableDecimal = new Decimal(order?.total_payable || "0");
     const deliveryTaxDecimal = new Decimal((order?.delivery?.delivery_tax || "0"))
     const tableTaxDecimal = new Decimal((order?.table?.tax_rate || "0"))
-    
+
     return (
         <div className="space-y-4">
             {/* Status Card */}
@@ -210,11 +238,11 @@ export const OrderPaymentsResume = () => {
                     <div className="space-y-3">
                         <PriceField friendlyName="Troco para" name="change" value={change} setValue={setChange} optional />
                         <SelectField friendlyName="Forma de pagamento" name="payment_method" values={payMethodsWithId} selectedValue={paymentMethod} setSelectedValue={setPaymentMethod} optional />
-                        
+
                         {(change.toNumber() !== (new Decimal(order.delivery.change || "0").toNumber() || 0) || paymentMethod !== order.delivery.payment_method) && (
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 className="w-full text-orange-600 border-orange-300 hover:bg-orange-50"
                                 onClick={updateChange}
                             >
@@ -239,18 +267,18 @@ export const OrderPaymentsResume = () => {
                             </p>
                         </div>
                         {tableTaxDecimal.gt(0) ? (
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 className="text-red-600 border-red-300 hover:bg-red-50"
                                 onClick={handleRemoveTax}
                             >
                                 Remover
                             </Button>
                         ) : (
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 className="text-green-600 border-green-300 hover:bg-green-50"
                                 onClick={handleAddTax}
                             >
@@ -279,7 +307,7 @@ export const OrderPaymentsResume = () => {
                             )}
                         </div>
                     )}
-                    
+
                     <div className="border-t border-gray-700 pt-3 mt-3">
                         <div className="flex justify-between items-center">
                             <span className="text-gray-400">Total a pagar</span>
@@ -293,7 +321,7 @@ export const OrderPaymentsResume = () => {
 
             {/* Launch Order Button */}
             {isThrowButton && (
-                <Button 
+                <Button
                     className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold text-lg shadow-lg"
                     onClick={onSubmit}
                 >

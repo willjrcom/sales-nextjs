@@ -4,11 +4,15 @@ import AddProductCard from "@/app/forms/item/form";
 import ButtonIconText from "../../button/button-icon-text";
 import Decimal from "decimal.js";
 
+import { useGroupItem } from "@/app/context/group-item/context";
+
 interface ProductCardProps {
     product: Product;
+    orderId?: string;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, orderId }: ProductCardProps) => {
+    const contextGroupItem = useGroupItem();
     return (
         <div className="relative p-4 bg-white rounded-lg shadow-md border hover:shadow-lg transition-shadow duration-200 w-full max-w-sm mx-auto">
             {/* Imagem do produto */}
@@ -81,7 +85,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
                 {/* Botão */}
                 <ButtonIconText modalName={`add-item-${product.id}`} isDisabled={!product.is_available}>
-                    <AddProductCard product={product} />
+                    <AddProductCard product={product} orderId={orderId || contextGroupItem.groupItem?.order_id} />
                 </ButtonIconText>
             </div>
         </div>

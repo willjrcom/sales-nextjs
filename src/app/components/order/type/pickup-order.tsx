@@ -1,17 +1,31 @@
 import ButtonIcon from "../../button/button-icon";
-import Order from "@/app/entities/order/order";
 import StatusComponent from "../../button/show-status";
 import PickupNameForm from "@/app/forms/pickup-order/update-name-order";
-import { useEffect, useState } from "react";
-import { useCurrentOrder } from "@/app/context/current-order/context";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import GetOrderByID from "@/app/api/order/[id]/order";
+import { notifyError } from "@/app/utils/notifications";
 
-const PickupCard = () => {
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
+interface PickupCardProps {
+    orderId: string;
+}
 
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order)
-    }, [contextCurrentOrder.order])
+const PickupCard = ({ orderId }: PickupCardProps) => {
+    const { data: session } = useSession();
+
+    const { data: order } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !session?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, session);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!session?.user?.access_token,
+    });
 
     if (!order || !order.pickup) return null
     const pickup = order.pickup;

@@ -17,7 +17,6 @@ import {
     FaHourglassHalf, FaFileInvoiceDollar
 } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
-import { useCurrentOrder } from "@/app/context/current-order/context";
 import Link from "next/link";
 import Carousel from "../carousel/carousel";
 import type { IconType } from 'react-icons';
@@ -41,7 +40,7 @@ const paymentIcons: Record<string, IconType> = {
 };
 const DefaultPaymentIcon = FaDollarSign;
 import CloseTable from "@/app/api/order-table/status/close/order-table";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifyError } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
@@ -53,39 +52,39 @@ import AdditionalItem from "@/app/components/order/additional-item";
 import RemovedItem from "@/app/components/order/removed-item";
 import EmitNFCeModal from "@/app/components/order/emit-nfce-modal";
 import Item from "@/app/entities/order/item";
+import GetOrderByID from "@/app/api/order/[id]/order";
 
 interface CardOrderProps {
     orderId: string | null;
 }
 
 const CardOrder = ({ orderId }: CardOrderProps) => {
-    const contextCurrentOrder = useCurrentOrder();
-    const [order, setOrder] = useState<Order | null>(contextCurrentOrder.order);
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
     const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
 
-    const fetchOrder = async () => {
-        if (!data || !orderId) return;
-
-        try {
-            await contextCurrentOrder.fetchData(orderId);
-        } catch (error) {
-            setOrder(null);
-        }
-    };
-
-    useEffect(() => {
-        setOrder(contextCurrentOrder.order);
-    }, [contextCurrentOrder.order]);
+    // Usar React Query diretamente
+    const { data: order, refetch } = useQuery({
+        queryKey: ['order', 'current'],
+        queryFn: async () => {
+            if (!orderId || !data?.user?.access_token) return null;
+            try {
+                return await GetOrderByID(orderId, data);
+            } catch (error) {
+                notifyError('Erro ao buscar pedido');
+                return null;
+            }
+        },
+        enabled: !!orderId && !!data?.user?.access_token,
+    });
 
     const handleReady = async () => {
         if (!order || !data) return;
 
         try {
             await ReadyOrder(order.id, data);
-            fetchOrder();
+            refetch();
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao marcar como pronto");
@@ -99,7 +98,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
         try {
             await FinishOrder(order.id, data);
-            fetchOrder();
+            refetch();
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao marcar como finalizado");
@@ -113,7 +112,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
         try {
             await CancelOrder(order.id, data);
-            fetchOrder();
+            refetch();
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao cancelar pedido");
@@ -121,10 +120,6 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
 
         modalHandler.hideModal("cancel-order-" + order.id);
     };
-
-    useEffect(() => {
-        fetchOrder();
-    }, [orderId]);
 
     if (!order) return null;
 
@@ -213,7 +208,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                 try {
                     await CloseTable(order.table?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
-                    fetchOrder();
+                    refetch();
                 } catch (error) {
                     const err = error as RequestError;
                     notifyError(err.message || "Erro ao fechar mesa");
@@ -264,7 +259,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
-                    fetchOrder();
+                    refetch();
                 } catch (error) {
                     const err = error as RequestError;
                     notifyError(err.message || "Erro ao entregar retirada");
@@ -462,7 +457,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
                 {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
-                    <PaymentForm />
+                    <PaymentForm orderId={order.id} />
                 </ButtonIconText>}
 
                 {isOrderStatusFinished && <div>&nbsp;</div>}
@@ -519,7 +514,7 @@ const CardOrder = ({ orderId }: CardOrderProps) => {
                         icon={FaFileInvoiceDollar}
                         isDisabled={!isOrderStatusFinished || isOrderStatusCanceled}
                     >
-                        <EmitNFCeModal orderId={order.id} onSuccess={fetchOrder} />
+                        <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
                     </ButtonIconText>
                 </div>
             </div>

@@ -19,13 +19,17 @@ import { FaTimes } from "react-icons/fa";
 import { useModal } from "@/app/context/modal/context";
 import ButtonIconText from "../../button/button-icon-text";
 
-export default function EditGroupItem() {
+interface EditGroupItemProps {
+    orderId?: string;
+}
+
+export default function EditGroupItem({ orderId }: EditGroupItemProps) {
     const contextGroupItem = useGroupItem();
 
     if (!contextGroupItem.groupItem || contextGroupItem.groupItem?.status === "Staging") {
         return (
             <div>
-                <CartToAdd />
+                <CartToAdd orderId={orderId || contextGroupItem.groupItem?.order_id} />
             </div>
         );
     }

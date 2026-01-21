@@ -4,7 +4,6 @@ import GetProductByID from "@/app/api/product/[id]/product";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from "@/app/components/modal/field";
-import { useCurrentOrder } from "@/app/context/current-order/context";
 import { useGroupItem } from "@/app/context/group-item/context";
 import { useModal } from "@/app/context/modal/context";
 import Product from "@/app/entities/product/product";
@@ -12,18 +11,19 @@ import Quantity from "@/app/entities/quantity/quantity";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetQuantitiesByCategoryID from "@/app/api/quantity/quantity";
 
 interface AddProductCardProps {
   product: Product;
+  orderId?: string;
 }
 
-const AddProductCard = ({ product: item }: AddProductCardProps) => {
+const AddProductCard = ({ product: item, orderId }: AddProductCardProps) => {
   const modalName = 'add-item-' + item.id
   const modalHandler = useModal();
-  const contextCurrentOrder = useCurrentOrder();
   const contextGroupItem = useGroupItem();
+  const queryClient = useQueryClient();
   const { data } = useSession();
   const [product, setProduct] = useState<Product>(item || new Product());
   const [quantity, setQuantity] = useState<Quantity>(new Quantity());
@@ -62,7 +62,14 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   }
 
   const submit = async () => {
-    if (!contextCurrentOrder.order || !quantity || !data) return;
+    if (!data) return;
+
+    if (!orderId) {
+      notifyError("Nenhum pedido ativo encontrado. Por favor, inicie um pedido primeiro.");
+      return;
+    }
+
+    if (!quantity) return;
 
     const requiresFlavorSelection = availableFlavors && availableFlavors.length > 0;
     if (requiresFlavorSelection && !selectedFlavor) {
@@ -74,7 +81,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       const body = {
         product_id: product.id,
         quantity_id: quantity?.id,
-        order_id: contextCurrentOrder.order.id,
+        order_id: orderId,
         observation: observation,
         flavor: selectedFlavor || undefined,
       } as NewItemProps
