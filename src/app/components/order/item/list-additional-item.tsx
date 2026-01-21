@@ -52,14 +52,16 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
     const isStaging = groupItem?.status === "Staging";
     const [lastUpdate, setLastUpdate] = useState<string>("");
 
-    const { data: additionalProductsResponse, refetch, isRefetching } = useQuery({
+    const { data: additionalProductsResponse, refetch, isRefetching, isLoading, error } = useQuery({
         queryKey: ['additional-products', item.category_id],
-        queryFn: () => {
-            setLastUpdate(FormatRefreshTime(new Date()))
-            return GetAdditionalProducts(data!, item.category_id);
+        queryFn: async () => {
+            const result = await GetAdditionalProducts(data!, item.category_id);
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return result;
         },
         enabled: !!data?.user?.access_token && !!item.category_id,
         refetchInterval: 60 * 1000, // 60 seconds
+        staleTime: 30 * 1000, // Consider data fresh for 30 seconds
     });
 
     const additionalItems = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse?.items]);
@@ -75,7 +77,7 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
         } catch (error: RequestError | any) {
             notifyError(error);
         }
-    }, [item.id, item.additional_items]);
+    }, [item.id, item.additional_items, additionalItems]); // Added additionalItems dependency
 
     const updateAdditionalItem = async (clickedItem: ItemAdditional) => {
         if (!data) return
@@ -191,10 +193,29 @@ const AdditionalItemList = ({ item, setItem }: ItemListProps) => {
                 <Refresh onRefresh={refetch} isPending={isRefetching} lastUpdate={lastUpdate} />
             </div>
             <hr className='my-4' />
-            <div className="space-y-4">
-                {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}
-                {additionalItemsToAdd.length === 0 && <p className="text-gray-500">Nenhum item disponível</p>}
-            </div>
+
+            {/* Loading State */}
+            {isLoading && (
+                <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                    <span className="ml-3 text-gray-600">Carregando itens adicionais...</span>
+                </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                    Erro ao carregar itens adicionais. Tente novamente.
+                </div>
+            )}
+
+            {/* Content */}
+            {!isLoading && !error && (
+                <div className="space-y-4">
+                    {additionalItemsToAdd?.map((item) => <AdditionalItemCard key={item.product_id} item={item} />)}
+                    {additionalItemsToAdd.length === 0 && <p className="text-gray-500">Nenhum item disponível</p>}
+                </div>
+            )}
         </div>
     );
 };
