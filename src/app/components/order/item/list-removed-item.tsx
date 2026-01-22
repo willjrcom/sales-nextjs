@@ -3,7 +3,7 @@ import AddRemovedItem from '@/app/api/item/update/removed-item/add/item';
 import RemoveRemovedItem from '@/app/api/item/update/removed-item/remove/item';
 import Item from '@/app/entities/order/item';
 import { useSession } from 'next-auth/react';
-import React, { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { notifyError } from '@/app/utils/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetCategoryByID from '@/app/api/category/[id]/category';
@@ -18,9 +18,10 @@ const RemovedItemList = ({ item }: ItemListProps) => {
     const queryClient = useQueryClient();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
-    React.useEffect(() => {
+    useEffect(() => {
         setRemovedItems(item.removed_items || []);
     }, [item.removed_items]);
+
     const { data } = useSession();
     const isStaging = groupItem?.status === "Staging";
 

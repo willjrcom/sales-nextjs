@@ -17,18 +17,13 @@ const EditItem = ({ item, itemsCount }: EditItemProps) => {
     const queryClient = useQueryClient();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const isStaging = groupItem?.status === "Staging"
-    const [itemState, setItemState] = useState<Item>(item);
 
-    useEffect(() => {
-        setItemState(item);
-    }, [item]);
+    if (!item) return
 
-    if (!itemState) return
-
-    const totalAdditionalsDecimal = useMemo(() => itemState.additional_items?.reduce(
+    const totalAdditionalsDecimal = useMemo(() => item.additional_items?.reduce(
         (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.price).times(it.quantity)),
         new Decimal(0)
-    ) || new Decimal(0), [itemState.additional_items]);
+    ) || new Decimal(0), [item.additional_items]);
 
     return (
         <div
@@ -37,22 +32,22 @@ const EditItem = ({ item, itemsCount }: EditItemProps) => {
             {/* Estado padrão */}
             <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">
-                    {itemState.quantity} x {itemState.name}
+                    {item.quantity} x {item.name}
                 </div>
                 {isStaging &&
-                    <ButtonDelete modalName={"delete-item-" + itemState.id} name={itemState.name} additionalModals={["edit-item-" + itemState.id]}>
-                        <DeleteItemModal item={itemState} itemsCount={itemsCount} />
+                    <ButtonDelete modalName={"delete-item-" + item.id} name={item.name} additionalModals={["edit-item-" + item.id]}>
+                        <DeleteItemModal item={item} itemsCount={itemsCount} />
                     </ButtonDelete>
                 }
             </div>
-            {itemState.observation && <p className="text-sm text-gray-600">{itemState.observation}</p>}
-            <AdditionalItemList item={itemState} setItem={setItemState} />
-            <RemovedItemList item={itemState} />
+            {item.observation && <p className="text-sm text-gray-600">{item.observation}</p>}
+            <AdditionalItemList item={item} />
+            <RemovedItemList item={item} />
 
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-md">Produto</p>
-                <p className="text-lg font-bold">R$ {new Decimal(itemState.price).toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {new Decimal(item.price).toFixed(2)}</p>
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-md">Adicionais</p>
@@ -60,7 +55,7 @@ const EditItem = ({ item, itemsCount }: EditItemProps) => {
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total</p>
-                <p className="text-lg font-bold">R$ {new Decimal(itemState.total_price).toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {new Decimal(item.total_price).toFixed(2)}</p>
             </div>
         </div>
     );

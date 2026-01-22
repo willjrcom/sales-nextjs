@@ -19,9 +19,7 @@ const ItemCard = ({ item }: CardProps) => {
     const modalName = "edit-item-" + item.id;
 
     const onClose = () => {
-        if (groupItem?.id) {
-            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
-        }
+        queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
         modalHandler.hideModal(modalName);
     };
 
