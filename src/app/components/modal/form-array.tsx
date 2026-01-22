@@ -13,7 +13,17 @@ interface FormArrayProps {
 const FormArray = ({ title, singleItemName, items, onAdd, onRemove, onChange }: FormArrayProps) => {
     return (
         <div className="space-y-4">
-            <h3 className="text-md font-semibold">{title}</h3>
+            <div className='flex justify-between items-center'>
+                <h3 className="text-md font-semibold">{title}</h3>
+                <button
+                    type="button"
+                    className="mt-4 text-blue-500"
+                    onClick={onAdd}
+                >
+                    Adicionar
+                </button>
+            </div>
+
             <div className="space-y-2 grid grid-cols-2">
                 {items?.map((item, index) => (
                     <div key={index} className="flex items-center space-x-4">
@@ -32,16 +42,6 @@ const FormArray = ({ title, singleItemName, items, onAdd, onRemove, onChange }: 
                         </button>
                     </div>
                 ))}
-            </div>
-
-            <div className='flex justify-end'>
-                <button
-                    type="button"
-                    className="mt-4 text-blue-500"
-                    onClick={onAdd}
-                >
-                    Adicionar
-                </button>
             </div>
         </div>
     );

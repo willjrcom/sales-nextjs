@@ -240,7 +240,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
                     {/* Seção: Ingredientes Removíveis */}
                     <div className="bg-gradient-to-br from-white to-orange-50 rounded-lg shadow-sm border border-orange-100 p-6 transition-all duration-300 hover:shadow-md">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-orange-200">Ingredientes Removíveis</h3>
                         <RemovableItensComponent item={category} setItem={setCategory} />
                     </div>
                 </>
