@@ -22,7 +22,10 @@ const DeliveryOrderFinished = () => {
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
         queryKey: ['delivery-orders'],
-        queryFn: () => GetOrdersWithDelivery(data!),
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetOrdersWithDelivery(data!);
+        },
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });
@@ -37,15 +40,10 @@ const DeliveryOrderFinished = () => {
         return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
     }, [deliveryDriversResponse?.items]);
 
-    const handleRefresh = async () => {
-        await refetch();
-        setLastUpdate(FormatRefreshTime(new Date()));
-    };
-
     const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
 
     const { deliveryOrders, ordersNotFinished } = useMemo(() => {
-        const deliveredOrders = allOrders.filter((order) => order.delivery?.status === 'Delivered');
+        const deliveredOrders = allOrders.filter((order) => order.status === 'Finished' && order.delivery?.status === 'Delivered');
         const notFinished = allOrders.filter((order) => order.status === 'Ready' && order.delivery?.status === 'Delivered');
 
         if (!selectedDriverId) {
@@ -74,7 +72,7 @@ const DeliveryOrderFinished = () => {
                     values={deliveryDrivers}
                     optional
                 />
-                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
             {ordersNotFinished.length > 0 &&
                 <div className="mt-2 text-sm">

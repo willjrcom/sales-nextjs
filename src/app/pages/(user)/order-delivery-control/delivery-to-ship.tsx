@@ -44,9 +44,9 @@ const DeliveryOrderToShip = () => {
         refetchInterval: 30000,
     });
 
-    const orders = useMemo(() => {
-        return (deliveryOrdersResponse?.items || []).filter((order) => order.delivery?.status === 'Ready');
-    }, [deliveryOrdersResponse?.items]);
+    const orders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
+    const readyOrders = useMemo(() => orders.filter((order) => order.delivery?.status === 'Ready'), [orders]);
+    const readyOrdersSorted = useMemo(() => readyOrders.sort((a, b) => new Date(a.ready_at!).getTime() - new Date(b.ready_at!).getTime()), [readyOrders]);
 
     // const getCenterPoint = async () => {
     //     if (!data) return;
@@ -74,7 +74,7 @@ const DeliveryOrderToShip = () => {
         // const newPoints: Point[] = [];
         // const newSelectedPoints: Point[] = [];
 
-        for (let order of orders) {
+        for (let order of readyOrdersSorted) {
             if (selectedRows.has(order.id)) {
                 // newSelectedPoints.push(point);
                 deliveryIDs.push(order.delivery?.id || "");
@@ -98,7 +98,7 @@ const DeliveryOrderToShip = () => {
         // setSelectedPoints(newSelectedPoints);
         // setPoints(newPoints);
 
-    }, [orders, selectedRows]);
+    }, [readyOrdersSorted, selectedRows]);
 
     return (
         <>
@@ -106,7 +106,7 @@ const DeliveryOrderToShip = () => {
                 <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
 
-            <CrudTable columns={DeliveryOrderColumns()} data={orders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+            <CrudTable columns={DeliveryOrderColumns()} data={readyOrdersSorted} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
             <div className="flex flex-col md:flex-row gap-2 items-start">
                 {/* Tabela */}
                 {/* <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
