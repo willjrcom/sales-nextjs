@@ -42,7 +42,8 @@ const ComplementCategorySelector = ({ selectedCategory, setSelectedCategory }: C
 
     return (
         <div className="w-full overflow-x-hidden">
-            <div className="flex items-center justify-end mb-4 space-x-2">
+            <div className="flex items-center justify-between mb-4 space-x-2">
+                <h4 className="text-md font-medium">Categorias complemento</h4>
                 <Refresh removeText
                     onRefresh={refetch}
                     isPending={isPending}

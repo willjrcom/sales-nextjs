@@ -224,7 +224,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
                     {/* Seção: Categorias Adicionais */}
                     <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Categorias Adicionais</h3>
                         <AdditionalCategorySelector
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
@@ -233,7 +232,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
                     {/* Seção: Complementos */}
                     <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Complementos</h3>
                         <ComplementCategorySelector
                             selectedCategory={category}
                             setSelectedCategory={setCategory}
