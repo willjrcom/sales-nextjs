@@ -17,7 +17,7 @@ const PageDeliveryOrder = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="w-full px-3 py-2">
             <PageTitle title="Controle de Entregas" tooltip="Gerencie pedidos de entrega por status: A enviar, Na rua ou Finalizadas." />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">

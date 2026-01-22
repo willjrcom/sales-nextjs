@@ -25,8 +25,8 @@ const OrderProcess = () => {
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
 
     return (
-        <div className='max-w-[85vw] flex-auto h-full'>
-            <div className="flex items-center justify-between mb-4">
+        <div className='w-full h-full px-3 py-2'>
+            <div className="flex items-center justify-between mb-2">
                 <PageTitle title="Processos" tooltip="Exibe as regras de processamento de pedidos, agrupadas por categoria, com indicadores de atraso e fila." />
                 <Refresh
                     onRefresh={refetch}

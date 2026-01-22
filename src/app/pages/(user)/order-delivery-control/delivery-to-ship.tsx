@@ -106,13 +106,13 @@ const DeliveryOrderToShip = () => {
                 <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 items-start">
+            <div className="flex flex-col md:flex-row gap-2 items-start">
                 {/* Tabela */}
-                <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
+                <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
                     <CrudTable columns={DeliveryOrderColumns()} data={orders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
                 </div>
                 {/* Mapa */}
-                <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-4">
+                <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
                     <Map mapId="delivery-to-ship" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
             </div>

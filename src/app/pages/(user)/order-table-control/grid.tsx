@@ -2,6 +2,7 @@
 
 import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import PageTitle from "@/app/components/PageTitle";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import RequestError from "@/app/utils/error";
@@ -128,9 +129,10 @@ const DragAndDropGrid = () => {
     );
 
     return (
-        <div className="flex p-4">
+        <div className="flex p-2">
             <div className="flex-1">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-1">
+                    <PageTitle title="Controle de Mesas" tooltip="Gerencie mesas e pedidos em cada local." />
                     <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
                         optional />
                 </div>
@@ -139,10 +141,10 @@ const DragAndDropGrid = () => {
                         display: "grid",
                         gridTemplateColumns: `repeat(${totalCols - 1}, 100px) auto`,
                         gridTemplateRows: `repeat(${totalRows}, 80px) auto`,
-                        gap: "4px",
+                        gap: "3px",
                         position: "relative",
                         backgroundColor: "#f4f4f4",
-                        padding: "20px",
+                        padding: "10px",
                     }}
                 >
                     {/* Células da grade */}

@@ -32,21 +32,21 @@ const CardCategory = ({ category }: CardCategoryProps) => {
 
     return (
         <>
-            <hr className="my-4" />
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold mb-4">{category.name}</h1>
-                <Refresh
-                    onRefresh={refetch}
-                    isPending={isPending}
-                    lastUpdate={lastUpdate}
-                    optionalText="Processo"
-                />
-            </div>
-            <Carousel items={processRules}>
-                {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
-            </Carousel>
-        </>
-    )
+            <>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold mb-2">{category.name}</h1>
+                    <Refresh
+                        onRefresh={refetch}
+                        isPending={isPending}
+                        lastUpdate={lastUpdate}
+                        optionalText="Processo"
+                    />
+                </div>
+                <Carousel items={processRules}>
+                    {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
+                </Carousel>
+            </>
+            )
 }
 
-export default CardCategory
+            export default CardCategory

@@ -42,7 +42,7 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
             await PayOrder(payment, data)
 
             // Invalidar queries do pedido
-            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
+            queryClient.invalidateQueries({ queryKey: ['order', orderId] });
             notifySuccess('Pagamento realizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {

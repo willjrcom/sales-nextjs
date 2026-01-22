@@ -77,13 +77,13 @@ const DeliveryOrderFinished = () => {
                 <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
             {ordersNotFinished.length > 0 &&
-                <div className="mt-4">
-                    <h3 className="text-lg font-semibold mb-2">Pedidos não finalizados</h3>
+                <div className="mt-2 text-sm">
+                    <h3 className="text-lg font-semibold mb-1">Pedidos não finalizados</h3>
                     <CrudTable columns={DeliveryOrderColumns()} data={ordersNotFinished} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
                 </div>}
 
-            <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Pedidos finalizados</h3>
+            <div className="mt-2 text-sm">
+                <h3 className="text-lg font-semibold mb-1">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
             {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => queryClient.invalidateQueries({ queryKey: ['delivery-orders'] })}>

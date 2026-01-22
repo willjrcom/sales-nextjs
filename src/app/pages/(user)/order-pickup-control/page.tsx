@@ -58,7 +58,7 @@ const PickupOrderPage = () => {
     const deliveredOrders = useMemo(() => (deliveredOrdersResponse?.items || []).sort((a, b) => new Date(b.pickup?.delivered_at || 0).getTime() - new Date(a.pickup?.delivered_at || 0).getTime()), [deliveredOrdersResponse?.items]);
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="w-full px-3 py-2">
             <PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
