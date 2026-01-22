@@ -59,7 +59,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
             try {
                 await ReadyOrder(orderId, data);
                 queryClient.invalidateQueries({ queryKey: ['orders'] });
-            } catch (error: RequestError | any) { 
+            } catch (error: RequestError | any) {
                 notifyError(error.message || 'erro ao deixar pedido pronto')
             }
 
@@ -84,7 +84,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
 
     return (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragPending={(event) => setActiveId(event.id as string)}>
-            <div className="flex space-x-6 p-6 flex-nowrap">
+            <div className="flex space-x-3 p-2 flex-nowrap">
                 {/* Pendentes */}
                 <Droppable
                     id="Pending"

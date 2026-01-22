@@ -22,16 +22,16 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
         : "#ffffff"; // Branco padrão
 
     const style = {
-        padding: "16px",
-        borderRadius: "8px",
+        padding: "10px",
+        borderRadius: "6px",
         border: "2px dashed #d1d5db",
         backgroundColor,
         boxShadow: isOver ? "0 4px 10px rgba(0, 128, 0, 0.2)" : "none",
         transition: "background-color 0.3s ease, box-shadow 0.3s ease",
         // Responsive flex column: grow/shrink equally, minimum width to prevent too narrow
         flex: "1 1 0px",
-        minWidth: "300px",
-        height: "58vh",
+        minWidth: "280px",
+        height: "75vh",
         display: "flex",
         alignItems: "flex-start", // Align items at top
         justifyContent: "flex-start",
@@ -40,7 +40,7 @@ function Droppable({ id, orders, children, activeId, canReceive }: OrderProps) {
     return (
         <div ref={setNodeRef} style={style} className="flex flex-col items-center">
             {children}
-            <div className="mt-4 flex flex-col w-full flex-1 overflow-y-auto">
+            <div className="mt-2 flex flex-col w-full flex-1 overflow-y-auto gap-2">
                 {orders?.map(order => (
                     <Draggable key={order.id} order={order}>
                         <OrderItemList order={order} />

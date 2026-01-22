@@ -1,6 +1,5 @@
 "use client"
 
-import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import OrderKanban from "@/app/components/order/kanban/kanban";
@@ -52,31 +51,33 @@ const PageOrder = () => {
                 <CardOrderListItem orders={finishedOrders} />
             </ButtonIconTextFloat>
 
-            <CrudLayout
-                title={<PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />}
-                searchButtonChildren={
-                    <div>
-                        <button
-                            className={`px-4 py-2 rounded whitespace-nowrap ${classOrderStaging}`}
-                            onClick={openStagingOrders}
-                        >
-                            {stagingOrders.length} pedidos em aberto
-                        </button>
+            <div className="w-full h-full px-3 py-2">
+                {/* Header compacto inline */}
+                <div className="flex items-center justify-between gap-4 mb-2">
+                    <button
+                        className={`px-3 py-1.5 text-sm rounded whitespace-nowrap ${classOrderStaging}`}
+                        onClick={openStagingOrders}
+                    >
+                        {stagingOrders.length} pedidos em aberto
+                    </button>
 
-                        <p className="text-sm text-gray-600 mb-4 text-center">
-                            Arraste o pedido para a direita para alterar o status.
-                        </p>
+                    <div className="flex items-center gap-2">
+                        <PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />
+                        <span className="text-xs text-gray-500">Arraste para alterar status</span>
                     </div>
-                }
-                refreshButton={
+
                     <Refresh
                         onRefresh={refetch}
                         isPending={isPending}
                         lastUpdate={lastUpdate}
                     />
-                }
-                tableChildren={<OrderKanban orders={orders} />}
-            />
+                </div>
+
+                {/* Kanban ocupa todo o espaço restante */}
+                <div className="w-full">
+                    <OrderKanban orders={orders} />
+                </div>
+            </div>
         </>
     );
 };
