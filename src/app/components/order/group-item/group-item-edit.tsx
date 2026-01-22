@@ -60,7 +60,7 @@ const GroupItemEdit = () => {
                             Adicionar complemento
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-lg">
+                    <DialogContent className="max-w-2xl">
                         <DialogHeader>
                             <DialogTitle>Adicionar complemento</DialogTitle>
                         </DialogHeader>
