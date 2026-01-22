@@ -1,32 +1,33 @@
 "use client";
+
 import RequestError from "@/app/utils/error";
 import DeliveryOrderDelivery from "@/app/api/order-delivery/status/delivery/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudTable from "@/app/components/crud/table";
-import dynamic from 'next/dynamic';
-import type { Point } from "@/app/components/map/map";
-const Map = dynamic(() => import("@/app/components/map/map"), { ssr: false });
+// import type { Point } from "@/app/components/map/map";
+// import dynamic from 'next/dynamic';
+// const Map = dynamic(() => import("@/app/components/map/map"), { ssr: false });
+// import GetCompany from "@/app/api/company/company";
+// import Address from "@/app/entities/address/address";
+import { FaCheck } from "react-icons/fa";
 import { SelectField } from "@/app/components/modal/field";
 import Decimal from 'decimal.js';
 import CardOrder from "@/app/components/order/card-order";
 import { useModal } from "@/app/context/modal/context";
-import Address from "@/app/entities/address/address";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
-import { FaCheck } from "react-icons/fa";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-import GetCompany from "@/app/api/company/company";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const DeliveryOrderToFinish = () => {
-    const [centerPoint, setCenterPoint] = useState<Point | null>(null);
-    const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
-    const [points, setPoints] = useState<Point[]>([]);
+    // const [centerPoint, setCenterPoint] = useState<Point | null>(null);
+    // const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
+    // const [points, setPoints] = useState<Point[]>([]);
     const [orderID, setSelectedOrderID] = useState<string>("");
     const [selectedOrder, setOrder] = useState<Order | null>(null);
     const [selectedDriverId, setSelectedDriverId] = useState<string>();
@@ -35,7 +36,10 @@ const DeliveryOrderToFinish = () => {
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
         queryKey: ['delivery-orders'],
-        queryFn: () => GetOrdersWithDelivery(data!),
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetOrdersWithDelivery(data!);
+        },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
@@ -44,6 +48,7 @@ const DeliveryOrderToFinish = () => {
         queryKey: ['delivery-drivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
     });
 
     const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
@@ -51,11 +56,6 @@ const DeliveryOrderToFinish = () => {
     const deliveryDrivers = useMemo(() => {
         return (deliveryDriversResponse?.items || []).map((dd) => dd.employee);
     }, [deliveryDriversResponse?.items]);
-
-    const handleRefresh = async () => {
-        await refetch();
-        setLastUpdate(FormatRefreshTime(new Date()));
-    };
 
     const deliveryOrders = useMemo(() => {
         const shippedOrders = allOrders.filter((order) => order.delivery?.status === 'Shipped');
@@ -73,45 +73,45 @@ const DeliveryOrderToFinish = () => {
         setOrder(order);
     }, [orderID, allOrders]);
 
-    useEffect(() => {
-        setCentralCoordinates();
-    }, [data?.user.access_token]);
+    // useEffect(() => {
+    //     setCentralCoordinates();
+    // }, [data?.user.access_token]);
 
-    const setCentralCoordinates = async () => {
-        if (!data) return;
+    // const setCentralCoordinates = async () => {
+    //     if (!data) return;
 
-        const company = await GetCompany(data);
-        if (!data || !company.address) return;
+    //     const company = await GetCompany(data);
+    //     if (!data || !company.address) return;
 
-        const coordinates = company.address.coordinates;
+    //     const coordinates = company.address.coordinates;
 
-        const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
-        setCenterPoint(point);
-    };
+    //     const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
+    //     setCenterPoint(point);
+    // };
 
-    useEffect(() => {
-        const newPoints: Point[] = [];
-        const newSelectedPoints: Point[] = [];
+    // useEffect(() => {
+    //     const newPoints: Point[] = [];
+    //     const newSelectedPoints: Point[] = [];
 
-        for (let order of deliveryOrders) {
-            const address = Object.assign(new Address(), order.delivery?.address);
-            if (!address) continue;
+    //     for (let order of deliveryOrders) {
+    //         const address = Object.assign(new Address(), order.delivery?.address);
+    //         if (!address) continue;
 
-            const coordinates = address.coordinates;
-            if (!coordinates) continue;
+    //         const coordinates = address.coordinates;
+    //         if (!coordinates) continue;
 
-            const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
+    //         const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
 
-            if (orderID === order.id) {
-                newSelectedPoints.push(point);
-            } else {
-                newPoints.push(point);
-            }
-        }
+    //         if (orderID === order.id) {
+    //             newSelectedPoints.push(point);
+    //         } else {
+    //             newPoints.push(point);
+    //         }
+    //     }
 
-        setSelectedPoints(newSelectedPoints);
-        setPoints(newPoints);
-    }, [deliveryOrders, orderID]);
+    //     setSelectedPoints(newSelectedPoints);
+    //     setPoints(newPoints);
+    // }, [deliveryOrders, orderID]);
 
     return (
         <>
@@ -124,18 +124,18 @@ const DeliveryOrderToFinish = () => {
                     values={deliveryDrivers}
                     optional
                 />
-                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
-            <div className="flex flex-col md:flex-row gap-2 items-start">
-                {/* Tabela */}
+            <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
+            {/* <div className="flex flex-col md:flex-row gap-2 items-start">
+                
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
-                    <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
                 </div>
-                {/* Mapa */}
+                
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
                     <Map key={"center-point"} mapId="delivery-to-finish" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
                 </div>
-            </div>
+            </div> */}
             {orderID && <ButtonIconTextFloat modalName="finish-delivery" icon={FaCheck} title="Receber entrega" position="bottom-right">
                 <FinishDelivery order={selectedOrder} />
             </ButtonIconTextFloat>}

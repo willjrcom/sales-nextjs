@@ -17,11 +17,11 @@ interface OrderKanbanProps {
 function OrderKanban({ orders }: OrderKanbanProps) {
     const allOrders = useMemo(() => orders, [orders]);
     const pendingOrders = useMemo(
-        () => allOrders.filter(order => order.status === "Pending"),
+        () => allOrders.filter(order => order.status === "Pending").sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
         [allOrders]
     );
     const readyOrders = useMemo(
-        () => allOrders.filter(order => order.status === "Ready"),
+        () => allOrders.filter(order => order.status === "Ready").sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
         [allOrders]
     );
     const [activeId, setActiveId] = useState<string | null>(null);

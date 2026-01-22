@@ -25,13 +25,13 @@ export default class Order {
     delivery?: OrderDelivery;
     table?: OrderTable;
     pickup?: OrderPickup;
+    created_at?: Date;
     pending_at?: Date;
     finished_at?: Date;
     ready_at?: Date;
     canceled_at?: Date;
     archived_at?: Date;
 
-    
     constructor(data: Partial<Order> = {}) {
         Object.assign(this, data);
     }

@@ -1,4 +1,5 @@
 "use client";
+
 import GetCompany from "@/app/api/company/company";
 import RequestError from "@/app/utils/error";
 import ShipOrderDelivery from "@/app/api/order-delivery/status/ship/order-delivery";
@@ -6,11 +7,11 @@ import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Carousel from "@/app/components/carousel/carousel";
 import { FaUserCircle } from 'react-icons/fa';
 import CrudTable from "@/app/components/crud/table";
-import dynamic from 'next/dynamic';
-import type { Point } from "@/app/components/map/map";
-const Map = dynamic(() => import("@/app/components/map/map"), { ssr: false });
+// import dynamic from 'next/dynamic';
+// import type { Point } from "@/app/components/map/map";
+// const Map = dynamic(() => import("@/app/components/map/map"), { ssr: false });
+// import Address from "@/app/entities/address/address";
 import { useModal } from "@/app/context/modal/context";
-import Address from "@/app/entities/address/address";
 import DeliveryDriver from "@/app/entities/delivery-driver/delivery-driver";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import { useSession } from "next-auth/react";
@@ -24,9 +25,9 @@ import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 const DeliveryOrderToShip = () => {
-    const [centerPoint, setCenterPoint] = useState<Point | null>(null);
-    const [points, setPoints] = useState<Point[]>([]);
-    const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
+    // const [centerPoint, setCenterPoint] = useState<Point | null>(null);
+    // const [points, setPoints] = useState<Point[]>([]);
+    // const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [selectedDeliveryIDs, setSelectedDeliveryIDs] = useState<string[]>([]);
     const [selectedOrderIDs, setSelectedOrderIDs] = useState<string[]>([]);
@@ -35,7 +36,10 @@ const DeliveryOrderToShip = () => {
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
         queryKey: ['delivery-orders'],
-        queryFn: () => GetOrdersWithDelivery(data!),
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetOrdersWithDelivery(data!);
+        },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
@@ -44,77 +48,72 @@ const DeliveryOrderToShip = () => {
         return (deliveryOrdersResponse?.items || []).filter((order) => order.delivery?.status === 'Ready');
     }, [deliveryOrdersResponse?.items]);
 
-    const handleRefresh = async () => {
-        await refetch();
-        setLastUpdate(FormatRefreshTime(new Date()));
-    };
+    // const getCenterPoint = async () => {
+    //     if (!data) return;
 
-    const getCenterPoint = async () => {
-        if (!data) return;
+    //     const company = await GetCompany(data);
+    //     if (!company) return notifyError("Nenhuma empresa encontrada");
 
-        const company = await GetCompany(data);
-        if (!company) return notifyError("Nenhuma empresa encontrada");
+    //     const address = company.address;
+    //     if (!company.address) return notifyError("Nenhuma endereço encontrada");
 
-        const address = company.address;
-        if (!company.address) return notifyError("Nenhuma endereço encontrada");
+    //     const coordinates = address.coordinates;
+    //     if (!coordinates) return notifyError("Nenhuma coordenada encontrada");
 
-        const coordinates = address.coordinates;
-        if (!coordinates) return notifyError("Nenhuma coordenada encontrada");
+    //     const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
+    //     setCenterPoint(point);
+    // };
 
-        const point = { id: company.id, lat: coordinates.latitude, lng: coordinates.longitude, label: company.trade_name } as Point;
-        setCenterPoint(point);
-    };
-
-    useEffect(() => {
-        getCenterPoint();
-    }, [status]);
+    // useEffect(() => {
+    //     getCenterPoint();
+    // }, [status]);
 
     useEffect(() => {
-        const newPoints: Point[] = [];
         const deliveryIDs: string[] = [];
         const orderIDs: string[] = [];
-        const newSelectedPoints: Point[] = [];
+        // const newPoints: Point[] = [];
+        // const newSelectedPoints: Point[] = [];
 
         for (let order of orders) {
-            const address = Object.assign(new Address(), order.delivery?.address);
-            if (!address) continue;
-
-            const coordinates = address.coordinates;
-            if (!coordinates) continue;
-
-            const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
-
             if (selectedRows.has(order.id)) {
-                newSelectedPoints.push(point);
+                // newSelectedPoints.push(point);
                 deliveryIDs.push(order.delivery?.id || "");
                 orderIDs.push(order.id || "");
-            } else {
-                newPoints.push(point);
             }
+            // const address = order.delivery?.address;
+            // if (!address) continue;
+
+            // const coordinates = address.coordinates;
+            // if (!coordinates) continue;
+
+            // const point = { id: order.id, lat: coordinates.latitude, lng: coordinates.longitude, label: address.getSmallAddress() } as Point;
+
+            // else {
+            //     newPoints.push(point);
+            // }
         }
 
         setSelectedDeliveryIDs(deliveryIDs);
         setSelectedOrderIDs(orderIDs);
-        setSelectedPoints(newSelectedPoints);
-        setPoints(newPoints);
+        // setSelectedPoints(newSelectedPoints);
+        // setPoints(newPoints);
 
     }, [orders, selectedRows]);
 
     return (
         <>
             <div className="flex justify-end items-center">
-                <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
             </div>
 
+            <CrudTable columns={DeliveryOrderColumns()} data={orders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
             <div className="flex flex-col md:flex-row gap-2 items-start">
                 {/* Tabela */}
-                <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
-                    <CrudTable columns={DeliveryOrderColumns()} data={orders} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+                {/* <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
                 </div>
-                {/* Mapa */}
                 <div className="w-full md:w-1/2 bg-white shadow-md rounded-lg p-2">
                     <Map mapId="delivery-to-ship" centerPoint={centerPoint} points={points} selectedPoints={selectedPoints} />
-                </div>
+                </div> */}
             </div>
 
             {selectedRows.size > 0 &&

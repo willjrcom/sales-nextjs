@@ -25,7 +25,7 @@ const PageOrder = () => {
             return GetOrders(data!);
         },
         enabled: !!data?.user?.access_token,
-        refetchInterval: 60000,
+        refetchInterval: 30000,
     });
 
     useEffect(() => {
