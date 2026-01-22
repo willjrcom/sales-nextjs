@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import Category from "@/app/entities/category/category";
-import Carousel from "@/app/components/carousel/carousel";
-import { FaPlusCircle, FaRedo } from 'react-icons/fa';
+import { FaPlusCircle } from 'react-icons/fa';
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
@@ -53,7 +52,7 @@ const ComplementCategorySelector = ({ selectedCategory, setSelectedCategory }: C
     const complementCategories = useMemo(() => complementCategoriesResponse || [], [complementCategoriesResponse]);
 
     return (
-        <div>
+        <div className="w-full overflow-x-hidden">
             <div className="flex items-center mb-4 space-x-2">
                 <h4 className="text-md font-medium">Categorias complemento</h4>
                 <Refresh removeText
@@ -62,37 +61,37 @@ const ComplementCategorySelector = ({ selectedCategory, setSelectedCategory }: C
                     lastUpdate={lastUpdate}
                 />
             </div>
-            <Carousel items={complementCategories}>
-                {(category) => {
+            <div className="w-full grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar">
+                {complementCategories.map((category) => {
                     const isSelected = selectedCategories?.some(cat => cat.id === category.id);
                     return (
                         <div
                             key={category.id}
-                            className={`flex flex-col items-center p-4 border rounded-lg shadow-md cursor-pointer transition-transform transform ${isSelected ? 'bg-green-50 border-green-500' : 'bg-white border-gray-200'} hover:shadow-lg hover:scale-105`}
+                            className={`flex flex-col items-center p-3 border rounded-lg shadow-sm cursor-pointer transition-all duration-200 min-w-0 ${isSelected ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'bg-white border-gray-200 hover:border-gray-300'} hover:shadow-md`}
                             onClick={() => handleCategorySelection(category)}
                         >
                             {category.image_path ? (
                                 <Image
                                     src={category.image_path}
                                     alt={category.name}
-                                    className="w-full h-32 object-cover rounded-md mb-4"
+                                    className="w-full h-20 object-cover rounded-md mb-2"
                                     width={100}
                                     height={100}
                                 />
                             ) : (
-                                <FaPlusCircle className="text-4xl text-gray-300 mb-4" />
+                                <div className="w-full h-20 bg-gray-50 rounded-md flex items-center justify-center mb-2">
+                                    <FaPlusCircle className="text-xl text-gray-300" />
+                                </div>
                             )}
-                            <h3 className="text-md font-semibold text-center mb-1">{category.name}</h3>
-                            <span className="text-sm text-gray-500">Categoria Complemento</span>
-                            {isSelected ? (
-                                <span className="mt-2 text-xs font-medium text-green-600">Selecionado</span>
-                            ) : (
-                                <span className="mt-2 text-xs text-gray-400">&nbsp;</span>
+                            <h3 className="text-xs font-semibold text-center mb-1 line-clamp-2 leading-tight w-full px-1">{category.name}</h3>
+                            <span className="text-xs text-gray-500 truncate w-full text-center">Complemento</span>
+                            {isSelected && (
+                                <span className="text-xs font-medium text-green-600 mt-1">✓</span>
                             )}
                         </div>
                     );
-                }}
-            </Carousel>
+                })}
+            </div>
             {complementCategories?.length === 0 && <p className="text-sm text-gray-500">Nenhuma categoria complemento encontrada.</p>}
         </div>
     );
