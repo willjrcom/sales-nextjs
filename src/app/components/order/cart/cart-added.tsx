@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import CardOrderResume from "../resume/resume";
 import CategoryOrder from "../category/category";
 import Order from "@/app/entities/order/order";
+import GroupItem from "@/app/entities/order/group-item";
 
 export const CartAdded = () => {
     const { data: session } = useSession();
@@ -75,11 +76,11 @@ export const CartAdded = () => {
     )
 }
 
-function groupBy<T extends Record<string, any>>(array: T[], key: keyof T): Record<string, T[]> {
+function groupBy(array: GroupItem[], key: keyof GroupItem): Record<string, GroupItem[]> {
     if (!array || array.length === 0) {
         return {};
     }
-    return array?.reduce((result, currentItem) => {
+    return array?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).reduce((result, currentItem) => {
         const groupKey = currentItem[key] as string;
 
         if (!result[groupKey]) {
@@ -87,5 +88,5 @@ function groupBy<T extends Record<string, any>>(array: T[], key: keyof T): Recor
         }
         result[groupKey].push(currentItem);
         return result;
-    }, {} as Record<string, T[]>);
+    }, {} as Record<string, GroupItem[]>);
 }

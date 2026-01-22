@@ -7,7 +7,7 @@ import React, { createContext, useContext, ReactNode, useState } from "react";
 interface ModalData {
     title: string;
     content: ReactNode;
-    size?: "sm" | "md" | "lg" | "xl";
+    size?: "sm" | "md" | "lg" | "xl" | "2xl";
     onClose?: () => void;
 }
 
@@ -17,7 +17,7 @@ interface ModalContextProps {
         modalName: string,
         title: string,
         content: ReactNode,
-        size?: "sm" | "md" | "lg" | "xl",
+        size?: "sm" | "md" | "lg" | "xl" | "2xl",
         onClose?: () => void
     ) => void;
     hideModal: (modalName: string) => void;
@@ -31,6 +31,7 @@ const sizeClasses = {
     md: 'max-w-[50vw] h-auto',
     lg: 'max-w-[75vw] h-[75vh]',
     xl: 'max-w-[90vw] h-[90vh]',
+    '2xl': 'max-w-[95vw] h-[95vh]',
 };
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
@@ -40,7 +41,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         modalName: string,
         title: string,
         content: ReactNode,
-        size: "sm" | "md" | "lg" | "xl" = "md",
+        size: "sm" | "md" | "lg" | "xl" | "2xl" = "md",
         onClose?: () => void
     ) => {
         setModals((prev) => ({

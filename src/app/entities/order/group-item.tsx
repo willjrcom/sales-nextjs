@@ -21,6 +21,7 @@ export default class GroupItem {
   category?: Category;
   complement_item_id?: string = '';
   complement_item?: Item;
+  created_at: string = '';
   start_at?: string;
   pending_at?: string;
   started_at?: string;

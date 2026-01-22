@@ -6,7 +6,7 @@ import { IconType } from "react-icons";
 
 interface NewButtonProps {
     icon?: IconType;
-    size?: 'sm' | 'md' | 'lg' | 'xl';
+    size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
     modalName: string;
     title?: string;
     onCloseModal?: () => void;
@@ -15,7 +15,7 @@ interface NewButtonProps {
 
 const ButtonIcon = ({ icon: Icon = FaEdit, size = 'md', modalName, title = "", onCloseModal, children }: NewButtonProps) => {
     const modalHandler = useModal()
-    
+
     const onClose = () => {
         if (onCloseModal) onCloseModal();
         modalHandler.hideModal(modalName)

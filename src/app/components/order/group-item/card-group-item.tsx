@@ -39,7 +39,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
           <ButtonIcon
             title="Editar grupo"
             modalName={`edit-group-item-${groupItem.id}`}
-            size={groupItem.status === 'Staging' ? 'xl' : 'md'}
+            size={groupItem.status === 'Staging' ? '2xl' : 'lg'}
             onCloseModal={handleCloseModal}
           >
             <SelectGroupItem key={groupItem.id} id={groupItem.id} />
