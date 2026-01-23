@@ -82,7 +82,7 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormD
             headers: response.headers
         } as Response<TR>;
     }
-    
+
     // caso não seja binário, parseia JSON normalmente
     const parsedBody = await response.json();
     return { data: parsedBody.data, headers: response.headers } as Response<TR>;

@@ -48,6 +48,7 @@ export default function PageProcessRules() {
             .sort((a: any, b: any) => a.order - b.order),
         [processRules, categoryID]
     );
+    const totalCount = useMemo(() => parseInt(processRulesResponse?.headers.get('X-Total-Count') || '0'), [processRulesResponse?.items]);
 
     return (
         <>
@@ -79,7 +80,7 @@ export default function PageProcessRules() {
                     <CrudTable
                         columns={ProcessRuleColumns()}
                         data={validProcessRules}
-                        totalCount={processRules.length}
+                        totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
                         }}

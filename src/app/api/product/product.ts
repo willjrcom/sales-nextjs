@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 
 const GetProducts = async (session: Session, page: number = 0, pageSize: number = 10, isActive: boolean = true): Promise<GetAllResponse<Product>> => {
     const response = await RequestApi<null, Product[]>({
-        path: `/product/all?page=${page}&page_size=${pageSize}&is_active=${isActive}`,
+        path: `/product/all?page=${page}&per_page=${pageSize}&is_active=${isActive}`,
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -14,7 +14,7 @@ const GetProducts = async (session: Session, page: number = 0, pageSize: number 
 
 const GetDefaultProducts = async (session: Session, page: number = 0, pageSize: number = 10, isActive: boolean = true): Promise<GetAllResponse<Product>> => {
     const response = await RequestApi<null, Product[]>({
-        path: `/product/all/default?page=${page}&page_size=${pageSize}&is_active=${isActive}`,
+        path: `/product/all/default?page=${page}&per_page=${pageSize}&is_active=${isActive}`,
         method: "GET",
         headers: AddAccessToken(session),
     });

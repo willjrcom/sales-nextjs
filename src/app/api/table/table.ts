@@ -2,9 +2,9 @@ import Table from "@/app/entities/table/table";
 import RequestApi, { AddAccessToken, GetAllResponse } from "../request";
 import { Session } from "next-auth";
 
-const GetTables = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<Table>> => {
+const GetTables = async (session: Session, page?: number, perPage?: number, isActive?: boolean): Promise<GetAllResponse<Table>> => {
     const response = await RequestApi<null, Table[]>({
-        path: `/table/all?page=${page}&per_page=${perPage}`,
+        path: `/table/all?page=${page}&per_page=${perPage}&is_active=${isActive}`,
         method: "GET",
         headers: AddAccessToken(session),
     });

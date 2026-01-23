@@ -38,6 +38,7 @@ const PageCategories = () => {
     const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
     const categoriesSorted = useMemo(() => categories
         .sort((a, b) => a.name.localeCompare(b.name)), [categories]);
+    const totalCount = useMemo(() => parseInt(categoriesResponse?.headers.get('X-Total-Count') || '0'), [categoriesResponse?.items]);
 
     return (
         <>
@@ -62,7 +63,7 @@ const PageCategories = () => {
                     <CrudTable
                         columns={CategoryColumns()}
                         data={categoriesSorted}
-                        totalCount={categories.length}
+                        totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
                         }}

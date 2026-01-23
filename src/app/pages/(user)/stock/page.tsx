@@ -17,7 +17,7 @@ import Stock from "@/app/entities/stock/stock";
 import { StockReportComplete } from "@/app/entities/stock/stock-report";
 import Decimal from "decimal.js";
 import { useQuery } from "@tanstack/react-query";
-import { GetStockReport } from "@/app/api/stock/stock";
+import { GetAllStocks, GetStockReport } from "@/app/api/stock/stock";
 import { notifyError } from "@/app/utils/notifications";
 import GetProducts from "@/app/api/product/product";
 
@@ -27,11 +27,11 @@ const PageStock = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const { data } = useSession();
 
-    const { isPending: stockPending, error: stockError, data: report, refetch } = useQuery({
+    const { isPending: stockPending, error: stockError, data: stocksResponse, refetch } = useQuery({
         queryKey: ['stocks', pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetStockReport(data!);
+            return GetAllStocks(data!, pagination.pageIndex, pagination.pageSize);
         },
         enabled: !!data?.user?.access_token,
     });
@@ -40,42 +40,40 @@ const PageStock = () => {
         if (stockError) notifyError('Erro ao carregar relatório de estoque');
     }, [stockError]);
 
-    const filteredStocks = useMemo<Stock[]>(() => {
-        if (!report?.all_stocks || !Array.isArray(report.all_stocks)) return [];
+    const stocks = useMemo(() => stocksResponse?.items || [], [stocksResponse?.items]);
 
-        let stocks = report.all_stocks;
+    const filteredStocks = useMemo(() => {
+        let filteredStocks = stocks;
 
         // filtro de status
         if (stockFilter === "low") {
-            stocks = stocks.filter(s => {
+            filteredStocks = filteredStocks.filter(s => {
                 const current = new Decimal(s?.current_stock || 0);
                 return current.lessThanOrEqualTo(s.min_stock) && current.greaterThan(0);
             });
         }
 
         if (stockFilter === "out") {
-            stocks = stocks.filter(s => new Decimal(s?.current_stock || 0).lessThanOrEqualTo(0));
+            filteredStocks = filteredStocks.filter(s => new Decimal(s?.current_stock || 0).lessThanOrEqualTo(0));
         }
 
         // IMPORTANTÍSSIMO:
         // sort muta o array, então clona antes
-        return [...stocks].sort((a, b) =>
-            (a.product?.name || '').localeCompare(b.product?.name || '')
-        );
-    }, [report?.all_stocks, stockFilter]);
+        return [...filteredStocks].sort((a, b) => (a.product?.name || '').localeCompare(b.product?.name || ''));
+    }, [stocks, stockFilter]);
+
+    const totalCount = useMemo(() => parseInt(stocksResponse?.headers.get('X-Total-Count') || '0'), [stocksResponse?.items]);
 
     return (
         <>
             <div className="flex gap-2">
                 <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
-                    <StockReport reportStock={report || {} as StockReportComplete} />
+                    <StockReport />
                 </ButtonIconTextFloat>
 
-                {report?.summary && typeof report.summary.total_active_alerts === 'number' && report.summary.total_active_alerts > 0 && (
-                    <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
-                        <StockAlerts />
-                    </ButtonIconTextFloat>
-                )}
+                <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
+                    <StockAlerts />
+                </ButtonIconTextFloat>
             </div>
 
             <ButtonIconTextFloat modalName="new-stock" title="Novo Controle de estoque" position="bottom-right">
@@ -116,7 +114,7 @@ const PageStock = () => {
                     <CrudTable
                         columns={StockColumns()}
                         data={filteredStocks || []}
-                        totalCount={filteredStocks.length}
+                        totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
                         }}

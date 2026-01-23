@@ -4,7 +4,6 @@ import PageTitle from '@/app/components/PageTitle';
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { SelectField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";

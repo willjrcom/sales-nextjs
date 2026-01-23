@@ -44,7 +44,7 @@ export async function listCompanyPayments(
                 amount: new Decimal(payment.amount),
             }),
     );
-    const totalHeader = response.headers.get("x-total-count");
+    const totalHeader = response.headers.get("X-Total-Count");
     const totalCount = totalHeader ? parseInt(totalHeader, 10) : items.length;
 
     return { items, totalCount };

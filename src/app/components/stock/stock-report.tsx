@@ -3,17 +3,30 @@
 import React from 'react';
 import Decimal from 'decimal.js';
 import { StockReportComplete } from '@/app/entities/stock/stock-report';
+import { useQuery } from '@tanstack/react-query';
+import { GetStockReport } from '@/app/api/stock/stock'
+import { FormatRefreshTime } from '../crud/refresh';
+import { useSession } from 'next-auth/react';
 
-interface StockReportCompleteProps {
-    reportStock: StockReportComplete;
-}
+const StockReport = () => {
+    const { data } = useSession();
+    const [lastUpdate, setLastUpdate] = React.useState<string>('');
 
-const StockReport = ({ reportStock }: StockReportCompleteProps) => {
-    if (!reportStock) {
+    const { data: reportStock, isLoading, error } = useQuery<StockReportComplete>({
+        queryKey: ['stocks'],
+        queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetStockReport(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
+    });
+
+    if (isLoading) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Relatório de Estoque</h2>
-                <p>Nenhum dado disponível</p>
+                <p>Carregando...</p>
             </div>
         );
     }

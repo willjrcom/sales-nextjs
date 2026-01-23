@@ -2,64 +2,57 @@
 
 import CrudLayout from "@/app/components/crud/crud-layout";
 import PageTitle from '@/app/components/PageTitle';
-import ClientForm from "@/app/forms/client/form";
+import TableForm from "@/app/forms/table/form";
 import CrudTable from "@/app/components/crud/table";
-import ClientColumns from "@/app/entities/client/table-columns";
-import { TextField, CheckboxField } from "@/app/components/modal/field";
+import TableColumns from "@/app/entities/table/table-columns";
+import { CheckboxField } from "@/app/components/modal/field";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import { FaFilter } from "react-icons/fa";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import { useMemo, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import GetClients from "@/app/api/client/client";
+import GetTables from "@/app/api/table/table";
 import { notifyError } from "@/app/utils/notifications";
 
-const PageClient = () => {
-    const [nome, setNome] = useState<string>("");
+const PageTable = () => {
     const [showInactive, setShowInactive] = useState(false);
     const { data } = useSession();
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: clientsResponse, refetch } = useQuery({
-        queryKey: ['clients', pagination.pageIndex, pagination.pageSize, !showInactive],
+    const { isPending, error, data: tablesResponse, refetch } = useQuery({
+        queryKey: ['tables', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetClients(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
+            return GetTables(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
     })
 
     useEffect(() => {
         if (error) {
-            notifyError('Erro ao carregar clientes');
+            notifyError('Erro ao carregar tables');
         }
     }, [error]);
 
-    const clients = useMemo(() => clientsResponse?.items || [], [clientsResponse?.items]);
-    const totalCount = useMemo(() => parseInt(clientsResponse?.headers.get('X-Total-Count') || '0'), [clientsResponse?.items]);
-
-    const sortedClients = useMemo(() => {
-        return clients
-            .filter(client => showInactive ? true : client.is_active)
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [clients, showInactive]);
+    const tables = useMemo(() => tablesResponse?.items || [], [tablesResponse?.items]);
+    const totalCount = useMemo(() => parseInt(tablesResponse?.headers.get('X-Total-Count') || '0'), [tablesResponse?.items]);
+    const sortedTables = useMemo(() => tables.sort((a, b) => a.name.localeCompare(b.name)), [tables]);
 
     return (
         <>
-            {/* <ButtonIconTextFloat modalName="filter-client" icon={FaFilter}>
+            {/* <ButtonIconTextFloat modalName="filter-table" icon={FaFilter}>
                 <h1>Filtro</h1>
             </ButtonIconTextFloat> */}
 
-            <ButtonIconTextFloat title="Novo cliente" modalName="new-client" position="bottom-right">
-                <ClientForm />
+            <ButtonIconTextFloat title="Nova mesa" modalName="new-table" position="bottom-right">
+                <TableForm />
             </ButtonIconTextFloat>
 
-            <CrudLayout title={<PageTitle title="Clientes" tooltip="Gerencie o cadastro de clientes, incluindo busca e filtro por nome." />}
+            <CrudLayout title={<PageTitle title="Mesas" tooltip="Gerencie o cadastro de mesas, incluindo busca e filtro por nome." />}
                 searchButtonChildren={
                     <>
-                        <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional />
+                        {/* <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome da mesa" setValue={setNome} value={nome} optional /> */}
                         <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
                     </>
                 }
@@ -74,8 +67,8 @@ const PageClient = () => {
 
                 tableChildren={
                     <CrudTable
-                        columns={ClientColumns()}
-                        data={sortedClients}
+                        columns={TableColumns()}
+                        data={sortedTables}
                         totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
@@ -86,4 +79,4 @@ const PageClient = () => {
         </>
     )
 }
-export default PageClient
+export default PageTable

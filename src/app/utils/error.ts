@@ -40,7 +40,12 @@ const errorTranslations: Record<string, string> = {
     "invalid email or password": "Email ou senha inválidos",
     "access-token is required": "Access token é obrigatório",
     "id-token is required": "ID token é obrigatório",
-    "email do token invalido!": "Email do token inválido",
+    "email token invalid": "Email do token inválido",
+    "password must be at least 8 characters long": "Senha deve ter pelo menos 8 caracteres",
+    "password must contain at least one uppercase letter": "Senha deve conter pelo menos uma letra maiúscula",
+    "password must contain at least one lowercase letter": "Senha deve conter pelo menos uma letra minúscula",
+    "password must contain at least one digit": "Senha deve conter pelo menos um número",
+    "password must contain at least one symbol": "Senha deve conter pelo menos um caractere especial",
 
     // Erros de Pedido (Order)
     "order must have at least one item": "O pedido deve ter pelo menos um item",

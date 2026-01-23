@@ -10,6 +10,7 @@ import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
 import { Button } from '@/components/ui/button';
 import { notifyError } from '../utils/notifications';
+import { translateError } from '../utils/error';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -32,7 +33,7 @@ const LoginForm = () => {
 
 
       if (res?.error) {
-        notifyError(res.error);
+        notifyError(translateError(res.error));
         console.log(res);
         return;
       }

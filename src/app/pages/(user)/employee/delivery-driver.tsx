@@ -36,7 +36,7 @@ const PageDeliveryDriver = () => {
     }, [error]);
 
     const drivers = useMemo(() => (deliveryDriversResponse?.items || []).filter((driver) => !!driver.employee), [deliveryDriversResponse?.items]);
-    const totalCount = useMemo(() => parseInt(deliveryDriversResponse?.headers.get('x-total-count') || '0'), [deliveryDriversResponse?.items]);
+    const totalCount = useMemo(() => parseInt(deliveryDriversResponse?.headers.get('X-Total-Count') || '0'), [deliveryDriversResponse?.items]);
 
     const filteredDrivers = useMemo(() => drivers
         .filter((driver) => driver.employee.name.toLowerCase().includes(nome.toLowerCase()))

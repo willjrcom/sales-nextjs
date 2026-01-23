@@ -36,7 +36,7 @@ const PageEmployee = () => {
     }, [error]);
 
     const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse?.items]);
-    const totalCount = useMemo(() => parseInt(employeesResponse?.headers.get('x-total-count') || '0'), [employeesResponse?.items]);
+    const totalCount = useMemo(() => parseInt(employeesResponse?.headers.get('X-Total-Count') || '0'), [employeesResponse?.items]);
 
     const filteredEmployees = useMemo(() => employees
         .filter(employee => employee.name.includes(nome))

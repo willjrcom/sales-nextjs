@@ -3,9 +3,9 @@ import { StockReportComplete } from "@/app/entities/stock/stock-report";
 import RequestApi, { AddAccessToken, GetAllResponse } from "../request";
 import { Session } from "next-auth";
 
-const GetAllStocks = async (session: Session): Promise<GetAllResponse<Stock>> => {
+const GetAllStocks = async (session: Session, page: number = 0, perPage: number = 10): Promise<GetAllResponse<Stock>> => {
     const response = await RequestApi<null, Stock[]>({
-        path: "/stock/all",
+        path: `/stock/all?page=${page}&per_page=${perPage}`,
         method: "GET",
         headers: AddAccessToken(session),
     });
