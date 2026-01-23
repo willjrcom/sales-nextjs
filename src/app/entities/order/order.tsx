@@ -25,7 +25,7 @@ export default class Order {
     delivery?: OrderDelivery;
     table?: OrderTable;
     pickup?: OrderPickup;
-    created_at?: Date;
+    created_at: Date = new Date();
     pending_at?: Date;
     finished_at?: Date;
     ready_at?: Date;
