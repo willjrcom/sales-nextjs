@@ -5,15 +5,15 @@ import Decimal from 'decimal.js';
 import { StockReportComplete } from '@/app/entities/stock/stock-report';
 import { useQuery } from '@tanstack/react-query';
 import { GetStockReport } from '@/app/api/stock/stock'
-import { FormatRefreshTime } from '../crud/refresh';
+import Refresh, { FormatRefreshTime } from '../crud/refresh';
 import { useSession } from 'next-auth/react';
 
 const StockReport = () => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = React.useState<string>('');
 
-    const { data: reportStock, isLoading, error } = useQuery<StockReportComplete>({
-        queryKey: ['stocks'],
+    const { data: reportStock, isLoading, refetch } = useQuery<StockReportComplete>({
+        queryKey: ['stock-report'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetStockReport(data!);
@@ -47,7 +47,10 @@ const StockReport = () => {
 
     return (
         <div className="p-6">
-            <h2 className="text-xl font-bold mb-6">Relatório de Estoque</h2>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Relatório de Estoque</h2>
+                <Refresh lastUpdate={lastUpdate} onRefresh={refetch} isPending={isLoading} />
+            </div>
 
             {/* Resumo */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

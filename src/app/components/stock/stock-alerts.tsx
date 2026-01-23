@@ -1,20 +1,23 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { GetAllAlerts, ResolveAlert, DeleteAlert } from '@/app/api/stock/alerts';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import RequestError from '@/app/utils/error';
 import { FaCheck, FaTrash } from 'react-icons/fa';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Refresh, { FormatRefreshTime } from '../crud/refresh';
 
 const StockAlerts = () => {
     const { data } = useSession();
     const queryClient = useQueryClient();
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, data: stockAlertsResponse } = useQuery({
+    const { isLoading, data: stockAlertsResponse, refetch } = useQuery({
         queryKey: ['stock-alerts'],
         queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
             return GetAllAlerts(data!);
         },
         enabled: !!data?.user?.access_token,
@@ -74,7 +77,7 @@ const StockAlerts = () => {
         }
     };
 
-    if (isPending) {
+    if (isLoading) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
@@ -88,16 +91,29 @@ const StockAlerts = () => {
     const activeAlerts = useMemo(() => safeAlerts.filter(alert => !alert.is_resolved), [safeAlerts]);
     const resolvedAlerts = useMemo(() => safeAlerts.filter(alert => alert.is_resolved), [safeAlerts]);
 
+    if (activeAlerts.length === 0 && resolvedAlerts.length === 0) {
+        return (
+            <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
+                    <Refresh onRefresh={refetch} isPending={isLoading} lastUpdate={lastUpdate} />
+                </div>
+                <p>Nenhum alerta encontrado</p>
+            </div>
+        );
+    }
     return (
         <div className="p-6">
-            <h2 className="text-xl font-bold mb-6">Alertas de Estoque</h2>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
+                <Refresh onRefresh={refetch} isPending={isLoading} lastUpdate={lastUpdate} />
+            </div>
 
             {/* Alertas Ativos */}
-            <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Alertas Ativos ({activeAlerts.length})</h3>
-                {activeAlerts.length === 0 ? (
-                    <p className="text-gray-500">Nenhum alerta ativo</p>
-                ) : (
+            {activeAlerts.length > 0 && (
+                <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3">Alertas Ativos ({activeAlerts.length})</h3>
+
                     <div className="space-y-3">
                         {activeAlerts.map((alert) => (
                             <div key={alert.id} className="bg-white border rounded-lg p-4">
@@ -111,7 +127,7 @@ const StockAlerts = () => {
                                                 {new Date(alert.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <h4 className="font-semibold mb-1">{alert.product?.name || 'Produto não encontrado'}</h4>
+                                        <h4 className="font-semibold mb-1">{alert.product_name || 'Produto não encontrado'}</h4>
                                         <p className="text-gray-600">{alert.message}</p>
                                     </div>
                                     <div className="flex gap-2">
@@ -134,8 +150,8 @@ const StockAlerts = () => {
                             </div>
                         ))}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             {/* Alertas Resolvidos */}
             {resolvedAlerts.length > 0 && (
@@ -154,7 +170,7 @@ const StockAlerts = () => {
                                                 {new Date(alert.resolved_at || '').toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <h4 className="font-semibold mb-1">{alert.product?.name || 'Produto não encontrado'}</h4>
+                                        <h4 className="font-semibold mb-1">{alert.product_name || 'Produto não encontrado'}</h4>
                                         <p className="text-gray-600">{alert.message}</p>
                                     </div>
                                     <button

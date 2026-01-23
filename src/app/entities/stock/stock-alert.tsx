@@ -1,5 +1,3 @@
-import Product from "../product/product";
-
 export default class StockAlert {
     id: string = '';
     stock_id: string = '';
@@ -9,7 +7,8 @@ export default class StockAlert {
     resolved_at?: string;
     resolved_by?: string;
     created_at: string = '';
-    product?: Product;
+    product_name: string = '';
+    product_code: string = '';
 
     constructor(data: Partial<StockAlert> = {}) {
         Object.assign(this, data);

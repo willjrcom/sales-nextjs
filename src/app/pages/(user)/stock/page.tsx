@@ -13,13 +13,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import StockReport from "@/app/components/stock/stock-report";
 import StockAlerts from "@/app/components/stock/stock-alerts";
-import Stock from "@/app/entities/stock/stock";
-import { StockReportComplete } from "@/app/entities/stock/stock-report";
 import Decimal from "decimal.js";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { GetAllStocks, GetStockReport } from "@/app/api/stock/stock";
 import { notifyError } from "@/app/utils/notifications";
-import GetProducts from "@/app/api/product/product";
 
 const PageStock = () => {
     const [stockFilter, setStockFilter] = useState("all"); // all, low, out
@@ -68,9 +65,9 @@ const PageStock = () => {
     return (
         <>
             <div className="flex gap-2">
-                <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
+                {/* <ButtonIconTextFloat modalName="stock-report" icon={FaChartBar} position="bottom-left-1">
                     <StockReport />
-                </ButtonIconTextFloat>
+                </ButtonIconTextFloat> */}
 
                 <ButtonIconTextFloat modalName="stock-alerts" icon={FaExclamationTriangle} position="bottom-left">
                     <StockAlerts />
