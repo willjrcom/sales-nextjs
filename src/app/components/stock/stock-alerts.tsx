@@ -77,6 +77,9 @@ const StockAlerts = () => {
         }
     };
 
+    const activeAlerts = useMemo(() => alerts.filter(alert => !alert.is_resolved), [alerts]);
+    const resolvedAlerts = useMemo(() => alerts.filter(alert => alert.is_resolved), [alerts]);
+
     if (isLoading) {
         return (
             <div className="p-6">
@@ -85,11 +88,6 @@ const StockAlerts = () => {
             </div>
         );
     }
-
-    // Ensure alerts is always an array
-    const safeAlerts = useMemo(() => Array.isArray(alerts) ? alerts : [], [alerts]);
-    const activeAlerts = useMemo(() => safeAlerts.filter(alert => !alert.is_resolved), [safeAlerts]);
-    const resolvedAlerts = useMemo(() => safeAlerts.filter(alert => alert.is_resolved), [safeAlerts]);
 
     if (activeAlerts.length === 0 && resolvedAlerts.length === 0) {
         return (
