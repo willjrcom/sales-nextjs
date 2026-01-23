@@ -11,7 +11,7 @@ import { TextField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";
 import DeliveryDriverColumns from "@/app/entities/delivery-driver/table-columns";
 import { useSession } from "next-auth/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetAllDeliveryDrivers from "@/app/api/delivery-driver/delivery-driver";
 import { notifyError } from "@/app/utils/notifications";
 
@@ -29,6 +29,7 @@ const PageDeliveryDriver = () => {
             return GetAllDeliveryDrivers(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     });
 
     useEffect(() => {

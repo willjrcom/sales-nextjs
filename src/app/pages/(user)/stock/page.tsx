@@ -16,7 +16,7 @@ import StockAlerts from "@/app/components/stock/stock-alerts";
 import Stock from "@/app/entities/stock/stock";
 import { StockReportComplete } from "@/app/entities/stock/stock-report";
 import Decimal from "decimal.js";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { GetAllStocks, GetStockReport } from "@/app/api/stock/stock";
 import { notifyError } from "@/app/utils/notifications";
 import GetProducts from "@/app/api/product/product";
@@ -34,6 +34,7 @@ const PageStock = () => {
             return GetAllStocks(data!, pagination.pageIndex, pagination.pageSize);
         },
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     });
 
     useEffect(() => {

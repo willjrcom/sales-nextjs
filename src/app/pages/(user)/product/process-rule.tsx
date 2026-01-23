@@ -9,7 +9,7 @@ import { CheckboxField, SelectField } from "@/app/components/modal/field";
 import { useMemo, useState } from "react";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { useSession } from "next-auth/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetProcessRules from "@/app/api/process-rule/process-rule";
 import { GetCategoriesMap } from "@/app/api/category/category";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
@@ -25,6 +25,7 @@ export default function PageProcessRules() {
         queryKey: ['process-rules', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: () => GetProcessRules(data!, !showInactive),
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     });
 
     const { data: categoriesResponse } = useQuery({

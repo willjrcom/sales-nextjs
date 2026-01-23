@@ -11,7 +11,7 @@ import { TextField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import AddEmployeeAlreadyCreated from "@/app/forms/employee/add-already-created";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetEmployees from "@/app/api/employee/employee";
 import { notifyError } from "@/app/utils/notifications";
 
@@ -29,6 +29,7 @@ const PageEmployee = () => {
             return GetEmployees(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     });
 
     useEffect(() => {

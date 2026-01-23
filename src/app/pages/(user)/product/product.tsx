@@ -8,7 +8,7 @@ import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { SelectField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { notifyError } from "@/app/utils/notifications";
 import GetProducts from "@/app/api/product/product";
 import { GetCategoriesMap } from "@/app/api/category/category";
@@ -34,6 +34,7 @@ const PageProducts = () => {
             return GetProducts(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     });
 
     useEffect(() => {
@@ -47,6 +48,8 @@ const PageProducts = () => {
     const validProducts = useMemo(() => products
         .filter(product => !categoryID || product.category_id === categoryID)
         .sort((a, b) => a.name.localeCompare(b.name)), [products, categoryID]);
+
+    const totalCount = useMemo(() => parseInt(productsResponse?.headers.get('X-Total-Count') || '0'), [productsResponse?.items]);
 
     return (
         <>
@@ -76,7 +79,7 @@ const PageProducts = () => {
                     < CrudTable
                         columns={ProductColumns()}
                         data={validProducts}
-                        totalCount={products.length}
+                        totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {
                             setPagination({ pageIndex, pageSize });
                         }}

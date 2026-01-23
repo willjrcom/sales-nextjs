@@ -10,7 +10,7 @@ import ButtonIconTextFloat from "@/app/components/button/button-float";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import { useMemo, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import GetTables from "@/app/api/table/table";
 import { notifyError } from "@/app/utils/notifications";
 
@@ -27,6 +27,7 @@ const PageTable = () => {
             return GetTables(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     })
 
     useEffect(() => {

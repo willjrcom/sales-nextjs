@@ -7,7 +7,7 @@ import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import { useSession } from "next-auth/react";
 import PickupOrderColumns from "@/app/entities/order/pickup-table-columns";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { GetOrdersWithPickupReady, GetOrdersWithPickupDelivered } from "@/app/api/order/all/pickup/order";
 import { notifyError } from "@/app/utils/notifications";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,6 +33,7 @@ const PickupOrderPage = () => {
         },
         enabled: !!data,
         refetchInterval: 30000,
+        placeholderData: keepPreviousData,
     });
 
     // Query para últimos 10 entregues (status Delivered)
@@ -44,6 +45,7 @@ const PickupOrderPage = () => {
         },
         enabled: !!data,
         refetchInterval: 30000,
+        placeholderData: keepPreviousData,
     });
 
     useEffect(() => {

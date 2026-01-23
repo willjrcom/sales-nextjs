@@ -11,7 +11,7 @@ import { FaFilter } from "react-icons/fa";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import { useMemo, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import GetClients from "@/app/api/client/client";
 import { notifyError } from "@/app/utils/notifications";
 
@@ -29,6 +29,7 @@ const PageClient = () => {
             return GetClients(data!, pagination.pageIndex, pagination.pageSize, !showInactive);
         },
         enabled: !!data?.user?.access_token,
+        placeholderData: keepPreviousData,
     })
 
     useEffect(() => {

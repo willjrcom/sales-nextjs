@@ -86,15 +86,16 @@ const CrudTable = <T extends BaseRow,>({
     const isAllRowsSelected = () => selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0;
 
     const hasTotalCount = totalCount != null && totalCount > 0;
-    const pageCount = hasTotalCount ? Math.ceil(totalCount! / pageSize) : Math.ceil(data.length / pageSize);
+    const pageCount = hasTotalCount ? Math.ceil(totalCount! / pageSize) : undefined;
 
     const table = useReactTable({
         columns,
         data,
         getCoreRowModel: getCoreRowModel(),
         manualPagination: hasTotalCount,
-        getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: hasTotalCount ? getPaginationRowModel() : undefined,
         pageCount,
+        autoResetPageIndex: !hasTotalCount,
         state: { pagination: { pageIndex, pageSize } },
         onPaginationChange: updater => {
             const newState = typeof updater === 'function'
@@ -116,7 +117,7 @@ const CrudTable = <T extends BaseRow,>({
                     {tBody({ table, rowSelectionType, columns, toggleRowSelection, isRowSelected })}
                 </table>
             </div>
-            {Pagination({ table })}
+            {hasTotalCount && Pagination({ table })}
         </div>
     );
 };

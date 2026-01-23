@@ -8,7 +8,7 @@ import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { FaBoxOpen } from "react-icons/fa";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
@@ -28,6 +28,7 @@ const DeliveryOrderFinished = () => {
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
+        placeholderData: keepPreviousData,
     });
 
     const { data: deliveryDriversResponse } = useQuery({

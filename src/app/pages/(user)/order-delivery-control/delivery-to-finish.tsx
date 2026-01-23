@@ -19,7 +19,7 @@ import Order from "@/app/entities/order/order";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
@@ -42,6 +42,7 @@ const DeliveryOrderToFinish = () => {
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
+        placeholderData: keepPreviousData,
     });
 
     const { data: deliveryDriversResponse } = useQuery({
