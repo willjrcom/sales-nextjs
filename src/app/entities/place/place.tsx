@@ -18,7 +18,6 @@ const SchemaPlace = z.object({
     image_path: z.string().optional(),
     name: z.string().min(2, 'Nome precisa ter pelo menos 2 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     is_available: z.boolean(),
-    is_active: z.boolean(),
 });
 
 export const ValidatePlaceForm = (place: Place) => {
@@ -26,7 +25,6 @@ export const ValidatePlaceForm = (place: Place) => {
         image_path: place.image_path,
         name: place.name,
         is_available: place.is_available,
-        is_active: place.is_active
     });
 
     if (!validatedFields.success) {

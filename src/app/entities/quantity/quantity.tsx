@@ -13,14 +13,12 @@ export default class Quantity {
 
 const SchemaQuantity = z.object({
   quantity: z.number().positive("Quantidade precisa ser um valor positivo"),
-  is_active: z.boolean(),
   category_id: z.string().uuid("Categoria inválida"),
 });
 
 export const ValidateQuantityForm = (quantity: Quantity) => {
   const validatedFields = SchemaQuantity.safeParse({
     quantity: quantity.quantity,
-    is_active: quantity.is_active,
     category_id: quantity.category_id
   });
 

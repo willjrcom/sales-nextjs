@@ -33,7 +33,6 @@ const SchemaCategory = z.object({
     need_print: z.boolean(),
     printer_name: z.string().optional(),
     use_process_rule: z.boolean(),
-    is_active: z.boolean(),
 });
 
 export const ValidateCategoryForm = (category: Category) => {
@@ -43,7 +42,6 @@ export const ValidateCategoryForm = (category: Category) => {
         need_print: category.need_print,
         printer_name: category.printer_name,
         use_process_rule: category.use_process_rule,
-        is_active: category.is_active,
     });
 
     if (!validatedFields.success) {

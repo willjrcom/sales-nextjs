@@ -16,13 +16,11 @@ export default class DeliveryDriver {
 
 const SchemaDeliveryDriver = z.object({
     employee_id: z.string().uuid("Funcionário inválido"),
-    is_active: z.boolean(),
 });
 
 export const ValidateDeliveryDriverForm = (driver: DeliveryDriver) => {
     const validatedFields = SchemaDeliveryDriver.safeParse({
         employee_id: driver.employee_id,
-        is_active: driver.is_active
     });
 
     if (!validatedFields.success) {

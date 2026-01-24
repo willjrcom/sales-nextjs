@@ -36,7 +36,6 @@ const SchemaProduct = z.object({
     category_id: z.string().uuid("Categoria inválida"),
     size_id: z.string().uuid("Tamanho inválido"),
     is_available: z.boolean(),
-    is_active: z.boolean(),
 });
 
 export const ValidateProductForm = (product: Product) => {
@@ -50,7 +49,6 @@ export const ValidateProductForm = (product: Product) => {
         category_id: product.category_id,
         size_id: product.size_id,
         is_available: product.is_available,
-        is_active: product.is_active
     });
 
     if (!validatedFields.success) {

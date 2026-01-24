@@ -25,7 +25,6 @@ const SchemaStock = z.object({
     min_stock: z.coerce.number().min(0, 'Estoque mínimo deve ser maior ou igual a 0'),
     max_stock: z.coerce.number().min(0, 'Estoque máximo deve ser maior ou igual a 0'),
     unit: z.string().min(1, 'Unidade é obrigatória').max(20, 'Unidade deve ter no máximo 20 caracteres'),
-    is_active: z.boolean(),
 });
 
 export const ValidateStockForm = (stock: Stock) => {
@@ -35,11 +34,10 @@ export const ValidateStockForm = (stock: Stock) => {
         min_stock: new Decimal(stock.min_stock).toNumber(),
         max_stock: new Decimal(stock.max_stock).toNumber(),
         unit: stock.unit,
-        is_active: stock.is_active
     });
 
     if (!validatedFields.success) {
         return validatedFields.error.flatten().fieldErrors;
-    } 
+    }
     return {}
 }; 
