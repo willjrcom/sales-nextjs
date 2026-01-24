@@ -107,9 +107,7 @@ const Topbar = () => {
           >
             <IoIosNotifications className="text-xl text-gray-300" />
           </button> */}
-          <div className="absolute top-4 right-4">
-            {user && <EmployeeUserProfile user={user} setUser={setUser} />}
-          </div>
+          {user && <EmployeeUserProfile user={user} setUser={setUser} />}
         </div>
       </header>
       <Toaster
