@@ -15,7 +15,7 @@ const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
     const [client, setClient] = useState<Client | null>(null);
     const { data } = useSession();
-    
+
     const search = async () => {
         if (!data) return
         try {
@@ -95,7 +95,7 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
                 {/* Client Info */}
                 <div className="space-y-2">
                     <p className="text-gray-700">Nome: <span className="font-semibold">{client.name}</span></p>
-                    <p className="text-gray-700">Contato: <span className="font-semibold">({client.contact.ddd}) {client.contact.number}</span></p>
+                    <p className="text-gray-700">Contato: <span className="font-semibold">{client.contact.number}</span></p>
                     <p className="text-gray-700">CPF: <span className="font-semibold">{client.cpf}</span></p>
                 </div>
                 {/* Address Info */}
@@ -107,7 +107,7 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
                     <p className="ml-4 text-gray-600">CEP: {client.address.cep}</p>
                 </div>
             </div>
-            
+
             <button
                 onClick={() => newOrder(client)}
                 className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"

@@ -139,7 +139,7 @@ const CardUser = ({ user }: CardUserProps) => {
             <div className="text-gray-600 text-sm">Cidade: <span className="font-medium">{user.address.city}</span></div>
             <div className="text-gray-600 text-sm">CEP: <span className="font-medium">{user.address.cep}</span></div>
             <div className="flex gap-2 mt-2">
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">({user.contact.ddd}) {user.contact.number}</span>
+                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">{user.contact.number}</span>
                 <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">{user.cpf}</span>
             </div>
             <button

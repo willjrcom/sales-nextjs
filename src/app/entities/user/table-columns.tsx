@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import User  from "./user";
+import User from "./user";
 import ButtonIcon from "@/app/components/button/button-icon";
 import Contact from "../contact/contact";
 import UserFormRelation from "@/app/forms/user/form-relation";
@@ -17,10 +17,7 @@ const UserColumns = (): ColumnDef<User>[] => [
     accessorFn: row => {
       if (row.contact as Contact) {
         const contact = row.contact as Contact
-        if (contact.ddd || contact.number) {
-          return "(" + contact.ddd + ") " + contact.number
-        }
-        return contact.ddd + " " + contact.number
+        return contact.number
       }
     },
   },
@@ -40,7 +37,7 @@ const UserColumns = (): ColumnDef<User>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-user-" + row.original.id }
+        <ButtonIcon modalName={"edit-user-" + row.original.id}
           title={"Editar " + row.original.name}>
           <UserFormRelation
             item={row.original}

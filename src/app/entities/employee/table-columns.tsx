@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import Employee  from "./employee";
+import Employee from "./employee";
 import ButtonIcon from "@/app/components/button/button-icon";
 import Contact from "../contact/contact";
 import Address from "../address/address";
@@ -19,10 +19,7 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     accessorFn: row => {
       if (row.contact as Contact) {
         const contact = row.contact as Contact
-        if (contact.ddd || contact.number) {
-          return "(" + contact.ddd + ") " + contact.number
-        }
-        return contact.ddd + " " + contact.number
+        return contact.number
       }
     },
   },
@@ -46,7 +43,7 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
     header: 'Visualizar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"view-employee-" + row.original.id }
+        <ButtonIcon modalName={"view-employee-" + row.original.id}
           title={"Visualizar " + row.original.name}>
           <EmployeeCard item={row.original} />
         </ButtonIcon>

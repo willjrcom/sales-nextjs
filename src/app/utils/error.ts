@@ -116,7 +116,7 @@ const errorTranslations: Record<string, string> = {
     "contact already exists": "Contato já cadastrado",
     "contact not found": "Contato não encontrado",
     "invalid contact": "Contato inválido",
-    "ddd and number are required": "DDD e número são obrigatórios",
+    "number is required": "Número é obrigatório",
     "contact format invalid": "Formato de contato inválido",
 
     // Erros de Endereço

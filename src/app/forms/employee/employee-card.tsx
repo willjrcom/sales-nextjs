@@ -174,7 +174,7 @@ function EmployeeCard({ item }: EmployeeCardProps) {
                             <span className="text-gray-400 uppercase text-xs font-semibold tracking-wider">Contato</span>
                             <div className="flex items-center gap-2 text-gray-700">
                                 <HiOutlinePhone size={20} className="text-blue-500" />
-                                <span>{contact ? `(${contact.ddd}) ${contact.number}` : '-'}</span>
+                                <span>{contact ? contact.number : '-'}</span>
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">

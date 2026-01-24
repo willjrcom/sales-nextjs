@@ -51,7 +51,7 @@ const UserFormRelation = ({ item, isUpdate }: CreateFormsProps<User>) => {
             <>
                 <p className='text-gray-600'><strong>Email:</strong> {user.email}</p>
                 <p className='text-gray-600'><strong>Nome:</strong> {user.name}</p>
-                {user.contact && <p className='text-gray-600'><strong>Telefone:</strong> ({user.contact.ddd}) {user.contact.number}</p>}
+                {user.contact && <p className='text-gray-600'><strong>Telefone:</strong> {user.contact.number}</p>}
                 <p className='text-gray-600'><strong>CPF:</strong> {user.cpf}</p>
                 <ButtonsModal item={user} name="Usuário" deleteItem={handleRemoveUserFromCompany} isRemoveItem />
             </>

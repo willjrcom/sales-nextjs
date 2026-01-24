@@ -19,23 +19,12 @@ const ContactForm = ({ contactParent, setContactParent, isHidden }: ContactFormP
 
     return (
         <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                <PatternField
-                    patternName='ddd-phone'
-                    name="ddd-phone"
-                    friendlyName="DDD"
-                    placeholder="(xx)"
-                    setValue={value => handleInputChange('ddd', value)}
-                    value={contactParent.ddd}
-                    disabled={isHidden}
-                />
-            </div>
             <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
                 <PatternField
-                    patternName='number-phone'
-                    name="number-phone"
+                    patternName='full-phone'
+                    name="full-phone"
                     friendlyName="Contato"
-                    placeholder="x xxxx-xxxx"
+                    placeholder="xx xxxx-xxxx"
                     setValue={value => handleInputChange('number', value)}
                     value={contactParent.number}
                     disabled={isHidden}

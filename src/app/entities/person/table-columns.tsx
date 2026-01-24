@@ -15,10 +15,7 @@ const PersonColumns = <T extends Person,>(): ColumnDef<T>[] => [
     accessorFn: row => {
       if (row.contact as Contact) {
         const contact = row.contact as Contact
-        if (contact.ddd || contact.number) {
-          return "(" + contact.ddd + ") " + contact.number
-        }
-        return contact.ddd + " " + contact.number
+        return contact.number
       }
     },
   },
