@@ -101,12 +101,12 @@ const Topbar = () => {
 
         <div className="flex space-x-4 items-center">
           <TopbarItem label="Turno" href="/pages/shift" color='green' />
-          <button
+          {/* <button
             onClick={handleNotifications}
             className="p-2 rounded hover:bg-gray-700 transition-colors duration-200"
           >
             <IoIosNotifications className="text-xl text-gray-300" />
-          </button>
+          </button> */}
           <div className="absolute top-4 right-4">
             {user && <EmployeeUserProfile user={user} setUser={setUser} />}
           </div>

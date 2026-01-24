@@ -33,7 +33,6 @@ function CompanySelection() {
     const modalHandler = useModal();
     const [selecting, setSelecting] = useState<boolean>(false);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const queryClient = useQueryClient();
 
     const { isPending: loadingCompanies, error, data: companiesResponse, refetch } = useQuery({
         queryKey: ['user-companies'],
