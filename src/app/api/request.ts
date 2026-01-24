@@ -66,7 +66,11 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormD
 
         const error = body.error as RequestError;
 
-        error.message = translateError(error.message)
+        if (typeof window !== "undefined") {
+            error.message = translateError(error.message)
+        } else {
+            error.message = error.message;
+        }
 
         error.status = response.status;
         error.path = fullPath;

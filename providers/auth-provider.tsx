@@ -18,7 +18,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }));
 
     return (
-        <SessionProvider>
+        <SessionProvider refetchInterval={60}>
             <QueryClientProvider client={queryClient}>
                 {children}
             </QueryClientProvider>
