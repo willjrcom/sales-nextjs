@@ -25,7 +25,7 @@ import Company from "@/app/entities/company/company";
 import { useModal } from "@/app/context/modal/context";
 import CompanyForm from "@/app/forms/company/form";
 import GetCompany from "@/app/api/company/company";
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface SidebarLinkItemProps {
   href?: string;
@@ -80,28 +80,22 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
   };
 
   const { data } = useSession();
-  const [company, setCompany] = useState<Company>(new Company());
 
-  useEffect(() => {
-    getCurrentCompany();
-  }, [data?.user.access_token]);
-
-  const getCurrentCompany = async () => {
-    if (!data) return;
-
-    const companyFound = await GetCompany(data);
-    setCompany(companyFound);
-  };
+  const { data: company } = useQuery({
+    queryKey: ['company'],
+    queryFn: () => GetCompany(data!),
+    enabled: !!data?.user.access_token,
+  })
 
   const handleCompanyModal = async () => {
     const onClose = () => {
-      modalHandler.hideModal("edit-company-" + company.id);
+      modalHandler.hideModal("edit-company-" + company?.id);
     };
 
     modalHandler.showModal(
-      "edit-company-" + company.id,
+      "edit-company-" + company?.id,
       "Editar Empresa",
-      <CompanyForm item={company} setItem={setCompany} isUpdate />,
+      <CompanyForm item={company} isUpdate />,
       "md",
       onClose,
     );
@@ -115,7 +109,7 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
     >
       <SidebarLinkItem
         icon={MdOutlineHomeWork}
-        label={company.trade_name}
+        label={company?.trade_name || ''}
         onClick={handleCompanyModal}
       />
       <SidebarLinkItem

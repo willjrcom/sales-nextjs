@@ -17,6 +17,7 @@ import {
 } from "@/app/api/company/payments";
 import GetCompany from "@/app/api/company/company";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { useQuery } from "@tanstack/react-query";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -56,7 +57,6 @@ const InfoCard = ({
 
 const CompanyPaymentPage = () => {
   const { data: session } = useSession();
-  const [company, setCompany] = useState<Company | null>(null);
   const [payments, setPayments] = useState<CompanyPayment[]>([]);
   const [totalPayments, setTotalPayments] = useState(0);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
@@ -66,17 +66,11 @@ const CompanyPaymentPage = () => {
   const [months, setMonths] = useState(1);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  const loadCompany = useCallback(async () => {
-    if (!session) return;
-    try {
-      const response = await GetCompany(session);
-      setCompany(new Company(response));
-    } catch (error: any) {
-      notifyError(
-        error?.message ?? "Não foi possível carregar os dados da empresa.",
-      );
-    }
-  }, [session]);
+  const { data: company } = useQuery({
+    queryKey: ['company'],
+    queryFn: () => GetCompany(session!),
+    enabled: !!session?.user.access_token,
+  })
 
   const loadSettings = useCallback(async () => {
     if (!session) return;
@@ -118,9 +112,8 @@ const CompanyPaymentPage = () => {
 
   useEffect(() => {
     if (!session) return;
-    loadCompany();
     loadSettings();
-  }, [session, loadCompany, loadSettings]);
+  }, [session, loadSettings]);
 
   useEffect(() => {
     if (!session) return;

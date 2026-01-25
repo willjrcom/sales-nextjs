@@ -137,6 +137,12 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const modalHandler = useModal();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user.access_token,
+    })
+
     const { data: deliveryDriversResponse, refetch, isPending } = useQuery({
         queryKey: ['delivery-drivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
@@ -176,8 +182,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
                 notifySuccess("Entrega enviada com sucesso");
             }
 
-            const company = await GetCompany(data);
-            if (company.preferences.enable_print_order_on_ship_delivery) {
+            if (company?.preferences.enable_print_order_on_ship_delivery) {
                 for (let i = 0; i < orderIDs.length; i++) {
                     await printOrder({
                         orderID: orderIDs[i],

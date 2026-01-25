@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
 import { FaSearch } from 'react-icons/fa';
 import GetCompany from '@/app/api/company/company';
+import { useQuery } from '@tanstack/react-query';
 
 export interface AddressClientFormProps {
     addressParent: Address;
@@ -19,21 +20,17 @@ const AddressClientForm = ({ addressParent, setAddressParent, isHidden }: Addres
     const [address, setAddress] = useState<Address>(addressParent || new Address());
     const { data } = useSession();
 
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user.access_token,
+    })
+
     useEffect(() => {
-        getUfFromCompany()
-    }, [data?.user.access_token]);
-
-    const getUfFromCompany = async () => {
-        if (address.uf || !data) return;
-
-        const company = await GetCompany(data)
-        if (!company) return;
-
-        const companyAddress = company.address;
-        if (!companyAddress) return;
-
-        handleInputChange('uf', companyAddress.uf);
-    }
+        if (company?.address?.uf) {
+            handleInputChange('uf', company.address.uf);
+        }
+    }, [company]);
 
     const handleInputChange = (field: keyof Address, value: any) => {
         const newAddress = Object.assign({}, { ...address, [field]: value }) as Address;
@@ -106,7 +103,7 @@ const AddressClientForm = ({ addressParent, setAddressParent, isHidden }: Addres
                     <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
                 </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                     <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />

@@ -17,6 +17,7 @@ import { listInvoices, type FiscalInvoice } from "@/app/api/fiscal/invoices";
 import GetCompany from "@/app/api/company/company";
 import Company from "@/app/entities/company/company";
 import FiscalActivationModal from "@/app/components/modal/FiscalActivationModal";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -52,7 +53,6 @@ const InfoCard = ({
 
 const CompanyBillingPage = () => {
   const { data: session } = useSession();
-  const [company, setCompany] = useState<Company | null>(null);
   const [summary, setSummary] = useState<MonthlyCostSummary | null>(null);
   const [breakdown, setBreakdown] = useState<CostBreakdown | null>(null);
   const [invoices, setInvoices] = useState<FiscalInvoice[]>([]);
@@ -62,6 +62,13 @@ const CompanyBillingPage = () => {
   const [loading, setLoading] = useState(false);
   const [fiscalLoading, setFiscalLoading] = useState(false);
   const [showFiscalModal, setShowFiscalModal] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: company } = useQuery({
+    queryKey: ['company'],
+    queryFn: () => GetCompany(session!),
+    enabled: !!session?.user.access_token,
+  })
 
   const loadNextInvoice = useCallback(async () => {
     if (!session) return;
@@ -72,18 +79,6 @@ const CompanyBillingPage = () => {
       // Silently fail - preview is optional, don't block the page
       console.warn("Could not load next invoice preview:", error?.message || error);
       setNextInvoice(null);
-    }
-  }, [session]);
-
-  const loadCompany = useCallback(async () => {
-    if (!session) return;
-    try {
-      const response = await GetCompany(session);
-      setCompany(new Company(response));
-    } catch (error: any) {
-      notifyError(
-        error?.message ?? "Não foi possível carregar os dados da empresa.",
-      );
     }
   }, [session]);
 
@@ -117,10 +112,9 @@ const CompanyBillingPage = () => {
 
   useEffect(() => {
     if (!session) return;
-    loadCompany();
     loadInvoices();
     loadNextInvoice();
-  }, [session, loadCompany, loadInvoices, loadNextInvoice]);
+  }, [session, loadInvoices, loadNextInvoice]);
 
 
   useEffect(() => {
@@ -143,7 +137,7 @@ const CompanyBillingPage = () => {
       try {
         await disableFiscalInvoices(session);
         notifySuccess("Emissão de notas fiscais desabilitada. A cobrança continua até o fim do mês.");
-        await loadCompany();
+        queryClient.invalidateQueries({ queryKey: ['company'] });
       } catch (error: any) {
         notifyError(
           error?.message ?? "Não foi possível desativar o serviço fiscal.",
@@ -160,7 +154,7 @@ const CompanyBillingPage = () => {
     try {
       await enableFiscalInvoices(session);
       notifySuccess("Emissão de notas fiscais habilitada!");
-      await loadCompany();
+      queryClient.invalidateQueries({ queryKey: ['company'] });
       await loadNextInvoice(); // Reload invoice preview to show new fee
     } catch (error: any) {
       notifyError(

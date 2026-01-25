@@ -21,8 +21,9 @@ import FormArrayPattern from '@/app/components/modal/form-array-pattern';
 import printService from '@/app/utils/print-service';
 import Address from "@/app/entities/address/address";
 import AddressForm from "../address/form";
+import { useQueryClient } from '@tanstack/react-query';
 
-const CompanyForm = ({ item, isUpdate, setItem }: CreateFormsProps<Company>) => {
+const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
     const [company, setCompany] = useState<Company>(item || new Company());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -30,6 +31,10 @@ const CompanyForm = ({ item, isUpdate, setItem }: CreateFormsProps<Company>) => 
     const { data, update } = useSession();
     const router = useRouter();
     const modalHandler = useModal();
+    const queryClient = useQueryClient();
+
+    // Carrega impressoras disponíveis via Print Agent (WebSocket) ou Electron
+    const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
 
     const handleInputChange = (field: keyof Company, value: any) => {
         setCompany(prev => ({ ...prev, [field]: value }));
@@ -71,8 +76,7 @@ const CompanyForm = ({ item, isUpdate, setItem }: CreateFormsProps<Company>) => 
         }));
     };
 
-    // Carrega impressoras disponíveis via Print Agent (WebSocket) ou Electron
-    const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
+
     useEffect(() => {
         (async () => {
             try {
@@ -136,7 +140,7 @@ const CompanyForm = ({ item, isUpdate, setItem }: CreateFormsProps<Company>) => 
         try {
             await UpdateCompany(company, data);
             setCompany(company);
-            if (setItem) setItem(company);
+            queryClient.invalidateQueries({ queryKey: ['company'] });
             notifySuccess('Empresa atualizada com sucesso');
             modalHandler.hideModal(modalName);
 

@@ -12,7 +12,7 @@ import printGroupItem from "../../print/print-group-item";
 import AddTableTax from "@/app/api/order-table/update/add-tax/order-table";
 import RemoveTableTax from "@/app/api/order-table/update/remove-tax/order-table";
 import GetCompany from "@/app/api/company/company";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,12 @@ export default function OrderPaymentsResume() {
     const queryClient = useQueryClient();
     const order = queryClient.getQueryData<Order>(['order', 'current']);
 
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user.access_token,
+    })
+
     const [change, setChange] = useState<Decimal>(new Decimal(order?.delivery?.change || 0));
     const [paymentMethod, setPaymentMethod] = useState<string>(order?.delivery?.payment_method || "");
 
@@ -33,9 +39,7 @@ export default function OrderPaymentsResume() {
         try {
             await PendingOrder(order.id, data)
 
-            const company = await GetCompany(data);
-
-            if (company.preferences.enable_print_order_on_pend_order) {
+            if (company?.preferences.enable_print_order_on_pend_order) {
                 await printOrder({
                     orderID: order.id,
                     session: data

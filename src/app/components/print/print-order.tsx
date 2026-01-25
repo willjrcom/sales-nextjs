@@ -4,6 +4,7 @@ import GetOrderPrintByID from "@/app/api/print/print-order"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
 import printService from '@/app/utils/print-service';
+import { useQuery } from "@tanstack/react-query";
 
 interface PrintOrderProps {
     orderID: string;
@@ -11,6 +12,11 @@ interface PrintOrderProps {
 }
 
 const printOrder = async ({ orderID, session }: PrintOrderProps) => {
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(session),
+        enabled: !!session?.user.access_token,
+    })
 
     // Obtém o conteúdo de impressão uma única vez
     let html: string;
@@ -28,8 +34,7 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
 
     // Tenta usar o Print Agent (WebSocket) primeiro
     try {
-        const company = await GetCompany(session);
-        let printerName = company.preferences["printer_order_on_pend_order"] || "default";
+        let printerName = company?.preferences["printer_order_on_pend_order"] || "default";
 
         if (printerName === "default") {
             const printers = await printService.getPrinters();
@@ -43,12 +48,11 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
         return;
     } catch (wsError: any) {
         console.warn("Erro ao usar Print Agent, tentando fallback:", wsError);
-        
+
         // Fallback: tenta Electron se ainda estiver disponível
         try {
             if ((window as any).electronAPI?.printer) {
-                const company = await GetCompany(session);
-                let printerName = company.preferences["printer_order_on_pend_order"] || "default";
+                let printerName = company?.preferences["printer_order_on_pend_order"] || "default";
 
                 if (printerName === "default") {
                     const printers = await (window as any).electronAPI.getPrinters();
@@ -78,10 +82,10 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
             w.onafterprint = () => w.close();
             notifySuccess("Diálogo de impressão aberto");
         } catch (browserError: any) {
-            const errorMessage = wsError?.message || 
-                                (typeof wsError === 'string' ? wsError : '') ||
-                                browserError?.message || 
-                                "Erro desconhecido ao imprimir";
+            const errorMessage = wsError?.message ||
+                (typeof wsError === 'string' ? wsError : '') ||
+                browserError?.message ||
+                "Erro desconhecido ao imprimir";
             notifyError(`Erro ao imprimir: ${errorMessage}`);
         }
     }

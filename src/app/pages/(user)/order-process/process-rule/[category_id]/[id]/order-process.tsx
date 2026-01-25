@@ -13,7 +13,7 @@ import { notifyError } from '@/app/utils/notifications';
 import ObservationCard from '@/app/components/order/observation';
 import printGroupItem from '@/app/components/print/print-group-item';
 import GetCompany from '@/app/api/company/company';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ItemProcessCard from './item-process-card';
 
 interface OrderProcessCardProps {
@@ -24,6 +24,12 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const { data } = useSession();
     const modalHandler = useModal();
     const queryClient = useQueryClient();
+
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user.access_token,
+    })
 
     // atualiza o timer a cada segundo para mostrar duração dinâmica
     const [now, setNow] = useState(new Date());
@@ -56,9 +62,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         try {
             const nextProcessID = await FinishOrderProcess(id, data)
 
-            const company = await GetCompany(data);
-            if (!nextProcessID && company.preferences?.["enable_print_items_on_finish_process"]) {
-
+            if (!nextProcessID && company?.preferences?.["enable_print_items_on_finish_process"]) {
                 await printGroupItem({ groupItemID: groupItem.id, printerName: groupItem.printer_name, session: data })
             }
 

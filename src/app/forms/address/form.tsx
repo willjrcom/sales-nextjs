@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
 import { FaSearch } from 'react-icons/fa';
 import GetCompany from '@/app/api/company/company';
+import { useQuery } from '@tanstack/react-query';
 
 export interface AddressFormProps {
     addressParent: Address;
@@ -19,24 +20,20 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
     const [address, setAddress] = useState<Address>(addressParent || new Address());
     const { data } = useSession();
 
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user.access_token,
+    })
+
     useEffect(() => {
-        getUfFromCompany()
-    }, [data?.user.access_token]);
-
-    const getUfFromCompany = async() => {
-        if (address.uf || !data) return;
-
-        const company = await GetCompany(data)
-        if (!company) return;
-
-        const companyAddress = company.address;
-        if (!companyAddress) return;
-
-        handleInputChange('uf', companyAddress.uf);
-    }
+        if (company?.address?.uf) {
+            handleInputChange('uf', company.address.uf);
+        }
+    }, [company]);
 
     const handleInputChange = (field: keyof Address, value: any) => {
-        const newAddress = Object.assign({}, { ...address, [field]: value }) as Address; 
+        const newAddress = Object.assign({}, { ...address, [field]: value }) as Address;
         setAddress(newAddress);
         setAddressParent(newAddress);
     };
@@ -46,27 +43,29 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
             const addressFound = await GetAddressByCEP(address.cep)
 
             if (addressFound.cep.replace("-", "") === address.cep.replace("-", "")) {
-                const newAddress = Object.assign({}, 
-                    { ...address, 
-                        street: addressFound.logradouro, 
-                        neighborhood: addressFound.bairro, 
-                        city: addressFound.localidade, 
-                        uf: addressFound.uf }
-                    ) as Address;
+                const newAddress = Object.assign({},
+                    {
+                        ...address,
+                        street: addressFound.logradouro,
+                        neighborhood: addressFound.bairro,
+                        city: addressFound.localidade,
+                        uf: addressFound.uf
+                    }
+                ) as Address;
                 setAddress(newAddress);
                 setAddressParent(newAddress);
 
             }
-        } catch(error) {}
+        } catch (error) { }
     }
 
     return (
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 items-end">
                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} formatted={true}/>
+                    <PatternField patternName='cep' name="cep" friendlyName="Cep" placeholder="Digite o cep" setValue={value => handleInputChange('cep', value)} value={address.cep} optional disabled={isHidden} formatted={true} />
                 </div>
-                <button 
+                <button
                     className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md'
                     onClick={getAddress}
                 >
@@ -104,9 +103,9 @@ const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormP
                     <SelectField name="state" friendlyName="Estado" setSelectedValue={value => handleInputChange('uf', value)} selectedValue={address.uf} values={addressUFsWithId} disabled={isHidden} />
                 </div>
             </div>
-        
-            <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id}/>
-            <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id}/>
+
+            <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id} />
+            <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id} />
         </div>
     );
 };

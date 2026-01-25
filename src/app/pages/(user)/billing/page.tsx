@@ -10,6 +10,7 @@ import { billingService } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 // Hardcoded Plan Prices (Synced with Backend ENVs)
 const PLANS = {
@@ -24,15 +25,12 @@ export default function BillingPage() {
     const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
     const [periodicity, setPeriodicity] = useState<Periodicity>("MONTHLY");
-    const [companyId, setCompanyId] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (session) {
-            GetCompany(session).then((company) => {
-                setCompanyId(company.id);
-            }).catch((err) => console.error("Failed to load company", err));
-        }
-    }, [session]);
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(session!),
+        enabled: !!session?.user.access_token,
+    })
 
     const calculateTotal = (basePrice: number) => {
         let months = 1;
@@ -55,11 +53,11 @@ export default function BillingPage() {
     };
 
     const handleSubscribe = async (planKey: string) => {
-        if (!session || !companyId) return;
+        if (!session || !company?.id) return;
         setLoading(true);
         try {
             const response = await billingService.checkout(session, {
-                company_id: companyId,
+                company_id: company.id,
                 plan: planKey,
                 periodicity: periodicity,
             });
@@ -67,11 +65,10 @@ export default function BillingPage() {
             if (response && response.data && response.data.init_point) {
                 window.location.href = response.data.init_point;
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Erro ao iniciar checkout");
-            // Fallback alert if toast not configured
-            // alert("Erro ao iniciar checkout");
+            const msg = error?.message || "Erro ao iniciar checkout";
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
@@ -108,19 +105,24 @@ export default function BillingPage() {
                             </div>
 
                             <div className="mb-6">
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-bold">{formatCurrency(final)}</span>
-                                    <span className="text-sm text-muted-foreground">/{periodicity === "MONTHLY" ? "mês" : "ciclo"}</span>
-                                </div>
-                                {periodicity !== "MONTHLY" && (
-                                    <div className="text-sm text-green-600 font-medium mt-1">
-                                        Economia de {formatCurrency(discountValue)}
+                                {periodicity === "MONTHLY" ? (
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-bold">{formatCurrency(final)}</span>
+                                        <span className="text-sm text-muted-foreground">/mês</span>
                                     </div>
-                                )}
-                                {periodicity !== "MONTHLY" && (
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                        Equivalente a {formatCurrency(final / (periodicity === "SEMIANNUAL" ? 6 : 12))}/mês
-                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-3xl font-bold">{formatCurrency(final / (periodicity === "SEMIANNUAL" ? 6 : 12))}</span>
+                                            <span className="text-sm text-muted-foreground">/mês</span>
+                                        </div>
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                            Total de {formatCurrency(final)} por {periodicity === "SEMIANNUAL" ? "semestre" : "ano"}
+                                        </div>
+                                        <div className="text-xs text-green-600 font-medium mt-1">
+                                            Economia de {formatCurrency(discountValue)}
+                                        </div>
+                                    </>
                                 )}
                             </div>
 

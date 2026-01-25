@@ -6,9 +6,9 @@ import { Line, Bar, Pie } from 'react-chartjs-2';
 import RequestApi, { AddAccessToken } from '@/app/api/request';
 import { useSession } from 'next-auth/react';
 import GetCompany from '@/app/api/company/company';
-import Company from '@/app/entities/company/company';
 import { notifyError } from '@/app/utils/notifications';
 import RequestError from '@/app/utils/error';
+import { useQuery } from '@tanstack/react-query';
 
 Chart.register(...registerables);
 
@@ -33,29 +33,27 @@ export default function ReportChart({
   dataKey,
   title,
 }: ReportChartProps) {
-  const { data: sessionData } = useSession();
-  const [company, setCompany] = useState<Company | null>(null);
+  const { data } = useSession();
   const [labels, setLabels] = useState<string[]>([]);
   const [values, setValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (sessionData) {
-      GetCompany(sessionData)
-        .then(setCompany)
-        .catch(() => notifyError('Error fetching company'));
-    }
-  }, [sessionData]);
+  const { data: company } = useQuery({
+    queryKey: ['company'],
+    queryFn: () => GetCompany(data!),
+    enabled: !!data?.user.access_token,
+  })
 
   useEffect(() => {
     async function fetchData() {
-      if (!sessionData || !company) return;
+      if (!data || !company) return;
       setLoading(true);
+
       try {
         const schema = company.schema_name;
         let path = endpoint;
         let reqBody = body;
-        const headers = AddAccessToken(sessionData);
+
         if (method === 'GET') {
           const params = { schema, ...(queryParams || {}) };
           const query = new URLSearchParams(
@@ -65,25 +63,27 @@ export default function ReportChart({
         } else {
           reqBody = { schema, ...(body || {}) };
         }
+
         const response = await RequestApi<Record<string, any>, any[] | any>({
           path,
           method,
           body: reqBody,
-          headers,
+          headers: AddAccessToken(data!),
         });
-        const data = response.data;
-        
+
+        const dataResponse = response.data;
+
         // Handle both array and single object responses
         let newLabels: string[] = [];
         let newValues: number[] = [];
-        
-        if (Array.isArray(data)) {
+
+        if (Array.isArray(dataResponse)) {
           // Array response (most reports)
-          newLabels = data.map((item) => {
+          newLabels = dataResponse.map((item) => {
             const v = item[labelKey];
             return v instanceof Date ? v.toISOString() : String(v);
           });
-          newValues = data.map((item) => {
+          newValues = dataResponse.map((item) => {
             const value = item[dataKey];
             // Handle null/undefined values for profitability reports
             if (value === null || value === undefined) {
@@ -93,12 +93,12 @@ export default function ReportChart({
           });
         } else {
           // Single object response (like overall-profitability)
-          const value = data[dataKey];
-          const label = data[labelKey];
+          const value = dataResponse[dataKey];
+          const label = dataResponse[labelKey];
           newLabels = [label instanceof Date ? label.toISOString() : String(label)];
           newValues = [value === null || value === undefined ? 0 : Number(value)];
         }
-        
+
         setLabels(newLabels);
         setValues(newValues);
       } catch (err: RequestError | any) {
@@ -109,7 +109,7 @@ export default function ReportChart({
     }
     fetchData();
   }, [
-    sessionData,
+    data,
     company,
     endpoint,
     method,
