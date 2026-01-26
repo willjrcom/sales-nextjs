@@ -11,12 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, CompanyPayment } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
-import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/components/billing/register-cost-dialog";
+import { notifyError, notifyInfo } from "@/app/utils/notifications";
 
 // Hardcoded Plan Prices
 const PLANS = {
@@ -97,9 +97,7 @@ export default function BillingPage() {
                 window.location.href = response.data.checkout_url;
             }
         } catch (error: any) {
-            console.error(error);
-            const msg = error?.message || "Erro ao iniciar checkout";
-            toast.error(msg);
+            notifyError(error?.message || "Erro ao iniciar checkout");
         } finally {
             setLoading(false);
         }
@@ -114,12 +112,10 @@ export default function BillingPage() {
             if (response && response.data && response.data.checkout_url) {
                 window.location.href = response.data.checkout_url;
             } else {
-                toast.info("Nenhum custo pendente encontrado.");
+                notifyInfo("Nenhum custo pendente encontrado.");
             }
         } catch (error: any) {
-            console.error(error);
-            const msg = error?.message || "Erro ao iniciar pagamento de custos";
-            toast.error(msg);
+            notifyError(error?.message || "Erro ao iniciar checkout");
         } finally {
             setLoading(false);
         }
@@ -255,6 +251,7 @@ export default function BillingPage() {
                                         <TableHead>Status</TableHead>
                                         <TableHead>Período</TableHead>
                                         <TableHead>Ref.</TableHead>
+                                        <TableHead>Ações</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -263,8 +260,17 @@ export default function BillingPage() {
                                             <TableCell>{safeFormat(payment.created_at, "dd/MM/yyyy HH:mm")}</TableCell>
                                             <TableCell>{formatCurrency(parseFloat(payment.amount))}</TableCell>
                                             <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                                            <TableCell>{payment.months} meses</TableCell>
-                                            <TableCell className="font-mono text-xs text-muted-foreground">{payment.external_reference}</TableCell>
+                                            <TableCell>{payment.months > 0 ? `${payment.months} meses` : "Avulso"}</TableCell>
+                                            <TableCell className="font-mono text-xs text-muted-foreground">{payment.external_reference?.substring(0, 8)}...</TableCell>
+                                            <TableCell>
+                                                {payment.status === "pending" && payment.payment_url && (
+                                                    <Button variant="link" size="sm" asChild className="h-auto p-0 text-blue-600">
+                                                        <a href={payment.payment_url} target="_blank" rel="noopener noreferrer">
+                                                            Pagar
+                                                        </a>
+                                                    </Button>
+                                                )}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                     {!payments?.data?.length && (

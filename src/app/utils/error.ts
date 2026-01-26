@@ -46,6 +46,7 @@ const errorTranslations: Record<string, string> = {
     "password must contain at least one lowercase letter": "Senha deve conter pelo menos uma letra minúscula",
     "password must contain at least one digit": "Senha deve conter pelo menos um número",
     "password must contain at least one symbol": "Senha deve conter pelo menos um caractere especial",
+    "no pending costs found": "Nenhum custo pendente encontrado",
 
     // Erros de Pedido (Order)
     "order must have at least one item": "O pedido deve ter pelo menos um item",

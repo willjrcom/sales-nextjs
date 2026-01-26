@@ -28,6 +28,7 @@ export interface CompanyPayment {
     paid_at?: string;
     months: number;
     provider_payment_id: string;
+    payment_url: string;
     external_reference: string;
 }
 
@@ -70,7 +71,7 @@ export const createCostCheckout = async (session: Session) => {
     });
 }
 
-export const listPayments = async (session: Session, page = 1, perPage = 10) => {
+export const listPayments = async (session: Session, page = 0, perPage = 10) => {
     return await RequestApi<null, CompanyPayment[]>({
         path: `/company/payments?page=${page}&per_page=${perPage}`,
         method: "GET",
