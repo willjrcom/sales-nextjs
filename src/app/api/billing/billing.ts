@@ -32,16 +32,33 @@ export interface CompanyPayment {
     external_reference: string;
 }
 
+export interface UsageCost {
+    id: string;
+    company_id: string;
+    cost_type: string;
+    description: string;
+    amount: string;
+    status: string;
+    created_at: string;
+    reference_id?: string;
+    payment_id?: string;
+}
+
 export interface MonthlyCostSummary {
     company_id: string;
     month: number;
     year: number;
     total_amount: string;
+    total_paid: string;
     costs_by_type: Record<string, string>;
     costs_count: number;
     other_fee: string;
     nfce_costs: string;
     nfce_count: number;
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    items: UsageCost[];
 }
 
 export const createCheckout = async (session: Session, data: CheckoutRequestDTO) => {
@@ -79,9 +96,9 @@ export const listPayments = async (session: Session, page = 0, perPage = 10) => 
     });
 }
 
-export const getMonthlyCosts = async (session: Session, month: number, year: number) => {
+export const getMonthlyCosts = async (session: Session, month: number, year: number, page = 1) => {
     return await RequestApi<null, MonthlyCostSummary>({
-        path: `/company/costs/monthly?month=${month}&year=${year}`,
+        path: `/company/costs/monthly?month=${month}&year=${year}&page=${page}`,
         method: "GET",
         headers: AddAccessToken(session),
     });

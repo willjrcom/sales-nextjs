@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, CompanyPayment } from "@/app/api/billing/billing";
+
+import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, CompanyPayment, UsageCost } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
+import CrudTable from "@/app/components/crud/table";
+import { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -48,19 +50,21 @@ export default function BillingPage() {
         enabled: !!session?.user?.access_token,
     });
 
+    const [paymentsPage, setPaymentsPage] = useState(0);
     const { data: payments, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
-        queryKey: ['payments'],
-        queryFn: () => listPayments(session!),
+        queryKey: ['payments', paymentsPage],
+        queryFn: () => listPayments(session!, paymentsPage),
         enabled: !!session?.user?.access_token,
     });
 
     const currentDate = new Date();
     const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+    const [costsPage, setCostsPage] = useState(0);
 
     const { data: costs, refetch: refetchCosts, isRefetching: isRefetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
-        queryKey: ['costs', selectedMonth, selectedYear],
-        queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear),
+        queryKey: ['costs', selectedMonth, selectedYear, costsPage],
+        queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear, costsPage),
         enabled: !!session?.user?.access_token,
     });
 
@@ -144,6 +148,74 @@ export default function BillingPage() {
         }
     }
 
+    const paymentColumns: ColumnDef<CompanyPayment>[] = [
+        {
+            accessorKey: "created_at",
+            header: "Data",
+            cell: ({ row }) => safeFormat(row.original.created_at, "dd/MM/yyyy HH:mm"),
+        },
+        {
+            accessorKey: "amount",
+            header: "Valor",
+            cell: ({ row }) => formatCurrency(parseFloat(row.original.amount)),
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => getStatusBadge(row.original.status),
+        },
+        {
+            header: "Período",
+            cell: ({ row }) => row.original.months > 0 ? `${row.original.months} meses` : "Avulso",
+        },
+        {
+            accessorKey: "external_reference",
+            header: "Ref.",
+            cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.external_reference?.substring(0, 8)}...</span>,
+        },
+        {
+            id: "actions",
+            header: "Ações",
+            cell: ({ row }) => {
+                const payment = row.original;
+                return payment.status === "pending" && payment.payment_url ? (
+                    <Button variant="link" size="sm" asChild className="h-auto p-0 text-blue-600">
+                        <a href={payment.payment_url} target="_blank" rel="noopener noreferrer">
+                            Pagar
+                        </a>
+                    </Button>
+                ) : null;
+            },
+        },
+    ];
+
+    const costColumns: ColumnDef<UsageCost>[] = [
+        {
+            accessorKey: "created_at",
+            header: "Data",
+            cell: ({ row }) => safeFormat(row.original.created_at, "dd/MM/yyyy HH:mm"),
+        },
+        {
+            header: "Descrição/Tipo",
+            cell: ({ row }) => (
+                <div className="flex flex-col">
+                    <span>{row.original.description || "Sem descrição"}</span>
+                    <span className="text-xs text-muted-foreground uppercase">{row.original.cost_type}</span>
+                </div>
+            ),
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => getStatusBadge(row.original.status),
+        },
+        {
+            accessorKey: "amount",
+            header: "Valor",
+            cell: ({ row }) => formatCurrency(parseFloat(row.original.amount)),
+        },
+    ];
+
     return (
         <div className="p-6 space-y-8 max-w-6xl mx-auto">
             <div className="flex flex-col gap-2">
@@ -159,6 +231,13 @@ export default function BillingPage() {
                 </TabsList>
 
                 <TabsContent value="plans" className="space-y-8">
+                    {company?.subscription_expires_at && (
+                        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md mb-6 flex items-center gap-2">
+                            <span className="font-medium">Seu plano é válido até:</span>
+                            <span>{safeFormat(company.subscription_expires_at, "dd/MM/yyyy")}</span>
+                        </div>
+                    )}
+
                     {/* Periodicity Toggle */}
                     <div className="flex justify-center mt-6">
                         <Tabs value={periodicity} onValueChange={(v) => setPeriodicity(v as Periodicity)} className="w-[400px]">
@@ -243,43 +322,12 @@ export default function BillingPage() {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Data</TableHead>
-                                        <TableHead>Valor</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Período</TableHead>
-                                        <TableHead>Ref.</TableHead>
-                                        <TableHead>Ações</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {payments?.data?.map((payment: CompanyPayment) => (
-                                        <TableRow key={payment.id}>
-                                            <TableCell>{safeFormat(payment.created_at, "dd/MM/yyyy HH:mm")}</TableCell>
-                                            <TableCell>{formatCurrency(parseFloat(payment.amount))}</TableCell>
-                                            <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                                            <TableCell>{payment.months > 0 ? `${payment.months} meses` : "Avulso"}</TableCell>
-                                            <TableCell className="font-mono text-xs text-muted-foreground">{payment.external_reference?.substring(0, 8)}...</TableCell>
-                                            <TableCell>
-                                                {payment.status === "pending" && payment.payment_url && (
-                                                    <Button variant="link" size="sm" asChild className="h-auto p-0 text-blue-600">
-                                                        <a href={payment.payment_url} target="_blank" rel="noopener noreferrer">
-                                                            Pagar
-                                                        </a>
-                                                    </Button>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {!payments?.data?.length && (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">Nenhum pagamento encontrado.</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                            <CrudTable
+                                columns={paymentColumns}
+                                data={payments?.data || []}
+                                totalCount={100} // Backend doesn't seem to return total count for payments list yet, assumed infinite or handled elsewhere
+                                onPageChange={(page) => setPaymentsPage(page)}
+                            />
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -332,6 +380,7 @@ export default function BillingPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{formatCurrency(parseFloat(costs?.data?.total_amount || "0"))}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Pago: {formatCurrency(parseFloat(costs?.data?.total_paid || "0"))}</p>
                             </CardContent>
                         </Card>
                         <Card>
@@ -351,6 +400,16 @@ export default function BillingPage() {
                                 <div className="text-2xl font-bold">{formatCurrency(parseFloat(costs?.data?.other_fee || "0"))}</div>
                             </CardContent>
                         </Card>
+                    </div>
+
+
+                    <div className="mt-6">
+                        <CrudTable
+                            columns={costColumns}
+                            data={costs?.data?.items || []}
+                            totalCount={costs?.data?.total_items || 0}
+                            onPageChange={(page) => setCostsPage(page + 1)} // CrudTable uses 0-based index, API uses 1-based (from my specific impl)
+                        />
                     </div>
                 </TabsContent >
             </Tabs >
