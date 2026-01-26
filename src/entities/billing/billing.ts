@@ -1,14 +1,4 @@
-export interface CheckoutRequestDTO {
-    company_id: string;
-    cost_ids?: string[];
-    plan?: string;        // "BASIC", "INTERMEDIATE", "ENTERPRISE"
-    periodicity?: string; // "MONTHLY", "SEMIANNUAL", "ANNUAL"
-}
 
-export interface CheckoutResponseDTO {
-    payment_id: string;
-    init_point: string;
-}
 
 export interface CompanyUsageCost {
     id: string;

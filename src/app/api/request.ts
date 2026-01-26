@@ -4,6 +4,7 @@ import RequestError, { translateError } from "../utils/error"
 export interface GetAllResponse<T> {
     items: T[];
     headers: Headers;
+    totalCount?: number;
 }
 interface RequestApiProps<T> {
     path: string;

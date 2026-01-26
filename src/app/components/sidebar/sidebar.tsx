@@ -84,7 +84,7 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
   const { data: company } = useQuery({
     queryKey: ['company'],
     queryFn: () => GetCompany(data!),
-    enabled: !!data?.user.access_token,
+    enabled: !!data?.user?.access_token,
   })
 
   const handleCompanyModal = async () => {
@@ -140,15 +140,11 @@ const Sidebar = ({ onToggleAdmin, setHover }: SidebarProps) => {
       <SidebarLinkItem icon={FaTh} label="Mesas" href="/pages/place" />
       <SidebarLinkItem icon={FaBox} label="Estoque" href="/pages/stock" />
       <SidebarLinkItem icon={FaPrint} label="Impressão" href="/pages/print" />
+
       <SidebarLinkItem
         icon={MdOutlineAttachMoney}
-        label="Mensalidade"
-        href="/pages/company-payment"
-      />
-      <SidebarLinkItem
-        icon={MdOutlineAttachMoney}
-        label="Billing & NFC-e"
-        href="/pages/company-billing"
+        label="Planos e Assinatura"
+        href="/pages/billing"
       />
       <SidebarLinkItem
         icon={FaRedo}

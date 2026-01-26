@@ -23,7 +23,7 @@ const AddressClientForm = ({ addressParent, setAddressParent, isHidden }: Addres
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!data?.user.access_token,
+        enabled: !!data?.user?.access_token,
     })
 
     useEffect(() => {

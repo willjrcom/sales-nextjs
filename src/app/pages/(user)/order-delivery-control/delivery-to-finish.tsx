@@ -76,7 +76,7 @@ const DeliveryOrderToFinish = () => {
 
     // useEffect(() => {
     //     setCentralCoordinates();
-    // }, [data?.user.access_token]);
+    // }, [data?.user?.access_token]);
 
     // const setCentralCoordinates = async () => {
     //     if (!data) return;

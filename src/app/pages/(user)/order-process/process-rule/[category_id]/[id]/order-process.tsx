@@ -28,7 +28,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!data?.user.access_token,
+        enabled: !!data?.user?.access_token,
     })
 
     // atualiza o timer a cada segundo para mostrar duração dinâmica

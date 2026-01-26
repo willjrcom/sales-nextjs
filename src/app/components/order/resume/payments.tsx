@@ -27,7 +27,7 @@ export default function OrderPaymentsResume() {
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!data?.user.access_token,
+        enabled: !!data?.user?.access_token,
     })
 
     const [change, setChange] = useState<Decimal>(new Decimal(order?.delivery?.change || 0));

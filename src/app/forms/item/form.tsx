@@ -37,7 +37,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
   useEffect(() => {
     fetchProduct();
-  }, [data?.user.access_token, reloadProduct]);
+  }, [data?.user?.access_token, reloadProduct]);
 
   const availableFlavors = useMemo(() => product.flavors || [], [product.flavors]);
 
