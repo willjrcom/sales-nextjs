@@ -103,3 +103,11 @@ export const getMonthlyCosts = async (session: Session, month: number, year: num
         headers: AddAccessToken(session),
     });
 }
+
+export const cancelPayment = async (session: Session, paymentId: string) => {
+    return await RequestApi<null, null>({
+        path: `/company/checkout/cancel/${paymentId}`,
+        method: "POST",
+        headers: AddAccessToken(session),
+    });
+}

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, CompanyPayment, UsageCost } from "@/app/api/billing/billing";
+import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, cancelPayment, CompanyPayment, UsageCost } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
 import CrudTable from "@/app/components/crud/table";
 import { ColumnDef } from "@tanstack/react-table";
@@ -125,13 +125,35 @@ export default function BillingPage() {
         }
     };
 
+    const handleCancel = async (paymentId: string) => {
+        if (!session) return;
+        if (!confirm("Tem certeza que deseja cancelar este pagamento?")) return;
+
+        setLoading(true);
+        try {
+            await cancelPayment(session, paymentId);
+            notifyInfo("Pagamento cancelado com sucesso!");
+            refetchPayments();
+        } catch (error: any) {
+            notifyError(error?.message || "Erro ao cancelar pagamento");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     function getStatusBadge(status: string) {
-        switch (status) {
+        if (!status) return <Badge variant="secondary">-</Badge>;
+
+        const s = status.toLowerCase();
+        switch (s) {
             case "approved":
             case "paid":
                 return <Badge className="bg-green-500">Pago</Badge>;
             case "pending":
                 return <Badge variant="outline" className="text-yellow-600 border-yellow-600">Pendente</Badge>;
+            case "refused":
+            case "rejected":
+                return <Badge variant="destructive">Recusado</Badge>;
             default:
                 return <Badge variant="secondary">{status}</Badge>;
         }
@@ -178,13 +200,27 @@ export default function BillingPage() {
             header: "Ações",
             cell: ({ row }) => {
                 const payment = row.original;
-                return payment.status === "pending" && payment.payment_url ? (
-                    <Button variant="link" size="sm" asChild className="h-auto p-0 text-blue-600">
-                        <a href={payment.payment_url} target="_blank" rel="noopener noreferrer">
-                            Pagar
-                        </a>
-                    </Button>
-                ) : null;
+                return (
+                    <div className="flex gap-2">
+                        {payment.status === "pending" && payment.payment_url && (
+                            <Button variant="link" size="sm" asChild className="h-auto p-0 text-blue-600">
+                                <a href={payment.payment_url} target="_blank" rel="noopener noreferrer">
+                                    Pagar
+                                </a>
+                            </Button>
+                        )}
+                        {payment.status === "pending" && (
+                            <Button
+                                variant="link"
+                                size="sm"
+                                className="h-auto p-0 text-red-600 ml-2"
+                                onClick={() => handleCancel(payment.id)}
+                            >
+                                Cancelar
+                            </Button>
+                        )}
+                    </div>
+                );
             },
         },
     ];

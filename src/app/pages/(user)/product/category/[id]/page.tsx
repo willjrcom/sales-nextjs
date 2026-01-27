@@ -18,6 +18,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
@@ -28,6 +29,8 @@ const PageCategoryEdit = () => {
         queryFn: () => GetCategoryByID(session!, id as string),
         enabled: !!id && !!session,
     });
+
+    const isDefaultCategory = useMemo(() => !category?.is_additional && !category?.is_complement, [category?.is_additional, category?.is_complement]);
 
     if (!id || !category) {
         return (
@@ -52,8 +55,9 @@ const PageCategoryEdit = () => {
             <CategoryForm isUpdate={true} item={category} />
 
             <ButtonIconTextFloat title="Tamanhos e quantidades" modalName="edit-size-and-quantity" size="xl" icon={FaEdit} position="bottom-right">
-                <ListSize category={category} />
-                <ListQuantity category={category} />
+                <ListSize categoryID={category.id} isDefaultCategory={isDefaultCategory} />
+                <hr className="my-4" />
+                <ListQuantity categoryID={category.id} isDefaultCategory={isDefaultCategory} />
             </ButtonIconTextFloat>
         </div>
     );
