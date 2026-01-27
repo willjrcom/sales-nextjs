@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useModal } from '@/app/context/modal/context';
 import EditItem from './edit-item';
 import ButtonDelete from '../../button/button-delete';
@@ -30,7 +30,7 @@ const ItemCard = ({ item }: CardProps) => {
         new Decimal(0)
     ) || new Decimal(0);
     totalPriceDecimal = totalPriceDecimal.plus(totalAdditionalsDecimal);
-    const isGroupItemStaging = groupItem?.status === "Staging"
+    const isGroupItemStaging = useMemo(() => groupItem?.status === "Staging", [groupItem?.status]);
 
     return (
         <div

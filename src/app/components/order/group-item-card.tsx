@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import StatusComponent from "../button/show-status";
-import ItemCard from "./item/card-item";
+import ItemCard from "./item-card";
 import GroupItem from "@/app/entities/order/group-item";
 import RoundComponent from "../button/round-component";
 
