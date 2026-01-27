@@ -1,0 +1,13 @@
+export interface CompanyPayment {
+    id: string;
+    status: string;
+    amount: string;
+    created_at: string;
+    paid_at?: string;
+    months: number;
+    provider_payment_id: string;
+    payment_url: string;
+    external_reference: string;
+    expires_at?: string;
+    is_mandatory: boolean;
+}

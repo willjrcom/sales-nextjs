@@ -1,5 +1,7 @@
-import RequestApi, { AddAccessToken } from "../request";
+import RequestApi, { AddAccessToken, GetAllResponse } from "../request";
 import { Session } from "next-auth";
+import { CompanyPayment } from "@/app/entities/company/company-payment";
+import { CompanyUsageCost } from "@/app/entities/company/company-usage-cost";
 
 export interface CheckoutRequestDTO {
     company_id: string;
@@ -20,30 +22,6 @@ export interface CheckoutResponseDTO {
     checkout_url: string;
 }
 
-export interface CompanyPayment {
-    id: string;
-    status: string;
-    amount: string;
-    created_at: string;
-    paid_at?: string;
-    months: number;
-    provider_payment_id: string;
-    payment_url: string;
-    external_reference: string;
-}
-
-export interface UsageCost {
-    id: string;
-    company_id: string;
-    cost_type: string;
-    description: string;
-    amount: string;
-    status: string;
-    created_at: string;
-    reference_id?: string;
-    payment_id?: string;
-}
-
 export interface MonthlyCostSummary {
     company_id: string;
     month: number;
@@ -58,56 +36,73 @@ export interface MonthlyCostSummary {
     current_page: number;
     per_page: number;
     total_items: number;
-    items: UsageCost[];
+    items: CompanyUsageCost[];
 }
 
 export const createCheckout = async (session: Session, data: CheckoutRequestDTO) => {
-    return await RequestApi<CheckoutRequestDTO, CheckoutResponseDTO>({
+    const response = await RequestApi<CheckoutRequestDTO, CheckoutResponseDTO>({
         path: "/company/checkout/subscription",
         method: "POST",
         body: data,
         headers: AddAccessToken(session),
     });
+
+    return response.data;
 }
 
 
 export const createCost = async (session: Session, data: CreateCostDTO) => {
-    return await RequestApi<CreateCostDTO, null>({
+    const response = await RequestApi<CreateCostDTO, null>({
         path: "/company/costs/register",
         method: "POST",
         body: data,
         headers: AddAccessToken(session),
     });
+
+    return response.data;
 }
 
 export const createCostCheckout = async (session: Session) => {
-    return await RequestApi<null, CheckoutResponseDTO>({
+    const response = await RequestApi<null, CheckoutResponseDTO>({
         path: "/company/checkout/costs",
         method: "POST",
         headers: AddAccessToken(session),
     });
+
+    return response.data;
 }
 
-export const listPayments = async (session: Session, page = 0, perPage = 10) => {
-    return await RequestApi<null, CompanyPayment[]>({
+export const listPayments = async (session: Session, page = 0, perPage = 10): Promise<GetAllResponse<CompanyPayment>> => {
+    const response = await RequestApi<null, CompanyPayment[]>({
         path: `/company/payments?page=${page}&per_page=${perPage}`,
         method: "GET",
         headers: AddAccessToken(session),
     });
+
+    const totalCount = response.headers.get("X-Total-Count");
+    return {
+        items: response.data,
+        headers: response.headers,
+        totalCount: totalCount ? parseInt(totalCount) : 0,
+    }
 }
 
-export const getMonthlyCosts = async (session: Session, month: number, year: number, page = 1) => {
-    return await RequestApi<null, MonthlyCostSummary>({
+export const getMonthlyCosts = async (session: Session, month: number, year: number, page = 1): Promise<MonthlyCostSummary> => {
+    const response = await RequestApi<null, MonthlyCostSummary>({
         path: `/company/costs/monthly?month=${month}&year=${year}&page=${page}`,
         method: "GET",
         headers: AddAccessToken(session),
     });
+
+    return response.data;
 }
 
 export const cancelPayment = async (session: Session, paymentId: string) => {
-    return await RequestApi<null, null>({
+    const response = await RequestApi<null, null>({
         path: `/company/checkout/cancel/${paymentId}`,
         method: "POST",
         headers: AddAccessToken(session),
     });
+
+    return response.data;
 }

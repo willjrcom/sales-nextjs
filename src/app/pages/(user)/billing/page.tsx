@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { formatCurrency } from "@/app/utils/format";
@@ -9,16 +9,18 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, cancelPayment, CompanyPayment, UsageCost } from "@/app/api/billing/billing";
+import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, cancelPayment } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
 import CrudTable from "@/app/components/crud/table";
-import { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/components/billing/register-cost-dialog";
 import { notifyError, notifyInfo } from "@/app/utils/notifications";
+import { safeFormat } from "@/app/entities/company/methods";
+import { paymentColumns } from "@/app/entities/company/company-payment-columns";
+import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
 
 // Hardcoded Plan Prices
 const PLANS = {
@@ -51,7 +53,7 @@ export default function BillingPage() {
     });
 
     const [paymentsPage, setPaymentsPage] = useState(0);
-    const { data: payments, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
+    const { data: paymentsResponse, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
         queryKey: ['company-payments', paymentsPage],
         queryFn: () => listPayments(session!, paymentsPage),
         enabled: !!session?.user?.access_token,
@@ -62,11 +64,14 @@ export default function BillingPage() {
     const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
     const [costsPage, setCostsPage] = useState(0);
 
-    const { data: costs, refetch: refetchCosts, isRefetching: isRefetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
+    const { data: costsResponse, refetch: refetchCosts, isRefetching: isRefetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
         queryKey: ['company-costs', selectedMonth, selectedYear, costsPage],
         queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear, costsPage),
         enabled: !!session?.user?.access_token,
     });
+
+    const payments = useMemo(() => paymentsResponse?.items || [], [paymentsResponse?.items]);
+    const costs = useMemo(() => costsResponse?.items || [], [costsResponse?.items]);
 
     const calculateTotal = (basePrice: number) => {
         let months = 1;
@@ -97,8 +102,8 @@ export default function BillingPage() {
                 periodicity: periodicity,
             });
 
-            if (response && response.data && response.data.checkout_url) {
-                window.location.href = response.data.checkout_url;
+            if (response.checkout_url) {
+                window.location.href = response.checkout_url;
             }
         } catch (error: any) {
             notifyError(error?.message || "Erro ao iniciar checkout");
@@ -113,8 +118,8 @@ export default function BillingPage() {
         try {
             const response = await createCostCheckout(session);
 
-            if (response && response.data && response.data.checkout_url) {
-                window.location.href = response.data.checkout_url;
+            if (response.checkout_url) {
+                window.location.href = response.checkout_url;
             } else {
                 notifyInfo("Nenhum custo pendente encontrado.");
             }
@@ -141,125 +146,6 @@ export default function BillingPage() {
             setLoading(false);
         }
     };
-
-    function getStatusBadge(status: string) {
-        if (!status) return <Badge variant="secondary">-</Badge>;
-
-        const s = status.toLowerCase();
-        switch (s) {
-            case "approved":
-            case "paid":
-                return <Badge className="bg-green-500">Pago</Badge>;
-            case "pending":
-                return <Badge variant="outline" className="text-yellow-600 border-yellow-600">Pendente</Badge>;
-            case "refused":
-            case "rejected":
-                return <Badge variant="destructive">Recusado</Badge>;
-            case "cancelled":
-                return <Badge variant="secondary" className="bg-gray-200 text-gray-600">Cancelado</Badge>;
-            case "payment_generated":
-                return <Badge variant="outline" className="text-blue-600 border-blue-600">Pagamento Gerado</Badge>;
-            case "overdue":
-                return <Badge variant="destructive">Vencido</Badge>;
-            case "waived":
-                return <Badge variant="secondary">Isento</Badge>;
-            default:
-                return <Badge variant="secondary">{status}</Badge>;
-        }
-    }
-
-    function safeFormat(dateStr: string, fmt: string) {
-        try {
-            if (!dateStr) return "-";
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return "-";
-            return format(d, fmt, { locale: ptBR });
-        } catch (e) {
-            return "-";
-        }
-    }
-
-    const paymentColumns: ColumnDef<CompanyPayment>[] = [
-        {
-            accessorKey: "created_at",
-            header: "Data",
-            cell: ({ row }) => safeFormat(row.original.created_at, "dd/MM/yyyy HH:mm"),
-        },
-        {
-            accessorKey: "amount",
-            header: "Valor",
-            cell: ({ row }) => formatCurrency(parseFloat(row.original.amount)),
-        },
-        {
-            accessorKey: "status",
-            header: "Status",
-            cell: ({ row }) => getStatusBadge(row.original.status),
-        },
-        {
-            header: "Período",
-            cell: ({ row }) => row.original.months > 0 ? `${row.original.months} meses` : "Avulso",
-        },
-        {
-            accessorKey: "external_reference",
-            header: "Ref.",
-            cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.external_reference?.substring(0, 8)}...</span>,
-        },
-        {
-            id: "actions",
-            header: "Ações",
-            cell: ({ row }) => {
-                const payment = row.original;
-                return (
-                    <div className="flex gap-2">
-                        {payment.status === "pending" && payment.payment_url && (
-                            <Button variant="link" size="sm" asChild className="h-auto p-0 text-blue-600">
-                                <a href={payment.payment_url} target="_blank" rel="noopener noreferrer">
-                                    Pagar
-                                </a>
-                            </Button>
-                        )}
-                        {payment.status === "pending" && (
-                            <Button
-                                variant="link"
-                                size="sm"
-                                className="h-auto p-0 text-red-600 ml-2"
-                                onClick={() => handleCancel(payment.id)}
-                            >
-                                Cancelar
-                            </Button>
-                        )}
-                    </div>
-                );
-            },
-        },
-    ];
-
-    const costColumns: ColumnDef<UsageCost>[] = [
-        {
-            accessorKey: "created_at",
-            header: "Data",
-            cell: ({ row }) => safeFormat(row.original.created_at, "dd/MM/yyyy HH:mm"),
-        },
-        {
-            header: "Descrição/Tipo",
-            cell: ({ row }) => (
-                <div className="flex flex-col">
-                    <span>{row.original.description || "Sem descrição"}</span>
-                    <span className="text-xs text-muted-foreground uppercase">{row.original.cost_type}</span>
-                </div>
-            ),
-        },
-        {
-            accessorKey: "status",
-            header: "Status",
-            cell: ({ row }) => getStatusBadge(row.original.status),
-        },
-        {
-            accessorKey: "amount",
-            header: "Valor",
-            cell: ({ row }) => formatCurrency(parseFloat(row.original.amount)),
-        },
-    ];
 
     return (
         <div className="p-6 space-y-8 max-w-6xl mx-auto">
@@ -368,8 +254,8 @@ export default function BillingPage() {
                         </CardHeader>
                         <CardContent>
                             <CrudTable
-                                columns={paymentColumns}
-                                data={payments?.data || []}
+                                columns={paymentColumns(handleCancel)}
+                                data={payments}
                                 onPageChange={(page) => setPaymentsPage(page)}
                             />
                         </CardContent>
@@ -423,8 +309,8 @@ export default function BillingPage() {
                                 <CardTitle className="text-sm font-medium text-muted-foreground">Total do Mês</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{formatCurrency(parseFloat(costs?.data?.total_amount || "0"))}</div>
-                                <p className="text-xs text-muted-foreground mt-1">Pago: {formatCurrency(parseFloat(costs?.data?.total_paid || "0"))}</p>
+                                <div className="text-2xl font-bold">{formatCurrency(parseFloat(costsResponse?.total_amount || "0"))}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Pago: {formatCurrency(parseFloat(costsResponse?.total_paid || "0"))}</p>
                             </CardContent>
                         </Card>
                         <Card>
@@ -432,8 +318,8 @@ export default function BillingPage() {
                                 <CardTitle className="text-sm font-medium text-muted-foreground">Notas Emitidas</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{costs?.data?.nfce_count || 0}</div>
-                                <p className="text-xs text-muted-foreground mt-1">Custo: {formatCurrency(parseFloat(costs?.data?.nfce_costs || "0"))}</p>
+                                <div className="text-2xl font-bold">{costsResponse?.nfce_count || 0}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Custo: {formatCurrency(parseFloat(costsResponse?.nfce_costs || "0"))}</p>
                             </CardContent>
                         </Card>
                         <Card>
@@ -441,7 +327,7 @@ export default function BillingPage() {
                                 <CardTitle className="text-sm font-medium text-muted-foreground">Outros</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{formatCurrency(parseFloat(costs?.data?.other_fee || "0"))}</div>
+                                <div className="text-2xl font-bold">{formatCurrency(parseFloat(costsResponse?.other_fee || "0"))}</div>
                             </CardContent>
                         </Card>
                     </div>
@@ -449,8 +335,8 @@ export default function BillingPage() {
 
                     <div className="mt-6">
                         <CrudTable
-                            columns={costColumns}
-                            data={costs?.data?.items || []}
+                            columns={costColumns()}
+                            data={costs}
                             onPageChange={(page) => setCostsPage(page + 1)} // CrudTable uses 0-based index, API uses 1-based (from my specific impl)
                         />
                     </div>

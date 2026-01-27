@@ -6,6 +6,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import AuthProvider from "../../providers/auth-provider";
 import { Toaster } from "react-hot-toast";
+import { PendingPaymentModal } from "./components/billing/pending-payment-modal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="br" suppressHydrationWarning>
       <body className={inter.className + " text-black bg-gray-100"} suppressHydrationWarning>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <PendingPaymentModal />
+          {children}
+        </AuthProvider>
         <Toaster position="top-right" />
         <div id="modal-root"></div>
       </body>

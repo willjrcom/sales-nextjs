@@ -1,14 +1,12 @@
 
-
 export interface CompanyUsageCost {
     id: string;
     company_id: string;
     cost_type: string;
     description: string;
-    amount: number;
-    original_amount?: number;
+    amount: string;
     status: string;
-    month: number;
-    year: number;
+    created_at: string;
+    reference_id?: string;
     payment_id?: string;
 }
