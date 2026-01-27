@@ -13,27 +13,34 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import GetQuantitiesByCategoryID from "@/app/api/quantity/quantity";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { CheckboxField } from "@/app/components/modal/field";
 
 interface ListQuantityProps {
-    category: Category;
+    categoryID: string;
+    isDefaultCategory: boolean;
 }
 
-const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
+const ListQuantity = ({ categoryID, isDefaultCategory }: ListQuantityProps) => {
     const { data: session } = useSession();
     const [editingQuantity, setEditingQuantity] = useState<Quantity | null>(null);
     const [isNewOpen, setIsNewOpen] = useState(false);
+    const [showInactive, setShowInactive] = useState(false);
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     // Usa useQuery para manter os dados sincronizados
-    const { data: category, refetch } = useQuery({
-        queryKey: ['category', initialCategory.id],
-        queryFn: () => GetCategoryByID(session!, initialCategory.id),
-        enabled: !!session && !!initialCategory.id,
-        initialData: initialCategory,
+    const { data: quantities, refetch, isPending } = useQuery({
+        queryKey: ['quantities', categoryID],
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetQuantitiesByCategoryID(session!, categoryID);
+        },
+        enabled: !!session && !!categoryID,
     });
 
-    const currentCategory = category || initialCategory;
-    const quantities = [...(currentCategory?.quantities || [])].sort((a, b) => a.quantity - b.quantity);
-    const isDefaultCategory = !currentCategory.is_additional && !currentCategory.is_complement;
+    const filteredQuantities = quantities?.filter(q => showInactive || q.is_active) || [];
+    const sortedQuantities = [...filteredQuantities].sort((a, b) => a.quantity - b.quantity);
 
     const handleSuccess = () => {
         refetch();
@@ -43,14 +50,25 @@ const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
 
     return (
         <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4">Quantidades</h2>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold mb-4">Quantidades</h2>
+                <div className="flex gap-4 items-center">
+                    <CheckboxField
+                        friendlyName="Mostrar inativos"
+                        name="show_inactive"
+                        value={showInactive}
+                        setValue={setShowInactive}
+                    />
+                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                </div>
+            </div>
             <div className="flex flex-wrap gap-4">
-                {quantities.map((quantity) => (
+                {sortedQuantities.map((quantity) => (
                     <Dialog key={quantity.id} open={editingQuantity?.id === quantity.id} onOpenChange={(open) => !open && setEditingQuantity(null)}>
                         <DialogTrigger asChild>
                             <div
                                 onClick={() => setEditingQuantity(quantity)}
-                                className="border p-2 rounded-md text-center bg-white w-32 cursor-pointer hover:bg-gray-50 transition-colors"
+                                className={`border p-2 rounded-md text-center ${quantity.is_active ? ' hover:bg-gray-100' : 'bg-gray-200 hover:bg-gray-300'} w-32 cursor-pointer transition-colors`}
                             >
                                 {quantity.quantity}
                             </div>
@@ -60,7 +78,7 @@ const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
                                 <DialogTitle>Editar quantidade: {quantity.quantity}</DialogTitle>
                             </DialogHeader>
                             <QuantityForm
-                                category={currentCategory}
+                                categoryID={categoryID}
                                 isUpdate={true}
                                 item={quantity}
                                 onSuccess={handleSuccess}
@@ -82,7 +100,7 @@ const ListQuantity = ({ category: initialCategory }: ListQuantityProps) => {
                                 <DialogTitle>Nova Quantidade</DialogTitle>
                             </DialogHeader>
                             <QuantityForm
-                                category={currentCategory}
+                                categoryID={categoryID}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import Size from "@/app/entities/size/size";
 import SizeForm from "@/app/forms/size/form";
-import Category from "@/app/entities/category/category";
 import { useQuery } from "@tanstack/react-query";
-import GetCategoryByID from "@/app/api/category/[id]/category";
 import { useSession } from "next-auth/react";
 import { FaPlus } from "react-icons/fa";
 import {
@@ -13,27 +11,34 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import GetSizesByCategoryID from "@/app/api/size/size";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { CheckboxField } from "@/app/components/modal/field";
 
 interface ListSizeProps {
-    category: Category;
+    categoryID: string;
+    isDefaultCategory: boolean;
 }
 
-const ListSize = ({ category: initialCategory }: ListSizeProps) => {
+const ListSize = ({ categoryID, isDefaultCategory }: ListSizeProps) => {
     const { data: session } = useSession();
     const [editingSize, setEditingSize] = useState<Size | null>(null);
     const [isNewOpen, setIsNewOpen] = useState(false);
+    const [showInactive, setShowInactive] = useState(false);
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     // Usa useQuery para manter os dados sincronizados
-    const { data: category, refetch } = useQuery({
-        queryKey: ['category', initialCategory.id],
-        queryFn: () => GetCategoryByID(session!, initialCategory.id),
-        enabled: !!session && !!initialCategory.id,
-        initialData: initialCategory,
+    const { data: sizes, refetch, isPending } = useQuery({
+        queryKey: ['sizes', categoryID],
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetSizesByCategoryID(session!, categoryID);
+        },
+        enabled: !!session?.user?.access_token && !!categoryID,
     });
 
-    const currentCategory = category || initialCategory;
-    const sizes = [...(currentCategory?.sizes || [])].sort((a, b) => a.name.localeCompare(b.name));
-    const isDefaultCategory = !currentCategory.is_additional && !currentCategory.is_complement;
+    const filteredSizes = sizes?.filter(s => showInactive || s.is_active) || [];
+    const sortedSizes = [...filteredSizes].sort((a, b) => a.name.localeCompare(b.name));
 
     const handleSuccess = () => {
         refetch();
@@ -43,14 +48,25 @@ const ListSize = ({ category: initialCategory }: ListSizeProps) => {
 
     return (
         <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
+                <div className="flex gap-4 items-center">
+                    <CheckboxField
+                        friendlyName="Mostrar inativos"
+                        name="show_inactive"
+                        value={showInactive}
+                        setValue={setShowInactive}
+                    />
+                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                </div>
+            </div>
             <div className="flex flex-wrap gap-4">
-                {sizes.map((size) => (
+                {sortedSizes.map((size) => (
                     <Dialog key={size.id} open={editingSize?.id === size.id} onOpenChange={(open) => !open && setEditingSize(null)}>
                         <DialogTrigger asChild>
                             <div
                                 onClick={() => setEditingSize(size)}
-                                className="border p-2 rounded-md text-center bg-white w-32 cursor-pointer hover:bg-gray-50 transition-colors"
+                                className={`border p-2 rounded-md text-center ${size.is_active ? ' hover:bg-gray-100' : 'bg-gray-200 hover:bg-gray-300'} w-32 cursor-pointer transition-colors`}
                             >
                                 {size.name}
                             </div>
@@ -60,9 +76,9 @@ const ListSize = ({ category: initialCategory }: ListSizeProps) => {
                                 <DialogTitle>Editar tamanho: {size.name}</DialogTitle>
                             </DialogHeader>
                             <SizeForm
-                                category={currentCategory}
                                 isUpdate={true}
                                 item={size}
+                                categoryID={categoryID}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>
@@ -82,7 +98,7 @@ const ListSize = ({ category: initialCategory }: ListSizeProps) => {
                                 <DialogTitle>Novo Tamanho</DialogTitle>
                             </DialogHeader>
                             <SizeForm
-                                category={currentCategory}
+                                categoryID={categoryID}
                                 onSuccess={handleSuccess}
                             />
                         </DialogContent>

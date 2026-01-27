@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { HiddenField, CheckboxField } from '../../components/modal/field';
 import Quantity, { ValidateQuantityForm } from '@/app/entities/quantity/quantity';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -13,16 +13,16 @@ import UpdateQuantity from '@/app/api/quantity/update/quantity';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import Category from '@/app/entities/category/category';
 import NumericField from '@/app/components/modal/fields/numeric';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import GetCategoryByID from '@/app/api/category/[id]/category';
 
 interface QuantityFormProps extends CreateFormsProps<Quantity> {
-    category: Category
-    onSuccess?: () => void
+    categoryID: string;
+    onSuccess?: () => void;
 }
 
-const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps) => {
+const QuantityForm = ({ item, isUpdate, categoryID, onSuccess }: QuantityFormProps) => {
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity';
     const modalHandler = useModal();
     const queryClient = useQueryClient();
@@ -31,18 +31,25 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
+    const { data: category } = useQuery({
+        queryKey: ['category', categoryID],
+        queryFn: () => GetCategoryByID(data!, categoryID),
+        enabled: !!data?.user?.access_token && !!categoryID,
+    });
+
     const createMutation = useMutation({
         mutationFn: (newQuantity: Quantity) => NewQuantity(newQuantity, data!),
 
         onSuccess: (response, newQuantity) => {
             newQuantity.id = response;
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
-
+            queryClient.invalidateQueries({ queryKey: ['quantities', categoryID] });
 
             notifySuccess(`Quantidade ${newQuantity.quantity} criada com sucesso`);
-            modalHandler.hideModal(modalName);
-            onSuccess?.();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                modalHandler.hideModal(modalName);
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar quantitye');
@@ -52,12 +59,14 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
     const updateMutation = useMutation({
         mutationFn: (updatedQuantity: Quantity) => UpdateQuantity(updatedQuantity, data!),
         onSuccess: (_, updatedQuantity) => {
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            queryClient.invalidateQueries({ queryKey: ['quantities', categoryID] });
 
             notifySuccess(`Quantidade ${updatedQuantity.quantity} atualizada com sucesso`);
-            modalHandler.hideModal(modalName);
-            onSuccess?.();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                modalHandler.hideModal(modalName);
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar quantitye');
@@ -67,12 +76,14 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
     const deleteMutation = useMutation({
         mutationFn: (quantityId: string) => DeleteQuantity(quantityId, data!),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            queryClient.invalidateQueries({ queryKey: ['quantities', categoryID] });
 
             notifySuccess(`Quantidade ${quantity.quantity} removida com sucesso`);
-            modalHandler.hideModal(modalName);
-            onSuccess?.();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                modalHandler.hideModal(modalName);
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || `Erro ao remover quantitye ${quantity.quantity}`);
@@ -84,9 +95,9 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
     };
 
     const submit = async () => {
-        if (!data || !category) return;
+        if (!data) return;
 
-        quantity.category_id = category.id;
+        quantity.category_id = categoryID;
 
         const validationErrors = ValidateQuantityForm(quantity);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
@@ -103,7 +114,7 @@ const QuantityForm = ({ item, isUpdate, category, onSuccess }: QuantityFormProps
         deleteMutation.mutate(quantity.id);
     }
 
-    const isDefaultCategory = !category.is_additional && !category.is_complement;
+    const isDefaultCategory = useMemo(() => !category?.is_additional && !category?.is_complement, [category]);
 
     return (
         <div className="text-black space-y-6">

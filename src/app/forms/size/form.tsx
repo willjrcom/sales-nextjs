@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import Size, { ValidateSizeForm } from '@/app/entities/size/size';
 import { notifyError } from '@/app/utils/notifications';
@@ -13,22 +13,28 @@ import UpdateSize from '@/app/api/size/update/size';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import Category from '@/app/entities/category/category';
 import { notifySuccess } from '@/app/utils/notifications';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import GetCategoryByID from '@/app/api/category/[id]/category';
 
 interface SizeFormProps extends CreateFormsProps<Size> {
-    category: Category
-    onSuccess?: () => void
+    categoryID: string;
+    onSuccess?: () => void;
 }
 
-const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
+const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
     const [size, setSize] = useState<Size>(item || new Size());
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+    const { data: category } = useQuery({
+        queryKey: ['category', categoryID],
+        queryFn: () => GetCategoryByID(data!, categoryID),
+        enabled: !!data?.user?.access_token && !!categoryID,
+    });
 
     const handleInputChange = (field: keyof Size, value: any) => {
         setSize(prev => ({ ...prev, [field]: value }));
@@ -39,12 +45,14 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
 
         onSuccess: (response, newSize) => {
             newSize.id = response;
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
 
+            queryClient.invalidateQueries({ queryKey: ['sizes', categoryID] });
             notifySuccess(`Tamanho ${newSize.name} criado com sucesso`);
-            modalHandler.hideModal(modalName);
-            onSuccess?.();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                modalHandler.hideModal(modalName);
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar tamanho');
@@ -54,12 +62,14 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
     const updateMutation = useMutation({
         mutationFn: (updatedSize: Size) => UpdateSize(updatedSize, data!),
         onSuccess: (_, updatedSize) => {
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            queryClient.invalidateQueries({ queryKey: ['sizes', categoryID] });
 
             notifySuccess(`Tamanho ${updatedSize.name} atualizado com sucesso`);
-            modalHandler.hideModal(modalName);
-            onSuccess?.();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                modalHandler.hideModal(modalName);
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar tamanho');
@@ -69,12 +79,14 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
     const deleteMutation = useMutation({
         mutationFn: (sizeId: string) => DeleteSize(sizeId, data!),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['category', category.id] });
+            queryClient.invalidateQueries({ queryKey: ['sizes', categoryID] });
 
             notifySuccess(`Tamanho ${size.name} removido com sucesso`);
-            modalHandler.hideModal(modalName);
-            onSuccess?.();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                modalHandler.hideModal(modalName);
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || `Erro ao remover tamanho ${size.name}`);
@@ -101,7 +113,7 @@ const SizeForm = ({ item, isUpdate, category, onSuccess }: SizeFormProps) => {
         deleteMutation.mutate(size.id);
     }
 
-    const isDefaultCategory = !category.is_additional && !category.is_complement;
+    const isDefaultCategory = useMemo(() => !category?.is_additional && !category?.is_complement, [category?.is_additional, category?.is_complement]);
 
     return (
         <div className="text-black space-y-6">
