@@ -11,6 +11,16 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
         cell: ({ row }) => safeFormat(row.original.created_at, "dd/MM/yyyy HH:mm"),
     },
     {
+        accessorKey: "expires_at",
+        header: "Vencimento",
+        cell: ({ row }) => {
+            if (row.original.is_mandatory && row.original.expires_at) {
+                return safeFormat(row.original.expires_at, "dd/MM/yyyy");
+            }
+            return "-";
+        },
+    },
+    {
         accessorKey: "amount",
         header: "Valor",
         cell: ({ row }) => formatCurrency(parseFloat(row.original.amount)),

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, cancelPayment } from "@/app/api/billing/billing";
+import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, cancelPayment, triggerMonthlyBilling } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
 import CrudTable from "@/app/components/crud/table";
 import { useQuery } from "@tanstack/react-query";
@@ -142,6 +142,21 @@ export default function BillingPage() {
             refetchCosts();
         } catch (error: any) {
             notifyError(error?.message || "Erro ao cancelar pagamento");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleTriggerBatch = async () => {
+        if (!session) return;
+        setLoading(true);
+        try {
+            await triggerMonthlyBilling(session);
+            notifyInfo("Processamento mensal iniciado com sucesso!");
+            refetchPayments();
+            refetchCosts();
+        } catch (error: any) {
+            notifyError(error?.message || "Erro ao rodar mensalidade");
         } finally {
             setLoading(false);
         }
@@ -285,12 +300,6 @@ export default function BillingPage() {
                             </select>
                         </div>
                         <div className="flex items-center">
-                            <Refresh
-                                onRefresh={refetchCosts}
-                                isPending={isRefetchingCosts}
-                                lastUpdate={costsUpdatedAt ? FormatRefreshTime(new Date(costsUpdatedAt)) : undefined}
-                                optionalText="Custos"
-                            />
                         </div>
                         <Button
                             variant="outline"
@@ -299,7 +308,20 @@ export default function BillingPage() {
                         >
                             {loading ? "Processando..." : "Pagar Pendentes"}
                         </Button>
+                        <Button
+                            variant="secondary"
+                            onClick={handleTriggerBatch}
+                            disabled={loading}
+                        >
+                            {loading ? "..." : "Rodar Mensalidade"}
+                        </Button>
                         <RegisterCostDialog onSuccess={refetchCosts} />
+                        <Refresh
+                            onRefresh={refetchCosts}
+                            isPending={isRefetchingCosts}
+                            lastUpdate={costsUpdatedAt ? FormatRefreshTime(new Date(costsUpdatedAt)) : undefined}
+                            optionalText="Custos"
+                        />
                     </div>
 
 

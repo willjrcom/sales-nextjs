@@ -106,3 +106,13 @@ export const cancelPayment = async (session: Session, paymentId: string) => {
 
     return response.data;
 }
+
+export const triggerMonthlyBilling = async (session: Session) => {
+    const response = await RequestApi<null, null>({
+        path: "/company/billing/scheduler/trigger",
+        method: "POST",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data;
+}

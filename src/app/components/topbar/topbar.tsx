@@ -10,7 +10,9 @@ import { useSession } from 'next-auth/react';
 import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
 import Order from '@/app/entities/order/order';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { PendingPaymentModal } from '../billing/pending-payment-modal';
+import { listPayments } from '@/app/api/billing/billing';
 
 interface TopbarItemProps {
   label: string;
@@ -44,13 +46,40 @@ const TopbarItemAlert = ({ label, icon: Icon, href }: TopbarItemIconProps) => (
   </Link>
 );
 
+interface TopbarItemPaymentAlertProps {
+  onClick: () => void;
+}
+
+const TopbarItemPaymentAlert = ({ onClick }: TopbarItemPaymentAlertProps) => (
+  <div onClick={onClick} className="inline-flex items-center bg-red-500 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200 hover:bg-red-600 cursor-pointer">
+    <FaExclamationCircle className="mr-2 text-base" />
+    Pagamentos pendentes
+  </div>
+);
+
 const Topbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const { data } = useSession();
   const queryClient = useQueryClient();
+  const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
 
   // Ler o pedido atual do cache (sem localStorage!)
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+
+  // Check for pending payments to show alert
+  const { data: paymentsResponse } = useQuery({
+    queryKey: ['company-payments', 0],
+    queryFn: () => listPayments(data!, 0, 100),
+    enabled: !!data?.user?.access_token,
+    // Shared cache with modal
+    staleTime: 60000,
+  });
+
+  // Calculate if there are any mandatory pending payments
+  const hasPendingPayments = React.useMemo(() => {
+    if (!paymentsResponse?.items) return false;
+    return paymentsResponse.items.some(p => p.is_mandatory && p.status === 'pending');
+  }, [paymentsResponse]);
 
   useEffect(() => {
     // Verificar cache periodicamente
@@ -100,6 +129,7 @@ const Topbar = () => {
         </div>
 
         <div className="flex space-x-4 items-center">
+          {hasPendingPayments && <TopbarItemPaymentAlert onClick={() => setPaymentModalOpen(true)} />}
           <TopbarItem label="Turno" href="/pages/shift" color='green' />
           {/* <button
             onClick={handleNotifications}
@@ -110,6 +140,7 @@ const Topbar = () => {
           {user && <EmployeeUserProfile user={user} setUser={setUser} />}
         </div>
       </header>
+      <PendingPaymentModal isOpen={isPaymentModalOpen} onOpenChange={setPaymentModalOpen} />
       <Toaster
         position="top-right"
         containerStyle={{ zIndex: 20000 }}

@@ -20,6 +20,9 @@ export default class Company {
   cnae?: string;
   crt?: number;
 
+  monthly_payment_due_day?: number;
+  monthly_payment_due_day_updated_at?: string;
+
   constructor(data: Partial<Company> = {}) {
     Object.assign(this, data);
   }

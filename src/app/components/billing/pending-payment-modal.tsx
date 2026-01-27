@@ -10,9 +10,13 @@ import { ptBR } from 'date-fns/locale';
 import { useEffect, useMemo, useState } from 'react';
 import { formatCurrency } from '@/app/utils/format';
 
-export function PendingPaymentModal() {
+interface PendingPaymentModalProps {
+    isOpen: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export function PendingPaymentModal({ isOpen, onOpenChange }: PendingPaymentModalProps) {
     const { data: session } = useSession();
-    const [isOpen, setIsOpen] = useState(false);
 
     // We can fetch page 0 to see recent payments.
     // Ideally we should have an endpoint "getMandatoryPendingPayment" but filtering list is okay for MVP.
@@ -28,11 +32,9 @@ export function PendingPaymentModal() {
 
     useEffect(() => {
         if (mandatoryPayment) {
-            setIsOpen(true);
-        } else {
-            setIsOpen(false);
+            onOpenChange(false);
         }
-    }, [mandatoryPayment]);
+    }, [mandatoryPayment]); // Only trigger when payment detection changes
 
     if (!mandatoryPayment) return null;
 
@@ -41,18 +43,12 @@ export function PendingPaymentModal() {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => {
             // Prevent closing if overdue (force payment)
-            // Or just nag? User said: "se for obrigatorio, sempre ao fazer login ... abre um modal"
-            // Usually "mandatory" implies you can't ignore it easily.
-            // Let's allow closing only if not overdue? Or allow closing but it pops up next time.
-            // For now, allow closing but maybe add a "Remember me" or just persistent on every page load.
             if (!open && isOverdue) {
-                // Block closing if overdue?
-                // Let's allow closing for now to avoid locking user out if payment fails or something.
-                // But typically "Mandatory" means block.
-                // User request check: "se for obrigatorio, sempre ao fazer login ... abre um modal"
-                setIsOpen(false);
+                onOpenChange(false); // User block? "User said: sempre ao fazer login ... abre um modal"
+                // For now allow closing to be safe, logic from previous implementation:
+                onOpenChange(false);
             } else {
-                setIsOpen(open);
+                onOpenChange(open);
             }
         }}>
             <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => {
@@ -92,7 +88,7 @@ export function PendingPaymentModal() {
 
                 <DialogFooter className="sm:justify-between gap-2">
                     {!isOverdue && (
-                        <Button variant="outline" onClick={() => setIsOpen(false)}>
+                        <Button variant="outline" onClick={() => onOpenChange(false)}>
                             Resolver depois
                         </Button>
                     )}

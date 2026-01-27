@@ -240,6 +240,55 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 </div>
             )}
 
+            {/* Seção: Faturamento */}
+            {isUpdate && (
+                <div className="bg-gradient-to-br from-white to-yellow-50 rounded-lg shadow-sm border border-yellow-100 p-6 transition-all duration-300 hover:shadow-md">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-yellow-200">Faturamento</h3>
+                    {(() => {
+                        let isBlocked = false;
+                        let nextAllowedDate: Date | null = null;
+
+                        if (company.monthly_payment_due_day_updated_at) {
+                            const lastUpdate = new Date(company.monthly_payment_due_day_updated_at);
+                            nextAllowedDate = new Date(lastUpdate);
+                            nextAllowedDate.setMonth(nextAllowedDate.getMonth() + 3);
+
+                            if (new Date() < nextAllowedDate) {
+                                isBlocked = true;
+                            }
+                        }
+
+                        return (
+                            <>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Configure o dia de vencimento da fatura mensal. Só é permitido alterar a cada 3 meses.
+                                    {company.monthly_payment_due_day_updated_at && (
+                                        <span className="block mt-1 text-gray-600">
+                                            Última alteração em: {new Date(company.monthly_payment_due_day_updated_at).toLocaleDateString()}.
+                                        </span>
+                                    )}
+                                    {isBlocked && nextAllowedDate && (
+                                        <span className="block mt-1 text-orange-600 font-medium">
+                                            Bloqueado até: {nextAllowedDate.toLocaleDateString()}.
+                                        </span>
+                                    )}
+                                </p>
+                                <div className="w-full sm:w-1/2">
+                                    <SelectField
+                                        friendlyName="Dia de Vencimento Mensal"
+                                        name="monthly_payment_due_day"
+                                        values={Array.from({ length: 28 }, (_, i) => ({ id: String(i + 1), name: String(i + 1) }))}
+                                        selectedValue={String(company.monthly_payment_due_day || '10')}
+                                        setSelectedValue={value => handleInputChange('monthly_payment_due_day', parseInt(value))}
+                                        disabled={isBlocked}
+                                    />
+                                </div>
+                            </>
+                        );
+                    })()}
+                </div>
+            )}
+
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Preferências</h3>
                 <div className="space-y-4">
