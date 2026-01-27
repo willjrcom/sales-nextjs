@@ -52,7 +52,7 @@ export default function BillingPage() {
 
     const [paymentsPage, setPaymentsPage] = useState(0);
     const { data: payments, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
-        queryKey: ['payments', paymentsPage],
+        queryKey: ['company-payments', paymentsPage],
         queryFn: () => listPayments(session!, paymentsPage),
         enabled: !!session?.user?.access_token,
     });
@@ -63,7 +63,7 @@ export default function BillingPage() {
     const [costsPage, setCostsPage] = useState(0);
 
     const { data: costs, refetch: refetchCosts, isRefetching: isRefetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
-        queryKey: ['costs', selectedMonth, selectedYear, costsPage],
+        queryKey: ['company-costs', selectedMonth, selectedYear, costsPage],
         queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear, costsPage),
         enabled: !!session?.user?.access_token,
     });
@@ -134,6 +134,7 @@ export default function BillingPage() {
             await cancelPayment(session, paymentId);
             notifyInfo("Pagamento cancelado com sucesso!");
             refetchPayments();
+            refetchCosts();
         } catch (error: any) {
             notifyError(error?.message || "Erro ao cancelar pagamento");
         } finally {
@@ -154,6 +155,14 @@ export default function BillingPage() {
             case "refused":
             case "rejected":
                 return <Badge variant="destructive">Recusado</Badge>;
+            case "cancelled":
+                return <Badge variant="secondary" className="bg-gray-200 text-gray-600">Cancelado</Badge>;
+            case "payment_generated":
+                return <Badge variant="outline" className="text-blue-600 border-blue-600">Pagamento Gerado</Badge>;
+            case "overdue":
+                return <Badge variant="destructive">Vencido</Badge>;
+            case "waived":
+                return <Badge variant="secondary">Isento</Badge>;
             default:
                 return <Badge variant="secondary">{status}</Badge>;
         }
@@ -361,7 +370,6 @@ export default function BillingPage() {
                             <CrudTable
                                 columns={paymentColumns}
                                 data={payments?.data || []}
-                                totalCount={100} // Backend doesn't seem to return total count for payments list yet, assumed infinite or handled elsewhere
                                 onPageChange={(page) => setPaymentsPage(page)}
                             />
                         </CardContent>
@@ -443,7 +451,6 @@ export default function BillingPage() {
                         <CrudTable
                             columns={costColumns}
                             data={costs?.data?.items || []}
-                            totalCount={costs?.data?.total_items || 0}
                             onPageChange={(page) => setCostsPage(page + 1)} // CrudTable uses 0-based index, API uses 1-based (from my specific impl)
                         />
                     </div>

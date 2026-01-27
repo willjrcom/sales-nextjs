@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { GetMovementsByStockID } from '@/app/api/stock/movements';
 import Decimal from 'decimal.js';
 import { useQuery } from '@tanstack/react-query';
+import Refresh, { FormatRefreshTime } from '../crud/refresh';
 
 interface StockMovementsProps {
     stockID: string;
@@ -12,13 +13,15 @@ interface StockMovementsProps {
 
 const StockMovements = ({ stockID }: StockMovementsProps) => {
     const { data } = useSession();
-
-    const { isPending, data: stockMovementsResponse } = useQuery({
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const { isPending, data: stockMovementsResponse, refetch } = useQuery({
         queryKey: ['stock-movements'],
         queryFn: async () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
             return GetMovementsByStockID(data!, stockID);
         },
         enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
     });
 
     const movements = useMemo(() => stockMovementsResponse || [], [stockMovementsResponse]);
@@ -64,8 +67,10 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
 
     return (
         <div className="p-6">
-            <h2 className="text-xl font-bold mb-6">Histórico de Movimentos</h2>
-
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold mb-6">Histórico de Movimentos</h2>
+                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+            </div>
             {movements.length === 0 ? (
                 <p className="text-gray-500">Nenhum movimento encontrado</p>
             ) : (
