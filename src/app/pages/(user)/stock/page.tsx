@@ -2,7 +2,7 @@
 
 import StockForm from "@/app/forms/stock/form";
 import CrudLayout from "@/app/components/crud/crud-layout";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import CrudTable from "@/app/components/crud/table";
 import StockColumns from "@/app/entities/stock/table-columns";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";

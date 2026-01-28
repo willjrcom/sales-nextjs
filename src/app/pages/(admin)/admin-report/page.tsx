@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { reportConfigs } from '@/app/components/report/reportConfigs';
 
 export default function ReportsPage() {

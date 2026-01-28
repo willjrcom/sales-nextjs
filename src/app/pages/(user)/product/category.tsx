@@ -4,7 +4,7 @@ import { CheckboxField } from "@/app/components/modal/field";
 
 import CategoryForm from "@/app/forms/category/form";
 import CrudLayout from "@/app/components/crud/crud-layout";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import CrudTable from "@/app/components/crud/table";
 import CategoryColumns from "@/app/entities/category/table-columns";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";

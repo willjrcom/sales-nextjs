@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import React, { useMemo, useState } from 'react';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { useQuery } from '@tanstack/react-query';
 import CardCategory from './card-category';
 import { GetCategoriesMap } from '@/app/api/category/category';

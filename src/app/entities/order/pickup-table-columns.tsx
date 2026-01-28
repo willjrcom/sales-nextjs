@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Order from "./order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
-import CardOrder from "@/app/components/order/card-order";
+import CardOrder from "@/app/components/card-order/card-order";
 import ButtonIcon from "@/app/components/button/button-icon";
 import { FaSeedling } from "react-icons/fa";
 import { BsSend } from "react-icons/bs";

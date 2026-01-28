@@ -3,7 +3,7 @@
 import RequestError from "@/app/utils/error";
 import NewOrderPickup from "@/app/api/order-pickup/new/order-pickup";
 import { TextField } from "@/app/components/modal/field";
-import PageTitle from "@/app/components/PageTitle";
+import PageTitle from "@/app/components/ui/page-title";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

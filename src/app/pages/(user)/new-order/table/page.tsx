@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import PageTitle from "@/app/components/PageTitle";
+import PageTitle from "@/app/components/ui/page-title";
 import { notifyError } from "@/app/utils/notifications";
 import { useQuery } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';

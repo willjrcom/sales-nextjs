@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import CrudLayout from "@/app/components/crud/crud-layout";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { SelectField } from "@/app/components/modal/field";
 import OrderProcessCard from "./order-process";
 import { useQuery } from '@tanstack/react-query';

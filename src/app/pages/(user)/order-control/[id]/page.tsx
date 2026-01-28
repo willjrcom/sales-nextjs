@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from "next/navigation";
-import { CartAdded } from "@/app/components/order/cart/cart-added";
+import { CartCard } from "@/app/pages/(user)/order-control/[id]/cart/cart-card";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import GetOrderByID from "@/app/api/order/[id]/order";
@@ -27,7 +27,7 @@ const PageEditOrderControl = () => {
 
     return (
         <div className="w-full">
-            <CartAdded />
+            <CartCard />
         </div>
     );
 }

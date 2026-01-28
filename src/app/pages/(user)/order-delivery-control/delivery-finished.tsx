@@ -3,7 +3,7 @@
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import CrudTable from "@/app/components/crud/table";
 import { SelectField } from "@/app/components/modal/field";
-import CardOrder from "@/app/components/order/card-order";
+import CardOrder from "@/app/components/card-order/card-order";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";

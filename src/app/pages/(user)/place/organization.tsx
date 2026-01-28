@@ -1,7 +1,7 @@
 "use client";
 
 import React, { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
 import { useSession } from "next-auth/react";
 import PlaceTable from "@/app/entities/place/place_table";

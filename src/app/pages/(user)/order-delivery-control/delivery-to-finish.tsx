@@ -12,7 +12,7 @@ import CrudTable from "@/app/components/crud/table";
 import { FaCheck } from "react-icons/fa";
 import { SelectField } from "@/app/components/modal/field";
 import Decimal from 'decimal.js';
-import CardOrder from "@/app/components/order/card-order";
+import CardOrder from "@/app/components/card-order/card-order";
 import { useModal } from "@/app/context/modal/context";
 import DeliveryOrderColumns from "@/app/entities/order/delivery-table-columns";
 import Order from "@/app/entities/order/order";

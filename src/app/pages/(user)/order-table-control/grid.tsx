@@ -2,12 +2,12 @@
 
 import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import PageTitle from "@/app/components/PageTitle";
+import PageTitle from "@/app/components/ui/page-title";
 import PlaceTable from "@/app/entities/place/place_table";
 import { SelectField } from "@/app/components/modal/field";
 import RequestError from "@/app/utils/error";
 import { useModal } from "@/app/context/modal/context";
-import CardOrder from "@/app/components/order/card-order";
+import CardOrder from "@/app/components/card-order/card-order";
 import OrderTable from "@/app/entities/order/order-table";
 import { FaPlus, FaList } from "react-icons/fa";
 import NewOrderTable from "@/app/api/order-table/new/order-table";

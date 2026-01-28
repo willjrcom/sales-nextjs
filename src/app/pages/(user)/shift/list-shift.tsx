@@ -1,6 +1,6 @@
 
 import CrudLayout from "@/app/components/crud/crud-layout";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import CrudTable from "@/app/components/crud/table";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useEffect, useMemo, useState } from "react";

@@ -1,7 +1,7 @@
 'use client';
 
 import CrudLayout from "@/app/components/crud/crud-layout";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import TableForm from "@/app/forms/table/form";
 import CrudTable from "@/app/components/crud/table";
 import TableColumns from "@/app/entities/table/table-columns";

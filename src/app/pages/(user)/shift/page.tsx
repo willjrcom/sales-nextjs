@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ShiftDashboard from "./shift-dashboard"
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import Shift from "@/app/entities/shift/shift";
 import { useSession } from "next-auth/react";
 import GetCurrentShift from "@/app/api/shift/current/shift";

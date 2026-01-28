@@ -1,7 +1,7 @@
 'use client';
 
 import GetCategoryByID from "@/app/api/category/[id]/category";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import ListSize from "../../../../../forms/category/list-size";

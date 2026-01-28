@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { FaLuggageCart, FaMotorcycle, FaUtensils } from "react-icons/fa";
 
 

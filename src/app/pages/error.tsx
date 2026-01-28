@@ -1,6 +1,6 @@
 'use client';
 
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 
 export default function PageError() {
     return (

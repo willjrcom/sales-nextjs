@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import ReportChart from '@/app/components/report/ReportChart';
 import { reportConfigs } from '@/app/components/report/reportConfigs';
 import ReportCard from './report';

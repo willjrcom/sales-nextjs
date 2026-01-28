@@ -1,11 +1,11 @@
 import Item from '@/app/entities/order/item';
 import React from 'react';
-import AdditionalItem from '../../../../../../components/order/additional-item';
-import RemovedItem from '../../../../../../components/order/removed-item';
+import AdditionalItemCard from '../../../../../../components/order/additional-item-card';
+import RemovedItemCard from '../../../../../../components/order/removed-item-card';
 import Product from '@/app/entities/product/product';
 import { FaRegImage } from 'react-icons/fa';
 import { useModal } from '@/app/context/modal/context';
-import ObservationCard from '@/app/components/order/observation';
+import ObservationCard from '@/app/components/order/observation-card';
 import Image from 'next/image';
 
 interface ItemDetailsProps {
@@ -79,10 +79,10 @@ const ItemDetails = ({ item, product }: ItemDetailsProps) => {
                             )}
 
                             {item.additional_items?.map((add) => (
-                                <AdditionalItem item={add} key={add.id} />
+                                <AdditionalItemCard item={add} key={add.id} />
                             ))}
                             {item.removed_items?.map((rem) => (
-                                <RemovedItem item={rem} key={rem} />
+                                <RemovedItemCard item={rem} key={rem} />
                             ))}
                         </div>
                     </div>

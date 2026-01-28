@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ReportChart from '@/app/components/report/ReportChart';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import { reportConfigs } from '@/app/components/report/reportConfigs';
 
 export default function ReportPage() {
@@ -20,8 +20,8 @@ export default function ReportPage() {
   }
 
   const body = config.inputType === 'dateRange'
-      ? { start: new Date(startDate).toISOString(), end: new Date(endDate).toISOString() }
-      : config.inputType === 'date'
+    ? { start: new Date(startDate).toISOString(), end: new Date(endDate).toISOString() }
+    : config.inputType === 'date'
       ? { day: new Date(startDate).toISOString() }
       : undefined;
 

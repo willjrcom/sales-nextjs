@@ -1,10 +1,10 @@
 import React from 'react';
 import { useState } from 'react';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 
 const Table = ({ status, onClick }: { status: string, onClick: () => void }) => {
   const getStatusColor = () => {
-    switch(status) {
+    switch (status) {
       case 'livre':
         return 'bg-green-500';
       case 'reservada':
@@ -17,8 +17,8 @@ const Table = ({ status, onClick }: { status: string, onClick: () => void }) => 
   };
 
   return (
-    <div 
-      className={`w-16 h-16 m-2 flex items-center justify-center cursor-pointer ${getStatusColor()}`} 
+    <div
+      className={`w-16 h-16 m-2 flex items-center justify-center cursor-pointer ${getStatusColor()}`}
       onClick={onClick}
     >
       {/* Conteúdo adicional da mesa */}
@@ -41,9 +41,9 @@ const Tables = () => {
       <PageTitle title="Mesas" tooltip="Visualize e gerencie o status das mesas disponíveis, reserve ou libere conforme necessário." />
       <div className="flex flex-wrap">
         {tables.map((status, index) => (
-          <Table 
-            key={status} 
-            status={status} 
+          <Table
+            key={status}
+            status={status}
             onClick={() => handleTableClick(index)}
           />
         ))}

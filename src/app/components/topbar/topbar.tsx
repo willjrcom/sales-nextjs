@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Toaster, toast } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import { FaExclamationCircle } from 'react-icons/fa';
 import EmployeeUserProfile from '../profile/profile';
 import { useSession } from 'next-auth/react';

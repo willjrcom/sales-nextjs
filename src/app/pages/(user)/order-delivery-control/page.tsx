@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import DeliveryOrderToShip from "./delivery-to-ship";
 import DeliveryOrderToFinish from "./delivery-to-finish";
 import DeliveryOrderFinished from "./delivery-finished";

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import CrudTable from "@/app/components/crud/table";
 import { useSession } from "next-auth/react";

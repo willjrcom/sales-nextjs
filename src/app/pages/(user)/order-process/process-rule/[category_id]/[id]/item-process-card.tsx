@@ -1,6 +1,6 @@
-import AdditionalItem from "@/app/components/order/additional-item";
-import ObservationCard from "@/app/components/order/observation";
-import RemovedItem from "@/app/components/order/removed-item";
+import AdditionalItemCard from "@/app/components/order/additional-item-card";
+import ObservationCard from "@/app/components/order/observation-card";
+import RemovedItemCard from "@/app/components/order/removed-item-card";
 import Item from "@/app/entities/order/item";
 
 interface ItemProcessProps {
@@ -23,10 +23,10 @@ const ItemProcessCard = ({ item }: ItemProcessProps) => {
                 )}
                 <div className="flex flex-wrap mt-2 space-x-2">
                     {item.additional_items?.map(add => (
-                        <AdditionalItem item={add} key={add.id} />
+                        <AdditionalItemCard item={add} key={add.id} />
                     ))}
                     {item.removed_items?.map(rem => (
-                        <RemovedItem item={rem} key={rem} />
+                        <RemovedItemCard item={rem} key={rem} />
                     ))}
                 </div>
             </div>

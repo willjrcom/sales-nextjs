@@ -10,7 +10,7 @@ import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
-import ObservationCard from '@/app/components/order/observation';
+import ObservationCard from '@/app/components/order/observation-card';
 import printGroupItem from '@/app/components/print/print-group-item';
 import GetCompany from '@/app/api/company/company';
 import { useQuery, useQueryClient } from '@tanstack/react-query';

@@ -1,6 +1,6 @@
 import ProductForm from "@/app/forms/product/form";
 import CrudLayout from "@/app/components/crud/crud-layout";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import CrudTable from "@/app/components/crud/table";
 import ProductColumns from "@/app/entities/product/table-columns";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";

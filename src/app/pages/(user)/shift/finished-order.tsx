@@ -2,7 +2,7 @@ import Decimal from 'decimal.js';
 import Shift from "@/app/entities/shift/shift";
 import { StatusOrder } from '@/app/entities/order/order';
 import { useModal } from '@/app/context/modal/context';
-import CardOrder from '@/app/components/order/card-order';
+import CardOrder from '@/app/components/card-order/card-order';
 import { FaEye } from 'react-icons/fa';
 
 interface ListOrderProps {

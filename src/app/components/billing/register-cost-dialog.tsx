@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createCost } from "@/app/api/billing/billing";
 import { useSession } from "next-auth/react";
-import { toast } from "sonner";
 import GetCompany from "@/app/api/company/company";
 import { useQuery } from "@tanstack/react-query";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 const formSchema = z.object({
     cost_type: z.string().min(1, "Selecione o tipo de custo"),
@@ -57,13 +57,12 @@ export function RegisterCostDialog({ onSuccess }: RegisterCostDialogProps) {
                 description: data.description,
                 amount: data.amount,
             });
-            toast.success("Custo adicionado com sucesso!");
+            notifySuccess("Custo adicionado com sucesso!");
             setOpen(false);
             reset();
             onSuccess?.();
         } catch (error: any) {
-            console.error(error);
-            toast.error("Erro ao adicionar custo");
+            notifyError("Erro ao adicionar custo");
         } finally {
             setLoading(false);
         }

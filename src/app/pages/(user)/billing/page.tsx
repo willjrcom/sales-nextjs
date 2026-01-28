@@ -17,7 +17,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/components/billing/register-cost-dialog";
-import { notifyError, notifyInfo } from "@/app/utils/notifications";
+import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
 import { safeFormat } from "@/app/entities/company/methods";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
 import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
@@ -121,7 +121,7 @@ export default function BillingPage() {
             if (response.checkout_url) {
                 window.location.href = response.checkout_url;
             } else {
-                notifyInfo("Nenhum custo pendente encontrado.");
+                notifyError("Nenhum custo pendente encontrado.");
             }
         } catch (error: any) {
             notifyError(error?.message || "Erro ao iniciar checkout");
@@ -137,7 +137,7 @@ export default function BillingPage() {
         setLoading(true);
         try {
             await cancelPayment(session, paymentId);
-            notifyInfo("Pagamento cancelado com sucesso!");
+            notifySuccess("Pagamento cancelado com sucesso!");
             refetchPayments();
             refetchCosts();
         } catch (error: any) {
@@ -152,7 +152,7 @@ export default function BillingPage() {
         setLoading(true);
         try {
             await triggerMonthlyBilling(session);
-            notifyInfo("Processamento mensal iniciado com sucesso!");
+            notifyLoading("Processamento mensal iniciado com sucesso!");
             refetchPayments();
             refetchCosts();
         } catch (error: any) {

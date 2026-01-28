@@ -1,7 +1,7 @@
 'use client';
 
 import DeliveryDriverForm from "@/app/forms/delivery-driver/form";
-import PageTitle from '@/app/components/PageTitle';
+import PageTitle from '@/app/components/ui/page-title';
 import CrudLayout from "@/app/components/crud/crud-layout";
 import CrudTable from "@/app/components/crud/table";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
