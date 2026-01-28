@@ -86,18 +86,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                     list.map((p: any) => ({ id: p.name, name: p.name }))
                 );
             } catch (err) {
-                console.warn('Erro ao carregar impressoras via Print Agent, tentando Electron...', err);
-                // Fallback: tenta Electron se ainda estiver disponível
-                if ((window as any).electronAPI?.getPrinters) {
-                    try {
-                        const list = await (window as any).electronAPI.getPrinters();
-                        setPrinters(
-                            list.map((p: any) => ({ id: p.name, name: p.name }))
-                        );
-                    } catch (electronErr) {
-                        console.error('Error loading printers via Electron:', electronErr);
-                    }
-                }
+                console.warn('Erro ao carregar impressoras via Print Agent', err);
             }
         })();
     }, []);

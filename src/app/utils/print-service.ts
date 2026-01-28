@@ -1,7 +1,4 @@
-/**
- * Serviço centralizado de impressão via WebSocket (Print Agent)
- * Substitui o uso do Electron para impressão
- */
+/** Serviço centralizado de impressão via WebSocket(Print Agent) */
 
 interface PrintResponse {
     status: string;
@@ -52,25 +49,25 @@ class PrintService {
 
                 this.ws.onclose = (event) => {
                     this.isConnected = false;
-                    
+
                     // Código 1006 indica conexão fechada anormalmente (geralmente servidor não está rodando)
                     // if (event.code === 1006) {
                     //     console.error("🔴 Conexão fechada anormalmente (código 1006). O Print Agent está rodando em localhost:8089?");
                     // } else {
                     //     console.log("🔴 Print Agent desconectado, reconectando...");
                     // }
-                    
+
                     this.connectPromise = null;
                     this.scheduleReconnect();
                 };
 
                 this.ws.onerror = (error) => {
                     this.isConnected = false;
-                    
+
                     // O objeto error não tem informações úteis, então verificamos o estado do WebSocket
                     const readyState = this.ws?.readyState;
                     let errorMessage = "Erro ao conectar com o Print Agent";
-                    
+
                     // if (readyState === WebSocket.CONNECTING) {
                     //     errorMessage = "Não foi possível conectar ao Print Agent em ws://localhost:8089/ws. Verifique se o serviço está rodando.";
                     //     console.error("❌ Erro ao conectar:", errorMessage);
@@ -80,7 +77,7 @@ class PrintService {
                     // } else {
                     //     console.error("❌ Erro no WebSocket (readyState:", readyState, ")");
                     // }
-                    
+
                     this.connectPromise = null;
                     reject(new Error(errorMessage));
                 };
@@ -88,7 +85,7 @@ class PrintService {
                 this.ws.onmessage = (ev) => {
                     try {
                         const res: PrintResponse = JSON.parse(ev.data);
-                        
+
                         if (res.status === "ok" && Array.isArray(res.data)) {
                             // Resposta de get_printers
                             this.printersCache = res.data;
@@ -160,7 +157,7 @@ class PrintService {
         try {
             await Promise.race([
                 this.connect(),
-                new Promise((_, reject) => 
+                new Promise((_, reject) =>
                     setTimeout(() => reject(new Error("Timeout")), timeout)
                 )
             ]);
@@ -230,7 +227,7 @@ class PrintService {
      */
     async print(text: string, printerName?: string): Promise<void> {
         const printer = printerName || "default";
-        
+
         return new Promise((resolve, reject) => {
             // Limpa callbacks anteriores se houver
             if (this.printResolve || this.printReject) {

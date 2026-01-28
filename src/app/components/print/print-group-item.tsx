@@ -42,46 +42,23 @@ const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupI
         return;
     } catch (wsError: any) {
         console.warn("Erro ao usar Print Agent, tentando fallback:", wsError);
-        
-        // Fallback: tenta Electron se ainda estiver disponível
-        try {
-            if ((window as any).electronAPI?.printer) {
-                let selectedPrinter = printerName || "default";
+    }
 
-                if (selectedPrinter === "default") {
-                    const printers = await (window as any).electronAPI.getPrinters();
-                    if (printers.length > 0) {
-                        selectedPrinter = printers[0].name;
-                    }
-                }
-
-                await (window as any).electronAPI.printer(html, selectedPrinter, { silent: false, printBackground: true });
-                notifySuccess(`Impressão enviada para ${selectedPrinter}`);
-                return;
-            }
-        } catch (electronError: any) {
-            console.warn("Erro ao usar Electron, tentando fallback do browser:", electronError);
+    // Fallback final: abre diálogo de impressão do browser
+    try {
+        const w = window.open('', '_blank', 'width=800,height=600');
+        if (!w) {
+            throw new Error("Não foi possível abrir janela de impressão");
         }
-
-        // Fallback final: abre diálogo de impressão do browser
-        try {
-            const w = window.open('', '_blank', 'width=800,height=600');
-            if (!w) {
-                throw new Error("Não foi possível abrir janela de impressão");
-            }
-            w.document.write(html);
-            w.document.close();
-            w.focus();
-            w.print();
-            w.onafterprint = () => w.close();
-            notifySuccess("Diálogo de impressão aberto");
-        } catch (browserError: any) {
-            const errorMessage = wsError?.message || 
-                                (typeof wsError === 'string' ? wsError : '') ||
-                                browserError?.message || 
-                                "Erro desconhecido ao imprimir";
-            notifyError(`Erro ao imprimir: ${errorMessage}`);
-        }
+        w.document.write(html);
+        w.document.close();
+        w.focus();
+        w.print();
+        w.onafterprint = () => w.close();
+        notifySuccess("Diálogo de impressão aberto");
+    } catch (browserError: any) {
+        const errorMessage = browserError?.message || "Erro desconhecido ao imprimir";
+        notifyError(`Erro ao imprimir: ${errorMessage}`);
     }
 };
 
