@@ -65,7 +65,7 @@ export function PendingPaymentModal({ isOpen, onOpenChange }: PendingPaymentModa
                     </DialogTitle>
                     <DialogDescription>
                         Existe uma fatura mensal pendente que precisa ser regularizada.
-                        {isOverdue && <span className="block mt-2 font-bold text-red-600">Esta fatura está vencida! O acesso ao sistema pode ser bloqueado.</span>}
+                        {isOverdue && <span className="block mt-2 font-bold text-red-600">Esta fatura está vencida! Novos pedidos estão bloqueados.</span>}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -87,11 +87,9 @@ export function PendingPaymentModal({ isOpen, onOpenChange }: PendingPaymentModa
                 </div>
 
                 <DialogFooter className="sm:justify-between gap-2">
-                    {!isOverdue && (
-                        <Button variant="outline" onClick={() => onOpenChange(false)}>
-                            Resolver depois
-                        </Button>
-                    )}
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Resolver depois
+                    </Button>
                     <Button className="w-full sm:w-auto bg-green-600 hover:bg-green-700" asChild>
                         <a href={mandatoryPayment.payment_url} target="_blank" rel="noopener noreferrer">
                             Pagar Agora

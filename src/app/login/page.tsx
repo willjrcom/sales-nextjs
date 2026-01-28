@@ -69,30 +69,32 @@ const LoginForm = () => {
         <div className="w-full max-w-md px-8 py-10">
           <h2 className="text-2xl mb-6 hidden sm:block">Conecte-se</h2>
           <div className="flex flex-col">
-            <TextField friendlyName='Email' name='email' placeholder='Digite seu email' setValue={setEmail} value={email} />
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+              <TextField friendlyName='Email' name='email' placeholder='Digite seu email' setValue={setEmail} value={email} />
 
-            <PasswordField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
+              <PasswordField friendlyName='Senha' name='password' placeholder='Digite sua senha' setValue={setPassword} value={password} />
 
-            <div className="flex items-center mb-4 hidden sm:flex">
-              <input
-                type="checkbox"
-                id="remember"
-                name="remember"
-                className="mr-2"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-              />
-              <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
-            </div>
+              <div className="flex items-center mb-4 hidden sm:flex">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  name="remember"
+                  className="mr-2"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+                <label htmlFor="remember" className="text-gray-700">Lembrar conexão</label>
+              </div>
 
-            <Button
-              onClick={handleSubmit}
-              size="lg"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? <Loading /> : 'Conectar'}
-            </Button>
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? <Loading /> : 'Conectar'}
+              </Button>
+            </form>
 
             <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 mt-4 text-yellow-500">
               <Link href="/login/forget-password" className="hover:underline text-center sm:text-left">Esqueceu a senha?</Link>

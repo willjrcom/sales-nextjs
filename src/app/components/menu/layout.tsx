@@ -1,42 +1,26 @@
 "use client";
-import Sidebar from '../sidebar/sidebar';
-import AdminSidebar from '../sidebar/admin-sidebar';
+import React, { useState } from 'react';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '../sidebar/app-sidebar';
 import Topbar from '../topbar/topbar';
 import { ModalProvider } from '@/app/context/modal/context';
-import { useRef } from 'react';
-import { useState } from 'react';
 
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [adminMode, setAdminMode] = useState(false);
-  const [isHover, setIsHover] = useState(false);
 
   return (
     <ContextProviders>
-      <div className="relative flex overflow-hidden h-screen text-black bg-gray-100">
-        {/* Sidebars with slide transition */}
-        <div className={
-          `absolute inset-y-0 left-0 w-12 hover:w-52 transition-all duration-300 ease-in-out ` +
-          (adminMode ? 'translate-x-0 z-20' : '-translate-x-full z-10')
-        }>
-          <AdminSidebar onToggleAdmin={() => setAdminMode(false)} setHover={setIsHover} />
-        </div>
-
-        <div className={
-          `absolute inset-y-0 left-0 w-12 hover:w-52 transition-all duration-300 ease-in-out ` +
-          (adminMode ? '-translate-x-full z-10' : 'translate-x-0 z-20')
-        }>
-          <Sidebar onToggleAdmin={() => setAdminMode(true)} setHover={setIsHover} />
-        </div>
-
-        <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${isHover ? 'ml-52' : 'ml-12'}`}>
+      <SidebarProvider defaultOpen={false}>
+        <AppSidebar adminMode={adminMode} toggleAdminMode={() => setAdminMode(!adminMode)} />
+        <SidebarInset>
           <Topbar />
-          <main className="p-4 h-[90vh] flex justify-center">
-            <div className="bg-white p-6 rounded-md shadow-md overflow-y-auto w-[90vw] h-full box-border">
+          <main className="p-4 h-[calc(100vh-3.5rem)] flex justify-center bg-gray-100 dark:bg-zinc-950">
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-md shadow-md overflow-y-auto w-full max-w-[95vw] h-full box-border">
               {children}
             </div>
           </main>
-        </div>
-      </div>
+        </SidebarInset>
+      </SidebarProvider>
     </ContextProviders>
   );
 }
