@@ -42,6 +42,11 @@ export function notifyInfo(message: string, options?: ToastOptions) {
  * @param options Optional toast configuration.
  */
 export function notifyLoading(message: string, options?: ToastOptions) {
+  if (!options) {
+    options = {
+      duration: 5000, // 5 seconds
+    };
+  }
   return toast.loading(message, options);
 }
 

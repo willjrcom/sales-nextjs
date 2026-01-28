@@ -1,44 +1,50 @@
 "use client";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, A11y } from "swiper/modules";
+
+import * as React from "react";
+import {
+    Carousel as ShadcnCarousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 interface CarouselProps<T> {
     items: T[];
     children: (item: T) => React.ReactNode;
+    className?: string;
 }
 
-const Carousel = <T extends { id: string }>({ items, children }: CarouselProps<T>) => {
+const Carousel = <T extends { id: string }>({
+    items,
+    children,
+    className,
+}: CarouselProps<T>) => {
     return (
-        <div className=" overflow-hidden box-border">
-            <Swiper
-                className=""
-            modules={[Navigation, Pagination, A11y]}
-            navigation
-            pagination={{ clickable: true, dynamicBullets: true }}
-            breakpoints={{
-                // Define diferentes valores para slidesPerView com base no tamanho da tela
-                768: {
-                    slidesPerView: 1, // 1 slide em telas pequenas (mobile)
-                    spaceBetween: 10,
-                },
-                900: {
-                    slidesPerView: 2, // 2 slides em telas médias (tablet)
-                    spaceBetween: 20,
-                },
-                1200: {
-                    slidesPerView: 3, // 3 slides em telas grandes (desktop)
-                    spaceBetween: 30,
-                },
-                1600: {
-                    slidesPerView: 4, // 4 slides em telas grandes (desktop)
-                    spaceBetween: 40,
-                }
-            }}
-        >
-            {items.map((item) => (
-                <SwiperSlide key={item.id}>{children(item)}</SwiperSlide>
-            ))}
-        </Swiper>
+        <div className={cn("w-full overflow-hidden box-border px-12", className)}>
+            <ShadcnCarousel
+                opts={{
+                    align: "start",
+                    loop: false,
+                }}
+                className="w-full"
+            >
+                <CarouselContent className="-ml-[10px] min-[900px]:-ml-[20px] min-[1200px]:-ml-[30px] min-[1600px]:-ml-[40px]">
+                    {items.map((item) => (
+                        <CarouselItem
+                            key={item.id}
+                            className="pl-[10px] min-[900px]:pl-[20px] min-[1200px]:pl-[30px] min-[1600px]:pl-[40px] basis-full min-[900px]:basis-1/2 min-[1200px]:basis-1/3 min-[1600px]:basis-1/4"
+                        >
+                            {children(item)}
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <div className="hidden md:block">
+                    <CarouselPrevious />
+                    <CarouselNext />
+                </div>
+            </ShadcnCarousel>
         </div>
     );
 };
