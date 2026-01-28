@@ -50,9 +50,10 @@ const paymentIcons: Record<string, IconType> = {
 
 interface CardOrderProps {
     orderId: string | null;
+    editBlocked?: boolean;
 }
 
-export default function CardOrder({ orderId }: CardOrderProps) {
+export default function CardOrder({ orderId, editBlocked = false }: CardOrderProps) {
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
     const queryClient = useQueryClient();
     const { data } = useSession();
@@ -184,11 +185,11 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                             <li>Entregue em: {ToUtcDatetime(order.delivery.delivered_at)}</li>
                         </ul>
 
-                        {order.status === "Ready" && order.delivery.status === "Ready" && <button onClick={shipDelivery}
+                        {!editBlocked && order.status === "Ready" && order.delivery.status === "Ready" && <button onClick={shipDelivery}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Enviar entrega</button>
                         }
 
-                        {order.status === "Ready" && order.delivery.status === "Shipped" && <button onClick={finishDelivery}
+                        {!editBlocked && order.status === "Ready" && order.delivery.status === "Shipped" && <button onClick={finishDelivery}
                             className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Receber entrega</button>
                         }
                     </div>
@@ -223,7 +224,7 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                             <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>
                             <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>
                         </ul>
-                        {order.table.status === "Pending" && <button onClick={() => {
+                        {!editBlocked && order.table.status === "Pending" && <button onClick={() => {
                             const onConfirm = async () => {
                                 await closeTable();
                                 modalHandler.hideModal('close-table-' + order.id);
@@ -273,7 +274,7 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                             <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>
                         </ul>
 
-                        {order.pickup.status === "Ready" && <button onClick={() => {
+                        {!editBlocked && order.pickup.status === "Ready" && <button onClick={() => {
                             const onConfirm = async () => {
                                 await deliveryPickup();
                                 modalHandler.hideModal('delivery-pickup-' + order.id);
@@ -309,9 +310,9 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
                         <StatusComponent status={order?.status} />
-                        <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
+                        {!editBlocked && <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
                             <FaEdit />
-                        </Link>
+                        </Link>}
                     </div>
                     <p className="text-gray-700">
                         <strong>Comanda N°:</strong> {order.order_number}
@@ -433,7 +434,7 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                                     return (
                                         <div
                                             key={payment.id}
-                                            className="flex flex-col items-center p-4 border rounded-lg bg-gray-50 shadow-sm hover:shadow-md transition mx-2"
+                                            className="flex flex-col items-center p-4 border rounded-lg bg-gray-5 shadow-sm hover:shadow-md transition mx-2"
                                         >
                                             <Icon className="text-3xl text-gray-600 mb-2" />
                                             <p className="font-semibold text-gray-700 mb-1">{payment.method}</p>
@@ -450,14 +451,14 @@ export default function CardOrder({ orderId }: CardOrderProps) {
             <hr className="my-4" />
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
-                {!isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
+                {!editBlocked && !isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
                     <PaymentForm orderId={order.id} />
                 </ButtonIconText>}
 
                 {isOrderStatusFinished && <div>&nbsp;</div>}
 
                 <div className="flex justify-end items-center gap-4">
-                    {isOrderStatusPending &&
+                    {!editBlocked && isOrderStatusPending &&
                         <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck}>
                             <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
                             <button
@@ -468,7 +469,7 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                             </button>
                         </ButtonIconText>}
 
-                    {isOrderStatusReady &&
+                    {!editBlocked && isOrderStatusReady &&
                         <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck}>
                             <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
                             <button
@@ -479,7 +480,7 @@ export default function CardOrder({ orderId }: CardOrderProps) {
                             </button>
                         </ButtonIconText>}
 
-                    {!isOrderStatusCanceled &&
+                    {!editBlocked && !isOrderStatusCanceled &&
                         <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes}>
                             <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
                             <button
