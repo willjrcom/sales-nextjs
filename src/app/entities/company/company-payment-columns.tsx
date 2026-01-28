@@ -14,7 +14,7 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
         accessorKey: "expires_at",
         header: "Vencimento",
         cell: ({ row }) => {
-            if (row.original.is_mandatory && row.original.expires_at) {
+            if (row.original.expires_at) {
                 return safeFormat(row.original.expires_at, "dd/MM/yyyy");
             }
             return "-";
@@ -35,9 +35,13 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
         cell: ({ row }) => row.original.months > 0 ? `${row.original.months} meses` : "Avulso",
     },
     {
-        accessorKey: "external_reference",
-        header: "Ref.",
-        cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.external_reference?.substring(0, 8)}...</span>,
+        accessorKey: "is_mandatory",
+        header: "Obrigatório",
+        cell: ({ row }) => (
+            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.original.is_mandatory ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}>
+                {row.original.is_mandatory ? "Sim" : "Opcional"}
+            </span>
+        ),
     },
     {
         id: "actions",
@@ -56,7 +60,7 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
                         )
                     }
                     {
-                        payment.status === "pending" && (
+                        payment.status === "pending" && !payment.is_mandatory && (
                             <Button
                                 variant="link"
                                 size="sm"
