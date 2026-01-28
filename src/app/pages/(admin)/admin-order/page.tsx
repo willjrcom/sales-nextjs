@@ -1,8 +1,8 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function OrderAdminPage() {
   const reportIds = ['orders-by-status', 'orders-per-table', 'cancellation-rate', 'avg-process-step-duration'];
-  return <ShowReports name='Pedidos' reportIds={reportIds} />;
+  return <ListReports name='Pedidos' reportIds={reportIds} />;
 }

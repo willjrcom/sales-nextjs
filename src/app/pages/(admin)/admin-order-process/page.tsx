@@ -1,8 +1,8 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function OrderProcessAdminPage() {
   const reportIds = ['avg-process-step-duration', 'processed-count-by-rule', 'avg-process-duration-by-product', 'total-queue-time-by-group-item'];
-  return <ShowReports name='Processos' reportIds={reportIds} />;
+  return <ListReports name='Processos' reportIds={reportIds} />;
 }

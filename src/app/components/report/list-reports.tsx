@@ -2,17 +2,16 @@
 
 import { useState } from 'react';
 import PageTitle from '@/app/components/ui/page-title';
-import ReportChart from '@/app/components/report/ReportChart';
-import { reportConfigs } from '@/app/components/report/reportConfigs';
-import ReportCard from './report';
+import { reportConfigs } from '@/app/components/report/report-configs';
+import ReportCard from './report-card';
 import { FilterDateProps } from './filter';
 
-interface ReportProps {
+interface ListReportsProps {
     name: string;
     reportIds: string[];
 }
 
-const ShowReports = ({ name, reportIds }: ReportProps) => {
+const ListReports = ({ name, reportIds }: ListReportsProps) => {
     const reports = reportConfigs.filter((c) => reportIds.includes(c.id));
     const today = new Date().toISOString().slice(0, 10);
     const initialDate = { start: today, end: today } as FilterDateProps;
@@ -35,4 +34,4 @@ const ShowReports = ({ name, reportIds }: ReportProps) => {
     );
 }
 
-export default ShowReports;
+export default ListReports;

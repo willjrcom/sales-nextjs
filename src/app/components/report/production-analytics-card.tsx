@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { HiClock, HiUsers, HiChartBar, HiTrendingUp } from 'react-icons/hi';
 import Shift from '@/app/entities/shift/shift';
 
@@ -28,7 +28,7 @@ const ProductionAnalyticsCard = ({ shift }: ProductionAnalyticsCardProps) => {
     };
 
     // Verifica se há dados de produção disponíveis
-    const hasProductionData = shift.total_processes > 0 || (shift.order_process_analytics && Object.keys(shift.order_process_analytics).length > 0);
+    const hasProductionData = useMemo(() => shift.total_processes > 0 || (shift.order_process_analytics && Object.keys(shift.order_process_analytics).length > 0), [shift.total_processes, shift.order_process_analytics]);
 
     if (!hasProductionData) {
         return (
@@ -115,34 +115,34 @@ const ProductionAnalyticsCard = ({ shift }: ProductionAnalyticsCardProps) => {
                     </div>
 
                     {/* Top funcionários */}
-                    {shift.order_process_analytics && Object.values(shift.order_process_analytics).some(analytics => 
+                    {shift.order_process_analytics && Object.values(shift.order_process_analytics).some(analytics =>
                         analytics.employee_performance && Object.keys(analytics.employee_performance).length > 0
                     ) && (
-                        <div className="mt-4">
-                            <h4 className="font-semibold mb-2 text-sm">Top Funcionários</h4>
-                            <div className="space-y-1">
-                                {Object.values(shift.order_process_analytics)
-                                    .flatMap(analytics => 
-                                        Object.values(analytics.employee_performance || {})
-                                    )
-                                    .sort((a, b) => b.efficiency_score - a.efficiency_score)
-                                    .slice(0, 2)
-                                    .map((employee, index) => (
-                                        <div key={"analytics-card-"+employee.employee_id} className="flex items-center justify-between text-sm">
-                                            <div className="flex items-center">
-                                                <span className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                                                    <span className="text-blue-600 text-xs font-semibold">{index + 1}</span>
+                            <div className="mt-4">
+                                <h4 className="font-semibold mb-2 text-sm">Top Funcionários</h4>
+                                <div className="space-y-1">
+                                    {Object.values(shift.order_process_analytics)
+                                        .flatMap(analytics =>
+                                            Object.values(analytics.employee_performance || {})
+                                        )
+                                        .sort((a, b) => b.efficiency_score - a.efficiency_score)
+                                        .slice(0, 2)
+                                        .map((employee, index) => (
+                                            <div key={"analytics-card-" + employee.employee_id} className="flex items-center justify-between text-sm">
+                                                <div className="flex items-center">
+                                                    <span className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                                        <span className="text-blue-600 text-xs font-semibold">{index + 1}</span>
+                                                    </span>
+                                                    <span className="text-gray-600 truncate">{employee.employee_name}</span>
+                                                </div>
+                                                <span className={`text-xs ${getEfficiencyColor(employee.efficiency_score)}`}>
+                                                    {formatPercentage(employee.efficiency_score)}
                                                 </span>
-                                                <span className="text-gray-600 truncate">{employee.employee_name}</span>
                                             </div>
-                                            <span className={`text-xs ${getEfficiencyColor(employee.efficiency_score)}`}>
-                                                {formatPercentage(employee.efficiency_score)}
-                                            </span>
-                                        </div>
-                                    ))}
+                                        ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
                 </div>
             )}
         </div>

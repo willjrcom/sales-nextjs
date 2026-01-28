@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { RegisterCostDialog } from "@/app/components/billing/register-cost-dialog";
+import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dialog";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
 import { safeFormat } from "@/app/entities/company/methods";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";

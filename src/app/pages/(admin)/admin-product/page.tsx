@@ -1,6 +1,6 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function ProductAdminPage() {
   const reportIds = [
@@ -15,5 +15,5 @@ export default function ProductAdminPage() {
     'low-profit-products',
     'overall-profitability',
   ];
-  return <ShowReports name='Produtos' reportIds={reportIds} />;
+  return <ListReports name='Produtos' reportIds={reportIds} />;
 }

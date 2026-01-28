@@ -3,19 +3,17 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
 import { FaExclamationCircle } from 'react-icons/fa';
-import EmployeeUserProfile from '../profile/profile';
+import EmployeeUserProfile from './profile';
 import { useSession } from 'next-auth/react';
 import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
 import Order from '@/app/entities/order/order';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { PendingPaymentModal } from '../billing/pending-payment-modal';
+import { PendingPaymentModal } from './pending-payment-modal';
 import { listPayments } from '@/app/api/billing/billing';
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
   Menubar,
-  MenubarContent,
-  MenubarItem,
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar"

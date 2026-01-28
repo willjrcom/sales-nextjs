@@ -1,8 +1,8 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function ClientAdminPage() {
   const reportIds = ['clients-registered-by-day', 'new-vs-recurring-clients'];
-  return <ShowReports name='Clientes' reportIds={reportIds} />;
+  return <ListReports name='Clientes' reportIds={reportIds} />;
 }

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import ReportChart from '@/app/components/report/ReportChart';
+import ReportChart from '@/app/components/report/report-chart';
 import PageTitle from '@/app/components/ui/page-title';
-import { reportConfigs } from '@/app/components/report/reportConfigs';
+import { reportConfigs } from '@/app/components/report/report-configs';
 
 export default function ReportPage() {
   const params = useParams();

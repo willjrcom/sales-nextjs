@@ -1,8 +1,8 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function EmployeeAdminPage() {
   const reportIds = ['avg-delivery-time-by-driver', 'deliveries-per-driver', 'employee-payments-report'];
-  return <ShowReports name='Funcionários' reportIds={reportIds} />;
+  return <ListReports name='Funcionários' reportIds={reportIds} />;
 }

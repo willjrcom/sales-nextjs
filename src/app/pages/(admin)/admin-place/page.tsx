@@ -1,8 +1,8 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function PlaceAdminPage() {
   const reportIds = ['sales-by-place', 'top-tables'];
-  return <ShowReports name='Lugares' reportIds={reportIds} />;
+  return <ListReports name='Lugares' reportIds={reportIds} />;
 }

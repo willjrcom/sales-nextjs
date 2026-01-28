@@ -1,6 +1,6 @@
 import { FilterDateProps } from "./filter";
-import ReportChart from "./ReportChart";
-import { ReportConfig } from "./reportConfigs";
+import ReportChart from "./report-chart";
+import { ReportConfig } from "./report-configs";
 
 interface ReportCardProps {
     config: ReportConfig;
@@ -18,7 +18,7 @@ const ReportCard = ({ config, date, setDate }: ReportCardProps) => {
             ? {
                 day: new Date(date.start).toISOString(),
             }
-            : { 
+            : {
                 start: new Date(),
                 end: new Date(),
                 day: new Date(),

@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import { notifyError } from '@/app/utils/notifications';
-import EmployeeUserProfile from '@/app/components/profile/profile';
+import EmployeeUserProfile from '@/app/components/topbar/profile';
 import Link from 'next/link';
 import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';

@@ -1,8 +1,8 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function ShiftAdminPage() {
   const reportIds = ['sales-by-shift'];
-  return <ShowReports name='Turnos' reportIds={reportIds} />;
+  return <ListReports name='Turnos' reportIds={reportIds} />;
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import ShowReports from '@/app/components/report/show-reports';
+import ListReports from '@/app/components/report/list-reports';
 
 export default function AdminUserPage() {
-  return <ShowReports name='Usuários' reportIds={[]} />;
+  return <ListReports name='Usuários' reportIds={[]} />;
 }
