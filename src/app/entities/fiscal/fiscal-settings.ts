@@ -1,13 +1,14 @@
 export interface FiscalSettingsDTO {
+    company_registry_id?: number;
     fiscal_enabled: boolean;
-    inscricao_estadual?: string;
-    regime_tributario: number;
+    state_registration?: string;
+    tax_regime: number;
     cnae?: string;
     crt?: number;
-    simples_nacional: boolean;
-    inscricao_municipal?: string;
-    discrimina_impostos: boolean;
-    enviar_email_destinatario: boolean;
+    is_simple_national: boolean;
+    municipal_registration?: string;
+    show_tax_breakdown: boolean;
+    send_email_to_recipient: boolean;
     business_name: string;
     trade_name?: string;
     cnpj: string;
@@ -23,15 +24,16 @@ export interface FiscalSettingsDTO {
 }
 
 export interface FiscalSettingsUpdateDTO {
+    company_registry_id?: number;
     fiscal_enabled?: boolean;
-    inscricao_estadual?: string;
-    regime_tributario?: number;
-    simples_nacional?: boolean;
+    state_registration?: string;
+    tax_regime?: number;
+    is_simple_national?: boolean;
     cnae?: string;
     crt?: number;
-    inscricao_municipal?: string;
-    discrimina_impostos?: boolean;
-    enviar_email_destinatario?: boolean;
+    municipal_registration?: string;
+    show_tax_breakdown?: boolean;
+    send_email_to_recipient?: boolean;
     business_name?: string;
     trade_name?: string;
     cnpj?: string;

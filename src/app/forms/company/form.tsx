@@ -183,22 +183,22 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <TextField
                                     friendlyName="Inscrição Estadual (IE)"
-                                    name="inscricao_estadual"
-                                    value={company.inscricao_estadual || ''}
-                                    setValue={value => handleInputChange('inscricao_estadual', value)}
+                                    name="state_registration"
+                                    value={company.state_registration || ''}
+                                    setValue={value => handleInputChange('state_registration', value)}
                                 />
                             </div>
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <SelectField
                                     friendlyName="Regime Tributário"
-                                    name="regime_tributario"
+                                    name="tax_regime"
                                     values={[
                                         { id: '1', name: '1 - Simples Nacional' },
                                         { id: '2', name: '2 - Simples Nacional (Excesso)' },
                                         { id: '3', name: '3 - Regime Normal' },
                                     ]}
-                                    selectedValue={String(company.regime_tributario || '1')}
-                                    setSelectedValue={value => handleInputChange('regime_tributario', parseInt(value) || 1)}
+                                    selectedValue={String(company.tax_regime || '1')}
+                                    setSelectedValue={value => handleInputChange('tax_regime', parseInt(value) || 1)}
                                 />
                             </div>
                         </div>

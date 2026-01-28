@@ -21,10 +21,10 @@ export function FiscalSettingsDialog() {
     const { register, handleSubmit, control, reset, setValue, watch } = useForm<FiscalSettingsUpdateDTO>({
         defaultValues: {
             fiscal_enabled: false,
-            regime_tributario: 1,
-            simples_nacional: true,
-            discrimina_impostos: false,
-            enviar_email_destinatario: true,
+            tax_regime: 1,
+            is_simple_national: true,
+            show_tax_breakdown: false,
+            send_email_to_recipient: true,
         },
     });
 
@@ -38,13 +38,13 @@ export function FiscalSettingsDialog() {
         if (settings) {
             reset({
                 fiscal_enabled: settings.fiscal_enabled,
-                inscricao_estadual: settings.inscricao_estadual,
-                regime_tributario: settings.regime_tributario || 1,
+                state_registration: settings.state_registration,
+                tax_regime: settings.tax_regime || 1,
                 cnae: settings.cnae,
                 crt: settings.crt || 1,
-                inscricao_municipal: settings.inscricao_municipal,
-                discrimina_impostos: settings.discrimina_impostos,
-                enviar_email_destinatario: settings.enviar_email_destinatario,
+                municipal_registration: settings.municipal_registration,
+                show_tax_breakdown: settings.show_tax_breakdown,
+                send_email_to_recipient: settings.send_email_to_recipient,
                 business_name: settings.business_name,
                 trade_name: settings.trade_name,
                 cnpj: settings.cnpj,
@@ -74,9 +74,9 @@ export function FiscalSettingsDialog() {
     });
 
     const onSubmit = (data: FiscalSettingsUpdateDTO) => {
-        // Convert types if necessary (e.g. string to number for regime_tributario if select returns string)
+        // Convert types if necessary (e.g. string to number for tax_regime if select returns string)
         const payload = { ...data };
-        if (payload.regime_tributario) payload.regime_tributario = Number(payload.regime_tributario);
+        if (payload.tax_regime) payload.tax_regime = Number(payload.tax_regime);
         if (payload.crt) payload.crt = Number(payload.crt);
 
         updateMutation.mutate(payload);
@@ -122,10 +122,10 @@ export function FiscalSettingsDialog() {
                                     <Separator />
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="regime_tributario">Regime Tributário</Label>
+                                            <Label htmlFor="tax_regime">Regime Tributário</Label>
                                             <Controller
                                                 control={control}
-                                                name="regime_tributario"
+                                                name="tax_regime"
                                                 render={({ field }) => (
                                                     <Select onValueChange={(v: string) => field.onChange(Number(v))} value={String(field.value || 1)}>
                                                         <SelectTrigger>
@@ -163,12 +163,12 @@ export function FiscalSettingsDialog() {
                                             <Input id="cnae" {...register("cnae")} placeholder="Ex: 4712100" />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="inscricao_estadual">Inscrição Estadual</Label>
-                                            <Input id="inscricao_estadual" {...register("inscricao_estadual")} placeholder="Somente números" />
+                                            <Label htmlFor="state_registration">Inscrição Estadual</Label>
+                                            <Input id="state_registration" {...register("state_registration")} placeholder="Somente números" />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="inscricao_municipal">Inscrição Municipal</Label>
-                                            <Input id="inscricao_municipal" {...register("inscricao_municipal")} placeholder="Somente números" />
+                                            <Label htmlFor="municipal_registration">Inscrição Municipal</Label>
+                                            <Input id="municipal_registration" {...register("municipal_registration")} placeholder="Somente números" />
                                         </div>
                                     </div>
                                 </div>
@@ -242,30 +242,30 @@ export function FiscalSettingsDialog() {
                                         <div className="flex items-center space-x-2">
                                             <Controller
                                                 control={control}
-                                                name="discrimina_impostos"
+                                                name="show_tax_breakdown"
                                                 render={({ field }) => (
                                                     <Switch
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
-                                                        id="discrimina_impostos"
+                                                        id="show_tax_breakdown"
                                                     />
                                                 )}
                                             />
-                                            <Label htmlFor="discrimina_impostos">Discriminar impostos na nota (Lei da Transparência)</Label>
+                                            <Label htmlFor="show_tax_breakdown">Discriminar impostos na nota (Lei da Transparência)</Label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Controller
                                                 control={control}
-                                                name="enviar_email_destinatario"
+                                                name="send_email_to_recipient"
                                                 render={({ field }) => (
                                                     <Switch
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
-                                                        id="enviar_email_destinatario"
+                                                        id="send_email_to_recipient"
                                                     />
                                                 )}
                                             />
-                                            <Label htmlFor="enviar_email_destinatario">Enviar email automático para o destinatário</Label>
+                                            <Label htmlFor="send_email_to_recipient">Enviar email automático para o destinatário</Label>
                                         </div>
                                     </div>
                                 </div>

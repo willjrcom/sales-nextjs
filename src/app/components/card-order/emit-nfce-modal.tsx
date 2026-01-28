@@ -55,10 +55,10 @@ const EmitNFCeModal = ({ orderId, onSuccess }: EmitNFCeModalProps) => {
                     </h3>
                     <div className="space-y-2 text-sm text-gray-700">
                         <p>
-                            <strong>Número:</strong> {result.numero}
+                            <strong>Número:</strong> {result.number}
                         </p>
                         <p>
-                            <strong>Série:</strong> {result.serie}
+                            <strong>Série:</strong> {result.series}
                         </p>
                         <p>
                             <strong>Status:</strong>{" "}
@@ -68,15 +68,15 @@ const EmitNFCeModal = ({ orderId, onSuccess }: EmitNFCeModalProps) => {
                                 {statusLabels[result.status]}
                             </span>
                         </p>
-                        {result.chave_acesso && (
+                        {result.access_key && (
                             <p className="break-all">
                                 <strong>Chave de Acesso:</strong>{" "}
-                                <span className="font-mono text-xs">{result.chave_acesso}</span>
+                                <span className="font-mono text-xs">{result.access_key}</span>
                             </p>
                         )}
-                        {result.protocolo && (
+                        {result.protocol && (
                             <p>
-                                <strong>Protocolo:</strong> {result.protocolo}
+                                <strong>Protocolo:</strong> {result.protocol}
                             </p>
                         )}
                     </div>

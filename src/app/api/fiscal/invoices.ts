@@ -6,13 +6,13 @@ export interface FiscalInvoice {
     id: string;
     company_id: string;
     order_id: string;
-    chave_acesso?: string;
-    numero: number;
-    serie: number;
+    access_key?: string;
+    number: number;
+    series: number;
     status: "pending" | "authorized" | "rejected" | "cancelled";
     xml_path?: string;
     pdf_path?: string;
-    protocolo?: string;
+    protocol?: string;
     error_message?: string;
     cancellation_reason?: string;
     created_at: string;

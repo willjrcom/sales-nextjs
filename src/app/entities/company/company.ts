@@ -15,8 +15,8 @@ export default class Company {
   is_blocked: boolean = false;
   // Fiscal fields
   fiscal_enabled: boolean = false;
-  inscricao_estadual?: string;
-  regime_tributario?: number;
+  state_registration?: string;
+  tax_regime?: number;
   cnae?: string;
   crt?: number;
 

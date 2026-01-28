@@ -134,6 +134,11 @@ const errorTranslations: Record<string, string> = {
     "no company found": "Nenhuma empresa encontrada",
     "invalid userID": "ID de usuário inválido",
     "inscricao_estadual is required to enable fiscal invoices": "Inscrição estadual é obrigatoria",
+    "state_registration is required to enable fiscal invoices": "Inscrição estadual é obrigatória",
+    "tax_regime is required": "Regime tributário é obrigatório",
+    "cnae is required": "CNAE é obrigatório",
+    "crt is required": "CRT é obrigatório",
+    "municipal_registration is required": "Inscrição municipal é obrigatória",
 
     // Erros de Cliente
     "client already exists": "Cliente já cadastrado",
