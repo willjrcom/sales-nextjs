@@ -1,31 +1,26 @@
 "use client";
-import GetCompany from "@/app/api/company/company";
 import GetOrderPrintByID from "@/app/api/print/print-order"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
 import printService from '@/app/utils/print-service';
-import { useQuery } from "@tanstack/react-query";
+import Company from "@/app/entities/company/company";
 
 interface PrintOrderProps {
     orderID: string;
     session: Session;
+    company: Company;
 }
 
-const printOrder = async ({ orderID, session }: PrintOrderProps) => {
-    const { data: company } = useQuery({
-        queryKey: ['company'],
-        queryFn: () => GetCompany(session),
-        enabled: !!session?.user.access_token,
-    })
+const printOrder = async ({ orderID, session, company }: PrintOrderProps) => {
 
     // Obtém o conteúdo de impressão uma única vez
-    let html: string;
+    let printContent: string;
     try {
         const result = await GetOrderPrintByID(orderID, session) as any;
         if (result instanceof Blob) {
-            html = await result.text();
+            printContent = await result.text();
         } else {
-            html = String(result);
+            printContent = String(result);
         }
     } catch (fetchError: any) {
         notifyError(`Erro ao obter conteúdo de impressão: ${fetchError?.message || "Erro desconhecido"}`);
@@ -43,7 +38,7 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
             }
         }
 
-        await printService.print(html, printerName);
+        await printService.print(printContent, printerName);
         notifySuccess(`Impressão enviada para ${printerName}`);
         return;
     } catch (wsError: any) {
@@ -52,11 +47,20 @@ const printOrder = async ({ orderID, session }: PrintOrderProps) => {
 
     // Fallback final: abre diálogo de impressão do browser
     try {
+        // Fetch HTML content explicitly for browser printing
+        let htmlContent = printContent;
+        try {
+            const resultHtml = await GetOrderPrintByID(orderID, session, 'html');
+            htmlContent = String(resultHtml);
+        } catch (e) {
+            console.warn("Failed to fetch HTML format, trying with original content", e);
+        }
+
         const w = window.open('', '_blank', 'width=800,height=600');
         if (!w) {
             throw new Error("Não foi possível abrir janela de impressão");
         }
-        w.document.write(html);
+        w.document.write(htmlContent);
         w.document.close();
         w.focus();
         w.print();

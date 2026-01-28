@@ -187,6 +187,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
                     await printOrder({
                         orderID: orderIDs[i],
                         session: data,
+                        company: company
                     });
                 }
             }

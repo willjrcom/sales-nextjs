@@ -13,13 +13,13 @@ interface PrintGroupItemProps {
 const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupItemProps) => {
 
     // Obtém o conteúdo de impressão uma única vez
-    let html: string;
+    let printContent: string;
     try {
         const result = await GetGroupItemPrintByID(groupItemID, session) as any;
         if (result instanceof Blob) {
-            html = await result.text();
+            printContent = await result.text();
         } else {
-            html = String(result);
+            printContent = String(result);
         }
     } catch (fetchError: any) {
         notifyError(`Erro ao obter conteúdo de impressão: ${fetchError?.message || "Erro desconhecido"}`);
@@ -37,7 +37,7 @@ const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupI
             }
         }
 
-        await printService.print(html, selectedPrinter);
+        await printService.print(printContent, selectedPrinter);
         notifySuccess(`Impressão enviada para ${selectedPrinter}`);
         return;
     } catch (wsError: any) {
@@ -46,11 +46,22 @@ const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupI
 
     // Fallback final: abre diálogo de impressão do browser
     try {
+        // Fetch HTML content explicitly for browser printing
+        let htmlContent = printContent;
+        try {
+            // If the initial fetch wasn't HTML (checked by looking for <html> tag or similar, or just re-fetch to be safe/consistent)
+            // or simply purely re-fetch requesting HTML format.
+            const resultHtml = await GetGroupItemPrintByID(groupItemID, session, 'html');
+            htmlContent = String(resultHtml);
+        } catch (e) {
+            console.warn("Failed to fetch HTML format, trying with original content", e);
+        }
+
         const w = window.open('', '_blank', 'width=800,height=600');
         if (!w) {
             throw new Error("Não foi possível abrir janela de impressão");
         }
-        w.document.write(html);
+        w.document.write(htmlContent);
         w.document.close();
         w.focus();
         w.print();

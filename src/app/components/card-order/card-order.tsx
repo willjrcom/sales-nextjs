@@ -29,6 +29,7 @@ import {
     FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
     FaHourglassHalf, FaFileInvoiceDollar
 } from "react-icons/fa";
+import GetCompany from '@/app/api/company/company';
 
 // Ícones para métodos de pagamento
 const paymentIcons: Record<string, IconType> = {
@@ -58,6 +59,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();
+
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user?.access_token,
+    })
 
     // Usar React Query diretamente
     const { data: order, refetch } = useQuery({
@@ -491,9 +498,9 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             </button>
                         </ButtonIconText>}
                     {/* Botão de impressão */}
-                    {!isOrderStatusCanceled &&
+                    {!isOrderStatusCanceled && company &&
                         <button
-                            onClick={() => data && printOrder({ orderID: order.id, session: data })}
+                            onClick={() => data && printOrder({ orderID: order.id, session: data, company: company })}
                             className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
                         >
                             <FaPrint />

@@ -88,6 +88,15 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormD
         } as Response<TR>;
     }
 
+    if (ct.includes("text/html")) {
+        // Texto/HTML para impressão
+        const text = await response.text();
+        return {
+            data: text as unknown as TR,
+            headers: response.headers
+        } as Response<TR>;
+    }
+
     // caso não seja binário, parseia JSON normalmente
     const parsedBody = await response.json();
     return { data: parsedBody.data, headers: response.headers } as Response<TR>;

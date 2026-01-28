@@ -42,7 +42,8 @@ export default function OrderPaymentsResume() {
             if (company?.preferences.enable_print_order_on_pend_order) {
                 await printOrder({
                     orderID: order.id,
-                    session: data
+                    session: data,
+                    company: company
                 })
             }
 
