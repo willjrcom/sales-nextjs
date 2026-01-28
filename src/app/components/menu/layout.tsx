@@ -9,7 +9,7 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [adminMode, setAdminMode] = useState(false);
 
   return (
-    <ContextProviders>
+    <ModalProvider>
       <SidebarProvider defaultOpen={false}>
         <AppSidebar adminMode={adminMode} toggleAdminMode={() => setAdminMode(!adminMode)} />
         <SidebarInset>
@@ -21,16 +21,8 @@ const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
           </main>
         </SidebarInset>
       </SidebarProvider>
-    </ContextProviders>
-  );
-}
-
-const ContextProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ModalProvider>
-      {children}
     </ModalProvider>
-  )
+  );
 }
 
 export default Menu;

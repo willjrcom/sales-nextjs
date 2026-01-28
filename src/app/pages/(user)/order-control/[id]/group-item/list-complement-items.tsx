@@ -1,6 +1,6 @@
 import GroupItem from '@/app/entities/order/group-item';
 import { useMemo } from 'react';
-import Carousel from '../../../../../components/carousel/carousel';
+import Carousel from '../../../../../../components/carousel/carousel';
 import AddComplementItemModal from './add-complement-item-modal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';

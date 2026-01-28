@@ -1,4 +1,4 @@
-import Carousel from "@/app/components/carousel/carousel";
+import Carousel from "@/components/carousel/carousel";
 import Category, { CategoryMap } from "@/app/entities/category/category";
 import CardProcessRule from "./card-process-rule";
 import { useMemo, useState } from "react";

@@ -11,7 +11,7 @@ import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
 import { useModal } from "@/app/context/modal/context";
 import Link from "next/link";
-import Carousel from "../carousel/carousel";
+import Carousel from "../../../components/carousel/carousel";
 import type { IconType } from 'react-icons';
 const DefaultPaymentIcon = FaDollarSign;
 import CloseTable from "@/app/api/order-table/status/close/order-table";

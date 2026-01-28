@@ -15,7 +15,7 @@ import EmployeeUserProfile from '@/app/components/topbar/profile';
 import Link from 'next/link';
 import GetUser from '@/app/api/user/me/user';
 import User from '@/app/entities/user/user';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import GetUserCompanies from '@/app/api/user/companies/user';
 
 export default function Page() {

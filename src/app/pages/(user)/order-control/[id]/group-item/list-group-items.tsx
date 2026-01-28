@@ -4,7 +4,7 @@ import GroupItem from "@/app/entities/order/group-item"
 import { CategoryMap } from "@/app/entities/category/category";
 import Decimal from 'decimal.js';
 import GroupItemCard from "./group-item-card";
-import Carousel from "../../../../../components/carousel/carousel";
+import Carousel from "../../../../../../components/carousel/carousel";
 
 interface ListGroupItemsProps {
     category: CategoryMap;

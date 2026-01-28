@@ -4,7 +4,7 @@ import GetCompany from "@/app/api/company/company";
 import RequestError from "@/app/utils/error";
 import ShipOrderDelivery from "@/app/api/order-delivery/status/ship/order-delivery";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import Carousel from "@/app/components/carousel/carousel";
+import Carousel from "@/components/carousel/carousel";
 import { FaUserCircle } from 'react-icons/fa';
 import CrudTable from "@/app/components/crud/table";
 // import dynamic from 'next/dynamic';
