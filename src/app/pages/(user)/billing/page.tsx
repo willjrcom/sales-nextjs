@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dialog";
+import { FiscalSettingsDialog } from "@/app/pages/(user)/billing/fiscal-settings-dialog";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
 import { safeFormat } from "@/app/entities/company/methods";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
@@ -49,14 +50,14 @@ export default function BillingPage() {
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(session!),
-        enabled: !!session?.user?.access_token,
+        enabled: !!(session as any)?.user?.access_token,
     });
 
     const [paymentsPage, setPaymentsPage] = useState(0);
     const { data: paymentsResponse, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
         queryKey: ['company-payments', paymentsPage],
         queryFn: () => listPayments(session!, paymentsPage),
-        enabled: !!session?.user?.access_token,
+        enabled: !!(session as any)?.user?.access_token,
     });
 
     const currentDate = new Date();
@@ -67,7 +68,7 @@ export default function BillingPage() {
     const { data: costsResponse, refetch: refetchCosts, isRefetching: isRefetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
         queryKey: ['company-costs', selectedMonth, selectedYear, costsPage],
         queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear, costsPage),
-        enabled: !!session?.user?.access_token,
+        enabled: !!(session as any)?.user?.access_token,
     });
 
     const payments = useMemo(() => paymentsResponse?.items || [], [paymentsResponse?.items]);
@@ -315,6 +316,7 @@ export default function BillingPage() {
                         >
                             {loading ? "..." : "Rodar Mensalidade"}
                         </Button>
+                        <FiscalSettingsDialog />
                         <RegisterCostDialog onSuccess={refetchCosts} />
                         <Refresh
                             onRefresh={refetchCosts}

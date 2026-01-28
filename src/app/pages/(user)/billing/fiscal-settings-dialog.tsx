@@ -1,0 +1,287 @@
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { getFiscalSettings, updateFiscalSettings, FiscalSettingsUpdateDTO } from "@/app/api/fiscal-settings/fiscal-settings";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+
+export function FiscalSettingsDialog() {
+    const { data: session } = useSession();
+    const [open, setOpen] = useState(false);
+    const queryClient = useQueryClient();
+
+    const { register, handleSubmit, control, reset, setValue, watch } = useForm<FiscalSettingsUpdateDTO>({
+        defaultValues: {
+            fiscal_enabled: false,
+            regime_tributario: 1,
+            simples_nacional: true,
+            discrimina_impostos: false,
+            enviar_email_destinatario: true,
+        },
+    });
+
+    const { data: settings, isLoading } = useQuery({
+        queryKey: ['fiscal-settings'],
+        queryFn: () => getFiscalSettings(session!),
+        enabled: !!session?.user?.access_token && open,
+    });
+
+    useEffect(() => {
+        if (settings) {
+            reset({
+                fiscal_enabled: settings.fiscal_enabled,
+                inscricao_estadual: settings.inscricao_estadual,
+                regime_tributario: settings.regime_tributario || 1,
+                cnae: settings.cnae,
+                crt: settings.crt || 1,
+                inscricao_municipal: settings.inscricao_municipal,
+                discrimina_impostos: settings.discrimina_impostos,
+                enviar_email_destinatario: settings.enviar_email_destinatario,
+                business_name: settings.business_name,
+                trade_name: settings.trade_name,
+                cnpj: settings.cnpj,
+                email: settings.email,
+                phone: settings.phone,
+                street: settings.street,
+                number: settings.number,
+                complement: settings.complement,
+                neighborhood: settings.neighborhood,
+                city: settings.city,
+                uf: settings.uf,
+                cep: settings.cep,
+            });
+        }
+    }, [settings, reset]);
+
+    const updateMutation = useMutation({
+        mutationFn: (data: FiscalSettingsUpdateDTO) => updateFiscalSettings(session!, data),
+        onSuccess: () => {
+            notifySuccess("Configurações fiscais atualizadas com sucesso!");
+            setOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['fiscal-settings'] });
+        },
+        onError: (error: any) => {
+            notifyError(error?.message || "Erro ao atualizar configurações fiscais");
+        },
+    });
+
+    const onSubmit = (data: FiscalSettingsUpdateDTO) => {
+        // Convert types if necessary (e.g. string to number for regime_tributario if select returns string)
+        const payload = { ...data };
+        if (payload.regime_tributario) payload.regime_tributario = Number(payload.regime_tributario);
+        if (payload.crt) payload.crt = Number(payload.crt);
+
+        updateMutation.mutate(payload);
+    };
+
+    const fiscalEnabled = watch("fiscal_enabled");
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline">Configuração Fiscal</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0">
+                <DialogHeader className="px-6 pt-6 pb-2">
+                    <DialogTitle>Configurações Fiscais (Focus NFe)</DialogTitle>
+                    <DialogDescription>
+                        Configure os dados da sua empresa para emissão de notas fiscais.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <ScrollArea className="flex-1 px-6">
+                    <form id="fiscal-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-6">
+
+                        <div className="flex items-center space-x-2 border p-4 rounded bg-muted/20">
+                            <Controller
+                                control={control}
+                                name="fiscal_enabled"
+                                render={({ field }) => (
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        id="fiscal_enabled"
+                                    />
+                                )}
+                            />
+                            <Label htmlFor="fiscal_enabled" className="font-semibold cursor-pointer">Habilitar Emissão Fiscal</Label>
+                        </div>
+
+                        {fiscalEnabled && (
+                            <>
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Dados Tributários</h3>
+                                    <Separator />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="regime_tributario">Regime Tributário</Label>
+                                            <Controller
+                                                control={control}
+                                                name="regime_tributario"
+                                                render={({ field }) => (
+                                                    <Select onValueChange={(v: string) => field.onChange(Number(v))} value={String(field.value || 1)}>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Selecione" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="z-[10002]">
+                                                            <SelectItem value="1">1 - Simples Nacional</SelectItem>
+                                                            <SelectItem value="3">3 - Regime Normal</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="crt">CRT</Label>
+                                            <Controller
+                                                control={control}
+                                                name="crt"
+                                                render={({ field }) => (
+                                                    <Select onValueChange={(v: string) => field.onChange(Number(v))} value={String(field.value || 1)}>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Selecione" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="z-[10002]">
+                                                            <SelectItem value="1">1 - Simples Nacional</SelectItem>
+                                                            <SelectItem value="2">2 - Simples Nacional (Excesso)</SelectItem>
+                                                            <SelectItem value="3">3 - Regime Normal</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="cnae">CNAE Principal</Label>
+                                            <Input id="cnae" {...register("cnae")} placeholder="Ex: 4712100" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="inscricao_estadual">Inscrição Estadual</Label>
+                                            <Input id="inscricao_estadual" {...register("inscricao_estadual")} placeholder="Somente números" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="inscricao_municipal">Inscrição Municipal</Label>
+                                            <Input id="inscricao_municipal" {...register("inscricao_municipal")} placeholder="Somente números" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Identificação da Empresa</h3>
+                                    <Separator />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="business_name">Razão Social</Label>
+                                            <Input id="business_name" {...register("business_name")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="trade_name">Nome Fantasia</Label>
+                                            <Input id="trade_name" {...register("trade_name")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="cnpj">CNPJ</Label>
+                                            <Input id="cnpj" {...register("cnpj")} placeholder="00.000.000/0000-00" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="email">Email Fiscal</Label>
+                                            <Input id="email" type="email" {...register("email")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="phone">Telefone</Label>
+                                            <Input id="phone" {...register("phone")} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Endereço Fiscal</h3>
+                                    <Separator />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2 col-span-1">
+                                            <Label htmlFor="cep">CEP</Label>
+                                            <Input id="cep" {...register("cep")} />
+                                        </div>
+                                        <div className="space-y-2 col-span-2">
+                                            <Label htmlFor="street">Logradouro</Label>
+                                            <Input id="street" {...register("street")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="number">Número</Label>
+                                            <Input id="number" {...register("number")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="complement">Complemento</Label>
+                                            <Input id="complement" {...register("complement")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="neighborhood">Bairro</Label>
+                                            <Input id="neighborhood" {...register("neighborhood")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="city">Cidade</Label>
+                                            <Input id="city" {...register("city")} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="uf">UF</Label>
+                                            <Input id="uf" {...register("uf")} maxLength={2} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Preferências</h3>
+                                    <Separator />
+                                    <div className="space-y-3">
+                                        <div className="flex items-center space-x-2">
+                                            <Controller
+                                                control={control}
+                                                name="discrimina_impostos"
+                                                render={({ field }) => (
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                        id="discrimina_impostos"
+                                                    />
+                                                )}
+                                            />
+                                            <Label htmlFor="discrimina_impostos">Discriminar impostos na nota (Lei da Transparência)</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Controller
+                                                control={control}
+                                                name="enviar_email_destinatario"
+                                                render={({ field }) => (
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                        id="enviar_email_destinatario"
+                                                    />
+                                                )}
+                                            />
+                                            <Label htmlFor="enviar_email_destinatario">Enviar email automático para o destinatário</Label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                    </form>
+                </ScrollArea>
+
+                <DialogFooter className="mr-6 mb-6">
+                    <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+                    <Button onClick={handleSubmit(onSubmit)} disabled={updateMutation.isPending || isLoading}>
+                        {updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
