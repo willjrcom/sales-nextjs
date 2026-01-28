@@ -5,8 +5,8 @@ import ForgetUserPassword from '@/app/api/user/forget-password/user';
 import { TextField } from '@/app/components/modal/field';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { notifyError, notifySuccess } from '@/app/utils/notifications';
 import { HiOutlineMail, HiOutlineCheckCircle } from "react-icons/hi";
 import ValidatePasswordResetToken from '@/app/api/user/validate-password-reset-token';
@@ -23,6 +23,29 @@ const RegisterForm = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const tokenFromUrl = searchParams.get('token');
+
+    useEffect(() => {
+        if (tokenFromUrl) {
+            setJwtToken(tokenFromUrl);
+            setIsSuccess(true);
+
+            const validate = async () => {
+                setJwtResult(null);
+                try {
+                    const res = await ValidatePasswordResetToken(tokenFromUrl);
+                    setJwtResult(res);
+                    if (res.valid) {
+                        setShowPasswordModal(true);
+                    }
+                } catch (err: any) {
+                    setJwtResult({ valid: false, error: err?.message || 'Erro ao validar token' });
+                }
+            };
+            validate();
+        }
+    }, [tokenFromUrl]);
 
     const submit = async () => {
         try {
@@ -39,12 +62,12 @@ const RegisterForm = () => {
         return (
             <div className="flex flex-col sm:flex-row h-screen">
                 <div className="w-full sm:w-1/2 bg-yellow-500 relative min-h-[40vh] sm:min-h-screen">
-                    <Image 
-                        src="/icons/logo.png" 
-                        alt="Logo Image" 
-                        fill 
-                        style={{ objectFit: 'cover', objectPosition: 'center' }} 
-                        unoptimized 
+                    <Image
+                        src="/icons/logo.png"
+                        alt="Logo Image"
+                        fill
+                        style={{ objectFit: 'cover', objectPosition: 'center' }}
+                        unoptimized
                         priority
                     />
                     <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
@@ -124,7 +147,7 @@ const RegisterForm = () => {
                                         }
                                         setLoading(true);
                                         try {
-                                            await UpdateUserForgetPassword({email: email, password: newPassword, token: jwtToken})
+                                            await UpdateUserForgetPassword({ email: email, password: newPassword, token: jwtToken })
                                             notifySuccess('Senha redefinida com sucesso!');
                                             setShowPasswordModal(false);
                                             router.push('/login');
@@ -162,8 +185,8 @@ const RegisterForm = () => {
                                 </form>
                             </div>
                         )}
-                        <Link 
-                            href="/login" 
+                        <Link
+                            href="/login"
                             className="inline-block w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
                         >
                             Voltar ao Login
@@ -177,12 +200,12 @@ const RegisterForm = () => {
     return (
         <div className="flex flex-col sm:flex-row h-screen">
             <div className="w-full sm:w-1/2 bg-yellow-500 relative min-h-[40vh] sm:min-h-screen">
-                <Image 
-                    src="/icons/logo.png" 
-                    alt="Register" 
-                    fill 
-                    style={{ objectFit: 'cover', objectPosition: 'center' }} 
-                    unoptimized 
+                <Image
+                    src="/icons/logo.png"
+                    alt="Register"
+                    fill
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                    unoptimized
                     priority
                 />
                 <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
