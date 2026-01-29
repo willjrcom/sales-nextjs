@@ -9,12 +9,13 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar, Crown, AlertTriangle } from "lucide-react";
 import { FiscalSettingsDialog } from "./fiscal-settings-dialog";
+import { PlanType } from "@/app/entities/company/subscription";
 
 const PLAN_LABELS = {
-    free: { name: "Gratuito", color: "bg-gray-100 text-gray-700" },
-    basic: { name: "Básico", color: "bg-blue-100 text-blue-700" },
-    intermediate: { name: "Intermediário", color: "bg-purple-100 text-purple-700" },
-    advanced: { name: "Avançado", color: "bg-amber-100 text-amber-700" },
+    [PlanType.FREE]: { name: "Gratuito", color: "bg-gray-100 text-gray-700" },
+    [PlanType.BASIC]: { name: "Básico", color: "bg-blue-100 text-blue-700" },
+    [PlanType.INTERMEDIATE]: { name: "Intermediário", color: "bg-purple-100 text-purple-700" },
+    [PlanType.ADVANCED]: { name: "Avançado", color: "bg-amber-100 text-amber-700" },
 };
 
 export function SubscriptionStatusCard() {
@@ -100,7 +101,7 @@ export function SubscriptionStatusCard() {
                     <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-md text-sm">
                         <p className="font-medium">Próximo plano agendado</p>
                         <p className="text-xs mt-1">
-                            <span className="font-semibold">{PLAN_LABELS[status.upcoming_plan as keyof typeof PLAN_LABELS]?.name || status.upcoming_plan}</span>
+                            <span className="font-semibold">{PLAN_LABELS[status.upcoming_plan?.toLowerCase() as keyof typeof PLAN_LABELS]?.name || status.upcoming_plan}</span>
                             {' '}a partir de{' '}
                             {format(parseISO(status.upcoming_start_at), "dd/MM/yyyy")}
                         </p>
@@ -108,16 +109,14 @@ export function SubscriptionStatusCard() {
                 )}
 
                 {/* Free Plan CTA */}
-                {normalizedPlan === 'free' && (
+                {(normalizedPlan === 'free' || normalizedPlan === 'basic') && (
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 p-3 rounded-md text-sm">
                         <p className="font-medium text-purple-900">Faça upgrade para desbloquear emissão de notas fiscais!</p>
                         <p className="text-xs text-purple-700 mt-1">Escolha um plano abaixo para começar.</p>
                     </div>
                 )}
-                {normalizedPlan !== 'free' && (
-                    <div className="pt-4 border-t">
-                        <FiscalSettingsDialog currentPlan={normalizedPlan} />
-                    </div>
+                {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
+                    <FiscalSettingsDialog currentPlan={normalizedPlan} />
                 )}
             </CardContent>
         </Card>
