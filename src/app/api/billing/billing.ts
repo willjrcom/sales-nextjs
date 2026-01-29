@@ -6,7 +6,7 @@ import { CompanyUsageCost } from "@/app/entities/company/company-usage-cost";
 export interface CheckoutRequestDTO {
     company_id: string;
     cost_ids?: string[];
-    plan?: string;        // "BASIC", "INTERMEDIATE", "ENTERPRISE"
+    plan?: string;        // "BASIC", "INTERMEDIATE", "ADVANCED"
     periodicity?: string; // "MONTHLY", "SEMIANNUAL", "ANNUAL"
 }
 
@@ -72,9 +72,13 @@ export const createCostCheckout = async (session: Session) => {
     return response.data;
 }
 
-export const listPayments = async (session: Session, page = 0, perPage = 10): Promise<GetAllResponse<CompanyPayment>> => {
+export const listPayments = async (session: Session, page = 0, perPage = 10, month?: number, year?: number): Promise<GetAllResponse<CompanyPayment>> => {
+    let path = `/company/payments?page=${page}&per_page=${perPage}`;
+    if (month) path += `&month=${month}`;
+    if (year) path += `&year=${year}`;
+
     const response = await RequestApi<null, CompanyPayment[]>({
-        path: `/company/payments?page=${page}&per_page=${perPage}`,
+        path: path,
         method: "GET",
         headers: AddAccessToken(session),
     });

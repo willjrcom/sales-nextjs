@@ -3,6 +3,17 @@ import { CompanyPayment } from "./company-payment";
 import { formatCurrency } from "@/app/utils/format";
 import { safeFormat, getStatusBadge } from "./methods";
 import { Button } from "@/components/ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<CompanyPayment>[] => [
     {
@@ -74,15 +85,31 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
                     }
                     {
                         payment.status === "pending" && !payment.is_mandatory && (
-                            <Button
-                                variant="link"
-                                size="sm"
-                                className="h-auto p-0 text-red-600 ml-2"
-                                onClick={() => handleCancel(payment.id)
-                                }
-                            >
-                                Cancelar
-                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="link"
+                                        size="sm"
+                                        className="h-auto p-0 text-red-600 ml-2"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Cancelar Pagamento</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Tem certeza que deseja cancelar este pagamento? Esta ação não pode ser desfeita.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Voltar</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleCancel(payment.id)} className="bg-red-600 hover:bg-red-700">
+                                            Confirmar Cancelamento
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         )
                     }
                 </div>

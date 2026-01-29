@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { createCheckout, listPayments, getMonthlyCosts, createCostCheckout, cancelPayment, triggerMonthlyBilling } from "@/app/api/billing/billing";
+import { createCheckout, listPayments, getMonthlyCosts, cancelPayment, triggerMonthlyBilling } from "@/app/api/billing/billing";
 import GetCompany from "@/app/api/company/company";
 import CrudTable from "@/app/components/crud/table";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,6 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dialog";
-import { FiscalSettingsDialog } from "@/app/pages/(user)/billing/fiscal-settings-dialog";
 import { SubscriptionStatusCard } from "@/app/pages/(user)/billing/subscription-status-card";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
@@ -27,7 +26,7 @@ import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
 const PLANS = {
     BASIC: { name: "Básico", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_BASIC || "99.90"), features: ["Gestão de Vendas", "Controle de Estoque", "Relatórios Básicos"] },
     INTERMEDIATE: { name: "Intermediário (+Fiscal)", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_INTERMEDIATE || "119.90"), features: ["Tudo do Básico", "Emissão de NF-e/NFC-e", "Até 300 notas/mês"] },
-    ENTERPRISE: { name: "Enterprise (+Ilimitado)", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_ENTERPRISE || "129.90"), features: ["Tudo do Intermediário", "Notas Ilimitadas", "Suporte Prioritário"] },
+    ADVANCED: { name: "Avançado (+Ilimitado)", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_ADVANCED || "129.90"), features: ["Tudo do Intermediário", "Notas Ilimitadas", "Suporte Prioritário"] },
 };
 
 type Periodicity = "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
@@ -53,14 +52,20 @@ export default function BillingPage() {
         enabled: !!(session as any)?.user?.access_token,
     });
 
+    const currentDate = new Date();
+
+    // Payments State
     const [paymentsPage, setPaymentsPage] = useState(0);
+    const [paymentsMonth, setPaymentsMonth] = useState(currentDate.getMonth() + 1);
+    const [paymentsYear, setPaymentsYear] = useState(currentDate.getFullYear());
+
     const { data: paymentsResponse, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
-        queryKey: ['company-payments', paymentsPage],
-        queryFn: () => listPayments(session!, paymentsPage),
+        queryKey: ['company-payments', paymentsPage, paymentsMonth, paymentsYear],
+        queryFn: () => listPayments(session!, paymentsPage, 10, paymentsMonth, paymentsYear),
         enabled: !!(session as any)?.user?.access_token,
     });
 
-    const currentDate = new Date();
+    // Costs State
     const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
     const [costsPage, setCostsPage] = useState(0);
@@ -113,27 +118,9 @@ export default function BillingPage() {
         }
     };
 
-    const handlePayCosts = async () => {
-        if (!session || !company?.id) return;
-        setLoading(true);
-        try {
-            const response = await createCostCheckout(session);
-
-            if (response.checkout_url) {
-                window.location.href = response.checkout_url;
-            } else {
-                notifyError("Nenhum custo pendente encontrado.");
-            }
-        } catch (error: any) {
-            notifyError(error?.message || "Erro ao iniciar checkout");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleCancel = async (paymentId: string) => {
         if (!session) return;
-        if (!confirm("Tem certeza que deseja cancelar este pagamento?")) return;
+
 
         setLoading(true);
         try {
@@ -256,11 +243,31 @@ export default function BillingPage() {
                                     <CardTitle>Histórico de Pagamentos</CardTitle>
                                     <CardDescription>Visualize todos os pagamentos realizados.</CardDescription>
                                 </div>
-                                <Refresh
-                                    onRefresh={refetchPayments}
-                                    isPending={isRefetchingPayments}
-                                    lastUpdate={paymentsUpdatedAt ? FormatRefreshTime(new Date(paymentsUpdatedAt)) : undefined}
-                                />
+                                <div className="flex gap-4 items-center">
+                                    <select
+                                        className="bg-background border rounded px-3 py-2 text-sm"
+                                        value={paymentsMonth}
+                                        onChange={(e) => setPaymentsMonth(Number(e.target.value))}
+                                    >
+                                        {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                                            <option key={m} value={m}>{format(new Date(2024, m - 1, 1), "MMMM", { locale: ptBR })}</option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        className="bg-background border rounded px-3 py-2 text-sm"
+                                        value={paymentsYear}
+                                        onChange={(e) => setPaymentsYear(Number(e.target.value))}
+                                    >
+                                        {[2024, 2025, 2026].map(y => (
+                                            <option key={y} value={y}>{y}</option>
+                                        ))}
+                                    </select>
+                                    <Refresh
+                                        onRefresh={refetchPayments}
+                                        isPending={isRefetchingPayments}
+                                        lastUpdate={paymentsUpdatedAt ? FormatRefreshTime(new Date(paymentsUpdatedAt)) : undefined}
+                                    />
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -298,20 +305,13 @@ export default function BillingPage() {
                         <div className="flex items-center">
                         </div>
                         <Button
-                            variant="outline"
-                            onClick={handlePayCosts}
-                            disabled={loading}
-                        >
-                            {loading ? "Processando..." : "Pagar Pendentes"}
-                        </Button>
-                        <Button
                             variant="secondary"
                             onClick={handleTriggerBatch}
                             disabled={loading}
                         >
                             {loading ? "..." : "Rodar Mensalidade"}
                         </Button>
-                        <FiscalSettingsDialog />
+
                         <RegisterCostDialog onSuccess={refetchCosts} />
                         <Refresh
                             onRefresh={refetchCosts}

@@ -13,10 +13,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
-export function FiscalSettingsDialog() {
+interface FiscalSettingsDialogProps {
+    currentPlan?: string;
+}
+
+export function FiscalSettingsDialog({ currentPlan }: FiscalSettingsDialogProps) {
     const { data: session } = useSession();
     const [open, setOpen] = useState(false);
     const queryClient = useQueryClient();
+
+    const isPlanEligible = currentPlan === 'intermediate' || currentPlan === 'advanced' || currentPlan === 'advanced';
 
     const { register, handleSubmit, control, reset, setValue, watch } = useForm<FiscalSettingsUpdateDTO>({
         defaultValues: {
@@ -104,19 +110,27 @@ export function FiscalSettingsDialog() {
                 <ScrollArea className="flex-1 px-6">
                     <form id="fiscal-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-6">
 
-                        <div className="flex items-center space-x-2 border p-4 rounded bg-muted/20">
-                            <Controller
-                                control={control}
-                                name="fiscal_enabled"
-                                render={({ field }) => (
-                                    <Switch
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        id="fiscal_enabled"
-                                    />
-                                )}
-                            />
-                            <Label htmlFor="fiscal_enabled" className="font-semibold cursor-pointer">Habilitar Emissão Fiscal</Label>
+                        <div className="flex flex-col gap-2 border p-4 rounded bg-muted/20">
+                            <div className="flex items-center space-x-2">
+                                <Controller
+                                    control={control}
+                                    name="fiscal_enabled"
+                                    render={({ field }) => (
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            id="fiscal_enabled"
+                                            disabled={!isPlanEligible}
+                                        />
+                                    )}
+                                />
+                                <Label htmlFor="fiscal_enabled" className={`font-semibold cursor-pointer ${!isPlanEligible ? 'text-muted-foreground' : ''}`}>Habilitar Emissão Fiscal</Label>
+                            </div>
+                            {!isPlanEligible && (
+                                <p className="text-xs text-amber-600 font-medium ml-12">
+                                    Disponível apenas nos planos Intermediário e Avançado.
+                                </p>
+                            )}
                         </div>
 
                         {fiscalEnabled && (

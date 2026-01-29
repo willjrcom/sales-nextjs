@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar, Crown, AlertTriangle } from "lucide-react";
+import { FiscalSettingsDialog } from "./fiscal-settings-dialog";
 
 const PLAN_LABELS = {
     free: { name: "Gratuito", color: "bg-gray-100 text-gray-700" },
@@ -110,6 +111,11 @@ export function SubscriptionStatusCard() {
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 p-3 rounded-md text-sm">
                         <p className="font-medium text-purple-900">Faça upgrade para desbloquear emissão de notas fiscais!</p>
                         <p className="text-xs text-purple-700 mt-1">Escolha um plano abaixo para começar.</p>
+                    </div>
+                )}
+                {status.current_plan !== 'free' && (
+                    <div className="pt-4 border-t">
+                        <FiscalSettingsDialog currentPlan={status.current_plan} />
                     </div>
                 )}
             </CardContent>
