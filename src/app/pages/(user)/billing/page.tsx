@@ -18,8 +18,8 @@ import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dialog";
 import { FiscalSettingsDialog } from "@/app/pages/(user)/billing/fiscal-settings-dialog";
+import { SubscriptionStatusCard } from "@/app/pages/(user)/billing/subscription-status-card";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
-import { safeFormat } from "@/app/entities/company/methods";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
 import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
 
@@ -178,12 +178,7 @@ export default function BillingPage() {
                 </TabsList>
 
                 <TabsContent value="plans" className="space-y-8">
-                    {company?.subscription_expires_at && (
-                        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md mb-6 flex items-center gap-2">
-                            <span className="font-medium">Seu plano é válido até:</span>
-                            <span>{safeFormat(company.subscription_expires_at, "dd/MM/yyyy")}</span>
-                        </div>
-                    )}
+                    <SubscriptionStatusCard />
 
                     {/* Periodicity Toggle */}
                     <div className="flex justify-center mt-6">

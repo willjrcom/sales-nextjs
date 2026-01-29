@@ -35,6 +35,19 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
         cell: ({ row }) => row.original.months > 0 ? `${row.original.months} meses` : "Avulso",
     },
     {
+        header: "Plano",
+        cell: ({ row }) => {
+            if (!row.original.plan_type) return "-";
+            const planLabels: Record<string, string> = {
+                "basic": "Básico",
+                "intermediate": "Intermediário",
+                "advanced": "Avançado",
+            };
+            const normalizedType = row.original.plan_type.toLowerCase();
+            return planLabels[normalizedType] || row.original.plan_type;
+        },
+    },
+    {
         accessorKey: "is_mandatory",
         header: "Obrigatório",
         cell: ({ row }) => (

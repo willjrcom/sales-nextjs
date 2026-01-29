@@ -5,6 +5,7 @@ export interface CompanyPayment {
     created_at: string;
     paid_at?: string;
     months: number;
+    plan_type?: string;
     provider_payment_id: string;
     payment_url: string;
     external_reference: string;
