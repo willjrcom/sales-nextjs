@@ -41,7 +41,8 @@ export function SubscriptionStatusCard() {
 
     if (!status) return null;
 
-    const plan = PLAN_LABELS[status.current_plan] || PLAN_LABELS.free;
+    const normalizedPlan = status.current_plan?.toLowerCase() || 'free';
+    const plan = PLAN_LABELS[normalizedPlan as keyof typeof PLAN_LABELS] || PLAN_LABELS.free;
     const expiresAt = status.expires_at ? parseISO(status.expires_at) : null;
     const daysRemaining = status.days_remaining ?? null;
     const isExpiringSoon = daysRemaining !== null && daysRemaining <= 7 && daysRemaining > 0;
@@ -107,15 +108,15 @@ export function SubscriptionStatusCard() {
                 )}
 
                 {/* Free Plan CTA */}
-                {status.current_plan === 'free' && (
+                {normalizedPlan === 'free' && (
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 p-3 rounded-md text-sm">
                         <p className="font-medium text-purple-900">Faça upgrade para desbloquear emissão de notas fiscais!</p>
                         <p className="text-xs text-purple-700 mt-1">Escolha um plano abaixo para começar.</p>
                     </div>
                 )}
-                {status.current_plan !== 'free' && (
+                {normalizedPlan !== 'free' && (
                     <div className="pt-4 border-t">
-                        <FiscalSettingsDialog currentPlan={status.current_plan} />
+                        <FiscalSettingsDialog currentPlan={normalizedPlan} />
                     </div>
                 )}
             </CardContent>
