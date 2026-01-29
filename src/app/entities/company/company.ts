@@ -13,12 +13,6 @@ export default class Company {
   preferences: Record<string, string> = {};
   subscription_expires_at?: string | null;
   is_blocked: boolean = false;
-  // Fiscal fields
-  fiscal_enabled: boolean = false;
-  state_registration?: string;
-  tax_regime?: number;
-  cnae?: string;
-  crt?: number;
 
   monthly_payment_due_day?: number;
   monthly_payment_due_day_updated_at?: string;

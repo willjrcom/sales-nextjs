@@ -171,64 +171,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 </div>
             )}
 
-            {/* Seção: Dados Fiscais */}
-            {isUpdate && (
-                <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Dados Fiscais</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                        Configure os dados fiscais para emissão de NFC-e. Estes dados serão utilizados em todas as notas fiscais.
-                    </p>
-                    <div className="space-y-4">
-                        <div className='flex flex-col sm:flex-row gap-4 justify-between'>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <TextField
-                                    friendlyName="Inscrição Estadual (IE)"
-                                    name="state_registration"
-                                    value={company.state_registration || ''}
-                                    setValue={value => handleInputChange('state_registration', value)}
-                                />
-                            </div>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <SelectField
-                                    friendlyName="Regime Tributário"
-                                    name="tax_regime"
-                                    values={[
-                                        { id: '1', name: '1 - Simples Nacional' },
-                                        { id: '2', name: '2 - Simples Nacional (Excesso)' },
-                                        { id: '3', name: '3 - Regime Normal' },
-                                    ]}
-                                    selectedValue={String(company.tax_regime || '1')}
-                                    setSelectedValue={value => handleInputChange('tax_regime', parseInt(value) || 1)}
-                                />
-                            </div>
-                        </div>
-                        <div className='flex flex-col sm:flex-row gap-4 justify-between'>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <TextField
-                                    friendlyName="CNAE"
-                                    name="cnae"
-                                    value={company.cnae || ''}
-                                    setValue={value => handleInputChange('cnae', value)}
-                                />
-                            </div>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <SelectField
-                                    friendlyName="CRT (Código Regime Tributário)"
-                                    name="crt"
-                                    values={[
-                                        { id: '1', name: '1 - Simples Nacional' },
-                                        { id: '2', name: '2 - Simples Nacional (Excesso)' },
-                                        { id: '3', name: '3 - Regime Normal' },
-                                    ]}
-                                    selectedValue={String(company.crt || '1')}
-                                    setSelectedValue={value => handleInputChange('crt', parseInt(value) || 1)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Seção: Faturamento */}
             {isUpdate && (
                 <div className="bg-gradient-to-br from-white to-yellow-50 rounded-lg shadow-sm border border-yellow-100 p-6 transition-all duration-300 hover:shadow-md">
