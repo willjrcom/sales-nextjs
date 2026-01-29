@@ -47,6 +47,7 @@ const errorTranslations: Record<string, string> = {
     "password must contain at least one digit": "Senha deve conter pelo menos um número",
     "password must contain at least one symbol": "Senha deve conter pelo menos um caractere especial",
     "no pending costs found": "Nenhum custo pendente encontrado",
+    "fiscal invoice functionality is not enabled for this company": "A funcionalidade de nota fiscal não está habilitada para esta empresa",
 
     // Erros de Pedido (Order)
     "order must have at least one item": "O pedido deve ter pelo menos um item",

@@ -24,6 +24,7 @@ import { FinishDelivery } from "@/app/pages/(user)/order-delivery-control/delive
 import EmitNFCeModal from "@/app/components/card-order/emit-nfce-modal";
 import GetOrderByID from "@/app/api/order/[id]/order";
 import GroupItemCard from "./group-item-card";
+import { getFiscalSettings } from "@/app/api/fiscal-settings/fiscal-settings";
 import {
     FaCheck, FaClipboardCheck, FaEdit, FaTimes, FaMoneyBillWave, FaCreditCard, FaTicketAlt, FaDollarSign, FaPrint,
     FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
@@ -65,6 +66,13 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
         queryFn: () => GetCompany(data!),
         enabled: !!data?.user?.access_token,
     })
+
+
+    const { data: fiscalSettings } = useQuery({
+        queryKey: ['fiscal-settings'],
+        queryFn: () => getFiscalSettings(data!),
+        enabled: !!data?.user?.access_token,
+    });
 
     // Usar React Query diretamente
     const { data: order, refetch } = useQuery({
@@ -507,17 +515,20 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             <span>Imprimir</span>
                         </button>
                     }
+
                     {/* Botão de gerar nota fiscal */}
-                    <ButtonIconText
-                        modalName={"emit-nfce-" + order.id}
-                        title="Gerar NFC-e"
-                        size="md"
-                        color="purple"
-                        icon={FaFileInvoiceDollar}
-                        isDisabled={!isOrderStatusFinished || isOrderStatusCanceled}
-                    >
-                        <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
-                    </ButtonIconText>
+                    {fiscalSettings?.fiscal_enabled &&
+                        <ButtonIconText
+                            modalName={"emit-nfce-" + order.id}
+                            title="Gerar NFC-e"
+                            size="md"
+                            color="purple"
+                            icon={FaFileInvoiceDollar}
+                            isDisabled={!isOrderStatusFinished || isOrderStatusCanceled}
+                        >
+                            <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
+                        </ButtonIconText>
+                    }
                 </div>
             </div>
         </div>
