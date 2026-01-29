@@ -57,6 +57,10 @@ export function FiscalSettingsDialog() {
                 city: settings.city,
                 uf: settings.uf,
                 cep: settings.cep,
+                csc_production_id: settings.csc_production_id,
+                csc_production_code: settings.csc_production_code,
+                csc_homologation_id: settings.csc_homologation_id,
+                csc_homologation_code: settings.csc_homologation_code,
             });
         }
     }, [settings, reset]);
@@ -231,6 +235,43 @@ export function FiscalSettingsDialog() {
                                         <div className="space-y-2">
                                             <Label htmlFor="uf">UF</Label>
                                             <Input id="uf" {...register("uf")} maxLength={2} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Credenciais NFC-e (CSC)</h3>
+                                    <Separator />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="md:col-span-2">
+                                            <p className="text-sm text-muted-foreground mb-4">
+                                                O CSC (Código de Segurança do Contribuinte) é obrigatório para emissão de NFC-e.
+                                                Você pode obter esses códigos no portal da SEFAZ do seu estado.
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-4 border p-4 rounded-md">
+                                            <h4 className="font-semibold text-sm">Ambiente de PRODUÇÃO</h4>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="csc_production_id">ID do Token (Ex: 000001)</Label>
+                                                <Input id="csc_production_id" {...register("csc_production_id")} placeholder="000001" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="csc_production_code">Código CSC (Alfanumérico)</Label>
+                                                <Input id="csc_production_code" {...register("csc_production_code")} type="password" />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4 border p-4 rounded-md bg-muted/10">
+                                            <h4 className="font-semibold text-sm">Ambiente de HOMOLOGAÇÃO (Testes)</h4>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="csc_homologation_id">ID do Token (Ex: 000001)</Label>
+                                                <Input id="csc_homologation_id" {...register("csc_homologation_id")} placeholder="000001" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="csc_homologation_code">Código CSC (Alfanumérico)</Label>
+                                                <Input id="csc_homologation_code" {...register("csc_homologation_code")} type="password" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

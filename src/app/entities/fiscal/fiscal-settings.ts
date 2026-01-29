@@ -21,6 +21,10 @@ export interface FiscalSettingsDTO {
     city: string;
     uf: string;
     cep: string;
+    csc_production_id?: string;
+    csc_production_code?: string;
+    csc_homologation_id?: string;
+    csc_homologation_code?: string;
 }
 
 export interface FiscalSettingsUpdateDTO {
@@ -46,4 +50,8 @@ export interface FiscalSettingsUpdateDTO {
     city?: string;
     uf?: string;
     cep?: string;
+    csc_production_id?: string;
+    csc_production_code?: string;
+    csc_homologation_id?: string;
+    csc_homologation_code?: string;
 }
