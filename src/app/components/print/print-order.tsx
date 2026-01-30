@@ -9,9 +9,10 @@ interface PrintOrderProps {
     orderID: string;
     session: Session;
     company: Company;
+    printerKey?: string;
 }
 
-const printOrder = async ({ orderID, session, company }: PrintOrderProps) => {
+const printOrder = async ({ orderID, session, company, printerKey }: PrintOrderProps) => {
 
     // Obtém o conteúdo de impressão uma única vez
     let printContent: string;
@@ -29,7 +30,13 @@ const printOrder = async ({ orderID, session, company }: PrintOrderProps) => {
 
     // Tenta usar o Print Agent (WebSocket) primeiro
     try {
-        let printerName = company?.preferences["printer_order_on_pend_order"] || "default";
+        let printerName = "default";
+
+        if (printerKey && company?.preferences[printerKey]) {
+            printerName = company.preferences[printerKey];
+        } else {
+            printerName = company?.preferences["printer_order_on_pend_order"] || "default";
+        }
 
         if (printerName === "default") {
             const printers = await printService.getPrinters();

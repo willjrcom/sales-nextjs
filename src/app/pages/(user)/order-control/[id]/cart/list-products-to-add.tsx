@@ -121,7 +121,7 @@ export const ListProductsToAdd = () => {
     const endItem = Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalCount);
 
     return (
-        <div className="flex h-full overflow-hidden">
+        <div className="flex h-[85vh] overflow-hidden">
             {/* Category Sidebar */}
             <aside className="w-20 bg-white border-r border-gray-200 overflow-y-auto py-4 flex flex-col items-center gap-4 flex-shrink-0">
                 {/* All Categories Button */}

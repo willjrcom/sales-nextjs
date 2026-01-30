@@ -25,7 +25,20 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
-    const [company, setCompany] = useState<Company>(item || new Company());
+    const defaultPreferences = {
+        enable_delivery: 'true',
+        enable_table: 'true',
+        enable_min_order_value_for_free_delivery: 'false',
+        min_order_value_for_free_delivery: '0',
+        table_tax_rate: '10',
+        min_delivery_tax: '5',
+        enable_print_order_on_pend_order: 'false',
+        printer_order_on_pend_order: '',
+        enable_print_order_on_ship_delivery: 'false',
+        printer_delivery_on_ship_delivery: '',
+        enable_print_items_on_finish_process: 'false',
+    }
+    const [company, setCompany] = useState<Company>(item || new Company({ preferences: defaultPreferences }));
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [address, setAddress] = useState<Address>(company.address || new Address())
     const { data, update } = useSession();
@@ -269,7 +282,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             <NumberField
                                 friendlyName="Taxa de mesa (%)"
                                 name="table_tax_rate"
-                                value={parseFloat(company.preferences.table_tax_rate || '0')}
+                                value={parseFloat(company.preferences.table_tax_rate || '10')}
                                 setValue={value => handlePreferenceChange('table_tax_rate', value)}
                                 disabled={company.preferences.enable_table !== 'true'}
                             />
@@ -338,6 +351,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             value={company.preferences.enable_print_items_on_finish_process === 'true'}
                             setValue={value => handlePreferenceChange('enable_print_items_on_finish_process', value)}
                         />
+                        <p className="text-sm text-gray-500 mt-2 ml-1">
+                            * A impressora utilizada será a configurada em cada categoria
+                        </p>
                     </div>
                 </div>
             </div>

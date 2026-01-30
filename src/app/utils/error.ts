@@ -48,6 +48,7 @@ const errorTranslations: Record<string, string> = {
     "password must contain at least one symbol": "Senha deve conter pelo menos um caractere especial",
     "no pending costs found": "Nenhum custo pendente encontrado",
     "fiscal invoice functionality is not enabled for this company": "A funcionalidade de nota fiscal não está habilitada para esta empresa",
+    "start change must be higher than 0": "O valor inicial do caixa deve ser maior que 0",
 
     // Erros de Pedido (Order)
     "order must have at least one item": "O pedido deve ter pelo menos um item",
@@ -105,7 +106,8 @@ const errorTranslations: Record<string, string> = {
     "process already continued": "O processo já foi continuado",
 
     // Erros de Usuário
-    "user already exists": "Usuário já cadastrado",
+    "user email already exists": "Email do usuário já cadastrado",
+    "user cpf already exists": "CPF do usuário já cadastrado",
     "invalid email": "Email inválido",
     "invalid password": "Senha inválida",
     "email cannot be empty": "Email não pode estar vazio",
@@ -120,6 +122,7 @@ const errorTranslations: Record<string, string> = {
     "invalid contact": "Contato inválido",
     "number is required": "Número é obrigatório",
     "contact format invalid": "Formato de contato inválido",
+    "delivery tax is less than minimum delivery tax": "A taxa de entrega é menor que a taxa de entrega mínima",
 
     // Erros de Endereço
     "address already exists": "Endereço já cadastrado",
