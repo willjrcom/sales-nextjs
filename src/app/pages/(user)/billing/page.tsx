@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { formatCurrency } from "@/app/utils/format";
@@ -51,6 +51,24 @@ export default function BillingPage() {
         queryFn: () => GetCompany(session!),
         enabled: !!(session as any)?.user?.access_token,
     });
+
+    // Handle post-payment feedback
+    useEffect(() => {
+        const status = searchParams.get("payment");
+
+        if (status === "success") {
+            notifySuccess("Pagamento realizado com sucesso! Aguardando confirmação do Mercado Pago.");
+            // Clean URL
+            const params = new URLSearchParams(searchParams?.toString());
+            params.delete("payment");
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        } else if (status === "failed") {
+            notifyError("Pagamento não foi concluído. Tente novamente.");
+            const params = new URLSearchParams(searchParams?.toString());
+            params.delete("payment");
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }
+    }, [searchParams, router, pathname]);
 
     const currentDate = new Date();
 
@@ -182,12 +200,18 @@ export default function BillingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {Object.entries(PLANS).map(([key, plan]) => {
                             const { final, discountValue } = calculateTotal(plan.price);
+                            const isCurrentPlan = company?.plan_type?.toLowerCase() === key.toLowerCase();
 
                             return (
-                                <div key={key} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all ${key === "INTERMEDIATE" ? "border-primary/50 bg-primary/5" : "bg-card"}`}>
+                                <div key={key} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all ${isCurrentPlan ? "border-green-500 bg-green-50/50" :
+                                        key === "INTERMEDIATE" ? "border-primary/50 bg-primary/5" : "bg-card"
+                                    }`}>
                                     <div className="mb-4">
                                         <h3 className="font-bold text-xl">{plan.name}</h3>
-                                        {key === "INTERMEDIATE" && <Badge className="mt-2" variant="secondary">Mais Popular</Badge>}
+                                        <div className="flex gap-2 mt-2">
+                                            {isCurrentPlan && <Badge variant="default" className="bg-green-600">Plano Atual</Badge>}
+                                            {key === "INTERMEDIATE" && !isCurrentPlan && <Badge variant="secondary">Mais Popular</Badge>}
+                                        </div>
                                     </div>
 
                                     <div className="mb-6">
@@ -223,11 +247,11 @@ export default function BillingPage() {
 
                                     <Button
                                         className="w-full"
-                                        variant={key === "INTERMEDIATE" ? "default" : "outline"}
-                                        disabled={loading}
+                                        variant={key === "INTERMEDIATE" && !isCurrentPlan ? "default" : "outline"}
+                                        disabled={loading || isCurrentPlan}
                                         onClick={() => handleSubscribe(key)}
                                     >
-                                        {loading ? "Processando..." : "Assinar Agora"}
+                                        {isCurrentPlan ? "Plano Ativo" : loading ? "Processando..." : "Assinar Agora"}
                                     </Button>
                                 </div>
                             );

@@ -2,14 +2,18 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
-import { useQuery } from "@tanstack/react-query";
+import { cancelSubscription } from "@/app/api/billing/billing";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Crown, AlertTriangle } from "lucide-react";
+import { Calendar, Crown, AlertTriangle, XCircle } from "lucide-react";
 import { FiscalSettingsDialog } from "./fiscal-settings-dialog";
 import { PlanType } from "@/app/entities/company/subscription";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { useState } from "react";
 
 const PLAN_LABELS = {
     [PlanType.FREE]: { name: "Gratuito", color: "bg-gray-100 text-gray-700" },
@@ -20,12 +24,34 @@ const PLAN_LABELS = {
 
 export function SubscriptionStatusCard() {
     const { data: session } = useSession();
+    const queryClient = useQueryClient();
+    const [cancelling, setCancelling] = useState(false);
 
     const { data: status, isLoading } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
         enabled: !!(session as any)?.user?.access_token,
     });
+
+    const handleCancelSubscription = async () => {
+        if (!session) return;
+
+        if (!confirm("Tem certeza que deseja cancelar sua assinatura? A renovação automática será cancelada, mas você terá acesso até o fim do período atual.")) {
+            return;
+        }
+
+        setCancelling(true);
+        try {
+            await cancelSubscription(session);
+            notifySuccess("Assinatura cancelada com sucesso! Você terá acesso até o fim do período atual.");
+            queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
+            queryClient.invalidateQueries({ queryKey: ["company"] });
+        } catch (error: any) {
+            notifyError(error?.message || "Erro ao cancelar assinatura");
+        } finally {
+            setCancelling(false);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -116,7 +142,21 @@ export function SubscriptionStatusCard() {
                     </div>
                 )}
                 {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
-                    <FiscalSettingsDialog currentPlan={normalizedPlan} />
+                    <>
+                        <FiscalSettingsDialog currentPlan={normalizedPlan} />
+                        {status.can_cancel_renewal && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="w-full mt-3"
+                                onClick={handleCancelSubscription}
+                                disabled={cancelling}
+                            >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                {cancelling ? "Cancelando..." : "Cancelar Renovação Automática"}
+                            </Button>
+                        )}
+                    </>
                 )}
             </CardContent>
         </Card>

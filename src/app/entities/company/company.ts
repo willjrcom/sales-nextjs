@@ -12,6 +12,7 @@ export default class Company {
   address: Address = new Address();
   preferences: Record<string, string> = {};
   subscription_expires_at?: string | null;
+  plan_type?: string;
   is_blocked: boolean = false;
 
   monthly_payment_due_day?: number;

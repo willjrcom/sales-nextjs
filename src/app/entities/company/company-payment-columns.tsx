@@ -46,6 +46,21 @@ export const paymentColumns = (handleCancel: (id: string) => void): ColumnDef<Co
         cell: ({ row }) => row.original.months > 0 ? `${row.original.months} meses` : "Avulso",
     },
     {
+        header: "Tipo",
+        cell: ({ row }) => {
+            const isSubscription = row.original.external_reference?.startsWith("SUB:");
+            return isSubscription ? (
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                    Assinatura
+                </span>
+            ) : (
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                    Avulso
+                </span>
+            );
+        },
+    },
+    {
         header: "Plano",
         cell: ({ row }) => {
             if (!row.original.plan_type) return "-";

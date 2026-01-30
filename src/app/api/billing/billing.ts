@@ -120,3 +120,13 @@ export const triggerMonthlyBilling = async (session: Session) => {
 
     return response.data;
 }
+
+export const cancelSubscription = async (session: Session) => {
+    const response = await RequestApi<null, null>({
+        path: "/company/subscription/cancel",
+        method: "POST",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data;
+}
