@@ -5,13 +5,13 @@ import NewUser from '@/app/api/user/new/user';
 import ErrorForms from '@/app/components/modal/error-forms';
 import PasswordField from '@/app/components/modal/fields/password';
 import User, { ValidateUserForm } from '@/app/entities/user/user';
-import { ToIsoDate } from '@/app/utils/date';
+import { ToIsoDate, ToUtcDate } from '@/app/utils/date';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { notifyError, notifySuccess } from '@/app/utils/notifications';
-import { DateField, ImageField, TextField } from '@/app/components/modal/field';
+import { ImageField, TextField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
 import AddressForm from '@/app/forms/address/form';
 import ContactForm from '@/app/forms/contact/form';
@@ -24,7 +24,7 @@ const RegisterForm = () => {
     const [user, setUser] = useState<User>(new User());
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const router = useRouter();
-    
+
     const [contact, setContact] = useState<Contact>(user.contact || new Contact({ id: undefined, object_id: undefined }))
     const [address, setAddress] = useState<Address>(user.address || new Address({ id: undefined, object_id: undefined }))
 
@@ -138,7 +138,7 @@ const RegisterForm = () => {
                                             <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={user.cpf || ''} formatted={true} />
                                         </div>
                                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={user.birthday} />
+                                            <PatternField patternName="date" name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={user.birthday || ''} formatted={true} />
                                         </div>
                                     </div>
                                 </div>

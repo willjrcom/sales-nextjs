@@ -1,4 +1,4 @@
-import { parseISO, format } from 'date-fns';
+import { parseISO, format, parse, addHours } from 'date-fns';
 import { toZonedTime, format as formatUTC } from 'date-fns-tz';
 // Time zone for São Paulo, Brasil
 const TIME_ZONE = 'America/Sao_Paulo';
@@ -7,7 +7,15 @@ const ToIsoDate = (dateString: string) => {
     // Função para formatar a data
     const formatDate = (dateString: string) => {
         if (!dateString) return ""
-        const parsedDate = parseISO(dateString); // Convertendo a string para um objeto Date
+
+        let parsedDate;
+        // Check if date matches DD/MM/YYYY format
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+            parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
+        } else {
+            parsedDate = parseISO(dateString); // Convertendo a string para um objeto Date
+        }
+
         const formattedDate = format(parsedDate, "yyyy-MM-dd'T'HH:mm:ssXXX"); // Formatando a data no formato desejado
         return formattedDate;
     };
@@ -18,8 +26,19 @@ const ToIsoDate = (dateString: string) => {
 const ToUtcDate = (dateString?: string) => {
     if (!dateString) return "--/--/--"
 
+    // If date is already formatted as DD/MM/YYYY, return it as is
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+        return dateString;
+    }
+
     const date = new Date(dateString);
-    const zonedDate = toZonedTime(date, TIME_ZONE); // Ajusta para fuso de São Paulo
+    if (isNaN(date.getTime())) {
+        return dateString // Return raw value if invalid date to prevent crash
+    }
+
+    // Add buffer to prevent LMT timezone shifts (e.g. year 1213) from moving date to previous day
+    const safeDate = addHours(date, 12);
+    const zonedDate = toZonedTime(safeDate, TIME_ZONE); // Ajusta para fuso de São Paulo
 
     // Formata a data corretamente
     const formattedDate = formatUTC(zonedDate, "dd/MM/yyyy", { timeZone: TIME_ZONE });

@@ -4,8 +4,8 @@ import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { EmployeeSalaryHistory } from "@/app/entities/employee/employee-payment";
 import PriceField from "@/app/components/modal/fields/price";
-import { DateField, NumberField } from "@/app/components/modal/field";
-import TextField from "@/app/components/modal/fields/text";
+import PatternField from "@/app/components/modal/fields/pattern";
+import { ToIsoDate, ToUtcDate } from "@/app/utils/date";
 import SelectField from "@/app/components/modal/fields/select";
 
 interface SalaryHistoryModalProps {
@@ -29,11 +29,10 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
         setLoading(true);
         try {
             const { id, ...payload } = form;
-            
+
             // Converte a data para formato ISO se fornecida
             if (payload.start_date) {
-                const date = new Date(payload.start_date);
-                payload.start_date = date.toISOString();
+                payload.start_date = ToIsoDate(payload.start_date);
             }
 
             const newHistory = await createEmployeeSalaryHistory(employeeId, payload, data);
@@ -41,10 +40,10 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
             onSuccess(newHistory);
         } catch (err: any) {
             console.error('Erro detalhado:', err);
-            
+
             // Extrai a mensagem de erro de forma mais robusta
             let errorMessage = "Erro ao lançar histórico salarial";
-            
+
             if (err && typeof err === 'object') {
                 if (err.message) {
                     errorMessage = err.message;
@@ -56,7 +55,7 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
             } else if (typeof err === 'string') {
                 errorMessage = err;
             }
-            
+
             notifyError(errorMessage);
         } finally {
             setLoading(false);
@@ -67,11 +66,13 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-lg w-full max-w-md">
                 <h2 className="text-xl font-bold mb-4">Alterar Salário</h2>
-                <DateField
+                <PatternField
                     name="start_date"
                     friendlyName="Início"
                     value={form.start_date || ""}
                     setValue={value => handleInputChange('start_date', value)}
+                    patternName="date"
+                    formatted={true}
                 />
                 <SelectField
                     name="salary_type"

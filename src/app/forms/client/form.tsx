@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ValidateClientForm } from '@/app/entities/client/client';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import { ToIsoDate } from '@/app/utils/date';
+import { ToIsoDate, ToUtcDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteClient from '@/app/api/client/delete/client';
@@ -12,7 +12,7 @@ import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DateField, HiddenField, ImageField, TextField, CheckboxField } from '@/app/components/modal/field';
+import { HiddenField, ImageField, TextField, CheckboxField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
 import Contact from '@/app/entities/contact/contact';
 import Address from '@/app/entities/address/address';
@@ -22,7 +22,11 @@ import AddressClientForm from '../address/client-form';
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
-    const [client, setClient] = useState<Client>(new Client(item))
+    const [client, setClient] = useState<Client>(() => {
+        const c = new Client(item);
+        if (c.birthday) c.birthday = ToUtcDate(c.birthday);
+        return c;
+    });
     const [contact, setContact] = useState<Contact>(new Contact(client.contact))
     const [address, setAddress] = useState<Address>(new Address(client.address))
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -155,7 +159,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                             <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={client.cpf || ''} optional={true} formatted={true} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday} optional={true} />
+                            <PatternField patternName="date" name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday || ''} optional={true} formatted={true} />
                         </div>
                     </div>
                     {isUpdate && (

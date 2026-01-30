@@ -9,8 +9,8 @@ import UpdateEmployee from '@/app/api/employee/update/employee';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { ToIsoDate } from '@/app/utils/date';
-import { DateField, HiddenField, ImageField, TextField } from '@/app/components/modal/field';
+import { ToIsoDate, ToUtcDate } from '@/app/utils/date';
+import { HiddenField, ImageField, TextField } from '@/app/components/modal/field';
 import NewUser from '@/app/api/user/new/user';
 import AddUserToCompany from '@/app/api/company/add/company';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,13 +27,17 @@ interface EmployeeFormProps extends CreateFormsProps<Employee> {
 const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) => {
     const modalName = 'new-already-created-employee'
     const modalHandler = useModal();
-    const [employee, setEmployee] = useState<Employee>(item || new Employee());
+    const [employee, setEmployee] = useState<Employee>(() => {
+        const e = item || new Employee();
+        if (e.birthday) e.birthday = ToUtcDate(e.birthday);
+        return e;
+    });
     const [contact, setContact] = useState<Contact>(employee.contact || new Contact())
     const [address, setAddress] = useState<Address>(employee.address || new Address())
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
     const { data } = useSession();
- 
+
     const handleInputChange = useCallback((field: keyof Employee, value: any) => {
         setEmployee(prev => ({
             ...prev,
@@ -50,7 +54,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
     }, [contact]);
 
     const createMutation = useMutation({
-        mutationFn: async (newEmployee: Employee) => { 
+        mutationFn: async (newEmployee: Employee) => {
             const responseUser = await NewUser(newEmployee, "", true)
             await AddUserToCompany(newEmployee.email, data!)
             NewEmployee(responseUser, data!)
@@ -165,7 +169,7 @@ const EmployeeForm = ({ item, isUpdate, isDisabledPerson }: EmployeeFormProps) =
                             <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={employee.cpf || ''} optional={false} disabled={isDisabledPerson} formatted={true} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={employee.birthday} optional={false} disabled={isDisabledPerson} />
+                            <PatternField patternName="date" name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={employee.birthday || ''} optional={false} disabled={isDisabledPerson} formatted={true} />
                         </div>
                     </div>
                 </div>

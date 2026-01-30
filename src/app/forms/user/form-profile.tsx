@@ -8,8 +8,8 @@ import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { ToIsoDate } from '@/app/utils/date';
-import { DateField, ImageField, TextField } from '@/app/components/modal/field';
+import { ToIsoDate, ToUtcDate } from '@/app/utils/date';
+import { ImageField, TextField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
 import AddressForm from '../address/form';
 import ContactForm from '../contact/form';
@@ -19,7 +19,11 @@ import Contact from '@/app/entities/contact/contact';
 const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
     const modalName = 'show-user'
     const modalHandler = useModal();
-    const [user, setUser] = useState<User>(new User(item));
+    const [user, setUser] = useState<User>(() => {
+        const u = new User(item);
+        if (u.birthday) u.birthday = ToUtcDate(u.birthday);
+        return u;
+    });
     const [contact, setContact] = useState<Contact>(new Contact(user.contact))
     const [address, setAddress] = useState<Address>(new Address(user.address))
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -111,7 +115,7 @@ const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
                             <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={user.cpf || ''} optional={false} formatted={true} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <DateField name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={user.birthday} optional={false} />
+                            <PatternField patternName="date" name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={user.birthday || ''} optional={false} formatted={true} />
                         </div>
                     </div>
                 </div>

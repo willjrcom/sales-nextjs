@@ -1,8 +1,7 @@
-import React from "react";
 import { Decimal } from "decimal.js";
 import { EmployeeSalaryHistory } from "@/app/entities/employee/employee-payment";
-import { ToUtcDatetime, ToUtcHoursMinutes } from "@/app/utils/date";
-import { HiOutlineClock, HiOutlineCurrencyDollar, HiOutlineDocumentText } from "react-icons/hi";
+import { ToUtcDate } from "@/app/utils/date";
+import { HiOutlineCurrencyDollar, HiOutlineDocumentText } from "react-icons/hi";
 
 const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSalaryHistory[] }) => (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
@@ -12,7 +11,7 @@ const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSa
             </div>
             <h3 className="font-bold text-xl text-gray-800">Histórico Salarial</h3>
         </div>
-        
+
         <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -41,8 +40,8 @@ const EmployeeSalaryHistoryList = ({ history: histories }: { history: EmployeeSa
                     ) : (
                         histories.map(h => (
                             <tr key={h.id} className="hover:bg-gray-50 transition-colors duration-150">
-                                <td className="px-4 py-3 text-gray-700">{ToUtcDatetime(h.start_date)}</td>
-                                <td className="px-4 py-3 text-gray-700">{h.end_date ? ToUtcDatetime(h.end_date) : "-"}</td>
+                                <td className="px-4 py-3 text-gray-700">{ToUtcDate(h.start_date)}</td>
+                                <td className="px-4 py-3 text-gray-700">{h.end_date ? ToUtcDate(h.end_date) : "-"}</td>
                                 <td className="px-4 py-3">
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         {h.salary_type}
