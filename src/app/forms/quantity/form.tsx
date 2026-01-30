@@ -26,7 +26,7 @@ const QuantityForm = ({ item, isUpdate, categoryID, onSuccess }: QuantityFormPro
     const modalName = isUpdate ? 'edit-quantity-' + item?.id : 'new-quantity';
     const modalHandler = useModal();
     const queryClient = useQueryClient();
-    const [quantity, setQuantity] = useState<Quantity>(item || new Quantity());
+    const [quantity, setQuantity] = useState<Quantity>(new Quantity(item));
 
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});

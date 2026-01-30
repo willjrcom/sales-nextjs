@@ -40,6 +40,10 @@ export const patterns = {
     "full-phone": {
         pattern: "(##) #####-####",
         placeholder: "(00) 00000-0000"
+    },
+    "date": {
+        pattern: "##/##/####",
+        placeholder: "00/00/0000"
     }
 } as const; // Garantindo que o objeto 'patterns' tem um formato de constante para os valores
 

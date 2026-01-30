@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HiddenField, SelectField, TextField } from '../../components/modal/field';
-import PriceField from '@/app/components/modal/fields/price';
 import Address from '@/app/entities/address/address';
-import { addressUFsWithId, AddressTypesWithId } from '@/app/entities/address/utils';
+import { addressUFsWithId } from '@/app/entities/address/utils';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useSession } from 'next-auth/react';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
@@ -17,7 +16,7 @@ export interface AddressFormProps {
 }
 
 const AddressForm = ({ addressParent, setAddressParent, isHidden }: AddressFormProps) => {
-    const [address, setAddress] = useState<Address>(addressParent || new Address());
+    const [address, setAddress] = useState<Address>(new Address(addressParent));
     const { data } = useSession();
 
     const { data: company } = useQuery({

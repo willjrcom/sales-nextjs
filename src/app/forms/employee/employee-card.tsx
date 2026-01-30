@@ -10,10 +10,10 @@ import { useModal } from "@/app/context/modal/context";
 import RequestError from "@/app/utils/error";
 import { getEmployeeSalaryHistory } from "@/app/api/employee/salary-history";
 import { getEmployeePayments } from "@/app/api/employee/payments";
-import EmployeeSalaryHistoryList from "./EmployeeSalaryHistoryList";
-import EmployeePaymentsList from "./EmployeePaymentsList";
-import SalaryHistoryModal from "./SalaryHistoryModal";
-import PaymentModal from "./PaymentModal";
+import EmployeeSalaryHistoryList from "./list-employee-salary-history";
+import EmployeePaymentsList from "./list-employee-payments";
+import SalaryHistoryModal from "./salary-history-modal";
+import PaymentModal from "./payment-modal";
 import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -32,9 +32,9 @@ function formatDate(dateString?: string) {
 
 function EmployeeCard({ item }: EmployeeCardProps) {
     const modalName = "view-employee-" + item.id;
-    const [employee, setEmployee] = useState<Employee>(item || new Employee())
-    const contact = item.contact as Contact;
-    const address = item.address as Address;
+    const [employee, setEmployee] = useState<Employee>(new Employee(item))
+    const contact = new Contact(item.contact);
+    const address = new Address(item.address);
     const queryClient = useQueryClient();
     const { data } = useSession();
     const modalHandler = useModal();

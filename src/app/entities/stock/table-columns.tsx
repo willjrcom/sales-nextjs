@@ -73,17 +73,17 @@ const StockColumns = (): ColumnDef<Stock>[] => [
         <div style={{ display: 'flex', gap: 8 }}>
           <ButtonIcon icon={FaPlus} modalName={"add-stock-" + row.original.id}
             title={"Adicionar estoque " + (row.original.product?.name || "")}>
-            <AddStockForm key={"add:"+ row.original.id} stock={row.original} />
+            <AddStockForm key={"add:" + row.original.id} stock={row.original} />
           </ButtonIcon>
 
           <ButtonIcon icon={FaMinus} modalName={"remove-stock-" + row.original.id}
             title={"Remover estoque " + (row.original.product?.name || "")}>
-            <RemoveStockForm  key={"remove:"+ row.original.id} stock={row.original}/>
+            <RemoveStockForm key={"remove:" + row.original.id} stock={row.original} />
           </ButtonIcon >
 
           <ButtonIcon icon={FaEdit} modalName={"adjust-stock-" + row.original.id}
             title={"Ajustar estoque " + (row.original.product?.name || "")}>
-            <AdjustStockForm  key={"adjust:"+ row.original.id} stock={row.original}/>
+            <AdjustStockForm key={"adjust:" + row.original.id} stock={row.original} />
           </ButtonIcon >
         </div>
       )
@@ -92,12 +92,17 @@ const StockColumns = (): ColumnDef<Stock>[] => [
   {
     id: 'Historico',
     header: 'Historico',
-    cell: ({ row }) => {
+    cell: info => {
       return (
         <div style={{ display: 'flex', gap: 8 }}>
-          <ButtonIcon icon={FaSearch} modalName={"stock-movements-" + row.original.id}
-            title={"Histórico de movimentos de " + (row.original.product?.name || "estoque")}>
-            <StockMovements stockID={row.original.id} />
+          <ButtonIcon icon={FaSearch} modalName={"stock-movements-" + info.row.original.id}
+            title={"Histórico de movimentos de " + (info.row.original.product?.name || "estoque")}>
+            <StockMovements stockID={info.row.original.id} />
+          </ButtonIcon>
+
+          <ButtonIcon icon={FaEdit} modalName={"edit-stock-" + info.row.original.id}
+            title={"Editar estoque " + (info.row.original.product?.name || "")}>
+            <StockForm key={"edit:" + info.row.original.id} item={info.row.original} isUpdate={true} />
           </ButtonIcon>
         </div>
       )

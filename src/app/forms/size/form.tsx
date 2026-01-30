@@ -26,7 +26,7 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
-    const [size, setSize] = useState<Size>(item || new Size());
+    const [size, setSize] = useState<Size>(new Size(item));
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 

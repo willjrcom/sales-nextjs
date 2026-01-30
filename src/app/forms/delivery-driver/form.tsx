@@ -19,7 +19,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const modalHandler = useModal();
     const queryClient = useQueryClient();
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>(item?.employee_id || "");
-    const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(item || new DeliveryDriver());
+    const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(new DeliveryDriver(item));
     const { data } = useSession();
 
     const { data: employeesWithoutDriversResponse } = useQuery({

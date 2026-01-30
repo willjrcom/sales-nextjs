@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
-    const [groupItem, setGroupItem] = useState<GroupItem>(item as GroupItem);
+    const [groupItem, setGroupItem] = useState<GroupItem>(new GroupItem(item));
     const [observation, setObservation] = useState<string>(item?.observation || '');
     const [startAt, setStartAt] = useState<string | null | undefined>(item?.start_at);
     const [observationOpen, setObservationOpen] = useState(false);

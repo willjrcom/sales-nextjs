@@ -19,12 +19,11 @@ import Contact from '@/app/entities/contact/contact';
 const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
     const modalName = 'show-user'
     const modalHandler = useModal();
-    const [user, setUser] = useState<User>(item || new User());
-    const [contact, setContact] = useState<Contact>(user.contact || new Contact())
-    const [address, setAddress] = useState<Address>(user.address || new Address())
+    const [user, setUser] = useState<User>(new User(item));
+    const [contact, setContact] = useState<Contact>(new Contact(user.contact))
+    const [address, setAddress] = useState<Address>(new Address(user.address))
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const { data } = useSession();
-
 
     const handleInputChange = useCallback((field: keyof User, value: any) => {
         setUser(prev => ({

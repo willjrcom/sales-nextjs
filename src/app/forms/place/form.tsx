@@ -18,7 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const modalName = isUpdate ? 'edit-place-' + item?.id : 'new-place'
     const modalHandler = useModal();
-    const [place, setPlace] = useState<Place>(item || new Place());
+    const [place, setPlace] = useState<Place>(new Place(item));
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();

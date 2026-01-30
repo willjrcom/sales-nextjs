@@ -38,9 +38,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         printer_delivery_on_ship_delivery: '',
         enable_print_items_on_finish_process: 'false',
     }
-    const [company, setCompany] = useState<Company>(item || new Company({ preferences: defaultPreferences }));
+    const [company, setCompany] = useState<Company>(new Company(item || { preferences: defaultPreferences }));
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [address, setAddress] = useState<Address>(company.address || new Address())
+    const [address, setAddress] = useState<Address>(new Address(company.address))
     const { data, update } = useSession();
     const router = useRouter();
     const modalHandler = useModal();

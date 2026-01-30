@@ -17,7 +17,7 @@ export interface AddressClientFormProps {
 }
 
 const AddressClientForm = ({ addressParent, setAddressParent, isHidden }: AddressClientFormProps) => {
-    const [address, setAddress] = useState<Address>(addressParent || new Address());
+    const [address, setAddress] = useState<Address>(new Address(addressParent));
     const { data } = useSession();
 
     const { data: company } = useQuery({

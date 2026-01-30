@@ -21,7 +21,7 @@ interface PaymentFormProps extends CreateFormsProps<PaymentOrder> {
 const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
     const modalName = isUpdate ? 'edit-payment-' + item?.id : 'add-payment'
     const modalHandler = useModal();
-    const [payment, setPayment] = useState<PaymentOrder>(item || new PaymentOrder());
+    const [payment, setPayment] = useState<PaymentOrder>(new PaymentOrder(item));
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
     const { data } = useSession();

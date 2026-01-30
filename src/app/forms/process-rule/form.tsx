@@ -19,7 +19,7 @@ import { GetCategoriesMap } from '@/app/api/category/category';
 const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
     const modalHandler = useModal();
-    const [processRule, setProcessRule] = useState<ProcessRule>(item || new ProcessRule());
+    const [processRule, setProcessRule] = useState<ProcessRule>(new ProcessRule(item));
     const queryClient = useQueryClient();
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});

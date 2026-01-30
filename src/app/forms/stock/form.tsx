@@ -20,7 +20,7 @@ import { GetCategoriesMap } from '@/app/api/category/category';
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
     const modalHandler = useModal();
-    const [stock, setStock] = useState<Stock>(item || new Stock());
+    const [stock, setStock] = useState<Stock>(new Stock(item));
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [categoryID, setCategoryID] = useState<string>("");
@@ -95,21 +95,29 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Produto</h3>
                 <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    <RadioField
+                    {!isUpdate && <RadioField
                         friendlyName="Categoria"
                         name="category_id"
                         selectedValue={categoryID}
                         setSelectedValue={setCategoryID}
                         values={categories}
-                    />
+                    />}
 
-                    <RadioField
+                    {!isUpdate && <RadioField
                         friendlyName="Produto"
                         name="product_id"
                         selectedValue={stock.product_id}
                         setSelectedValue={(value) => handleInputChange('product_id', value)}
                         values={recordProducts}
-                    />
+                    />}
+
+                    {isUpdate && <TextField
+                        friendlyName="Produto"
+                        name="product_id"
+                        setValue={(value) => handleInputChange('product_id', value)}
+                        value={stock.product?.name || ""}
+                        disabled
+                    />}
                 </div>
             </div>
 
@@ -117,14 +125,14 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Níveis de Estoque</h3>
                 <div className="space-y-4">
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    {!isUpdate && <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <TextField
                             friendlyName="Estoque Atual"
                             name="current_stock"
                             setValue={(value) => handleDecimalChange('current_stock', value)}
                             value={stock.current_stock.toString()}
                         />
-                    </div>
+                    </div>}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <TextField

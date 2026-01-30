@@ -22,9 +22,9 @@ import AddressClientForm from '../address/client-form';
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
-    const [client, setClient] = useState<Client>(item || new Client())
-    const [contact, setContact] = useState<Contact>(client.contact || new Contact())
-    const [address, setAddress] = useState<Address>(client.address || new Address())
+    const [client, setClient] = useState<Client>(new Client(item))
+    const [contact, setContact] = useState<Contact>(new Contact(client.contact))
+    const [address, setAddress] = useState<Address>(new Address(client.address))
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const { data } = useSession();
     const queryClient = useQueryClient();

@@ -12,7 +12,7 @@ import Quantity from "@/app/entities/quantity/quantity";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import QuantitySelector from "./quantity-selector";
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
@@ -27,7 +27,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const modalHandler = useModal();
   const queryClient = useQueryClient();
   const { data } = useSession();
-  const [product, setProduct] = useState<Product>(item || new Product());
+  const [product, setProduct] = useState<Product>(new Product(item));
   const [quantity, setQuantity] = useState<Quantity>(new Quantity());
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);

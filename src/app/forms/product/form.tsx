@@ -23,7 +23,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalHandler = useModal();
     const queryClient = useQueryClient();
     const { data } = useSession();
-    const [product, setProduct] = useState<Product>(item || new Product());
+    const [product, setProduct] = useState<Product>(new Product(item));
     const [flavorsInput, setFlavorsInput] = useState<string>(item?.flavors?.join(', ') || '');
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 

@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
     const modalHandler = useModal();
-    const [table, setTable] = useState<Table>(item || new Table());
+    const [table, setTable] = useState<Table>(new Table(item));
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();

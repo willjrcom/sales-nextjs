@@ -23,7 +23,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
-    const [category, setCategory] = useState<Category>(item || new Category());
+    const [category, setCategory] = useState<Category>(new Category(item));
     const [selectedType, setSelectedType] = useState<"Normal" | "Adicional" | "Complemento">("Normal");
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
