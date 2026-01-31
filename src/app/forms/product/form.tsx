@@ -43,6 +43,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
     const sizes = useMemo(() => sizesResponse || [], [sizesResponse]);
+    const filteredSizes = useMemo(() => sizes.filter(size => size.is_active), [sizes]);
 
     const handleInputChange = (field: keyof Product, value: any) => {
         setProduct(prev => ({ ...prev, [field]: value }));
@@ -169,7 +170,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                         <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={categories} />
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={sizes} />
+                        <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={filteredSizes} />
                     </div>
                 </div>
             </div>

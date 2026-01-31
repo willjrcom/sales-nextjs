@@ -21,12 +21,13 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
     });
 
     const quantities = useMemo(() => quantitiesResponse || [], [quantitiesResponse]);
+    const filteredQuantities = useMemo(() => quantities.filter((quantity) => quantity.is_active), [quantities]);
 
     useEffect(() => {
-        quantities.forEach((quantity) => {
+        filteredQuantities.forEach((quantity) => {
             if (quantity.quantity === 1) setSelectedQuantity(quantity);
         })
-    }, [quantities])
+    }, [filteredQuantities])
 
     return (
         <div className="mb-4">
@@ -36,7 +37,7 @@ const QuantitySelector = ({ categoryID, selectedQuantity, setSelectedQuantity }:
                 </label>
 
                 <div className="flex flex-wrap gap-2">
-                    {quantities.map((quantity) => (
+                    {filteredQuantities.map((quantity) => (
                         <button
                             key={quantity.id}
                             className={`w-10 h-10 ${selectedQuantity.id === quantity.id

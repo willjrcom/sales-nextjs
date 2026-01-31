@@ -31,7 +31,7 @@ const SchemaProduct = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     description: z.string().optional(),
     flavors: z.array(z.string().trim().min(1, 'Sabor inválido')).optional(),
-    price: z.coerce.number().min(1, 'Preço inválido'),
+    price: z.coerce.number().optional(),
     cost: z.coerce.number().optional(),
     category_id: z.string().uuid("Categoria inválida"),
     size_id: z.string().uuid("Tamanho inválido"),
