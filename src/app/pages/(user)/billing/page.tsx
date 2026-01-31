@@ -228,23 +228,35 @@ export default function BillingPage() {
                             {(subscriptionStatus?.available_plans || [])
                                 .filter((p: Plan) => {
                                     const currentPlanOrder = subscriptionStatus?.available_plans?.find((cp: Plan) => cp.is_current)?.order || 0;
+
+                                    // If renewal is cancelled (can_cancel_renewal = false), show ALL plans
+                                    // User can now schedule any plan to start after current expires
+                                    const renewalCancelled = subscriptionStatus?.can_cancel_renewal === false;
+                                    if (renewalCancelled) {
+                                        return true; // Show all plans including lower ones
+                                    }
+
+                                    // Otherwise, show only current plan and upgrades (hide downgrades)
                                     return p.order >= currentPlanOrder;
                                 })
                                 .map((plan: Plan) => {
                                     const { final, discountValue } = calculateTotal(plan.price);
                                     const isCurrentPlan = plan.is_current;
                                     const isUpgrade = plan.is_upgrade;
-                                    const upgradePrice = plan.upgrade_price;
                                     const planKey = plan.key;
 
+                                    const isFreePlan = subscriptionStatus?.current_plan?.toUpperCase() === 'FREE' || !subscriptionStatus?.current_plan;
+
                                     const handlePlanAction = () => {
-                                        if (isUpgrade && isCurrentPlan === false) { // Ensure not upgrading to same plan? Logic handled by backend is_upgrade
-                                            // Reuse existing upgrade logic structure
+                                        if (isUpgrade && isCurrentPlan === false && !isFreePlan) {
+                                            // Only show upgrade dialog if NOT on Free plan
                                             setTargetUpgradePlan({ key: planKey, name: plan.name });
                                             setUpgradeDialogOpen(true);
-                                        } else {
+                                        } else if (isFreePlan || isCurrentPlan) {
+                                            // For Free plan or current plan
                                             handleSubscribe(planKey);
                                         }
+                                        // For lower-tier plans (downgrade), do nothing - button will be disabled
                                     };
 
                                     // Override price display for upgrade
@@ -261,12 +273,11 @@ export default function BillingPage() {
                                     // For now, I'll keep the standard price display but change the button text/action.
                                     // The UpgradeDialog shows the specific cost.
 
-                                    const isFreePlan = subscriptionStatus?.current_plan?.toUpperCase() === 'FREE' || !subscriptionStatus?.current_plan;
                                     const buttonText = isCurrentPlan
                                         ? "Plano Atual"
                                         : isUpgrade
                                             ? (isFreePlan ? "Assinar" : "Fazer Upgrade")
-                                            : "Fazer Downgrade";
+                                            : "Assinar"; // Lower tier plans (only visible after cancellation)
 
                                     return (
                                         <div key={plan.key} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all w-full max-w-sm ${isCurrentPlan ? "border-green-500 bg-green-50/50" :

@@ -3,6 +3,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
 import { cancelSubscription } from "@/app/api/billing/billing";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +36,7 @@ export function SubscriptionStatusCard() {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
     const [cancelling, setCancelling] = useState(false);
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
 
     const { data: status, isLoading } = useQuery({
         queryKey: ["subscription-status"],
@@ -36,10 +47,7 @@ export function SubscriptionStatusCard() {
     const handleCancelSubscription = async () => {
         if (!session) return;
 
-        if (!confirm("Tem certeza que deseja cancelar sua assinatura? A renovação automática será cancelada, mas você terá acesso até o fim do período atual.")) {
-            return;
-        }
-
+        setShowCancelDialog(false); // Close dialog
         setCancelling(true);
         try {
             await cancelSubscription(session);
@@ -154,24 +162,53 @@ export function SubscriptionStatusCard() {
                         <p className="text-xs text-purple-700 mt-1">Escolha um plano abaixo para começar.</p>
                     </div>
                 )}
-                {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
-                    <>
+
+                <div className="flex justify-between mt-3">
+                    {/* Fiscal Settings & Cancel Button for Paid Plans */}
+                    {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
                         <FiscalSettingsDialog currentPlan={normalizedPlan} />
-                        {status.can_cancel_renewal && (
+                    )}
+
+                    {/* Cancel Button: Show for ANY active paid plan (not Free) */}
+                    {normalizedPlan !== 'free' && status.can_cancel_renewal && (
+                        <div className="flex justify-end mt-3">
                             <Button
-                                variant="destructive"
+                                variant="ghost"
                                 size="sm"
-                                className="w-full mt-3"
-                                onClick={handleCancelSubscription}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => setShowCancelDialog(true)}
                                 disabled={cancelling}
                             >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                {cancelling ? "Cancelando..." : "Cancelar Renovação Automática"}
+                                <XCircle className="w-3 h-3 mr-1.5" />
+                                <span className="text-xs">{cancelling ? "Cancelando..." : "Cancelar renovação"}</span>
                             </Button>
-                        )}
-                    </>
-                )}
+                        </div>
+                    )}
+                </div>
             </CardContent>
+
+
+            {/* Cancel Confirmation Dialog */}
+            <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Cancelar renovação automática?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Você continuará com acesso ao plano atual até o fim do período já pago.
+                            A cobrança automática será cancelada e você não será cobrado novamente.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Voltar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleCancelSubscription}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Confirmar cancelamento
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Card>
     );
 }
