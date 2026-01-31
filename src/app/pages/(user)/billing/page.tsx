@@ -224,7 +224,7 @@ export default function BillingPage() {
                     {isLoadingStatus ? (
                         <div className="flex justify-center p-8">Carregando planos...</div>
                     ) : (
-                        <div className="flex flex-wrap justify-center gap-6">
+                        <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-6">
                             {(subscriptionStatus?.available_plans || [])
                                 .filter((p: Plan) => {
                                     const currentPlanOrder = subscriptionStatus?.available_plans?.find((cp: Plan) => cp.is_current)?.order || 0;
@@ -261,8 +261,15 @@ export default function BillingPage() {
                                     // For now, I'll keep the standard price display but change the button text/action.
                                     // The UpgradeDialog shows the specific cost.
 
+                                    const isFreePlan = subscriptionStatus?.current_plan?.toUpperCase() === 'FREE' || !subscriptionStatus?.current_plan;
+                                    const buttonText = isCurrentPlan
+                                        ? "Plano Atual"
+                                        : isUpgrade
+                                            ? (isFreePlan ? "Assinar" : "Fazer Upgrade")
+                                            : "Fazer Downgrade";
+
                                     return (
-                                        <div key={planKey} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all w-full max-w-sm ${isCurrentPlan ? "border-green-500 bg-green-50/50" :
+                                        <div key={plan.key} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all w-full max-w-sm ${isCurrentPlan ? "border-green-500 bg-green-50/50" :
                                             planKey === "intermediate" ? "border-primary/50 bg-primary/5" : "bg-card"
                                             }`}>
                                             <div className="mb-4">
@@ -303,14 +310,19 @@ export default function BillingPage() {
                                                     </li>
                                                 ))}
                                             </ul>
-
+                                            const isFreePlan = subscriptionStatus?.current_plan?.toUpperCase() === 'FREE' || !subscriptionStatus?.current_plan;
+                                            const buttonText = isCurrentPlan
+                                            ? "Plano Atual"
+                                            : isUpgrade
+                                            ? (isFreePlan ? "Assinar" : "Fazer Upgrade")
+                                            : "Fazer Downgrade";
                                             <Button
                                                 className="w-full"
                                                 variant={isUpgrade ? "default" : isCurrentPlan ? "outline" : "outline"}
                                                 disabled={loading || isCurrentPlan}
                                                 onClick={handlePlanAction}
                                             >
-                                                {isCurrentPlan ? "Plano Ativo" : isUpgrade ? "Fazer Upgrade" : "Assinar Agora"}
+                                                {buttonText}
                                             </Button>
                                         </div>
                                     );
