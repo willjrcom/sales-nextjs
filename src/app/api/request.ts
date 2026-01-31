@@ -38,7 +38,8 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormD
         throw new Error(`path: ${path} must start with /`);
     }
 
-    const fullPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`;
+    // const fullPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`;
+    const fullPath = `/api${path}`;
 
     let fetchHeaders = { ...headers };
     let fetchBody = undefined;
