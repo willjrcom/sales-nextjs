@@ -130,3 +130,33 @@ export const cancelSubscription = async (session: Session) => {
 
     return response.data;
 }
+
+export interface UpgradeSimulationResponse {
+    original_plan: string;
+    target_plan: string;
+    remaining_days: number;
+    upgrade_amount: number;
+    daily_difference: number;
+    is_full_renewal: boolean;
+}
+
+export const simulateUpgrade = async (session: Session, targetPlan: string) => {
+    const response = await RequestApi<null, UpgradeSimulationResponse>({
+        path: `/company/subscription/upgrade/simulate?target_plan=${targetPlan}`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data;
+}
+
+export const createUpgradeCheckout = async (session: Session, targetPlan: string) => {
+    const response = await RequestApi<{ target_plan: string }, CheckoutResponseDTO>({
+        path: "/company/subscription/upgrade/checkout",
+        method: "POST",
+        body: { target_plan: targetPlan },
+        headers: AddAccessToken(session),
+    });
+
+    return response.data;
+}

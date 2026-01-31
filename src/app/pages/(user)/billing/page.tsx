@@ -18,6 +18,7 @@ import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dialog";
 import { SubscriptionStatusCard } from "@/app/pages/(user)/billing/subscription-status-card";
+import { UpgradeDialog } from "@/app/pages/(user)/billing/upgrade-dialog";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
 import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
@@ -45,6 +46,8 @@ export default function BillingPage() {
     };
     const [loading, setLoading] = useState(false);
     const [periodicity, setPeriodicity] = useState<Periodicity>("MONTHLY");
+    const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+    const [targetUpgradePlan, setTargetUpgradePlan] = useState<{ key: string, name: string } | null>(null);
 
     const { data: company } = useQuery({
         queryKey: ['company'],
@@ -202,9 +205,23 @@ export default function BillingPage() {
                             const { final, discountValue } = calculateTotal(plan.price);
                             const isCurrentPlan = company?.plan_type?.toLowerCase() === key.toLowerCase();
 
+                            const PLAN_LEVELS: Record<string, number> = { "BASIC": 1, "INTERMEDIATE": 2, "ADVANCED": 3 };
+                            const currentLevel = PLAN_LEVELS[company?.plan_type?.toUpperCase() || ""] || 0;
+                            const thisLevel = PLAN_LEVELS[key] || 0;
+                            const isUpgrade = thisLevel > currentLevel;
+
+                            const handlePlanAction = () => {
+                                if (isUpgrade) {
+                                    setTargetUpgradePlan({ key, name: plan.name });
+                                    setUpgradeDialogOpen(true);
+                                } else {
+                                    handleSubscribe(key);
+                                }
+                            };
+
                             return (
                                 <div key={key} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all ${isCurrentPlan ? "border-green-500 bg-green-50/50" :
-                                        key === "INTERMEDIATE" ? "border-primary/50 bg-primary/5" : "bg-card"
+                                    key === "INTERMEDIATE" ? "border-primary/50 bg-primary/5" : "bg-card"
                                     }`}>
                                     <div className="mb-4">
                                         <h3 className="font-bold text-xl">{plan.name}</h3>
@@ -247,11 +264,11 @@ export default function BillingPage() {
 
                                     <Button
                                         className="w-full"
-                                        variant={key === "INTERMEDIATE" && !isCurrentPlan ? "default" : "outline"}
+                                        variant={isUpgrade ? "default" : isCurrentPlan ? "outline" : "outline"}
                                         disabled={loading || isCurrentPlan}
-                                        onClick={() => handleSubscribe(key)}
+                                        onClick={handlePlanAction}
                                     >
-                                        {isCurrentPlan ? "Plano Ativo" : loading ? "Processando..." : "Assinar Agora"}
+                                        {isCurrentPlan ? "Plano Ativo" : isUpgrade ? "Fazer Upgrade" : "Assinar Agora"}
                                     </Button>
                                 </div>
                             );
@@ -383,8 +400,17 @@ export default function BillingPage() {
                             onPageChange={(page) => setCostsPage(page + 1)} // CrudTable uses 0-based index, API uses 1-based (from my specific impl)
                         />
                     </div>
-                </TabsContent >
-            </Tabs >
-        </div >
+                </TabsContent>
+            </Tabs>
+
+            {targetUpgradePlan && (
+                <UpgradeDialog
+                    isOpen={upgradeDialogOpen}
+                    onClose={() => setUpgradeDialogOpen(false)}
+                    targetPlan={targetUpgradePlan.key}
+                    targetPlanName={targetUpgradePlan.name}
+                />
+            )}
+        </div>
     );
 }
