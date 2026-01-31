@@ -14,9 +14,10 @@ interface UpgradeDialogProps {
     onClose: () => void;
     targetPlan: string;
     targetPlanName: string;
+    currentPlanName?: string;
 }
 
-export function UpgradeDialog({ isOpen, onClose, targetPlan, targetPlanName }: UpgradeDialogProps) {
+export function UpgradeDialog({ isOpen, onClose, targetPlan, targetPlanName, currentPlanName }: UpgradeDialogProps) {
     const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
     const [simulation, setSimulation] = useState<UpgradeSimulationResponse | null>(null);
@@ -82,9 +83,9 @@ export function UpgradeDialog({ isOpen, onClose, targetPlan, targetPlanName }: U
                                     <span className="text-sm font-medium text-muted-foreground">Novo Plano</span>
                                 </div>
                                 <div className="flex justify-between items-center text-lg font-bold">
-                                    <span>{simulation.original_plan}</span>
+                                    <span>{currentPlanName || simulation.original_plan}</span>
                                     <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                                    <span className="text-primary">{simulation.target_plan}</span>
+                                    <span className="text-primary">{targetPlanName}</span>
                                 </div>
                             </div>
 

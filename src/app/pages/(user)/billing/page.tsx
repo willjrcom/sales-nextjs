@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { createCheckout, listPayments, getMonthlyCosts, cancelPayment, triggerMonthlyBilling } from "@/app/api/billing/billing";
+import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
 import GetCompany from "@/app/api/company/company";
 import CrudTable from "@/app/components/crud/table";
 import { useQuery } from "@tanstack/react-query";
@@ -22,13 +23,10 @@ import { UpgradeDialog } from "@/app/pages/(user)/billing/upgrade-dialog";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
 import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
+import { Plan } from "@/app/entities/company/subscription";
 
-// Hardcoded Plan Prices
-const PLANS = {
-    BASIC: { name: "Básico", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_BASIC || "99.90"), features: ["Gestão de Vendas", "Controle de Estoque", "Relatórios Básicos"] },
-    INTERMEDIATE: { name: "Intermediário (+Fiscal)", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_INTERMEDIATE || "119.90"), features: ["Tudo do Básico", "Emissão de NF-e/NFC-e", "Até 300 notas/mês"] },
-    ADVANCED: { name: "Avançado (+Ilimitado)", price: parseFloat(process.env.NEXT_PUBLIC_PRICE_ADVANCED || "129.90"), features: ["Tudo do Intermediário", "Notas Ilimitadas", "Suporte Prioritário"] },
-};
+
+// Hardcoded Plan Prices removed, will use dynamic data
 
 type Periodicity = "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
 
@@ -54,6 +52,18 @@ export default function BillingPage() {
         queryFn: () => GetCompany(session!),
         enabled: !!(session as any)?.user?.access_token,
     });
+
+    const { data: subscriptionStatus, isLoading: isLoadingStatus } = useQuery({
+        queryKey: ["subscription-status"],
+        queryFn: () => GetSubscriptionStatus(session!),
+        enabled: !!(session as any)?.user?.access_token,
+    });
+
+    useEffect(() => {
+        if (subscriptionStatus?.periodicity && subscriptionStatus.periodicity !== "MONTHLY") {
+            setPeriodicity(subscriptionStatus.periodicity);
+        }
+    }, [subscriptionStatus?.periodicity]);
 
     // Handle post-payment feedback
     useEffect(() => {
@@ -192,88 +202,121 @@ export default function BillingPage() {
                     <div className="flex justify-center mt-6">
                         <Tabs value={periodicity} onValueChange={(v) => setPeriodicity(v as Periodicity)} className="w-[400px]">
                             <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="MONTHLY">Mensal</TabsTrigger>
-                                <TabsTrigger value="SEMIANNUAL">Semestral (-5%)</TabsTrigger>
-                                <TabsTrigger value="ANNUAL">Anual (-10%)</TabsTrigger>
+                                {subscriptionStatus?.periodicity === "SEMIANNUAL" ? (
+                                    <TabsTrigger value="SEMIANNUAL" className="col-span-3">Semestral (-5%)</TabsTrigger>
+                                ) : subscriptionStatus?.periodicity === "ANNUAL" ? (
+                                    <TabsTrigger value="ANNUAL" className="col-span-3">Anual (-10%)</TabsTrigger>
+                                ) : subscriptionStatus?.available_plans?.some((p: Plan) => p.is_current) ? (
+                                    <TabsTrigger value="MONTHLY" className="col-span-3">Mensal</TabsTrigger>
+                                ) : (
+                                    <>
+                                        <TabsTrigger value="MONTHLY">Mensal</TabsTrigger>
+                                        <TabsTrigger value="SEMIANNUAL">Semestral (-5%)</TabsTrigger>
+                                        <TabsTrigger value="ANNUAL">Anual (-10%)</TabsTrigger>
+                                    </>
+                                )}
                             </TabsList>
                         </Tabs>
                     </div>
 
                     {/* Plan Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {Object.entries(PLANS).map(([key, plan]) => {
-                            const { final, discountValue } = calculateTotal(plan.price);
-                            const isCurrentPlan = company?.plan_type?.toLowerCase() === key.toLowerCase();
+                    {/* Plan Cards */}
+                    {isLoadingStatus ? (
+                        <div className="flex justify-center p-8">Carregando planos...</div>
+                    ) : (
+                        <div className="flex flex-wrap justify-center gap-6">
+                            {(subscriptionStatus?.available_plans || [])
+                                .filter((p: Plan) => {
+                                    const currentPlanOrder = subscriptionStatus?.available_plans?.find((cp: Plan) => cp.is_current)?.order || 0;
+                                    return p.order >= currentPlanOrder;
+                                })
+                                .map((plan: Plan) => {
+                                    const { final, discountValue } = calculateTotal(plan.price);
+                                    const isCurrentPlan = plan.is_current;
+                                    const isUpgrade = plan.is_upgrade;
+                                    const upgradePrice = plan.upgrade_price;
+                                    const planKey = plan.key;
 
-                            const PLAN_LEVELS: Record<string, number> = { "BASIC": 1, "INTERMEDIATE": 2, "ADVANCED": 3 };
-                            const currentLevel = PLAN_LEVELS[company?.plan_type?.toUpperCase() || ""] || 0;
-                            const thisLevel = PLAN_LEVELS[key] || 0;
-                            const isUpgrade = thisLevel > currentLevel;
+                                    const handlePlanAction = () => {
+                                        if (isUpgrade && isCurrentPlan === false) { // Ensure not upgrading to same plan? Logic handled by backend is_upgrade
+                                            // Reuse existing upgrade logic structure
+                                            setTargetUpgradePlan({ key: planKey, name: plan.name });
+                                            setUpgradeDialogOpen(true);
+                                        } else {
+                                            handleSubscribe(planKey);
+                                        }
+                                    };
 
-                            const handlePlanAction = () => {
-                                if (isUpgrade) {
-                                    setTargetUpgradePlan({ key, name: plan.name });
-                                    setUpgradeDialogOpen(true);
-                                } else {
-                                    handleSubscribe(key);
-                                }
-                            };
+                                    // Override price display for upgrade
+                                    // If it is an upgrade, show the upgrade price (prorated)
+                                    // Only if logic dictates. The user requirements said:
+                                    // "Displaying correct pricing (full price or upgrade difference) based on the user's current subscription status."
+                                    // If upgradePrice is available, maybe show explicitly?
+                                    // The card calculates total based on periodicity. 
+                                    // Prorated upgrade price is usually a one-time charge for the remainder of the cycle.
+                                    // The current UI logic for upgrade dialog handles the proration display.
+                                    // The card itself usually shows the standard monthly/annual price so user knows the ongoing cost.
+                                    // But maybe we should highlight "Upgrade por R$ X" if applicable?
+                                    // User said: "Displaying correct pricing... based on status".
+                                    // For now, I'll keep the standard price display but change the button text/action.
+                                    // The UpgradeDialog shows the specific cost.
 
-                            return (
-                                <div key={key} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all ${isCurrentPlan ? "border-green-500 bg-green-50/50" :
-                                    key === "INTERMEDIATE" ? "border-primary/50 bg-primary/5" : "bg-card"
-                                    }`}>
-                                    <div className="mb-4">
-                                        <h3 className="font-bold text-xl">{plan.name}</h3>
-                                        <div className="flex gap-2 mt-2">
-                                            {isCurrentPlan && <Badge variant="default" className="bg-green-600">Plano Atual</Badge>}
-                                            {key === "INTERMEDIATE" && !isCurrentPlan && <Badge variant="secondary">Mais Popular</Badge>}
-                                        </div>
-                                    </div>
-
-                                    <div className="mb-6">
-                                        {periodicity === "MONTHLY" ? (
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-3xl font-bold">{formatCurrency(final)}</span>
-                                                <span className="text-sm text-muted-foreground">/mês</span>
+                                    return (
+                                        <div key={planKey} className={`flex flex-col p-6 border rounded-xl shadow-sm hover:shadow-md transition-all w-full max-w-sm ${isCurrentPlan ? "border-green-500 bg-green-50/50" :
+                                            planKey === "intermediate" ? "border-primary/50 bg-primary/5" : "bg-card"
+                                            }`}>
+                                            <div className="mb-4">
+                                                <h3 className="font-bold text-xl">{plan.name}</h3>
+                                                <div className="flex gap-2 mt-2">
+                                                    {isCurrentPlan && <Badge variant="default" className="bg-green-600">Plano Atual</Badge>}
+                                                    {planKey === "intermediate" && !isCurrentPlan && <Badge variant="secondary">Mais Popular</Badge>}
+                                                </div>
                                             </div>
-                                        ) : (
-                                            <>
-                                                <div className="flex items-baseline gap-1">
-                                                    <span className="text-3xl font-bold">{formatCurrency(final / (periodicity === "SEMIANNUAL" ? 6 : 12))}</span>
-                                                    <span className="text-sm text-muted-foreground">/mês</span>
-                                                </div>
-                                                <div className="text-xs text-muted-foreground mt-1">
-                                                    Total de {formatCurrency(final)} por {periodicity === "SEMIANNUAL" ? "semestre" : "ano"}
-                                                </div>
-                                                <div className="text-xs text-green-600 font-medium mt-1">
-                                                    Economia de {formatCurrency(discountValue)}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
 
-                                    <ul className="space-y-3 mb-6 flex-1">
-                                        {plan.features.map((feature, i) => (
-                                            <li key={i} className="flex items-center gap-2 text-sm">
-                                                <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                            <div className="mb-6">
+                                                {periodicity === "MONTHLY" ? (
+                                                    <div className="flex items-baseline gap-1">
+                                                        <span className="text-3xl font-bold">{formatCurrency(final)}</span>
+                                                        <span className="text-sm text-muted-foreground">/mês</span>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="flex items-baseline gap-1">
+                                                            <span className="text-3xl font-bold">{formatCurrency(final / (periodicity === "SEMIANNUAL" ? 6 : 12))}</span>
+                                                            <span className="text-sm text-muted-foreground">/mês</span>
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground mt-1">
+                                                            Total de {formatCurrency(final)} por {periodicity === "SEMIANNUAL" ? "semestre" : "ano"}
+                                                        </div>
+                                                        <div className="text-xs text-green-600 font-medium mt-1">
+                                                            Economia de {formatCurrency(discountValue)}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
 
-                                    <Button
-                                        className="w-full"
-                                        variant={isUpgrade ? "default" : isCurrentPlan ? "outline" : "outline"}
-                                        disabled={loading || isCurrentPlan}
-                                        onClick={handlePlanAction}
-                                    >
-                                        {isCurrentPlan ? "Plano Ativo" : isUpgrade ? "Fazer Upgrade" : "Assinar Agora"}
-                                    </Button>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                            <ul className="space-y-3 mb-6 flex-1">
+                                                {plan.features.map((feature, i) => (
+                                                    <li key={i} className="flex items-center gap-2 text-sm">
+                                                        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                                        {feature}
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <Button
+                                                className="w-full"
+                                                variant={isUpgrade ? "default" : isCurrentPlan ? "outline" : "outline"}
+                                                disabled={loading || isCurrentPlan}
+                                                onClick={handlePlanAction}
+                                            >
+                                                {isCurrentPlan ? "Plano Ativo" : isUpgrade ? "Fazer Upgrade" : "Assinar Agora"}
+                                            </Button>
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    )}
                 </TabsContent>
 
                 <TabsContent value="history">
@@ -409,6 +452,7 @@ export default function BillingPage() {
                     onClose={() => setUpgradeDialogOpen(false)}
                     targetPlan={targetUpgradePlan.key}
                     targetPlanName={targetUpgradePlan.name}
+                    currentPlanName={subscriptionStatus?.available_plans?.find((cp: Plan) => cp.is_current)?.name}
                 />
             )}
         </div>

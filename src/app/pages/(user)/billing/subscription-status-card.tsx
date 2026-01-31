@@ -86,7 +86,20 @@ export function SubscriptionStatusCard() {
                             <CardDescription>Status da sua assinatura</CardDescription>
                         </div>
                     </div>
-                    <Badge className={plan.color}>{plan.name}</Badge>
+                    <div className="flex flex-col items-end gap-1.5">
+                        <Badge className={`${plan.color} px-3 py-1 text-sm`}>{plan.name}</Badge>
+                        {status.periodicity && status.periodicity !== "MONTHLY" && (
+                            <Badge variant="outline" className="text-xs font-medium gap-1.5 py-0.5 px-2 text-muted-foreground border-muted-foreground/30">
+                                <Calendar className="w-3 h-3" />
+                                {status.periodicity === "SEMIANNUAL" ? "Semestral" : "Anual"}
+                            </Badge>
+                        )}
+                        {status.periodicity === "MONTHLY" && (
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded-sm">
+                                Mensal
+                            </span>
+                        )}
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
