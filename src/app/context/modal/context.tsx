@@ -27,11 +27,11 @@ interface ModalContextProps {
 const ContextModal = createContext<ModalContextProps | undefined>(undefined);
 
 const sizeClasses = {
-    sm: 'max-w-[25vw] h-auto',
-    md: 'max-w-[50vw] h-auto',
-    lg: 'max-w-[75vw] h-[75vh]',
-    xl: 'max-w-[90vw] h-[90vh]',
-    '2xl': 'max-w-[95vw] h-[95vh]',
+    sm: 'w-[95vw] md:max-w-[25vw] h-auto',
+    md: 'w-[95vw] md:max-w-[50vw] h-auto',
+    lg: 'w-[95vw] md:max-w-[75vw] h-[75vh]',
+    xl: 'w-[95vw] md:max-w-[90vw] h-[90vh]',
+    '2xl': 'w-[95vw] md:max-w-[95vw] h-[95vh]',
 };
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
