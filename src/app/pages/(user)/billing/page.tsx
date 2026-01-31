@@ -310,12 +310,6 @@ export default function BillingPage() {
                                                     </li>
                                                 ))}
                                             </ul>
-                                            const isFreePlan = subscriptionStatus?.current_plan?.toUpperCase() === 'FREE' || !subscriptionStatus?.current_plan;
-                                            const buttonText = isCurrentPlan
-                                            ? "Plano Atual"
-                                            : isUpgrade
-                                            ? (isFreePlan ? "Assinar" : "Fazer Upgrade")
-                                            : "Fazer Downgrade";
                                             <Button
                                                 className="w-full"
                                                 variant={isUpgrade ? "default" : isCurrentPlan ? "outline" : "outline"}
