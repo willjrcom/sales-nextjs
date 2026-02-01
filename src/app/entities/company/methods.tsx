@@ -1,13 +1,19 @@
 import { ptBR } from "date-fns/locale"
 import { format } from "date-fns"
+import { toZonedTime } from 'date-fns-tz';
 import { Badge } from "@/components/ui/badge";
+
+const TIME_ZONE = 'America/Sao_Paulo';
 
 export function safeFormat(dateStr: string, fmt: string) {
     try {
         if (!dateStr) return "-";
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return "-";
-        return format(d, fmt, { locale: ptBR });
+
+        // Convert UTC to São Paulo timezone
+        const zonedDate = toZonedTime(d, TIME_ZONE);
+        return format(zonedDate, fmt, { locale: ptBR });
     } catch (e) {
         return "-";
     }
