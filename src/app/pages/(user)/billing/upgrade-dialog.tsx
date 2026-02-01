@@ -83,17 +83,13 @@ export function UpgradeDialog({ isOpen, onClose, targetPlan, targetPlanName, cur
                                     <span className="text-sm font-medium text-muted-foreground">Novo Plano</span>
                                 </div>
                                 <div className="flex justify-between items-center text-lg font-bold">
-                                    <span>{currentPlanName || simulation.original_plan}</span>
+                                    <span>{currentPlanName}</span>
                                     <ArrowRight className="h-5 w-5 text-muted-foreground" />
                                     <span className="text-primary">{targetPlanName}</span>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Dias restantes no ciclo:</span>
-                                    <span className="font-medium">{simulation.remaining_days} dias</span>
-                                </div>
                                 <div className="flex justify-between text-base pt-2 border-t">
                                     <span className="font-semibold">Valor a pagar agora (Proporcional):</span>
                                     <span className="font-bold text-xl text-green-600">
