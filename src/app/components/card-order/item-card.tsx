@@ -20,12 +20,17 @@ export default function ItemCard({ item }: ItemCardProps) {
             </div>
 
             {item.observation && <ObservationCard observation={item.observation} />}
-            {item.additional_items?.map((add) => (
-                <AdditionalItemCard item={add} key={add.id} />
-            ))}
-            {item.removed_items?.map((rem) => (
-                <RemovedItemCard item={rem} key={rem} />
-            ))}
+
+            <div className="flex">
+                {item.additional_items?.map((add) => (
+                    <AdditionalItemCard item={add} key={add.id} />
+                ))}
+            </div>
+            <div className="flex">
+                {item.removed_items?.map((rem) => (
+                    <RemovedItemCard item={rem} key={rem} />
+                ))}
+            </div>
         </div>
     )
 }

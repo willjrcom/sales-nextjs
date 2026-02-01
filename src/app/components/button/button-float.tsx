@@ -31,40 +31,40 @@ const ButtonIconTextFloat = ({
         modalHandler.hideModal(modalName);
     };
 
-    // Gerar classes de Tailwind para o posicionamento
+    // Gerar classes de Tailwind para o posicionamento (responsivo)
     let positionClasses = '';
     switch (position) {
         case 'top-left':
-            positionClasses = 'top-5 left-5';
+            positionClasses = 'top-4 left-4 md:top-5 md:left-5';
             break;
         case 'top-right':
-            positionClasses = 'top-5 right-5';
+            positionClasses = 'top-4 right-4 md:top-5 md:right-5';
             break;
         case 'bottom-left':
-            positionClasses = 'bottom-5 left-20';
+            positionClasses = 'bottom-5 left-4 md:left-20';
             break
         case 'bottom-left-1':
-            positionClasses = 'bottom-5 left-22';
+            positionClasses = 'bottom-5 left-4 md:left-22';
             break;
         case 'bottom-right':
-            positionClasses = 'bottom-5 right-5';
+            positionClasses = 'bottom-5 right-4 md:right-5';
             break;
         case 'bottom-right-1':
-            positionClasses = 'bottom-20 right-5';
+            positionClasses = 'bottom-20 right-4 md:right-5';
             break;
         case 'bottom-right-2':
-            positionClasses = 'bottom-30 right-5';
+            positionClasses = 'bottom-32 right-4 md:bottom-30 md:right-5';
             break;
     }
 
     return (
         <button
             onClick={() => modalHandler.showModal(modalName, title, children, size, onClose)}
-            className={`fixed ${positionClasses} flex items-center justify-center space-x-2 p-4 bg-${color}-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-${color}-600 w-max`}
+            className={`fixed ${positionClasses} flex items-center justify-center space-x-2 p-3 md:p-4 bg-${color}-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-${color}-600 w-max text-sm md:text-base`}
             style={{ zIndex: 1000 }}
         >
-            <Icon className="text-sm" /> {/* Ajustando o tamanho do ícone */}
-            {title && <span className="text-sm">{title}</span>}
+            <Icon className="text-base md:text-sm" /> {/* Ajustando o tamanho do ícone */}
+            {title && <span className="text-sm hidden sm:inline">{title}</span>}
         </button>
     );
 };

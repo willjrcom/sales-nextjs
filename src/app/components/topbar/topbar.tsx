@@ -17,17 +17,15 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal } from "lucide-react"
 
-interface TopbarItemPaymentAlertProps {
-  onClick: () => void;
-}
 
-const TopbarItemPaymentAlert = ({ onClick }: TopbarItemPaymentAlertProps) => (
-  <div onClick={onClick} className="inline-flex items-center bg-destructive text-destructive-foreground px-3 py-1.5 rounded-sm text-sm font-medium transition-colors hover:bg-destructive/90 cursor-pointer">
-    <FaExclamationCircle className="mr-2 text-base" />
-    Pagamentos pendentes
-  </div>
-);
 
 const Topbar = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -77,26 +75,34 @@ const Topbar = () => {
         <div className="flex items-center gap-2">
           <SidebarTrigger />
           <Menubar className="border-none shadow-none bg-transparent">
-            <MenubarMenu>
-              <MenubarTrigger asChild className="cursor-pointer border border-border">
-                <Link href="/pages/order-control">Pedidos</Link>
-              </MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger asChild className="cursor-pointer border border-border">
-                <Link href="/pages/order-table-control">Mesas</Link>
-              </MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger asChild className="cursor-pointer border border-border">
-                <Link href="/pages/order-delivery-control">Entregas</Link>
-              </MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger asChild className="cursor-pointer border border-border">
-                <Link href="/pages/order-pickup-control">Retiradas</Link>
-              </MenubarTrigger>
-            </MenubarMenu>
+            <div className="hidden lg:block">
+              <MenubarMenu>
+                <MenubarTrigger asChild className="cursor-pointer border border-border">
+                  <Link href="/pages/order-control">Pedidos</Link>
+                </MenubarTrigger>
+              </MenubarMenu>
+            </div>
+            <div className="hidden lg:block">
+              <MenubarMenu>
+                <MenubarTrigger asChild className="cursor-pointer border border-border">
+                  <Link href="/pages/order-table-control">Mesas</Link>
+                </MenubarTrigger>
+              </MenubarMenu>
+            </div>
+            <div className="hidden lg:block">
+              <MenubarMenu>
+                <MenubarTrigger asChild className="cursor-pointer border border-border">
+                  <Link href="/pages/order-delivery-control">Entregas</Link>
+                </MenubarTrigger>
+              </MenubarMenu>
+            </div>
+            <div className="hidden lg:block">
+              <MenubarMenu>
+                <MenubarTrigger asChild className="cursor-pointer border border-border">
+                  <Link href="/pages/order-pickup-control">Retiradas</Link>
+                </MenubarTrigger>
+              </MenubarMenu>
+            </div>
 
             {currentOrder?.status === 'Staging' && (
               <MenubarMenu>
@@ -108,17 +114,56 @@ const Topbar = () => {
                 </MenubarTrigger>
               </MenubarMenu>
             )}
+
+            {/* Overflow dropdown for items that don't fit */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="lg:hidden inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground" aria-label="More options">
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                  <Link href="/pages/order-control" className="w-full cursor-pointer">Pedidos</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pages/order-table-control" className="w-full cursor-pointer">Mesas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pages/order-delivery-control" className="w-full cursor-pointer">Entregas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pages/order-pickup-control" className="w-full cursor-pointer">Retiradas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pages/shift" className="w-full cursor-pointer">Turno</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </Menubar>
         </div>
 
         <div className="flex space-x-4 items-center">
-          {hasPendingPayments && <TopbarItemPaymentAlert onClick={() => setPaymentModalOpen(true)} />}
+          <div className="flex space-x-4 items-center">
+            <Menubar className="border-none shadow-none bg-transparent">
+              {hasPendingPayments && (
+                <MenubarMenu>
+                  <MenubarTrigger onClick={() => setPaymentModalOpen(true)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:bg-destructive/90 cursor-pointer">
+                    <FaExclamationCircle className="mr-2" />
+                    Pagamentos pendentes
+                  </MenubarTrigger>
+                </MenubarMenu>
+              )}
 
-          <div className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1.5 rounded-sm text-sm font-medium">
-            <Link href="/pages/shift">Turno</Link>
+              <div className="hidden lg:block">
+                <MenubarMenu>
+                  <MenubarTrigger asChild className="bg-green-100 text-green-800 hover:bg-green-200 focus:bg-green-200 cursor-pointer">
+                    <Link href="/pages/shift">Turno</Link>
+                  </MenubarTrigger>
+                </MenubarMenu>
+              </div>
+            </Menubar>
+
+            {user && <EmployeeUserProfile user={user} setUser={setUser} />}
           </div>
-
-          {user && <EmployeeUserProfile user={user} setUser={setUser} />}
         </div>
       </header>
       <PendingPaymentModal isOpen={isPaymentModalOpen} onOpenChange={setPaymentModalOpen} />
