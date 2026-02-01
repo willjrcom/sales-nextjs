@@ -28,6 +28,7 @@ export function UpgradeDialog({ isOpen, onClose, targetPlan, targetPlanName, cur
             fetchSimulation();
         } else {
             setSimulation(null);
+            setCheckingOut(false); // Reset checkout state when modal closes
         }
     }, [isOpen, targetPlan]);
 
