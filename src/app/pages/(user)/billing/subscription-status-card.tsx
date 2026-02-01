@@ -163,30 +163,31 @@ export function SubscriptionStatusCard() {
                     </div>
                 )}
 
-                <div className="flex justify-between mt-3">
-                    {/* Fiscal Settings & Cancel Button for Paid Plans */}
-                    {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
-                        <FiscalSettingsDialog currentPlan={normalizedPlan} />
-                    )}
+                <div className="flex justify-end">
+                    <div className="flex justify-between mt-3">
+                        {/* Fiscal Settings & Cancel Button for Paid Plans */}
+                        {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
+                            <FiscalSettingsDialog currentPlan={normalizedPlan} />
+                        )}
 
-                    {/* Cancel Button: Show for ANY active paid plan (not Free) */}
-                    {normalizedPlan !== 'free' && status.can_cancel_renewal && (
-                        <div className="flex justify-end mt-3">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => setShowCancelDialog(true)}
-                                disabled={cancelling}
-                            >
-                                <XCircle className="w-3 h-3 mr-1.5" />
-                                <span className="text-xs">{cancelling ? "Cancelando..." : "Cancelar renovação"}</span>
-                            </Button>
-                        </div>
-                    )}
+                        {/* Cancel Button: Show for ANY active paid plan (not Free) */}
+                        {normalizedPlan !== 'free' && status.can_cancel_renewal && (
+                            <div className="flex justify-end mt-3">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    onClick={() => setShowCancelDialog(true)}
+                                    disabled={cancelling}
+                                >
+                                    <XCircle className="w-3 h-3 mr-1.5" />
+                                    <span className="text-xs">{cancelling ? "Cancelando..." : "Cancelar renovação"}</span>
+                                </Button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </CardContent>
-
 
             {/* Cancel Confirmation Dialog */}
             <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>

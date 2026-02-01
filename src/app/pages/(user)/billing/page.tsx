@@ -134,7 +134,6 @@ export default function BillingPage() {
         setLoading(true);
         try {
             const response = await createCheckout(session, {
-                company_id: company.id,
                 plan: planKey,
                 periodicity: periodicity,
             });

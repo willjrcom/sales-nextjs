@@ -4,7 +4,7 @@ import User from "@/app/entities/user/user";
 
 const GetUsers = async (session: Session, page?: number, perPage?: number): Promise<GetAllResponse<User>> => {
     const response = await RequestApi<null, User[]>({
-        path: `/company/users?page=${page}&per_page=${perPage}`,
+        path: `/company/user?page=${page}&per_page=${perPage}`,
         method: "GET",
         headers: AddAccessToken(session),
     });

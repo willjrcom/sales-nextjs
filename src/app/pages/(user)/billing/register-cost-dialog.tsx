@@ -52,7 +52,6 @@ export function RegisterCostDialog({ onSuccess }: RegisterCostDialogProps) {
         setLoading(true);
         try {
             await createCost(session, {
-                company_id: company.id,
                 cost_type: data.cost_type,
                 description: data.description,
                 amount: data.amount,
