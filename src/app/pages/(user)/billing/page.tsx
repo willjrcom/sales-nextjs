@@ -228,13 +228,6 @@ export default function BillingPage() {
                                 .filter((p: Plan) => {
                                     const currentPlanOrder = subscriptionStatus?.available_plans?.find((cp: Plan) => cp.is_current)?.order || 0;
 
-                                    // If renewal is cancelled (can_cancel_renewal = false), show ALL plans
-                                    // User can now schedule any plan to start after current expires
-                                    const renewalCancelled = subscriptionStatus?.can_cancel_renewal === false;
-                                    if (renewalCancelled) {
-                                        return true; // Show all plans including lower ones
-                                    }
-
                                     // Otherwise, show only current plan and upgrades (hide downgrades)
                                     return p.order >= currentPlanOrder;
                                 })

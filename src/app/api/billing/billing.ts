@@ -121,7 +121,6 @@ export const cancelSubscription = async (session: Session) => {
 export interface UpgradeSimulationResponse {
     target_plan: string;
     upgrade_amount: number;
-    is_full_renewal: boolean;
 }
 
 export const simulateUpgrade = async (session: Session, targetPlan: string) => {

@@ -164,7 +164,7 @@ export function SubscriptionStatusCard() {
                 )}
 
                 <div className="flex justify-end">
-                    <div className="flex justify-between mt-3">
+                    <div className="flex flex-col gap-2">
                         {/* Fiscal Settings & Cancel Button for Paid Plans */}
                         {(normalizedPlan === 'intermediate' || normalizedPlan === 'advanced') && (
                             <FiscalSettingsDialog currentPlan={normalizedPlan} />
@@ -172,18 +172,25 @@ export function SubscriptionStatusCard() {
 
                         {/* Cancel Button: Show for ANY active paid plan (not Free) */}
                         {normalizedPlan !== 'free' && status.can_cancel_renewal && (
-                            <div className="flex justify-end mt-3">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    onClick={() => setShowCancelDialog(true)}
-                                    disabled={cancelling}
-                                >
-                                    <XCircle className="w-3 h-3 mr-1.5" />
-                                    <span className="text-xs">{cancelling ? "Cancelando..." : "Cancelar renovação"}</span>
-                                </Button>
-                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => setShowCancelDialog(true)}
+                                disabled={cancelling}
+                            >
+                                <XCircle className="w-3 h-3 mr-1.5" />
+                                <span className="text-xs">{cancelling ? "Cancelando..." : "Cancelar renovação"}</span>
+                            </Button>
+                        )}
+                        {/* show message "A recorrência do seu plano foi cancelada!"*/}
+                        {!status.can_cancel_renewal && (
+                            <Badge
+                                variant="destructive"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                                <span className="text-xs text-white">A recorrência do seu plano foi cancelada!</span>
+                            </Badge>
                         )}
                     </div>
                 </div>
