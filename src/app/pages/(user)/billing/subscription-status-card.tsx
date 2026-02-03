@@ -184,7 +184,7 @@ export function SubscriptionStatusCard() {
                             </Button>
                         )}
                         {/* show message "A recorrência do seu plano foi cancelada!"*/}
-                        {!status.can_cancel_renewal && (
+                        {status.current_plan !== 'free' && !status.can_cancel_renewal && (
                             <Badge
                                 variant="destructive"
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
