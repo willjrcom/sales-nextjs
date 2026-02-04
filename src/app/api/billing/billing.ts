@@ -15,7 +15,6 @@ export interface CreateCostDTO {
 }
 
 export interface CheckoutResponseDTO {
-    payment_id: string; // Updated from usage_cost_id
     checkout_url: string;
 }
 
