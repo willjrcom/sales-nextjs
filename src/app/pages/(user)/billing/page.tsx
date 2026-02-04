@@ -28,7 +28,7 @@ import { Plan } from "@/app/entities/company/subscription";
 
 // Hardcoded Plan Prices removed, will use dynamic data
 
-type Periodicity = "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
+type Frequency = "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
 
 export default function BillingPage() {
     const { data: session } = useSession();
@@ -43,7 +43,7 @@ export default function BillingPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
     const [loading, setLoading] = useState(false);
-    const [periodicity, setPeriodicity] = useState<Periodicity>("MONTHLY");
+    const [frequency, setFrequency] = useState<Frequency>("MONTHLY");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [targetUpgradePlan, setTargetUpgradePlan] = useState<{ key: string, name: string } | null>(null);
 
@@ -60,10 +60,10 @@ export default function BillingPage() {
     });
 
     useEffect(() => {
-        if (subscriptionStatus?.periodicity && subscriptionStatus.periodicity !== "MONTHLY") {
-            setPeriodicity(subscriptionStatus.periodicity);
+        if (subscriptionStatus?.frequency && subscriptionStatus.frequency !== "MONTHLY") {
+            setFrequency(subscriptionStatus.frequency);
         }
-    }, [subscriptionStatus?.periodicity]);
+    }, [subscriptionStatus?.frequency]);
 
     // Handle post-payment feedback
     useEffect(() => {
@@ -114,10 +114,10 @@ export default function BillingPage() {
         let months = 1;
         let discount = 0;
 
-        if (periodicity === "SEMIANNUAL") {
+        if (frequency === "SEMIANNUAL") {
             months = 6;
             discount = 0.05;
-        } else if (periodicity === "ANNUAL") {
+        } else if (frequency === "ANNUAL") {
             months = 12;
             discount = 0.10;
         }
@@ -135,7 +135,7 @@ export default function BillingPage() {
         try {
             const response = await createCheckout(session, {
                 plan: planKey,
-                periodicity: periodicity,
+                frequency: frequency,
             });
 
             if (response.checkout_url) {
@@ -197,13 +197,13 @@ export default function BillingPage() {
                 <TabsContent value="plans" className="space-y-8">
                     <SubscriptionStatusCard />
 
-                    {/* Periodicity Toggle */}
+                    {/* Frequency Toggle */}
                     <div className="flex justify-center mt-6">
-                        <Tabs value={periodicity} onValueChange={(v) => setPeriodicity(v as Periodicity)} className="w-[400px]">
+                        <Tabs value={frequency} onValueChange={(v) => setFrequency(v as Frequency)} className="w-[400px]">
                             <TabsList className="grid w-full grid-cols-3">
-                                {subscriptionStatus?.periodicity === "SEMIANNUAL" ? (
+                                {subscriptionStatus?.frequency === "SEMIANNUAL" ? (
                                     <TabsTrigger value="SEMIANNUAL" className="col-span-3">Semestral (-5%)</TabsTrigger>
-                                ) : subscriptionStatus?.periodicity === "ANNUAL" ? (
+                                ) : subscriptionStatus?.frequency === "ANNUAL" ? (
                                     <TabsTrigger value="ANNUAL" className="col-span-3">Anual (-10%)</TabsTrigger>
                                 ) : subscriptionStatus?.available_plans?.some((p: Plan) => p.is_current) ? (
                                     <TabsTrigger value="MONTHLY" className="col-span-3">Mensal</TabsTrigger>
@@ -256,7 +256,7 @@ export default function BillingPage() {
                                     // Only if logic dictates. The user requirements said:
                                     // "Displaying correct pricing (full price or upgrade difference) based on the user's current subscription status."
                                     // If upgradePrice is available, maybe show explicitly?
-                                    // The card calculates total based on periodicity. 
+                                    // The card calculates total based on frequency. 
                                     // Prorated upgrade price is usually a one-time charge for the remainder of the cycle.
                                     // The current UI logic for upgrade dialog handles the proration display.
                                     // The card itself usually shows the standard monthly/annual price so user knows the ongoing cost.
@@ -279,12 +279,13 @@ export default function BillingPage() {
                                                 <h3 className="font-bold text-xl">{plan.name}</h3>
                                                 <div className="flex gap-2 mt-2">
                                                     {isCurrentPlan && <Badge variant="default" className="bg-green-600">Plano Atual</Badge>}
+                                                    {subscriptionStatus?.can_cancel_renewal && <Badge variant="destructive">Recorrencia Cancelada</Badge>}
                                                     {planKey === "intermediate" && !isCurrentPlan && <Badge variant="secondary">Mais Popular</Badge>}
                                                 </div>
                                             </div>
 
                                             <div className="mb-6">
-                                                {periodicity === "MONTHLY" ? (
+                                                {frequency === "MONTHLY" ? (
                                                     <div className="flex items-baseline gap-1">
                                                         <span className="text-3xl font-bold">{formatCurrency(final)}</span>
                                                         <span className="text-sm text-muted-foreground">/mês</span>
@@ -292,11 +293,11 @@ export default function BillingPage() {
                                                 ) : (
                                                     <>
                                                         <div className="flex items-baseline gap-1">
-                                                            <span className="text-3xl font-bold">{formatCurrency(final / (periodicity === "SEMIANNUAL" ? 6 : 12))}</span>
+                                                            <span className="text-3xl font-bold">{formatCurrency(final / (frequency === "SEMIANNUAL" ? 6 : 12))}</span>
                                                             <span className="text-sm text-muted-foreground">/mês</span>
                                                         </div>
                                                         <div className="text-xs text-muted-foreground mt-1">
-                                                            Total de {formatCurrency(final)} por {periodicity === "SEMIANNUAL" ? "semestre" : "ano"}
+                                                            Total de {formatCurrency(final)} por {frequency === "SEMIANNUAL" ? "semestre" : "ano"}
                                                         </div>
                                                         <div className="text-xs text-green-600 font-medium mt-1">
                                                             Economia de {formatCurrency(discountValue)}

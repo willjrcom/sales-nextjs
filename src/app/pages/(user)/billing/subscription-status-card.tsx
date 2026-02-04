@@ -96,13 +96,13 @@ export function SubscriptionStatusCard() {
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
                         <Badge className={`${plan.color} px-3 py-1 text-sm`}>{plan.name}</Badge>
-                        {status.periodicity && status.periodicity !== "MONTHLY" && (
+                        {status.frequency && status.frequency !== "MONTHLY" && (
                             <Badge variant="outline" className="text-xs font-medium gap-1.5 py-0.5 px-2 text-muted-foreground border-muted-foreground/30">
                                 <Calendar className="w-3 h-3" />
-                                {status.periodicity === "SEMIANNUAL" ? "Semestral" : "Anual"}
+                                {status.frequency === "SEMIANNUAL" ? "Semestral" : "Anual"}
                             </Badge>
                         )}
-                        {status.periodicity === "MONTHLY" && (
+                        {status.frequency === "MONTHLY" && (
                             <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded-sm">
                                 Mensal
                             </span>
@@ -175,7 +175,7 @@ export function SubscriptionStatusCard() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-700"
                                 onClick={() => setShowCancelDialog(true)}
                                 disabled={cancelling}
                             >
@@ -187,7 +187,7 @@ export function SubscriptionStatusCard() {
                         {status.current_plan !== 'free' && !status.can_cancel_renewal && (
                             <Badge
                                 variant="destructive"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-700"
                             >
                                 <span className="text-xs text-white">A recorrência do seu plano foi cancelada!</span>
                             </Badge>

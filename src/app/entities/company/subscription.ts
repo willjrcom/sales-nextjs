@@ -5,7 +5,7 @@ export interface SubscriptionStatus {
     upcoming_plan?: string | null;
     upcoming_start_at?: string | null;
     can_cancel_renewal?: boolean;
-    periodicity?: "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
+    frequency?: "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
     available_plans?: Plan[];
 }
 
