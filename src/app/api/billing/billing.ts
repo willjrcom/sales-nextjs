@@ -5,7 +5,7 @@ import { CompanyUsageCost } from "@/app/entities/company/company-usage-cost";
 
 export interface CheckoutRequestDTO {
     plan?: string;        // "BASIC", "INTERMEDIATE", "ADVANCED"
-    frequency?: string; // "MONTHLY", "SEMIANNUAL", "ANNUAL"
+    frequency?: string; // "MONTHLY", "SEMIANNUALLY", "ANNUALLY"
 }
 
 export interface CreateCostDTO {

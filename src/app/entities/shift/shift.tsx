@@ -17,13 +17,13 @@ export default class Shift {
     opened_at: string = '';
     closed_at: string = '';
 
-	total_orders_finished: number = 0;
-	total_orders_canceled: number = 0;
-	total_sales: Decimal = new Decimal(0);
-	sales_by_category: Record<string,Decimal> = {};
-	products_sold_by_category: Record<string,number> = {};
-	total_items_sold: number = 0;
-	average_order_value: Decimal = new Decimal(0);
+    total_orders_finished: number = 0;
+    total_orders_cancelled: number = 0;
+    total_sales: Decimal = new Decimal(0);
+    sales_by_category: Record<string, Decimal> = {};
+    products_sold_by_category: Record<string, number> = {};
+    total_items_sold: number = 0;
+    average_order_value: Decimal = new Decimal(0);
     payments: PaymentOrder[] = [];
     delivery_drivers: DeliveryDriverTax[] = [];
 
@@ -35,7 +35,7 @@ export default class Shift {
     average_process_time: number = 0; // em segundos
     average_queue_time: number = 0; // em segundos
     process_efficiency_score: number = 0;
-    
+
     constructor(data: Partial<Shift> = {}) {
         Object.assign(this, data);
     }

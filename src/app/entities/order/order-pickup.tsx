@@ -1,4 +1,4 @@
-type StatusOrderPickup = "Staging" | "Pending" | "Ready" | "Delivered" | "Canceled";
+type StatusOrderPickup = "Staging" | "Pending" | "Ready" | "Delivered" | "Cancelled";
 
 export default class OrderPickup {
     id: string = '';
@@ -9,7 +9,7 @@ export default class OrderPickup {
     pending_at?: string = '';
     ready_at?: string = '';
     delivered_at?: string = '';
-    canceled_at?: string = '';
+    cancelled_at?: string = '';
 
 
     constructor(data: Partial<OrderPickup> = {}) {

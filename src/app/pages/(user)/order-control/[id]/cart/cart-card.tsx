@@ -42,7 +42,7 @@ export const CartCard = () => {
                     <h1 className="text-xl font-bold">Meus Itens</h1>
                     <CardOrderResume />
                 </div>
-                {order.status !== "Canceled" &&
+                {order.status !== "Cancelled" &&
                     <div onClick={() => queryClient.setQueryData(['group-item', 'current'], null)}>
                         <ButtonIconTextFloat size="xl"
                             position="bottom-right"

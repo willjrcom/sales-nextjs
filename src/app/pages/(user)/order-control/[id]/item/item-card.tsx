@@ -2,7 +2,6 @@ import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
 import { useModal } from '@/app/context/modal/context';
 import EditItem from './edit-item';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface CardProps {
     item: Item;

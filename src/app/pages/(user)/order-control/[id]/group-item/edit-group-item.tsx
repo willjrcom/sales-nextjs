@@ -100,7 +100,7 @@ const EditGroupItem = () => {
                 <GroupItemForm item={groupItem} />
             )}
             {/* Botão para cancelar grupo de itens se não estiver em Staging */}
-            {groupItem && groupItem.status !== "Staging" && groupItem.status !== "Canceled" && (
+            {groupItem && groupItem.status !== "Staging" && groupItem.status !== "Cancelled" && (
                 <div className="mt-4">
                     <ButtonIconText modalName={"cancel-group-item-" + groupItem.id} title="Cancelar item" size="md" color="red" icon={FaTimes}>
                         <p className="mb-2">tem certeza que deseja cancelar o item?</p>

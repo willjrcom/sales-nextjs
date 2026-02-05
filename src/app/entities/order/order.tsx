@@ -6,7 +6,7 @@ import { PaymentOrder } from "./order-payment";
 import OrderPickup from "./order-pickup";
 import OrderTable from "./order-table";
 
-export type StatusOrder = "Staging" | "Pending" | "Ready" | "Finished" | "Canceled" | "Archived";
+export type StatusOrder = "Staging" | "Pending" | "Ready" | "Finished" | "Cancelled" | "Archived";
 
 export default class Order {
     id: string = '';
@@ -29,7 +29,7 @@ export default class Order {
     pending_at?: Date;
     finished_at?: Date;
     ready_at?: Date;
-    canceled_at?: Date;
+    cancelled_at?: Date;
     archived_at?: Date;
 
     constructor(data: Partial<Order> = {}) {

@@ -91,7 +91,7 @@ function getSecondaryInfo(order: Order) {
         if (deliveryStatus === "Ready") flags.push({ label: "Entrega Pronto", variant: "purple" });
         if (deliveryStatus === "Shipped") flags.push({ label: "Entrega Enviado", variant: "blue" });
         if (deliveryStatus === "Delivered") flags.push({ label: "Entrega Entregue", variant: "green" });
-        if (deliveryStatus === "Canceled") flags.push({ label: "Entrega Cancelado", variant: "red" });
+        if (deliveryStatus === "Cancelled") flags.push({ label: "Entrega Cancelado", variant: "red" });
 
         const timeRef =
             formatTimeAgo(order.delivery.shipped_at) ||
@@ -107,7 +107,7 @@ function getSecondaryInfo(order: Order) {
                         ? "enviado"
                         : order.delivery.delivered_at
                             ? "entregue"
-                            : order.delivery.canceled_at
+                            : order.delivery.cancelled_at
                                 ? "cancelado"
                                 : null;
 
@@ -120,7 +120,7 @@ function getSecondaryInfo(order: Order) {
 
         if (order.table.status === "Pending") flags.push({ label: "Mesa Pendente", variant: "yellow" });
         if (order.table.status === "Closed") flags.push({ label: "Mesa Fechada", variant: "green" });
-        if (order.table.status === "Canceled") flags.push({ label: "Mesa Cancelada", variant: "red" });
+        if (order.table.status === "Cancelled") flags.push({ label: "Mesa Cancelada", variant: "red" });
 
         return {
             title: tableName,
@@ -138,7 +138,7 @@ function getSecondaryInfo(order: Order) {
         if (pickupStatus === "Pending") flags.push({ label: "Balcão Pendente", variant: "yellow" });
         if (pickupStatus === "Ready") flags.push({ label: "Balcão Pronto", variant: "green" });
         if (pickupStatus === "Delivered") flags.push({ label: "Balcão Retirado", variant: "blue" });
-        if (pickupStatus === "Canceled") flags.push({ label: "Balcão Cancelado", variant: "red" });
+        if (pickupStatus === "Cancelled") flags.push({ label: "Balcão Cancelado", variant: "red" });
 
         const timeRef =
             formatTimeAgo(order.pickup.delivered_at) ||
@@ -152,7 +152,7 @@ function getSecondaryInfo(order: Order) {
                     ? "pronto"
                     : order.pickup.pending_at
                         ? "pendente"
-                        : order.pickup.canceled_at
+                        : order.pickup.cancelled_at
                             ? "cancelado"
                             : null;
 

@@ -7,7 +7,7 @@ const showStatus: Record<string, string> = {
     Delivered: "Entregue",
     Closed: "Fechado",
     Finished: "Finalizado",
-    Canceled: "Cancelado",
+    Cancelled: "Cancelado",
     Archived: "Arquivado",
     default: "Indefinido"
 } as const;
@@ -21,7 +21,7 @@ const getStatusColor: Record<string, string> = {
     "Delivered": "bg-gray-100 text-gray-800",
     "Closed": "bg-gray-100 text-gray-800",
     "Finished": "bg-gray-100 text-gray-800",
-    "Canceled": "bg-red-100 text-red-800",
+    "Cancelled": "bg-red-100 text-red-800",
     "Archived": "bg-purple-100 text-purple-800",
     default: "bg-gray-100 text-gray-800"
 } as const;

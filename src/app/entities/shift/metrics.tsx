@@ -5,7 +5,7 @@ export interface OrderProcessAnalytics {
     process_rule_name: string;
     total_processes: number;
     completed_processes: number;
-    canceled_processes: number;
+    cancelled_processes: number;
     average_process_time: number; // em segundos
     total_process_time: number; // em segundos
     total_paused_count: number;

@@ -21,7 +21,7 @@ export interface FiscalInvoice {
 // Emit NFC-e
 export async function emitNFCe(session: Session, orderId: string) {
     const response = await RequestApi<{ order_id: string }, FiscalInvoice>({
-        path: "/fiscal/nfce/emitir",
+        path: "/fiscal/nfce/emit",
         method: "POST",
         body: { order_id: orderId },
         headers: AddAccessToken(session),
@@ -64,12 +64,12 @@ export async function listInvoices(
 export async function cancelInvoice(
     session: Session,
     invoiceId: string,
-    justificativa: string,
+    justification: string,
 ) {
-    const response = await RequestApi<{ justificativa: string }, { message: string }>({
-        path: `/fiscal/nfce/${invoiceId}/cancelar`,
+    const response = await RequestApi<{ justification: string }, { message: string }>({
+        path: `/fiscal/nfce/${invoiceId}/cancel`,
         method: "POST",
-        body: { justificativa },
+        body: { justification },
         headers: AddAccessToken(session),
     });
 

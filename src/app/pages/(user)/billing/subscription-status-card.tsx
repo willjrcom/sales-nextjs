@@ -99,7 +99,7 @@ export function SubscriptionStatusCard() {
                         {status.frequency && status.frequency !== "MONTHLY" && (
                             <Badge variant="outline" className="text-xs font-medium gap-1.5 py-0.5 px-2 text-muted-foreground border-muted-foreground/30">
                                 <Calendar className="w-3 h-3" />
-                                {status.frequency === "SEMIANNUAL" ? "Semestral" : "Anual"}
+                                {status.frequency === "SEMIANNUALLY" ? "Semestral" : "Anual"}
                             </Badge>
                         )}
                         {status.frequency === "MONTHLY" && (

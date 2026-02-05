@@ -135,7 +135,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
 
     const isOrderStatusPending = order.status === "Pending";
     const isOrderStatusReady = order.status === "Ready";
-    const isOrderStatusCanceled = order.status === "Canceled";
+    const isOrderStatusCancelled = order.status === "Cancelled";
     const isOrderStatusFinished = order.status === "Finished";
 
     // Converter valores plain para Decimal
@@ -466,7 +466,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             <hr className="my-4" />
             {/* Botões de Ação */}
             <div className="flex justify-between items-center gap-4">
-                {!editBlocked && !isOrderStatusCanceled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
+                {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
                     <PaymentForm orderId={order.id} />
                 </ButtonIconText>}
 
@@ -495,7 +495,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             </button>
                         </ButtonIconText>}
 
-                    {!editBlocked && !isOrderStatusCanceled &&
+                    {!editBlocked && !isOrderStatusCancelled &&
                         <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes}>
                             <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
                             <button
@@ -506,7 +506,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             </button>
                         </ButtonIconText>}
                     {/* Botão de impressão */}
-                    {!isOrderStatusCanceled && company &&
+                    {!isOrderStatusCancelled && company &&
                         <button
                             onClick={() => data && printOrder({ orderID: order.id, session: data, company: company })}
                             className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
@@ -524,7 +524,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             size="md"
                             color="purple"
                             icon={FaFileInvoiceDollar}
-                            isDisabled={!isOrderStatusFinished || isOrderStatusCanceled}
+                            isDisabled={!isOrderStatusFinished || isOrderStatusCancelled}
                         >
                             <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
                         </ButtonIconText>

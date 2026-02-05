@@ -47,7 +47,7 @@ const ShiftDashboard = ({ shift: initialShift, isUpdate }: SalesDashboardProps) 
                 />
                 <SalesCard
                     title="Pedidos Cancelados"
-                    value={shift.total_orders_canceled.toString()}
+                    value={shift.total_orders_cancelled.toString()}
                     icon={<FaExclamationTriangle size={30} className="text-gray-800" />}
                 />
                 {isUpdate &&
@@ -69,7 +69,7 @@ const ShiftDashboard = ({ shift: initialShift, isUpdate }: SalesDashboardProps) 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <Redeems shift={shift} />
                 <ListOrderCard shift={shift} status='Finished' title="Pedidos Finalizados" />
-                <ListOrderCard shift={shift} status='Canceled' title="Pedidos Cancelados" />
+                <ListOrderCard shift={shift} status='Cancelled' title="Pedidos Cancelados" />
                 <CategorySummary shift={shift} />
                 <ListPayment shift={shift} />
                 <ListDeliveryDriversTax shift={shift} />

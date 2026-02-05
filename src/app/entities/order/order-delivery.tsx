@@ -3,7 +3,7 @@ import Client from "../client/client";
 import DeliveryDriver from "../delivery-driver/delivery-driver";
 import Decimal from 'decimal.js';
 
-type StatusOrderDelivery = "Staging" | "Pending" | "Ready" | "Shipped" | "Delivered" | "Canceled";
+type StatusOrderDelivery = "Staging" | "Pending" | "Ready" | "Shipped" | "Delivered" | "Cancelled";
 
 export default class OrderDelivery {
     id: string = '';
@@ -24,7 +24,7 @@ export default class OrderDelivery {
     ready_at?: string = '';
     shipped_at?: string = '';
     delivered_at?: string = '';
-    canceled_at?: string = '';
+    cancelled_at?: string = '';
 
     constructor(data: Partial<OrderDelivery> = {}) {
         Object.assign(this, data);

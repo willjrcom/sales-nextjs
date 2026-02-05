@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import Table from "../table/table";
 
-type StatusOrderTable = "Staging" | "Pending" | "Closed" | "Canceled";
+type StatusOrderTable = "Staging" | "Pending" | "Closed" | "Cancelled";
 
 export default class OrderTable {
   id: string = '';
@@ -16,7 +16,7 @@ export default class OrderTable {
   pending_at?: string = '';
   closed_at?: string = '';
   order_number: number = 0;
-  canceled_at?: string = '';
+  cancelled_at?: string = '';
 
 
   constructor(data: Partial<OrderTable> = {}) {

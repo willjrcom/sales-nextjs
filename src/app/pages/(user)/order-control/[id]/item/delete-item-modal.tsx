@@ -19,12 +19,19 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
     const onDelete = async () => {
         if (!data) return;
         try {
-            await DeleteItem(item.id, data)
-            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+            const groupItemDeleted = await DeleteItem(item.id, data);
 
-            modalHandler.hideModal(modalName)
+            if (groupItemDeleted) {
+                // 👇 Se esse era o último item, o groupItem não deve mais existir
+                queryClient.setQueryData(['group-item', 'current'], null);
+            } else {
+                // Só atualiza normalmente se ainda existir grupo
+                queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+            }
+
+            modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao excluir item")
+            notifyError(error.message || "Erro ao excluir item");
         }
     }
 

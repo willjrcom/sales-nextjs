@@ -3,7 +3,7 @@ import GroupItem from "../order/group-item";
 import ProcessRule from "../process-rule/process-rule";
 import Product from "../product/product";
 
-type StatusProcess = "Pending" | "Started" | "Finished" | "Paused" | "Continued" | "Canceled";
+type StatusProcess = "Pending" | "Started" | "Finished" | "Paused" | "Continued" | "Cancelled";
 type orderType = "Delivery" | "Pickup" | "Table";
 
 export default class OrderProcess {
@@ -23,8 +23,8 @@ export default class OrderProcess {
     paused_at?: string = '';
     continued_at?: string = '';
     finished_at?: string = '';
-    canceled_at?: string = '';
-    canceled_reason?: string;
+    cancelled_at?: string = '';
+    cancelled_reason?: string;
     duration: number = 0;
     duration_formatted: string = '';
     total_paused: number = 0;

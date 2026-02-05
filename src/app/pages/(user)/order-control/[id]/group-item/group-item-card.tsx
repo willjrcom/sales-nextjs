@@ -22,7 +22,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
     Pending: 'border-blue-400',
     Ready: 'border-green-400',
     Finished: 'border-gray-400',
-    Canceled: 'border-red-400',
+    Cancelled: 'border-red-400',
   };
 
   const handleCloseModal = () => {

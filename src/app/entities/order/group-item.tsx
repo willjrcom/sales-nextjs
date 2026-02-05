@@ -2,7 +2,7 @@ import Category from "../category/category";
 import Item from "./item";
 import Decimal from 'decimal.js';
 
-export type StatusGroupItem = "Staging" | "Pending" | "Started" | "Ready" | "Canceled";
+export type StatusGroupItem = "Staging" | "Pending" | "Started" | "Ready" | "Cancelled";
 
 
 export default class GroupItem {
@@ -26,7 +26,7 @@ export default class GroupItem {
   pending_at?: string;
   started_at?: string;
   ready_at?: string;
-  canceled_at?: string;
+  cancelled_at?: string;
 
   constructor(data: Partial<GroupItem> = {}) {
     Object.assign(this, data);

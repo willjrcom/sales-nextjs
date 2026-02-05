@@ -28,7 +28,7 @@ import { Plan } from "@/app/entities/company/subscription";
 
 // Hardcoded Plan Prices removed, will use dynamic data
 
-type Frequency = "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
+type Frequency = "MONTHLY" | "SEMIANNUALLY" | "ANNUALLY";
 
 export default function BillingPage() {
     const { data: session } = useSession();
@@ -114,10 +114,10 @@ export default function BillingPage() {
         let months = 1;
         let discount = 0;
 
-        if (frequency === "SEMIANNUAL") {
+        if (frequency === "SEMIANNUALLY") {
             months = 6;
             discount = 0.05;
-        } else if (frequency === "ANNUAL") {
+        } else if (frequency === "ANNUALLY") {
             months = 12;
             discount = 0.10;
         }
@@ -201,17 +201,17 @@ export default function BillingPage() {
                     <div className="flex justify-center mt-6">
                         <Tabs value={frequency} onValueChange={(v) => setFrequency(v as Frequency)} className="w-[400px]">
                             <TabsList className="grid w-full grid-cols-3">
-                                {subscriptionStatus?.frequency === "SEMIANNUAL" ? (
-                                    <TabsTrigger value="SEMIANNUAL" className="col-span-3">Semestral (-5%)</TabsTrigger>
-                                ) : subscriptionStatus?.frequency === "ANNUAL" ? (
-                                    <TabsTrigger value="ANNUAL" className="col-span-3">Anual (-10%)</TabsTrigger>
+                                {subscriptionStatus?.frequency === "SEMIANNUALLY" ? (
+                                    <TabsTrigger value="SEMIANNUALLY" className="col-span-3">Semestral (-5%)</TabsTrigger>
+                                ) : subscriptionStatus?.frequency === "ANNUALLY" ? (
+                                    <TabsTrigger value="ANNUALLY" className="col-span-3">Anual (-10%)</TabsTrigger>
                                 ) : subscriptionStatus?.available_plans?.some((p: Plan) => p.is_current) ? (
                                     <TabsTrigger value="MONTHLY" className="col-span-3">Mensal</TabsTrigger>
                                 ) : (
                                     <>
                                         <TabsTrigger value="MONTHLY">Mensal</TabsTrigger>
-                                        <TabsTrigger value="SEMIANNUAL">Semestral (-5%)</TabsTrigger>
-                                        <TabsTrigger value="ANNUAL">Anual (-10%)</TabsTrigger>
+                                        <TabsTrigger value="SEMIANNUALLY">Semestral (-5%)</TabsTrigger>
+                                        <TabsTrigger value="ANNUALLY">Anual (-10%)</TabsTrigger>
                                     </>
                                 )}
                             </TabsList>
@@ -279,7 +279,7 @@ export default function BillingPage() {
                                                 <h3 className="font-bold text-xl">{plan.name}</h3>
                                                 <div className="flex gap-2 mt-2">
                                                     {isCurrentPlan && <Badge variant="default" className="bg-green-600">Plano Atual</Badge>}
-                                                    {subscriptionStatus?.can_cancel_renewal && <Badge variant="destructive">Recorrencia Cancelada</Badge>}
+                                                    {isCurrentPlan && subscriptionStatus?.can_cancel_renewal && <Badge variant="destructive">Recorrencia Cancelada</Badge>}
                                                     {planKey === "intermediate" && !isCurrentPlan && <Badge variant="secondary">Mais Popular</Badge>}
                                                 </div>
                                             </div>
@@ -293,11 +293,11 @@ export default function BillingPage() {
                                                 ) : (
                                                     <>
                                                         <div className="flex items-baseline gap-1">
-                                                            <span className="text-3xl font-bold">{formatCurrency(final / (frequency === "SEMIANNUAL" ? 6 : 12))}</span>
+                                                            <span className="text-3xl font-bold">{formatCurrency(final / (frequency === "SEMIANNUALLY" ? 6 : 12))}</span>
                                                             <span className="text-sm text-muted-foreground">/mês</span>
                                                         </div>
                                                         <div className="text-xs text-muted-foreground mt-1">
-                                                            Total de {formatCurrency(final)} por {frequency === "SEMIANNUAL" ? "semestre" : "ano"}
+                                                            Total de {formatCurrency(final)} por {frequency === "SEMIANNUALLY" ? "semestre" : "ano"}
                                                         </div>
                                                         <div className="text-xs text-green-600 font-medium mt-1">
                                                             Economia de {formatCurrency(discountValue)}
