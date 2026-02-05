@@ -5,15 +5,14 @@ import NewItem, { NewItemProps } from "@/app/api/item/new/item";
 import GetProductByID from "@/app/api/product/[id]/product";
 import ButtonsModal from "@/app/components/modal/buttons-modal"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
+import NumericField from "@/app/components/modal/fields/numeric";
 import { TextField } from "@/app/components/modal/field";
 import { useModal } from "@/app/context/modal/context";
 import Product from "@/app/entities/product/product";
-import Quantity from "@/app/entities/quantity/quantity";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import { useQueryClient } from '@tanstack/react-query';
-import QuantitySelector from "./quantity-selector";
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
 import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
@@ -28,12 +27,10 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const queryClient = useQueryClient();
   const { data } = useSession();
   const [product, setProduct] = useState<Product>(new Product(item));
-  const [quantity, setQuantity] = useState<Quantity>(new Quantity());
+  const [quantity, setQuantity] = useState<number>(1);
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);
   const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
-  const order = queryClient.getQueryData<Order>(['order', 'current']);
-  const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
   useEffect(() => {
     fetchProduct();
@@ -68,7 +65,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const submit = async () => {
     if (!data) return;
 
-    if (!quantity) return notifyError("Selecione uma quantidade para continuar");
+    if (quantity == 0) return notifyError("Selecione uma quantidade para continuar");
 
     const requiresFlavorSelection = availableFlavors && availableFlavors.length > 0;
     if (requiresFlavorSelection && !selectedFlavor) {
@@ -76,30 +73,27 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       return;
     }
 
+
+    const order = queryClient.getQueryData<Order>(['order', 'current']);
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+
     try {
       const body = {
         product_id: product.id,
-        quantity_id: quantity?.id,
+        quantity: quantity,
         order_id: order?.id,
+        group_item_id: groupItem?.id,
         observation: observation,
         flavor: selectedFlavor || undefined,
       } as NewItemProps
 
-      if (groupItem) {
-        body.group_item_id = groupItem.id
-      }
-
       const response = await NewItem(body, data)
 
-      // Invalidate and refetch the group-item query to update the cart
-      await queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
-
-      // Optionally, you can also manually set the query data if the response contains the updated group item
-      if (response?.group_item_id) {
+      if (!groupItem) {
         const updatedGroupItem = await GetGroupItemByID(response.group_item_id, data);
-        if (updatedGroupItem) {
-          queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
-        }
+        queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
       }
 
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
@@ -184,7 +178,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
               <p className="text-xs text-gray-500 mt-2">Obrigatório selecionar um sabor para produtos com variações.</p>
             </div>
           )}
-          <QuantitySelector categoryID={product.category_id} selectedQuantity={quantity} setSelectedQuantity={setQuantity} />
+          <NumericField name="quantity" friendlyName="Quantidade" placeholder="Digite a quantidade" setValue={setQuantity} value={quantity} />
           <div className="transform transition-transform duration-200 hover:scale-[1.01]">
             <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
           </div>
@@ -201,7 +195,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
           </div>
           <div className="flex justify-between items-center p-3 bg-white rounded-lg">
             <p className="text-lg font-bold">Total:</p>
-            <p className="text-lg font-bold text-green-600">R$ {new Decimal(product.price).times(quantity.quantity || 1).toFixed(2)}</p>
+            <p className="text-lg font-bold text-green-600">R$ {new Decimal(product.price).times(quantity).toFixed(2)}</p>
           </div>
         </div>
       </div>

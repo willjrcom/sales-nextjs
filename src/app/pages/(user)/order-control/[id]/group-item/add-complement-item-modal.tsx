@@ -69,11 +69,8 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
                 <p className="text-gray-600 mb-2">R$ {new Decimal(product.price).toFixed(2)}</p>
             </div>
 
-            {/* Tamanhos e botão */}
+            {/* botão */}
             <div className="flex items-center justify-between space-x-2">
-                {/* Tamanhos */}
-                <div></div>
-
                 {/* Botão para adicionar */}
                 <button onClick={submit} className={`flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max`}>
                     <FaPlus />

@@ -5,7 +5,6 @@ import PageTitle from '@/app/components/ui/page-title';
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import ListSize from "../../../../../forms/category/list-size";
-import ListQuantity from "../../../../../forms/category/list-quantity";
 import CategoryForm from "@/app/forms/category/form";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { FaEdit } from "react-icons/fa";
@@ -53,12 +52,6 @@ const PageCategoryEdit = () => {
             </Breadcrumb>
 
             <CategoryForm isUpdate={true} item={category} />
-
-            <ButtonIconTextFloat title="Tamanhos e quantidades" modalName="edit-size-and-quantity" size="xl" icon={FaEdit} position="bottom-right">
-                <ListSize categoryID={category.id} isDefaultCategory={isDefaultCategory} />
-                <hr className="my-4" />
-                <ListQuantity categoryID={category.id} isDefaultCategory={isDefaultCategory} />
-            </ButtonIconTextFloat>
         </div>
     );
 }

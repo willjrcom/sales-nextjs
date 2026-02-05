@@ -19,6 +19,7 @@ import RemovableItensComponent from './removable-ingredients';
 import { useRouter } from 'next/navigation';
 import printService from '@/app/utils/print-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import ListSize from './list-size';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
@@ -171,6 +172,11 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                             <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={category.is_active} />
                         </div>
                     )}
+
+                    {category?.id && <>
+                        <hr className="my-4" />
+                        <ListSize categoryID={category.id} isDefaultCategory={!category.is_complement && !category.is_additional} />
+                    </>}
                 </div>
             </div>
 
@@ -248,9 +254,9 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
             {/* Botões para Atualizar ou Excluir */}
             {isUpdated ? (
-                <ButtonsModal item={category} name="quantity" onSubmit={submit} />
+                <ButtonsModal item={category} name="category" onSubmit={submit} />
             ) : (
-                <ButtonsModal item={category} name="quantity" />
+                <ButtonsModal item={category} name="category" />
             )}
         </div>
     );

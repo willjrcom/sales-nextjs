@@ -8,10 +8,9 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface DeleteItemModalProps {
     item: Item;
-    itemsCount?: number;
 }
 
-const DeleteItemModal = ({ item, itemsCount }: DeleteItemModalProps) => {
+const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
     const queryClient = useQueryClient();
     const modalHandler = useModal();
     const { data } = useSession();
@@ -21,14 +20,7 @@ const DeleteItemModal = ({ item, itemsCount }: DeleteItemModalProps) => {
         if (!data) return;
         try {
             await DeleteItem(item.id, data)
-
-            if (itemsCount === 1) {
-                // Se era o último item, limpa o cache
-                queryClient.setQueryData(['group-item', 'current'], null);
-            } else {
-                // Senão, apenas invalida para refetch
-                queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
-            }
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
 
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {

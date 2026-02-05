@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 export interface NewItemProps {
     order_id: string;
     product_id: string;
-    quantity_id: string;
+    quantity: number;
     group_item_id?: string;
     observation: string;
     flavor?: string;
@@ -17,7 +17,7 @@ export interface NewItemResponse {
 
 const NewItem = async (body: NewItemProps, session: Session): Promise<NewItemResponse> => {
     const response = await RequestApi<NewItemProps, NewItemResponse>({
-        path: "/item/add", 
+        path: "/item/add",
         method: "POST",
         body: body,
         headers: AddAccessToken(session),

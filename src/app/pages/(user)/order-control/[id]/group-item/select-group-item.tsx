@@ -19,14 +19,8 @@ export default function SelectGroupItem({ id }: SelectGroupItemProps) {
     })
 
     if (!groupItem || groupItem?.status === "Staging") {
-        return (
-            <div>
-                <ListProductsToAdd />
-            </div>
-        );
+        return <ListProductsToAdd />
     }
 
-    return (
-        <EditGroupItem />
-    );
+    return <EditGroupItem />;
 }

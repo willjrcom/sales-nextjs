@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import Item from '@/app/entities/order/item';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import DeleteItemModal from './delete-item-modal';
 import ButtonDelete from '../../../../../components/button/button-delete';
 import ListAdditionalItems from './list-additional-items';
@@ -10,10 +10,9 @@ import { useQueryClient } from '@tanstack/react-query';
 
 interface EditItemProps {
     item: Item;
-    itemsCount?: number;
 }
 
-const EditItem = ({ item, itemsCount }: EditItemProps) => {
+const EditItem = ({ item }: EditItemProps) => {
     const queryClient = useQueryClient();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const isStaging = groupItem?.status === "Staging"
@@ -36,7 +35,7 @@ const EditItem = ({ item, itemsCount }: EditItemProps) => {
                 </div>
                 {isStaging &&
                     <ButtonDelete modalName={"delete-item-" + item.id} name={item.name} additionalModals={["edit-item-" + item.id]}>
-                        <DeleteItemModal item={item} itemsCount={itemsCount} />
+                        <DeleteItemModal item={item} />
                     </ButtonDelete>
                 }
             </div>

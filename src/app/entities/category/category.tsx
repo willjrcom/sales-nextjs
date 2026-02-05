@@ -1,7 +1,6 @@
 import { z } from "zod";
 import ProcessRule from "../process-rule/process-rule";
 import Product from "../product/product";
-import Quantity from "../quantity/quantity";
 import Size from "../size/size";
 
 export default class Category {
@@ -16,7 +15,6 @@ export default class Category {
     is_complement: boolean = false;
     is_active: boolean = true;
     sizes: Size[] = [];
-    quantities: Quantity[] = [];
     products: Product[] = [];
     additional_categories: Category[] = [];
     complement_categories: Category[] = [];

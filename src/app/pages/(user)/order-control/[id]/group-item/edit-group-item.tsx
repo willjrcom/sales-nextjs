@@ -27,6 +27,19 @@ const EditGroupItem = () => {
     const containItems = useMemo(() => groupItem?.items && groupItem?.items.length > 0, [groupItem?.items]);
     const isGroupItemStaging = useMemo(() => groupItem?.status === "Staging", [groupItem?.status]);
 
+    const cancelGroupItem = async () => {
+        if (!session || !groupItem) return;
+        try {
+            await CancelGroupItem(groupItem.id, "cancelado pelo usuario", session);
+            notifySuccess("Item cancelado com sucesso!");
+
+            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+            modalHandler.hideModal("cancel-group-item-" + groupItem.id);
+        } catch (error: any) {
+            notifyError(error.message || 'Erro ao cancelar grupo de itens');
+        }
+    }
+
     return (
         <div className="p-4 bg-white rounded-l-md rounded-r-md text-black min-w-full h-full">
             <div className="flex justify-between items-center">
@@ -92,18 +105,7 @@ const EditGroupItem = () => {
                     <ButtonIconText modalName={"cancel-group-item-" + groupItem.id} title="Cancelar item" size="md" color="red" icon={FaTimes}>
                         <p className="mb-2">tem certeza que deseja cancelar o item?</p>
                         <button
-                            onClick={async () => {
-                                if (!session || !groupItem) return;
-                                try {
-                                    await CancelGroupItem(groupItem.id, "cancelado pelo usuario", session);
-                                    notifySuccess("Item cancelado com sucesso!");
-
-                                    queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
-                                    modalHandler.hideModal("cancel-group-item-" + groupItem.id);
-                                } catch (error: any) {
-                                    notifyError(error.message || 'Erro ao cancelar grupo de itens');
-                                }
-                            }}
+                            onClick={cancelGroupItem}
                             className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
                         >
                             Confirmar

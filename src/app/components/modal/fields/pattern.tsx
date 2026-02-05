@@ -44,7 +44,7 @@ export const patterns = {
     "date": {
         pattern: "##/##/####",
         placeholder: "00/00/0000"
-    }
+    },
 } as const; // Garantindo que o objeto 'patterns' tem um formato de constante para os valores
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";

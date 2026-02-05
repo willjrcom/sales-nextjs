@@ -28,7 +28,6 @@ export const ListProductsToAdd = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const queryClient = useQueryClient();
 
-
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
     useEffect(() => {

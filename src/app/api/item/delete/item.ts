@@ -1,9 +1,9 @@
 import RequestApi, { AddAccessToken } from "../../request";
 import { Session } from "next-auth";
 
-const DeleteItem = async (id: string, session: Session): Promise<string> => {
-    const response = await RequestApi<string, string>({
-        path: "/item/" + id, 
+const DeleteItem = async (id: string, session: Session): Promise<boolean> => {
+    const response = await RequestApi<string, boolean>({
+        path: "/item/" + id,
         method: "DELETE",
         headers: AddAccessToken(session),
     });
