@@ -171,7 +171,7 @@ export function SubscriptionStatusCard() {
                         )}
 
                         {/* Cancel Button: Show for ANY active paid plan (not Free) */}
-                        {normalizedPlan !== 'free' && status.can_cancel_renewal && (
+                        {normalizedPlan !== 'free' && !status.is_cancelled && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -184,7 +184,7 @@ export function SubscriptionStatusCard() {
                             </Button>
                         )}
                         {/* show message "A recorrência do seu plano foi cancelada!"*/}
-                        {status.current_plan !== 'free' && !status.can_cancel_renewal && (
+                        {status.current_plan !== 'free' && status.is_cancelled && (
                             <Badge
                                 variant="destructive"
                                 className="text-red-600 hover:text-red-700 hover:bg-red-700"

@@ -279,7 +279,7 @@ export default function BillingPage() {
                                                 <h3 className="font-bold text-xl">{plan.name}</h3>
                                                 <div className="flex gap-2 mt-2">
                                                     {isCurrentPlan && <Badge variant="default" className="bg-green-600">Plano Atual</Badge>}
-                                                    {isCurrentPlan && subscriptionStatus?.can_cancel_renewal && <Badge variant="destructive">Recorrencia Cancelada</Badge>}
+                                                    {isCurrentPlan && subscriptionStatus?.is_cancelled && <Badge variant="destructive">Recorrencia Cancelada</Badge>}
                                                     {planKey === "intermediate" && !isCurrentPlan && <Badge variant="secondary">Mais Popular</Badge>}
                                                 </div>
                                             </div>
