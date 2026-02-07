@@ -31,7 +31,7 @@ const PickupOrderPage = () => {
             setLastUpdateReady(FormatRefreshTime(new Date()));
             return GetOrdersWithPickupReady(data!);
         },
-        enabled: !!data,
+        enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
         placeholderData: keepPreviousData,
     });

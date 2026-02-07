@@ -1,6 +1,5 @@
 import { useState, useEffect, Dispatch, SetStateAction, useMemo } from "react";
 import Category from "@/app/entities/category/category";
-import { FaTags } from 'react-icons/fa';
 import { GetCategoriesAdditional } from "@/app/api/category/category";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";

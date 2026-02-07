@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { GetMovementsByStockID } from '@/app/api/stock/movements';
 import Decimal from 'decimal.js';

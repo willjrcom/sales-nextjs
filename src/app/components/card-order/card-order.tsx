@@ -10,6 +10,7 @@ import CancelOrder from "@/app/api/order/status/cancel/order";
 import ButtonIconText from "../button/button-icon-text";
 import PaymentForm from "@/app/forms/order-payment/form";
 import { useModal } from "@/app/context/modal/context";
+import Refresh from "@/app/components/crud/refresh";
 import Link from "next/link";
 import Carousel from "../../../components/carousel/carousel";
 import type { IconType } from 'react-icons';
@@ -87,6 +88,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             }
         },
         enabled: !!orderId && !!data?.user?.access_token,
+        refetchInterval: 10000,
     });
 
     const handleReady = async () => {
@@ -152,6 +154,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 const onClose = () => {
                     modalHandler.hideModal('ship-delivery');
                 }
+
                 modalHandler.showModal(
                     'ship-delivery', 'Enviar entrega',
                     <SelectDeliveryDriver deliveryIDs={[order.delivery!.id]} orderIDs={[order.id]} />,
@@ -218,6 +221,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 try {
                     await CloseTable(order.table?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
+                    queryClient.invalidateQueries({ queryKey: ['table-orders'] });
                     refetch();
                 } catch (error) {
                     const err = error as RequestError;
@@ -269,6 +273,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
+                    queryClient.invalidateQueries({ queryKey: ['pickup-orders-ready'] });
+                    queryClient.invalidateQueries({ queryKey: ['pickup-orders-delivered'] });
                     refetch();
                 } catch (error) {
                     const err = error as RequestError;
@@ -328,6 +334,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         {!editBlocked && <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
                             <FaEdit />
                         </Link>}
+                        <Refresh onRefresh={refetch} />
                     </div>
                     <p className="text-gray-700">
                         <strong>Comanda N°:</strong> {order.order_number}

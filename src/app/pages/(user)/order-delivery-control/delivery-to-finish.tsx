@@ -152,7 +152,7 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
     const { data } = useSession();
     const modalHandler = useModal();
 
-    if (!order) return <></>
+    if (!order) return <>Nenhum pedido selecionado</>
 
     const showOrder = (orderId: string) => {
         const onClose = () => {
