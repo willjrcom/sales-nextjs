@@ -8,6 +8,7 @@ import { notifyError } from '@/app/utils/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetCategoryByID from '@/app/api/category/[id]/category';
 import GroupItem from '@/app/entities/order/group-item';
+import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
 
 interface ListRemovedItemsProps {
     item: Item;
@@ -40,6 +41,11 @@ const ListRemovedItems = ({ item }: ListRemovedItemsProps) => {
         try {
             await AddRemovedItem(item.id, name, data);
             setRemovedItems((prev) => [...prev, name]); // Adiciona o item ao estado local
+
+            if (groupItem) {
+                const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
+                queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+            }
         } catch (error: RequestError | any) {
             notifyError(error);
         }
@@ -51,6 +57,11 @@ const ListRemovedItems = ({ item }: ListRemovedItemsProps) => {
         try {
             await RemoveRemovedItem(item.id, name, data);
             setRemovedItems((prev) => prev.filter((item) => item !== name)); // Remove o item do estado local
+
+            if (groupItem) {
+                const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
+                queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+            }
         } catch (error: RequestError | any) {
             notifyError(error);
         }

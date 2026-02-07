@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GetAdditionalProducts } from '@/app/api/product/product';
 import GroupItem from '@/app/entities/order/group-item';
 import Product from '@/app/entities/product/product';
+import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
 
 interface ListAdditionalItemsProps {
     item: Item;
@@ -70,7 +71,11 @@ const ListAdditionalItems = ({ item }: ListAdditionalItemsProps) => {
     const addMutation = useMutation({
         mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) =>
             NewAdditionalItem(item.id, { product_id: productId, quantity }, data!),
-        onSuccess: (additionalItemId, variables) => {
+        onSuccess: async (additionalItemId, variables) => {
+            if (groupItem && data) {
+                const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
+                queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+            }
             setQuantities(prev => ({
                 ...prev,
                 [variables.productId]: {
@@ -87,7 +92,11 @@ const ListAdditionalItems = ({ item }: ListAdditionalItemsProps) => {
     const removeMutation = useMutation({
         mutationFn: async ({ additionalItemId }: { additionalItemId: string, productId: string }) =>
             DeleteAdditionalItem(additionalItemId, data!),
-        onSuccess: (_, variables) => {
+        onSuccess: async (_, variables) => {
+            if (groupItem && data) {
+                const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
+                queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+            }
             setQuantities(prev => ({
                 ...prev,
                 [variables.productId]: {

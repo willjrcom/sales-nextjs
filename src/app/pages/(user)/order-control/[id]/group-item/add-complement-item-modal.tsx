@@ -1,5 +1,6 @@
 import RequestError from "@/app/utils/error";
 import NewComplementGroupItem from "@/app/api/group-item/update/complement/group-item";
+import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";
 import Product from "@/app/entities/product/product";
@@ -26,7 +27,8 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
 
         try {
             await NewComplementGroupItem(groupItem.id, product.id, data)
-            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+            const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
+            queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
             modalHandler.hideModal("add-complement-item-group-item-" + groupItem?.id)
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao adicionar complemento");

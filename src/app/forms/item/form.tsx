@@ -89,12 +89,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       const response = await NewItem(body, data)
 
-      if (!groupItem) {
-        const updatedGroupItem = await GetGroupItemByID(response.group_item_id, data);
-        queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
-      }
+      const updatedGroupItem = await GetGroupItemByID(response.group_item_id, data);
+      queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
 
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
       modalHandler.hideModal(modalName);

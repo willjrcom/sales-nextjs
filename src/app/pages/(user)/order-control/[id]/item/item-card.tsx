@@ -26,12 +26,11 @@ const ItemCard = ({ item }: CardProps) => {
     return (
         <div
             className="relative bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer"
+            onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}
         >
             {/* Estado padrão */}
             <div className="flex justify-between items-center">
-                <div className="flex justify-between items-center space-x-4 w-full h-full"
-                    onClick={() => modalHandler.showModal(modalName, item.name, <EditItem item={item} />, "md", onClose)}
-                >
+                <div className="flex justify-between items-center space-x-4 w-full h-full">
                     <div className="text-sm font-medium">
                         {item.quantity} x {item.name}
                     </div>

@@ -5,6 +5,7 @@ import Item from "@/app/entities/order/item";
 import { useSession } from "next-auth/react";
 import { notifyError } from "@/app/utils/notifications";
 import { useQueryClient } from "@tanstack/react-query";
+import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
 
 interface DeleteItemModalProps {
     item: Item;
@@ -26,7 +27,8 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
                 queryClient.setQueryData(['group-item', 'current'], null);
             } else {
                 // Só atualiza normalmente se ainda existir grupo
-                queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+                const updatedGroupItem = await GetGroupItemByID(item.group_item_id, data);
+                queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
             }
 
             modalHandler.hideModal(modalName);

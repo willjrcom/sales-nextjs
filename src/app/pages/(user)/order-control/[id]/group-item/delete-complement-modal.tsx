@@ -1,5 +1,6 @@
 import RequestError from "@/app/utils/error";
 import DeleteComplementGroupItem from "@/app/api/group-item/delete/complement/group-item";
+import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
 import { useModal } from "@/app/context/modal/context";
 import GroupItem from "@/app/entities/order/group-item";
 import { useSession } from "next-auth/react";
@@ -17,8 +18,8 @@ const DeleteComplementItemModal = () => {
         if (!data || !groupItem?.id) return;
         try {
             await DeleteComplementGroupItem(groupItem.id, data)
-
-            queryClient.invalidateQueries({ queryKey: ['group-item', 'current'] });
+            const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
+            queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
 
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {
