@@ -23,7 +23,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const { data } = useSession();
 
     const { data: employeesWithoutDriversResponse } = useQuery({
-        queryKey: ['employees'],
+        queryKey: ['employees-without-delivery-drivers'],
         queryFn: () => GetEmployeesWithoutDeliveryDrivers(data!, 0, 1000),
         enabled: !!data?.user?.access_token,
     });
@@ -33,7 +33,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
 
     const submit = async () => {
         if (!data) return;
-        if (selectedEmployee || selectedEmployeeId == "") {
+        if (!isUpdate && !selectedEmployee) {
             notifyError('Selecione um motoboy');
             return
         }
@@ -42,7 +42,9 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             deliveryDriver.employee_id = selectedEmployeeId
             const response = isUpdate ? await UpdateDeliveryDriver(deliveryDriver, data) : await NewDeliveryDriver(deliveryDriver.employee_id, data)
 
-            deliveryDriver.employee = selectedEmployee || new Employee();
+            if (!isUpdate) {
+                deliveryDriver.employee = selectedEmployee || new Employee();
+            }
 
             if (!isUpdate) {
                 deliveryDriver.id = response
@@ -52,6 +54,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             }
 
             queryClient.invalidateQueries({ queryKey: ['delivery-drivers'] });
+            queryClient.invalidateQueries({ queryKey: ['employees-without-delivery-drivers'] });
             modalHandler.hideModal(modalName);
         } catch (error) {
             const err = error as RequestError;
