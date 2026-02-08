@@ -5,8 +5,6 @@ import { Toaster } from 'react-hot-toast';
 import { FaExclamationCircle } from 'react-icons/fa';
 import EmployeeUserProfile from './profile';
 import { useSession } from 'next-auth/react';
-import GetUser from '@/app/api/user/me/user';
-import User from '@/app/entities/user/user';
 import Order from '@/app/entities/order/order';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { PendingPaymentModal } from './pending-payment-modal';
@@ -28,7 +26,6 @@ import { MoreHorizontal } from "lucide-react"
 
 
 const Topbar = () => {
-  const [user, setUser] = useState<User | null>(null);
   const { data } = useSession();
   const queryClient = useQueryClient();
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -58,16 +55,6 @@ const Topbar = () => {
     const interval = setInterval(checkCache, 1000);
     return () => clearInterval(interval);
   }, [queryClient]);
-
-  useEffect(() => {
-    getUser();
-  }, [data?.user?.access_token]);
-
-  const getUser = async () => {
-    if (!data) return;
-    const user = await GetUser(data);
-    setUser(user);
-  }
 
   return (
     <>
@@ -162,7 +149,7 @@ const Topbar = () => {
               </div>
             </Menubar>
 
-            {user && <EmployeeUserProfile user={user} setUser={setUser} />}
+            <EmployeeUserProfile />
           </div>
         </div>
       </header>

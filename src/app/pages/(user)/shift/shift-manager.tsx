@@ -7,11 +7,11 @@ import Shift from "@/app/entities/shift/shift";
 import RequestError from "@/app/utils/error";
 import OpenShift from "@/app/api/shift/open/shift";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import User from "@/app/entities/user/user";
+import { useState } from "react";
 import { useModal } from "@/app/context/modal/context";
 import { notifyError } from "@/app/utils/notifications";
-import GetUser from "@/app/api/user/me/user";
+import { useQuery } from "@tanstack/react-query";
+import GetMeUser from "@/app/api/user/me/user";
 
 interface ShiftProps {
     shift?: Shift | null;
@@ -20,22 +20,19 @@ interface ShiftProps {
 
 const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
     const { data } = useSession();
-    const [user, setUser] = useState<User>(new User());
     const [startChange, setStartChange] = useState<Decimal>(new Decimal(shift?.start_change || 0));
     const modalHandler = useModal();
 
-    useEffect(() => {
-        if (!data) return;
-        getUser();
-    }, [data?.user?.access_token]);
 
-    const getUser = async () => {
-        if (!data) return;
-        const user = await GetUser(data);
+    const { data: meUser } = useQuery({
+        queryKey: ['me-user'],
+        queryFn: async () => {
+            return GetMeUser(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
 
-        setUser(user);
-    }
-    
     const handleOpenShift = async () => {
         if (!data) return;
 
@@ -67,7 +64,7 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
         return (
             <div className="bg-white p-4 shadow-md rounded-lg flex items-center">
                 <div>
-                    <h2 className="text-xl font-bold">Olá, {user.name}</h2>
+                    <h2 className="text-xl font-bold">Olá, {meUser?.name}</h2>
                     <p className="text-gray-500">Nenhum turno aberto</p>
                 </div>
 
@@ -83,7 +80,7 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
     return (
         <div className="bg-white p-4 shadow-md rounded-lg flex items-center">
             <div>
-                <h2 className="text-xl font-bold">Olá, {user.name}</h2>
+                <h2 className="text-xl font-bold">Olá, {meUser?.name}</h2>
                 <p>Turno aberto às: <span className="font-semibold">{ToUtcHoursMinutes(shift.opened_at)}</span></p>
                 <p>Data: <span className="font-semibold">{ToUtcDate(shift.opened_at)}</span></p>
             </div>
@@ -92,7 +89,7 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
                 <div className="ml-auto text-right">
                     <p>Troco início: <span className="font-semibold">R$ {new Decimal(shift.start_change).toFixed(2)}</span></p>
                     <button className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                    onClick={onOpenRedeemModal}
+                        onClick={onOpenRedeemModal}
                     >Resgatar Dinheiro</button>
                 </div>
 

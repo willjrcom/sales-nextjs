@@ -13,8 +13,7 @@ import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import { notifyError } from '@/app/utils/notifications';
 import EmployeeUserProfile from '@/app/components/topbar/profile';
 import Link from 'next/link';
-import GetUser from '@/app/api/user/me/user';
-import User from '@/app/entities/user/user';
+import GetMeUser from '@/app/api/user/me/user';
 import { useQuery } from '@tanstack/react-query';
 import GetUserCompanies from '@/app/api/user/companies/user';
 
@@ -29,7 +28,6 @@ export default function Page() {
 function CompanySelection() {
     const router = useRouter();
     const { data, update } = useSession();
-    const [user, setUser] = useState<User | null>(null);
     const modalHandler = useModal();
     const [selecting, setSelecting] = useState<boolean>(false);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
@@ -49,15 +47,14 @@ function CompanySelection() {
         if (error) notifyError('Erro ao carregar empresas');
     }, [error]);
 
-    useEffect(() => {
-        getUser();
-    }, [data?.user?.access_token]);
-
-    const getUser = async () => {
-        if (!data) return;
-        const user = await GetUser(data);
-        setUser(user);
-    }
+    const { data: meUser } = useQuery({
+        queryKey: ['me-user'],
+        queryFn: async () => {
+            return GetMeUser(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         const schemaName = event.currentTarget.getAttribute('data-schema-name');
@@ -119,10 +116,10 @@ function CompanySelection() {
             <div className="absolute top-4 right-4 z-10 flex items-center gap-4">
                 <div className="text-right">
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-                        Bem-vindo, {user?.name?.split(' ')[0] || 'Usuário'}
+                        Bem-vindo, {meUser?.name?.split(' ')[0] || 'Usuário'}
                     </h1>
                 </div>
-                {user && <EmployeeUserProfile user={user} setUser={setUser} />}
+                <EmployeeUserProfile />
             </div>
             {loadingCompanies && (
                 <div className="flex justify-center items-center h-64 mb-10">

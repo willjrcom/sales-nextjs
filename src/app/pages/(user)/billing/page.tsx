@@ -237,6 +237,11 @@ export default function BillingPage() {
                                     const isUpgrade = plan.is_upgrade;
                                     const planKey = plan.key;
 
+                                    // If it is not the current plan and the subscription is cancelled, do not show the plan
+                                    if (!isCurrentPlan && subscriptionStatus?.is_cancelled) {
+                                        return null;
+                                    }
+
                                     const isFreePlan = subscriptionStatus?.current_plan?.toUpperCase() === 'FREE' || !subscriptionStatus?.current_plan;
 
                                     const handlePlanAction = () => {
@@ -250,20 +255,6 @@ export default function BillingPage() {
                                         }
                                         // For lower-tier plans (downgrade), do nothing - button will be disabled
                                     };
-
-                                    // Override price display for upgrade
-                                    // If it is an upgrade, show the upgrade price (prorated)
-                                    // Only if logic dictates. The user requirements said:
-                                    // "Displaying correct pricing (full price or upgrade difference) based on the user's current subscription status."
-                                    // If upgradePrice is available, maybe show explicitly?
-                                    // The card calculates total based on frequency. 
-                                    // Prorated upgrade price is usually a one-time charge for the remainder of the cycle.
-                                    // The current UI logic for upgrade dialog handles the proration display.
-                                    // The card itself usually shows the standard monthly/annual price so user knows the ongoing cost.
-                                    // But maybe we should highlight "Upgrade por R$ X" if applicable?
-                                    // User said: "Displaying correct pricing... based on status".
-                                    // For now, I'll keep the standard price display but change the button text/action.
-                                    // The UpgradeDialog shows the specific cost.
 
                                     const buttonText = isCurrentPlan
                                         ? "Plano Atual"

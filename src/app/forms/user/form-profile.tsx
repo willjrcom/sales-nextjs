@@ -15,8 +15,9 @@ import AddressForm from '../address/form';
 import ContactForm from '../contact/form';
 import Address from '@/app/entities/address/address';
 import Contact from '@/app/entities/contact/contact';
+import { useQueryClient } from '@tanstack/react-query';
 
-const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
+const UserForm = ({ item }: CreateFormsProps<User>) => {
     const modalName = 'show-user'
     const modalHandler = useModal();
     const [user, setUser] = useState<User>(() => {
@@ -28,6 +29,7 @@ const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
     const [address, setAddress] = useState<Address>(new Address(user.address))
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const { data } = useSession();
+    const queryClient = useQueryClient();
 
     const handleInputChange = useCallback((field: keyof User, value: any) => {
         setUser(prev => ({
@@ -58,8 +60,8 @@ const UserForm = ({ item, setItem }: CreateFormsProps<User>) => {
 
         try {
             await UpdateUser(newUser, data)
-            setUser(newUser);
-            if (setItem) setItem(newUser); // update parent state if setter provided
+            queryClient.invalidateQueries({ queryKey: ['me-user'] });
+            queryClient.invalidateQueries({ queryKey: ['me-employee'] });
             notifySuccess('Perfil atualizado com sucesso');
             modalHandler.hideModal(modalName);
         } catch (error) {

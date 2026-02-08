@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Employee from "@/app/entities/employee/employee";
 import { useSession } from "next-auth/react";
 import { notifyError } from "@/app/utils/notifications";
@@ -16,9 +16,23 @@ export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabP
 
     // Lista de permissões disponíveis (deve ser igual ao backend)
     const availablePermissions = [
-        { key: 'view_orders', label: 'Visualizar Pedidos' },
-        { key: 'edit_orders', label: 'Editar Pedidos' },
-        { key: 'manage_users', label: 'Gerenciar Usuários' },
+        { key: 'billing', label: 'Gerenciar Contas de pagamento' },
+        { key: 'client', label: 'Gerenciar Clientes' },
+        { key: 'employee', label: 'Gerenciar Funcionários' },
+        { key: 'new-order', label: 'Novo Pedido' },
+        { key: 'order-control', label: 'Editar Pedidos' },
+        { key: 'order-delivery-control', label: 'Editar pedidos de Entregas' },
+        { key: 'order-pickup-control', label: 'Editar pedidos de Balcões/Retiradas' },
+        { key: 'order-process', label: 'Editar Processos' },
+        { key: 'order-table-control', label: 'Editar pedidos de Mesas' },
+        { key: 'place', label: 'Gerenciar Mesas e Ambientes' },
+        { key: 'print', label: 'Teste de Impressão' },
+        { key: 'product', label: 'Gerenciar Produtos' }, // isso é um ?tab=products dentro da url product
+        { key: 'category', label: 'Gerenciar Categorias' }, // isso é um ?tab=categories dentro da url product
+        { key: 'process-rule', label: 'Gerenciar Processos' }, // isso é um ?tab=process-rules dentro da url product
+        { key: 'manage-stock', label: 'Gerenciar Estoques' },
+        { key: 'shift', label: 'Gerenciar Turnos' },
+        { key: 'manage-company', label: 'Gerenciar Empresa' }, // isso é um modal, nao uma rota
     ];
 
     useEffect(() => {

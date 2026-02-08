@@ -5,7 +5,6 @@ import PageTitle from '@/app/components/ui/page-title';
 import CrudTable from "@/app/components/crud/table";
 import EmployeeColumns from "@/app/entities/employee/table-columns";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { TextField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";

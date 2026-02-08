@@ -8,19 +8,25 @@ import PasswordField from "@/app/components/modal/fields/password";
 import UpdateUserPassword from "@/app/api/user/update/password/user";
 import { notifySuccess, notifyError } from "@/app/utils/notifications";
 import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import GetMeUser from "@/app/api/user/me/user";
 
-type EmployeeUserProfileProps = {
-    user: User;
-    setUser?: (user: User) => void;
-};
-
-const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
+const ChangePasswordModal = () => {
     const { data } = useSession();
     const modalHandler = useModal();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const { data: meUser } = useQuery({
+        queryKey: ['me-user'],
+        queryFn: async () => {
+            return GetMeUser(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
 
     return (
         <form
@@ -39,15 +45,15 @@ const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
                     return;
                 }
 
-                if (!user.email) {
+                if (!meUser?.email) {
                     notifyError('Email do usuário não disponível');
                     return;
                 }
-                
+
                 setLoading(true);
                 try {
                     await UpdateUserPassword({
-                        email: user.email,
+                        email: meUser?.email,
                         current_password: currentPassword,
                         new_password: newPassword
                     }, data);
@@ -90,21 +96,21 @@ const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
                 showConfirmValidation={false}
             />
             <div className="flex justify-end gap-2 mt-4">
-                <button 
-                    type="button" 
+                <button
+                    type="button"
                     onClick={() => {
                         modalHandler.hideModal("change-password");
                         setCurrentPassword('');
                         setNewPassword('');
                         setConfirmPassword('');
-                    }} 
+                    }}
                     className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 >
                     Cancelar
                 </button>
-                <button 
-                    type="submit" 
-                    disabled={loading} 
+                <button
+                    type="submit"
+                    disabled={loading}
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
                 >
                     {loading ? 'Salvando...' : 'Salvar'}
@@ -114,9 +120,19 @@ const ChangePasswordModal = ({ user }: EmployeeUserProfileProps) => {
     );
 };
 
-const EmployeeUserProfile = ({ user, setUser }: EmployeeUserProfileProps) => {
+const EmployeeUserProfile = () => {
     const getInitial = (name?: string) => name?.charAt(0).toUpperCase(); // Pega a primeira letra do nome
     const modalHandler = useModal();
+    const { data } = useSession();
+
+    const { data: meUser } = useQuery({
+        queryKey: ['me-user'],
+        queryFn: async () => {
+            return GetMeUser(data!);
+        },
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
 
     const OpenModal = () => {
         const onClose = () => {
@@ -128,21 +144,21 @@ const EmployeeUserProfile = ({ user, setUser }: EmployeeUserProfileProps) => {
             "Dados Pessoais",
             <>
                 <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
-                    {user.image_path ? (
+                    {meUser?.image_path ? (
                         <Image
-                            src={user.image_path}
-                            alt={`${user.name}'s profile`}
+                            src={meUser?.image_path}
+                            alt={`${meUser?.name}'s profile`}
                             className="w-full h-full object-cover"
                             width={100}
                             height={100}
                         />
                     ) : (
-                        <span className="text-lg font-bold text-gray-600">{getInitial(user.name)}</span>
+                        <span className="text-lg font-bold text-gray-600">{getInitial(meUser?.name)}</span>
                     )}
                 </div>
-                <p className="mt-2 text-lg font-bold">{user.name}</p>
+                <p className="mt-2 text-lg font-bold">{meUser?.name}</p>
                 <hr className="my-4" />
-                <UserForm item={user} setItem={setUser} />
+                <UserForm />
 
                 <hr className="my-4" />
                 <button
@@ -150,7 +166,7 @@ const EmployeeUserProfile = ({ user, setUser }: EmployeeUserProfileProps) => {
                         const onClose = () => {
                             modalHandler.hideModal("change-password")
                         }
-                        modalHandler.showModal("change-password", "Alterar Senha", <ChangePasswordModal user={user} setUser={setUser} />, "md", onClose)
+                        modalHandler.showModal("change-password", "Alterar Senha", <ChangePasswordModal />, "md", onClose)
                     }}
                     className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                 >
@@ -165,18 +181,18 @@ const EmployeeUserProfile = ({ user, setUser }: EmployeeUserProfileProps) => {
             <div className="relative">
                 <div onClick={OpenModal}
                     className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shadow-md cursor-pointer"
-                    title={user.name}
+                    title={meUser?.name}
                 >
-                    {user.image_path ? (
+                    {meUser?.image_path ? (
                         <Image
-                            src={user.image_path}
-                            alt={`${user.name}'s profile`}
+                            src={meUser?.image_path}
+                            alt={`${meUser?.name}'s profile`}
                             className="w-full h-full object-cover"
                             width={100}
                             height={100}
                         />
                     ) : (
-                        <span className="text-lg font-bold text-gray-600">{getInitial(user.name)}</span>
+                        <span className="text-lg font-bold text-gray-600">{getInitial(meUser?.name)}</span>
                     )}
                 </div>
             </div>
