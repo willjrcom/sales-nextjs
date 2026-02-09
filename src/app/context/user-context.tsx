@@ -22,7 +22,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: session } = useSession();
 
     const { data: user, isLoading } = useQuery({
-        queryKey: ["me"],
+        queryKey: ['me-employee'],
         queryFn: () => GetMeEmployee(session!),
         enabled: !!session?.user?.access_token,
     });

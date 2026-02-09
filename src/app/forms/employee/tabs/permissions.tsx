@@ -5,14 +5,21 @@ import { notifyError } from "@/app/utils/notifications";
 import RequestError from "@/app/utils/error";
 import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import GetMeEmployee from "@/app/api/employee/me/employee";
 
-interface EmployeePermissionsTabProps {
-    item: Employee;
-}
-
-export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabProps) {
+export default function EmployeePermissionsTab() {
     const { data } = useSession();
-    const [permissions, setPermissions] = useState<Record<string, boolean>>(item.permissions);
+    const queryClient = useQueryClient();
+
+    const { data: user, isLoading } = useQuery({
+        queryKey: ['me-employee'],
+        queryFn: () => GetMeEmployee(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
+    const [permissions, setPermissions] = useState<Record<string, boolean>>(user?.permissions || {});
+
 
     // Lista de permissões disponíveis (deve ser igual ao backend)
     const availablePermissions = [
@@ -27,26 +34,25 @@ export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabP
         { key: 'order-table-control', label: 'Editar pedidos de Mesas' },
         { key: 'place', label: 'Gerenciar Mesas e Ambientes' },
         { key: 'print', label: 'Teste de Impressão' },
-        { key: 'product', label: 'Gerenciar Produtos' }, // isso é um ?tab=products dentro da url product
-        { key: 'category', label: 'Gerenciar Categorias' }, // isso é um ?tab=categories dentro da url product
-        { key: 'process-rule', label: 'Gerenciar Processos' }, // isso é um ?tab=process-rules dentro da url product
+        { key: 'product', label: 'Gerenciar Produtos, Categorias e Processos' },
         { key: 'manage-stock', label: 'Gerenciar Estoques' },
         { key: 'shift', label: 'Gerenciar Turnos' },
-        { key: 'manage-company', label: 'Gerenciar Empresa' }, // isso é um modal, nao uma rota
+        { key: 'manage-company', label: 'Gerenciar Empresa' },
     ];
 
     useEffect(() => {
         if (permissions && Object.keys(permissions).length > 0) {
             updatePermissions();
         }
-    }, [permissions, data, item]);
+    }, [permissions, data, user]);
 
     const updatePermissions = async () => {
         if (!data) return;
 
         try {
-            const employeeWithPermissions = { ...item, permissions } as Employee;
+            const employeeWithPermissions = { ...user, permissions } as Employee;
             await UpdateEmployee(employeeWithPermissions, data);
+            queryClient.invalidateQueries({ queryKey: ['me-employee'] });
         } catch (error: RequestError | any) {
             console.error('Erro ao atualizar permissões:', error);
 

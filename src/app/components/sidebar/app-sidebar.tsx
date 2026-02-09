@@ -62,6 +62,8 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
     })
 
     const handleCompanyModal = () => {
+        if (!hasPermission('manage-company')) return
+
         const onClose = () => {
             modalHandler.hideModal("edit-company-" + company?.id)
         }
@@ -83,7 +85,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
         { label: "Novo Pedido", icon: FaPlus, href: "/pages/new-order", permission: 'new-order' },
         { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process", permission: 'order-process' },
         // Produto é um caso especial, pode ter product, category ou process-rule
-        { label: "Cardápio", icon: MdFastfood, href: "/pages/product?tab=products", permission: ['product', 'category', 'process-rule'] },
+        { label: "Cardápio", icon: MdFastfood, href: "/pages/product?tab=products", permission: 'product' },
         { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/client", permission: 'client' },
         { label: "Funcionários", icon: FaUserTie, href: "/pages/employee", permission: 'employee' },
         { label: "Mesas", icon: FaTh, href: "/pages/place", permission: 'place' },
@@ -123,7 +125,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                             </div>
                             <div className="flex flex-col gap-0.5 leading-none">
                                 <span className="font-semibold">{company?.trade_name || "Empresa"}</span>
-                                <span className="text-xs text-muted-foreground">Editar</span>
+                                {hasPermission('manage-company') && <span className="text-xs text-muted-foreground">Editar</span>}
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
