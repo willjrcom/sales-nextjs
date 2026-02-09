@@ -25,8 +25,11 @@ import { MoreHorizontal } from "lucide-react"
 
 
 
+import { useUser } from '@/app/context/user-context';
+
 const Topbar = () => {
   const { data } = useSession();
+  const { hasPermission } = useUser();
   const queryClient = useQueryClient();
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
 
@@ -62,34 +65,42 @@ const Topbar = () => {
         <div className="flex items-center gap-2">
           <SidebarTrigger />
           <Menubar className="border-none shadow-none bg-transparent">
-            <div className="hidden lg:block">
-              <MenubarMenu>
-                <MenubarTrigger asChild className="cursor-pointer border border-border">
-                  <Link href="/pages/order-control">Pedidos</Link>
-                </MenubarTrigger>
-              </MenubarMenu>
-            </div>
-            <div className="hidden lg:block">
-              <MenubarMenu>
-                <MenubarTrigger asChild className="cursor-pointer border border-border">
-                  <Link href="/pages/order-table-control">Mesas</Link>
-                </MenubarTrigger>
-              </MenubarMenu>
-            </div>
-            <div className="hidden lg:block">
-              <MenubarMenu>
-                <MenubarTrigger asChild className="cursor-pointer border border-border">
-                  <Link href="/pages/order-delivery-control">Entregas</Link>
-                </MenubarTrigger>
-              </MenubarMenu>
-            </div>
-            <div className="hidden lg:block">
-              <MenubarMenu>
-                <MenubarTrigger asChild className="cursor-pointer border border-border">
-                  <Link href="/pages/order-pickup-control">Retiradas</Link>
-                </MenubarTrigger>
-              </MenubarMenu>
-            </div>
+            {hasPermission('order-control') && (
+              <div className="hidden lg:block">
+                <MenubarMenu>
+                  <MenubarTrigger asChild className="cursor-pointer border border-border">
+                    <Link href="/pages/order-control">Pedidos</Link>
+                  </MenubarTrigger>
+                </MenubarMenu>
+              </div>
+            )}
+            {hasPermission('order-table-control') && (
+              <div className="hidden lg:block">
+                <MenubarMenu>
+                  <MenubarTrigger asChild className="cursor-pointer border border-border">
+                    <Link href="/pages/order-table-control">Mesas</Link>
+                  </MenubarTrigger>
+                </MenubarMenu>
+              </div>
+            )}
+            {hasPermission('order-delivery-control') && (
+              <div className="hidden lg:block">
+                <MenubarMenu>
+                  <MenubarTrigger asChild className="cursor-pointer border border-border">
+                    <Link href="/pages/order-delivery-control">Entregas</Link>
+                  </MenubarTrigger>
+                </MenubarMenu>
+              </div>
+            )}
+            {hasPermission('order-pickup-control') && (
+              <div className="hidden lg:block">
+                <MenubarMenu>
+                  <MenubarTrigger asChild className="cursor-pointer border border-border">
+                    <Link href="/pages/order-pickup-control">Retiradas</Link>
+                  </MenubarTrigger>
+                </MenubarMenu>
+              </div>
+            )}
 
             {currentOrder?.status === 'Staging' && (
               <MenubarMenu>
@@ -108,21 +119,31 @@ const Topbar = () => {
                 <MoreHorizontal className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                  <Link href="/pages/order-control" className="w-full cursor-pointer">Pedidos</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/pages/order-table-control" className="w-full cursor-pointer">Mesas</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/pages/order-delivery-control" className="w-full cursor-pointer">Entregas</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/pages/order-pickup-control" className="w-full cursor-pointer">Retiradas</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/pages/shift" className="w-full cursor-pointer">Turno</Link>
-                </DropdownMenuItem>
+                {hasPermission('order-control') && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/pages/order-control" className="w-full cursor-pointer">Pedidos</Link>
+                  </DropdownMenuItem>
+                )}
+                {hasPermission('order-table-control') && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/pages/order-table-control" className="w-full cursor-pointer">Mesas</Link>
+                  </DropdownMenuItem>
+                )}
+                {hasPermission('order-delivery-control') && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/pages/order-delivery-control" className="w-full cursor-pointer">Entregas</Link>
+                  </DropdownMenuItem>
+                )}
+                {hasPermission('order-pickup-control') && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/pages/order-pickup-control" className="w-full cursor-pointer">Retiradas</Link>
+                  </DropdownMenuItem>
+                )}
+                {hasPermission('shift') && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/pages/shift" className="w-full cursor-pointer">Turno</Link>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </Menubar>
@@ -140,13 +161,15 @@ const Topbar = () => {
                 </MenubarMenu>
               )}
 
-              <div className="hidden lg:block">
-                <MenubarMenu>
-                  <MenubarTrigger asChild className="bg-green-100 text-green-800 hover:bg-green-200 focus:bg-green-200 cursor-pointer">
-                    <Link href="/pages/shift">Turno</Link>
-                  </MenubarTrigger>
-                </MenubarMenu>
-              </div>
+              {hasPermission('shift') && (
+                <div className="hidden lg:block">
+                  <MenubarMenu>
+                    <MenubarTrigger asChild className="bg-green-100 text-green-800 hover:bg-green-200 focus:bg-green-200 cursor-pointer">
+                      <Link href="/pages/shift">Turno</Link>
+                    </MenubarTrigger>
+                  </MenubarMenu>
+                </div>
+              )}
             </Menubar>
 
             <EmployeeUserProfile />

@@ -25,6 +25,7 @@ import { signOut, useSession } from "next-auth/react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import GetCompany from "@/app/api/company/company"
 import { useModal } from "@/app/context/modal/context"
+import { useUser } from "@/app/context/user-context"
 import CompanyForm from "@/app/forms/company/form"
 
 import {
@@ -52,6 +53,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
     const queryClient = useQueryClient()
     const modalHandler = useModal()
     const { data: session } = useSession()
+    const { hasPermission, isLoading } = useUser()
 
     const { data: company } = useQuery({
         queryKey: ["company"],
@@ -78,16 +80,23 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
     }
 
     const userItems = [
-        { label: "Novo Pedido", icon: FaPlus, href: "/pages/new-order" },
-        { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process" },
-        { label: "Cardápio", icon: MdFastfood, href: "/pages/product" },
-        { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/client" },
-        { label: "Funcionários", icon: FaUserTie, href: "/pages/employee" },
-        { label: "Mesas", icon: FaTh, href: "/pages/place" },
-        { label: "Estoque", icon: FaBox, href: "/pages/stock" },
-        { label: "Impressão", icon: FaPrint, href: "/pages/print" },
-        { label: "Planos", icon: MdOutlineAttachMoney, href: "/pages/billing" },
-    ]
+        { label: "Novo Pedido", icon: FaPlus, href: "/pages/new-order", permission: 'new-order' },
+        { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process", permission: 'order-process' },
+        // Produto é um caso especial, pode ter product, category ou process-rule
+        { label: "Cardápio", icon: MdFastfood, href: "/pages/product?tab=products", permission: ['product', 'category', 'process-rule'] },
+        { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/client", permission: 'client' },
+        { label: "Funcionários", icon: FaUserTie, href: "/pages/employee", permission: 'employee' },
+        { label: "Mesas", icon: FaTh, href: "/pages/place", permission: 'place' },
+        { label: "Estoque", icon: FaBox, href: "/pages/stock", permission: 'manage-stock' },
+        { label: "Impressão", icon: FaPrint, href: "/pages/print", permission: 'print' },
+        { label: "Planos", icon: MdOutlineAttachMoney, href: "/pages/billing", permission: 'billing' },
+    ].filter(item => {
+        if (!item.permission) return true;
+        if (Array.isArray(item.permission)) {
+            return item.permission.some(p => hasPermission(p));
+        }
+        return hasPermission(item.permission);
+    });
 
     const adminItems = [
         { label: "Processos", icon: TiFlowMerge, href: "/pages/admin-order-process" },
@@ -100,7 +109,8 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
         { label: "Relatórios", icon: FaChartBar, href: "/pages/admin-report" },
     ]
 
-    const items = adminMode ? adminItems : userItems
+    // Se estiver carregando, mostra vazio ou esqueleto? Por enquanto vazio para nao piscar itens proibidos
+    const items = adminMode ? adminItems : isLoading ? [] : userItems
 
     return (
         <Sidebar collapsible="icon" {...props} className={adminMode ? "border-blue-800" : ""}>
