@@ -8,18 +8,27 @@ import UpdateEmployee from "@/app/api/employee/update/employee";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import GetMeEmployee from "@/app/api/employee/me/employee";
 
-export default function EmployeePermissionsTab() {
+interface EmployeePermissionsTabProps {
+    item: Employee;
+}
+
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabProps) {
     const { data } = useSession();
     const queryClient = useQueryClient();
+    const [permissions, setPermissions] = useState<Record<string, boolean>>(item.permissions);
 
-    const { data: user, isLoading } = useQuery({
+    const { data: employee } = useQuery({
         queryKey: ['me-employee'],
         queryFn: () => GetMeEmployee(data!),
         enabled: !!data?.user?.access_token,
     });
-
-    const [permissions, setPermissions] = useState<Record<string, boolean>>(user?.permissions || {});
-
 
     // Lista de permissões disponíveis (deve ser igual ao backend)
     const availablePermissions = [
@@ -38,21 +47,26 @@ export default function EmployeePermissionsTab() {
         { key: 'manage-stock', label: 'Gerenciar Estoques' },
         { key: 'shift', label: 'Gerenciar Turnos' },
         { key: 'manage-company', label: 'Gerenciar Empresa' },
+        { key: 'statistics', label: 'Estatísticas' },
     ];
 
     useEffect(() => {
         if (permissions && Object.keys(permissions).length > 0) {
             updatePermissions();
         }
-    }, [permissions, data, user]);
+    }, [permissions, data, item]);
 
     const updatePermissions = async () => {
         if (!data) return;
 
         try {
-            const employeeWithPermissions = { ...user, permissions } as Employee;
+            const employeeWithPermissions = { ...item, permissions } as Employee;
             await UpdateEmployee(employeeWithPermissions, data);
-            queryClient.invalidateQueries({ queryKey: ['me-employee'] });
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+
+            if (employee?.user_id === item.user_id) {
+                queryClient.invalidateQueries({ queryKey: ['me-employee'] });
+            }
         } catch (error: RequestError | any) {
             console.error('Erro ao atualizar permissões:', error);
 
@@ -75,20 +89,47 @@ export default function EmployeePermissionsTab() {
         }
     }
 
+    // Permissões que o usuário não pode remover de si mesmo para evitar lock-out
+    const protectedPermissions = ['employee'];
+
     return (
         <div className="flex flex-col gap-4">
-            {availablePermissions.map((perm) => (
-                <CheckboxField
-                    key={perm.key}
-                    friendlyName={perm.label}
-                    name={perm.key}
-                    value={permissions[perm.key] || false}
-                    setValue={(val) => {
-                        const boolVal = typeof val === 'function' ? val(permissions[perm.key] || false) : val;
-                        setPermissions(prev => ({ ...prev, [perm.key]: boolVal }));
-                    }}
-                />
-            ))}
+            <TooltipProvider>
+                {availablePermissions.map((perm) => {
+                    const isDisabled = protectedPermissions.includes(perm.key) && employee?.user_id === item.user_id;
+
+                    const checkbox = (
+                        <CheckboxField
+                            key={perm.key}
+                            friendlyName={perm.label}
+                            name={perm.key}
+                            value={permissions[perm.key] || false}
+                            disabled={isDisabled}
+                            setValue={(val) => {
+                                const boolVal = typeof val === 'function' ? val(permissions[perm.key] || false) : val;
+                                setPermissions(prev => ({ ...prev, [perm.key]: boolVal }));
+                            }}
+                        />
+                    );
+
+                    if (isDisabled) {
+                        return (
+                            <Tooltip key={perm.key}>
+                                <TooltipTrigger asChild>
+                                    <div>
+                                        {checkbox}
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Você não pode remover seu próprio acesso.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        );
+                    }
+
+                    return checkbox;
+                })}
+            </TooltipProvider>
         </div>
     );
 }

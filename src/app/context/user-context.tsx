@@ -21,21 +21,21 @@ const UserContext = createContext<UserContextType>({
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: session } = useSession();
 
-    const { data: user, isLoading } = useQuery({
+    const { data: employee, isLoading } = useQuery({
         queryKey: ['me-employee'],
         queryFn: () => GetMeEmployee(session!),
         enabled: !!session?.user?.access_token,
     });
 
     const hasPermission = (key: string): boolean => {
-        if (!user) return false;
+        if (!employee) return false;
         // Se for admin ou dono, talvez tenha todas? Por enquanto segue a logica do objeto permissions
         // Se a permissão não existe no objeto, assume false
-        return !!user.permissions[key];
+        return !!employee.permissions[key];
     };
 
     return (
-        <UserContext.Provider value={{ user, isLoading, hasPermission }}>
+        <UserContext.Provider value={{ user: employee, isLoading, hasPermission }}>
             {children}
         </UserContext.Provider>
     );

@@ -51,6 +51,8 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         requiredPermission = 'order-table-control';
     } else if (pathname?.startsWith('/pages/shift')) {
         requiredPermission = 'shift';
+    } else if (pathname?.startsWith('/pages/admin-')) {
+        requiredPermission = 'statistics';
     }
 
     if (requiredPermission) {

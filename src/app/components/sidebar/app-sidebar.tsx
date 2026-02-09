@@ -101,21 +101,27 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
     });
 
     const adminItems = [
-        { label: "Processos", icon: TiFlowMerge, href: "/pages/admin-order-process" },
-        { label: "Cardápio", icon: MdFastfood, href: "/pages/admin-product" },
-        { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/admin-client" },
-        { label: "Funcionários", icon: FaUserTie, href: "/pages/admin-employee" },
-        { label: "Mesas", icon: FaTh, href: "/pages/admin-place" },
-        { label: "Pedidos", icon: FaPlus, href: "/pages/admin-order" },
-        { label: "Turnos", icon: FaClock, href: "/pages/admin-shift" },
-        { label: "Relatórios", icon: FaChartBar, href: "/pages/admin-report" },
-    ]
+        { label: "Processos", icon: TiFlowMerge, href: "/pages/admin-order-process", permission: 'statistics' },
+        { label: "Cardápio", icon: MdFastfood, href: "/pages/admin-product", permission: 'statistics' },
+        { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/admin-client", permission: 'statistics' },
+        { label: "Funcionários", icon: FaUserTie, href: "/pages/admin-employee", permission: 'statistics' },
+        { label: "Mesas", icon: FaTh, href: "/pages/admin-place", permission: 'statistics' },
+        { label: "Pedidos", icon: FaPlus, href: "/pages/admin-order", permission: 'statistics' },
+        { label: "Turnos", icon: FaClock, href: "/pages/admin-shift", permission: 'statistics' },
+        { label: "Relatórios", icon: FaChartBar, href: "/pages/admin-report", permission: 'statistics' },
+    ].filter(item => {
+        if (!item.permission) return true;
+        if (Array.isArray(item.permission)) {
+            return item.permission.some(p => hasPermission(p));
+        }
+        return hasPermission(item.permission);
+    });
 
     // Se estiver carregando, mostra vazio ou esqueleto? Por enquanto vazio para nao piscar itens proibidos
     const items = adminMode ? adminItems : isLoading ? [] : userItems
 
     return (
-        <Sidebar collapsible="icon" {...props} className={adminMode ? "border-blue-800" : ""}>
+        <Sidebar collapsible="icon" {...props} className={adminMode ? "border-r-2 border-rose-500" : ""}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -126,6 +132,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                             <div className="flex flex-col gap-0.5 leading-none">
                                 <span className="font-semibold">{company?.trade_name || "Empresa"}</span>
                                 {hasPermission('manage-company') && <span className="text-xs text-muted-foreground">Editar</span>}
+                                {adminMode && <span className="text-[10px] font-bold text-rose-600 bg-rose-100 px-1 rounded w-fit">ADMIN</span>}
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -167,12 +174,18 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                         </SidebarMenuButton>
                     </SidebarMenuItem>
 
-                    <SidebarMenuItem>
-                        <SidebarMenuButton onClick={toggleAdminMode} tooltip={adminMode ? "Modo Usuário" : "Modo Admin"}>
-                            <FaTools />
-                            <span>{adminMode ? "Modo Usuário" : "Modo Admin"}</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    {hasPermission('statistics') && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                onClick={toggleAdminMode}
+                                tooltip={adminMode ? "Sair do Modo Admin" : "Entrar no Modo Admin"}
+                                className={adminMode ? "bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-900" : ""}
+                            >
+                                <FaTools />
+                                <span>{adminMode ? "Sair do Modo Admin" : "Entrar no Modo Admin"}</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
 
                     <SidebarMenuItem>
                         <SidebarMenuButton onClick={signOutToLogin} tooltip="Sair">

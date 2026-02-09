@@ -120,8 +120,7 @@ const ChangePasswordModal = () => {
     );
 };
 
-const EmployeeUserProfile = () => {
-    const getInitial = (name?: string) => name?.charAt(0).toUpperCase(); // Pega a primeira letra do nome
+const EmployeeUserProfile = () => {// Pega a primeira letra do nome
     const modalHandler = useModal();
     const { data } = useSession();
 
@@ -133,6 +132,8 @@ const EmployeeUserProfile = () => {
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
+
+    const getInitial = () => meUser?.name?.charAt(0).toUpperCase();
 
     const OpenModal = () => {
         const onClose = () => {
@@ -158,7 +159,7 @@ const EmployeeUserProfile = () => {
                 </div>
                 <p className="mt-2 text-lg font-bold">{meUser?.name}</p>
                 <hr className="my-4" />
-                <UserForm />
+                <UserForm item={meUser} />
 
                 <hr className="my-4" />
                 <button
