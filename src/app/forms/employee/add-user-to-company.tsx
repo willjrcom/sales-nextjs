@@ -9,11 +9,11 @@ import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { FaCheck, FaSearch, FaUserPlus, FaExclamationCircle } from "react-icons/fa";
-import EmployeeForm from "@/app/forms/employee/form";
+import CreateAndAddUserToCompanyForm from "@/app/forms/employee/create-and-add-user-to-company";
 import AddUserToCompany from "@/app/api/company/add/company";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const AddEmployeeAlreadyCreated = () => {
+const AddUserToCompanyForm = () => {
     const [userFound, setUserFound] = useState<User | null>();
     const [cpfToSearch, setCpfToSearch] = useState<string>('');
     const [notFound, setNotFound] = useState<boolean>(false);
@@ -99,7 +99,7 @@ const AddEmployeeAlreadyCreated = () => {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg p-6 border border-orange-100 shadow-sm">
-                            <EmployeeForm item={new Employee({ cpf: cpfToSearch })} />
+                            <CreateAndAddUserToCompanyForm cpf={cpfToSearch} />
                         </div>
                     </div>
                 )}
@@ -134,7 +134,7 @@ const CardUser = ({ user }: CardUserProps) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employees'] });
             notifySuccess('Funcionário criado com sucesso');
-            modalHandler.hideModal('new-already-created-employee');
+            modalHandler.hideModal('add-user-to-company');
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar funcionário');
@@ -193,4 +193,4 @@ const CardUser = ({ user }: CardUserProps) => {
     );
 }
 
-export default AddEmployeeAlreadyCreated;
+export default AddUserToCompanyForm;

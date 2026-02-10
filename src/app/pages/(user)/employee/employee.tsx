@@ -9,7 +9,7 @@ import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { TextField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import AddEmployeeAlreadyCreated from "@/app/forms/employee/add-already-created";
+import AddUserToCompanyForm from "@/app/forms/employee/add-user-to-company";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetEmployees from "@/app/api/employee/employee";
 import { notifyError } from "@/app/utils/notifications";
@@ -48,9 +48,9 @@ const PageEmployee = () => {
                 <h1>Filtro</h1>
             </ButtonIconTextFloat> */}
 
-            <ButtonIconTextFloat modalName="new-already-created-employee" position="bottom-right" size="xl"
+            <ButtonIconTextFloat modalName="add-user-to-company" position="bottom-right" size="xl"
                 title="Novo funcionário">
-                <AddEmployeeAlreadyCreated />
+                <AddUserToCompanyForm />
             </ButtonIconTextFloat>
 
             <CrudLayout

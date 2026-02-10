@@ -28,7 +28,7 @@ export default withAuth(
 export const config = {
     matcher: [
         // Ignora arquivos estáticos (qualquer coisa com .ext)
-        '/((?!_next|api/auth|login|login/forget-password|login/sign-up|access/company-selection|favicon.ico|.*\\.[a-zA-Z0-9]+).*)',
+        '/((?!_next|api/auth|api/user/new|login|login/forget-password|login/sign-up|access/company-selection|favicon.ico|.*\\.[a-zA-Z0-9]+).*)',
         '/',
     ],
 };

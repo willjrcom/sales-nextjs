@@ -133,7 +133,7 @@ const EmployeeUserProfile = () => {// Pega a primeira letra do nome
         refetchInterval: 30000,
     });
 
-    const getInitial = () => meUser?.name?.charAt(0).toUpperCase();
+    const getInitial = (name?: string) => name?.charAt(0).toUpperCase();
 
     const OpenModal = () => {
         const onClose = () => {

@@ -6,7 +6,7 @@ import { SchemaAddressUser } from "../address/address";
 
 export default class User extends Person {
     id: string = '';
-    companies: Company [] = [];
+    companies: Company[] = [];
 
     constructor(data: Partial<User> = {}) {
         super();
@@ -37,7 +37,28 @@ export const ValidateUserForm = (user: User) => {
     if (!validatedFields.success) {
         // Usa o método flatten para simplificar os erros
         return validatedFields.error.flatten().fieldErrors;
-    } 
-    
+    }
+
+    return {}
+};
+
+const createSchemaUser = z.object({
+    name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
+    email: z.string().email('Email inválido'),
+    cpf: z.string().min(11, 'CPF precisa ter pelo menos 11 caracteres').max(14, 'CPF precisa ter no máximo 14 caracteres'),
+});
+
+export const ValidateUserFormCreate = (user: User) => {
+    const validatedFields = createSchemaUser.safeParse({
+        name: user.name,
+        email: user.email,
+        cpf: user.cpf,
+    });
+
+    if (!validatedFields.success) {
+        // Usa o método flatten para simplificar os erros
+        return validatedFields.error.flatten().fieldErrors;
+    }
+
     return {}
 };
