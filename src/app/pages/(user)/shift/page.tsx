@@ -11,6 +11,7 @@ import ShiftManager from "./shift-manager";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import ListShift from "./list-shift";
 import { FaList } from "react-icons/fa";
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 const PageShift = () => {
     const [shift, setShift] = useState<Shift | null>();
@@ -36,7 +37,7 @@ const PageShift = () => {
 
     return (
         <>
-            <PageTitle title="Turno" tooltip="Painel do turno atual, exibindo vendas, cancelamentos e status." />
+            <ThreeColumnHeader center={<PageTitle title="Turno" tooltip="Painel do turno atual, exibindo vendas, cancelamentos e status." />} />
 
             <div className="p-8 bg-gray-100 overflow-y-auto">
                 <ShiftManager shift={shift} fetchShift={fetchCurrentShift} />

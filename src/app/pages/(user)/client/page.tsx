@@ -7,7 +7,6 @@ import CrudTable from "@/app/components/crud/table";
 import ClientColumns from "@/app/entities/client/table-columns";
 import { TextField, CheckboxField } from "@/app/components/modal/field";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import { FaFilter } from "react-icons/fa";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useSession } from "next-auth/react";
 import { useMemo, useEffect, useState } from 'react';

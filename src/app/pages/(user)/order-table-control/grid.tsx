@@ -16,6 +16,7 @@ import { notifyError } from "@/app/utils/notifications";
 import { useQuery } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
 import GetOrderTables from '@/app/api/order-table/order-table';
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 // Sidebar listing active tables and showing elapsed usage time
 const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
@@ -131,11 +132,10 @@ const DragAndDropGrid = () => {
     return (
         <div className="flex p-2">
             <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                    <PageTitle title="Controle de Mesas" tooltip="Gerencie mesas e pedidos em cada local." />
-                    <SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
-                        optional />
-                </div>
+                <ThreeColumnHeader
+                    center={<PageTitle title="Controle de Mesas" tooltip="Gerencie mesas e pedidos em cada local." />}
+                    right={<SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
+                        optional />} />
                 <div
                     style={{
                         display: "grid",

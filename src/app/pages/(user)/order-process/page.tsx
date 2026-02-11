@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from 'next-auth/react';
+import ThreeColumnHeader from "@/components/header/three-column-header";
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
 import React, { useMemo, useState } from 'react';
 import PageTitle from '@/app/components/ui/page-title';
@@ -26,15 +27,18 @@ const OrderProcess = () => {
 
     return (
         <div className='w-full h-full px-3 py-2'>
-            <div className="flex items-center justify-between mb-2">
-                <PageTitle title="Processos" tooltip="Exibe as regras de processamento de pedidos, agrupadas por categoria, com indicadores de atraso e fila." />
-                <Refresh
-                    onRefresh={refetch}
-                    isPending={isPending}
-                    lastUpdate={lastUpdate}
-                    optionalText='Categoria'
-                />
-            </div>
+            <ThreeColumnHeader
+                center={<PageTitle title="Processos" tooltip="Exibe as regras de processos para fazer os pedidos, agrupadas por categoria, com indicadores de atraso e fila." />}
+                right={
+                    <Refresh
+                        onRefresh={refetch}
+                        isPending={isPending}
+                        lastUpdate={lastUpdate}
+                        optionalText='Categoria'
+                    />
+                }
+                className="mb-2"
+            />
             {categories?.map((category) => <CardCategory key={category.id} category={category} />)}
         </div>
     );

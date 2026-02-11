@@ -12,6 +12,7 @@ import GetOrders from "@/app/api/order/order";
 import { notifyError } from "@/app/utils/notifications";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { FaList } from "react-icons/fa";
+import ThreeColumnHeader from '@/components/header/three-column-header';
 
 const PageOrder = () => {
     const { data } = useSession();
@@ -61,10 +62,10 @@ const PageOrder = () => {
                         {stagingOrders.length} pedidos em aberto
                     </button>
 
-                    <div className="flex items-center gap-2">
+                    <ThreeColumnHeader center={<div className="flex items-center gap-2">
                         <PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />
                         <span className="text-xs text-gray-500">Arraste para alterar status</span>
-                    </div>
+                    </div>} />
 
                     <Refresh
                         onRefresh={refetch}

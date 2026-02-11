@@ -11,6 +11,7 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { GetOrdersWithPickupReady, GetOrdersWithPickupDelivered } from "@/app/api/order/all/pickup/order";
 import { notifyError } from "@/app/utils/notifications";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 const PickupOrderPage = () => {
     const { data } = useSession();
@@ -61,7 +62,7 @@ const PickupOrderPage = () => {
 
     return (
         <div className="w-full px-3 py-2">
-            <PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />
+            <ThreeColumnHeader center={<PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />} />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="ready">Prontas</TabsTrigger>

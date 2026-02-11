@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import ReportChart from '@/app/components/report/report-chart';
 import PageTitle from '@/app/components/ui/page-title';
 import { reportConfigs } from '@/app/components/report/report-configs';
+import ThreeColumnHeader from '@/components/header/three-column-header';
 
 export default function ReportPage() {
   const params = useParams();
@@ -26,14 +27,15 @@ export default function ReportPage() {
       : undefined;
 
   return (
-    <div className="p-4 ml-52">
+    <div className="p-4">
       <button
         onClick={() => router.back()}
         className="mb-4 text-blue-600 hover:underline"
       >
         &larr; Voltar
       </button>
-      <PageTitle title={config.name} tooltip={`Relatório: ${config.name}`} />
+
+      <ThreeColumnHeader center={<PageTitle title={config.name} tooltip={`Relatório: ${config.name}`} />} />
       {config.inputType !== 'none' && (
         <div className="mb-4 flex gap-4">
           <input

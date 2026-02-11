@@ -12,6 +12,7 @@ import PageTitle from "@/app/components/ui/page-title";
 import { notifyError } from "@/app/utils/notifications";
 import { useQuery } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 const PageNewOrderTable = () => {
     const [placeID, setPlaceID] = useState<string>('');
@@ -51,11 +52,11 @@ const PageNewOrderTable = () => {
 
     return (
         <div className="flex items-center justify-center min-h-full p-4">
+            <ThreeColumnHeader center={<PageTitle
+                title="Novo Pedido Mesa"
+                tooltip="Selecione o local e a mesa para iniciar o pedido."
+            />} />
             <div className="w-full max-w-md bg-white p-6 rounded-md shadow space-y-6">
-                <PageTitle
-                    title="Novo Pedido Mesa"
-                    tooltip="Selecione o local e a mesa para iniciar o pedido."
-                />
                 <SelectField
                     friendlyName="Local"
                     name="local"

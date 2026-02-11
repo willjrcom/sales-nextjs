@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
@@ -29,11 +30,9 @@ const PageCategoryEdit = () => {
         enabled: !!id && !!session,
     });
 
-    const isDefaultCategory = useMemo(() => !category?.is_additional && !category?.is_complement, [category?.is_additional, category?.is_complement]);
-
     if (!id || !category) {
         return (
-            <PageTitle title="Categoria não encontrada" tooltip="Verifique o ID da categoria e tente novamente." />
+            <ThreeColumnHeader center={<PageTitle title="Categoria não encontrada" tooltip="Verifique o ID da categoria e tente novamente." />} />
         )
     }
 

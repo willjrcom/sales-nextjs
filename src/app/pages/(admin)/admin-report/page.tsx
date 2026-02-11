@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import PageTitle from '@/app/components/ui/page-title';
 import { reportConfigs } from '@/app/components/report/report-configs';
+import ThreeColumnHeader from '@/components/header/three-column-header';
 
 export default function ReportsPage() {
   return (
-    <div className="p-4 ml-52">
-      <PageTitle title="Relatórios" tooltip="Selecione um relatório para visualizar." />
+    <div className="p-4">
+      <ThreeColumnHeader center={<PageTitle title="Relatórios" tooltip="Selecione um relatório para visualizar." />} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {reportConfigs.map((c) => (
           <Link

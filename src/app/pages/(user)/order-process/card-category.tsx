@@ -1,5 +1,6 @@
 import Carousel from "@/components/carousel/carousel";
-import Category, { CategoryMap } from "@/app/entities/category/category";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CategoryMap } from "@/app/entities/category/category";
 import CardProcessRule from "./card-process-rule";
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -31,20 +32,22 @@ const CardCategory = ({ category }: CardCategoryProps) => {
     };
 
     return (
-        <>
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold mb-2">{category.name}</h1>
+        <Card className="mb-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <CardTitle className="text-2xl font-bold">{category.name}</CardTitle>
                 <Refresh
                     onRefresh={refetch}
                     isPending={isPending}
                     lastUpdate={lastUpdate}
                     optionalText="Processo"
                 />
-            </div>
-            <Carousel items={processRules}>
-                {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
-            </Carousel>
-        </>
+            </CardHeader>
+            <CardContent>
+                <Carousel items={processRules}>
+                    {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
+                </Carousel>
+            </CardContent>
+        </Card>
     )
 
 }

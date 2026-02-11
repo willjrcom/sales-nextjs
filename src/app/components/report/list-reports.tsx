@@ -5,6 +5,7 @@ import PageTitle from '@/app/components/ui/page-title';
 import { reportConfigs } from '@/app/components/report/report-configs';
 import ReportCard from './report-card';
 import { FilterDateProps } from './filter';
+import ThreeColumnHeader from '@/components/header/three-column-header';
 
 interface ListReportsProps {
     name: string;
@@ -19,7 +20,8 @@ const ListReports = ({ name, reportIds }: ListReportsProps) => {
 
     return (
         <div className="p-4 ml-52">
-            <PageTitle title={name} tooltip={"Relatórios de " + name} />
+
+            <ThreeColumnHeader center={<PageTitle title={name} tooltip={"Relatórios de " + name} />} />
             {reportIds.length == 0 && <p>Nenhum relatório disponível</p>}
 
             {/* Grid responsivo: 1 coluna em mobile, 2 colunas em desktop */}

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { notifyError } from "@/app/utils/notifications";
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 const PageNewOrderPickup = () => {
     const [orderName, setOrderName] = useState('');
@@ -27,10 +28,10 @@ const PageNewOrderPickup = () => {
 
     return (
         <div className="flex flex-col items-center justify-center h-full space-y-6">
-            <PageTitle
+            <ThreeColumnHeader center={<PageTitle
                 title="Balcão / Retirada"
                 tooltip="Digite o nome a ser exibido no pedido de retirada."
-            />
+            />} />
             <div className="w-full max-w-md">
                 <TextField
                     name="orderName"

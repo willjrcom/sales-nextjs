@@ -1,5 +1,6 @@
 "use client";
 
+import ThreeColumnHeader from "@/components/header/three-column-header";
 import React from "react";
 
 export interface CrudLayoutProps {
@@ -17,20 +18,7 @@ export default function CrudLayout({
 }: CrudLayoutProps) {
     return (
         <div className="container mx-auto p-6">
-            {/* Header */}
-            <div className="grid grid-cols-3 items-center mb-6">
-                <div className="flex justify-start">
-                    {searchButtonChildren}
-                </div>
-
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold">{title}</h1>
-                </div>
-
-                <div className="flex justify-end">
-                    {refreshButton}
-                </div>
-            </div>
+            <ThreeColumnHeader left={searchButtonChildren} center={title} right={refreshButton} />
 
             {/* Divider */}
             <div className="border-b my-4" />

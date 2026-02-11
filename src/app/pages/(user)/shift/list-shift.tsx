@@ -35,7 +35,6 @@ const ListShift = () => {
     return (
         <>
             <CrudLayout title={<PageTitle title="Turnos" tooltip="listagem de turnos anteriores." />}
-                searchButtonChildren={<></>}
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
