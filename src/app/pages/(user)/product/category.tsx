@@ -15,12 +15,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetCategories from "@/app/api/category/category";
 import { notifyError } from "@/app/utils/notifications";
+import { useUser } from "@/app/context/user-context";
+import AccessDenied from "@/app/components/access-denied";
 
 const PageCategories = () => {
     const { data } = useSession();
     const [showInactive, setShowInactive] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+    const { hasPermission, user } = useUser();
 
     const { isPending, error, data: categoriesResponse, refetch } = useQuery({
         queryKey: ['categories', pagination.pageIndex, pagination.pageSize, !showInactive],
@@ -35,6 +38,14 @@ const PageCategories = () => {
     useEffect(() => {
         if (error) notifyError('Erro ao carregar categorias');
     }, [error]);
+
+    if (!user) {
+        return <AccessDenied message="Usuário não encontrado ou sessão expirada." />;
+    }
+
+    if (!hasPermission('category')) {
+        return <AccessDenied />
+    }
 
     const categories = useMemo(() => categoriesResponse?.items || [], [categoriesResponse?.items]);
     const categoriesSorted = useMemo(() => categories

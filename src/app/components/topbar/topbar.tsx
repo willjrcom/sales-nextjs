@@ -83,7 +83,7 @@ const Topbar = () => {
                 </MenubarMenu>
               </div>
             )}
-            {hasPermission('order-delivery-control') && (
+            {(hasPermission('order-delivery-control-to-ship') || hasPermission('order-delivery-control-to-finish') || hasPermission('order-delivery-control-finished')) && (
               <div className="hidden lg:block">
                 <MenubarMenu>
                   <MenubarTrigger asChild className="cursor-pointer border border-border">
@@ -129,7 +129,7 @@ const Topbar = () => {
                     <Link href="/pages/order-table-control" className="w-full cursor-pointer">Mesas</Link>
                   </DropdownMenuItem>
                 )}
-                {hasPermission('order-delivery-control') && (
+                {(hasPermission('order-delivery-control-to-ship') || hasPermission('order-delivery-control-to-finish') || hasPermission('order-delivery-control-finished')) && (
                   <DropdownMenuItem asChild>
                     <Link href="/pages/order-delivery-control" className="w-full cursor-pointer">Entregas</Link>
                   </DropdownMenuItem>

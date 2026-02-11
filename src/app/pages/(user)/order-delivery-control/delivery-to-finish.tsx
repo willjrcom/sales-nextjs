@@ -23,6 +23,8 @@ import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-quer
 import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { useUser } from "@/app/context/user-context";
+import AccessDenied from "@/app/components/access-denied";
 
 const DeliveryOrderToFinish = () => {
     // const [centerPoint, setCenterPoint] = useState<Point | null>(null);
@@ -33,6 +35,7 @@ const DeliveryOrderToFinish = () => {
     const [selectedDriverId, setSelectedDriverId] = useState<string>();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { data } = useSession();
+    const { hasPermission, user } = useUser();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
         queryKey: ['delivery-orders'],
@@ -51,6 +54,14 @@ const DeliveryOrderToFinish = () => {
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
+
+    if (!user) {
+        return <AccessDenied message="Usuário não encontrado ou sessão expirada." />;
+    }
+
+    if (!hasPermission('order-delivery-control-to-finish')) {
+        return <AccessDenied />
+    }
 
     const allOrders = useMemo(() => deliveryOrdersResponse?.items || [], [deliveryOrdersResponse?.items]);
 

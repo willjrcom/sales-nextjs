@@ -13,6 +13,8 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetProcessRules from "@/app/api/process-rule/process-rule";
 import { GetCategoriesMap } from "@/app/api/category/category";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { useUser } from "@/app/context/user-context";
+import AccessDenied from "@/app/components/access-denied";
 
 export default function PageProcessRules() {
     const [categoryID, setCategoryID] = useState("");
@@ -20,6 +22,7 @@ export default function PageProcessRules() {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const { data } = useSession();
+    const { hasPermission, user } = useUser();
 
     const { data: processRulesResponse, refetch, isPending } = useQuery({
         queryKey: ['process-rules', pagination.pageIndex, pagination.pageSize, !showInactive],
@@ -34,6 +37,14 @@ export default function PageProcessRules() {
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });
+
+    if (!user) {
+        return <AccessDenied message="Usuário não encontrado ou sessão expirada." />;
+    }
+
+    if (!hasPermission('process-rule')) {
+        return <AccessDenied />
+    }
 
     const handleRefresh = async () => {
         await refetch();

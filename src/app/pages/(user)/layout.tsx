@@ -1,11 +1,11 @@
 "use client";
-import React from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useUser } from "@/app/context/user-context";
 import Loading from "../loading";
 import AccessDenied from "@/app/components/access-denied";
+import { ReactNode } from "react";
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+export default function UserLayout({ children }: { children: ReactNode }) {
     const { hasPermission, isLoading, user } = useUser();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -21,10 +21,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     let requiredPermission: string | string[] | null = null;
 
     if (pathname?.startsWith('/pages/product')) {
-        const tab = searchParams.get('tab');
-        if (tab === 'categories') requiredPermission = 'category';
-        else if (tab === 'process-rules') requiredPermission = 'process-rule';
-        else requiredPermission = 'product';
+        requiredPermission = ['product', 'category', 'process-rule'];
     } else if (pathname?.startsWith('/pages/client')) {
         requiredPermission = 'client';
     } else if (pathname?.startsWith('/pages/employee')) {
@@ -44,7 +41,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     } else if (pathname?.startsWith('/pages/order-control')) {
         requiredPermission = 'order-control';
     } else if (pathname?.startsWith('/pages/order-delivery-control')) {
-        requiredPermission = 'order-delivery-control';
+        requiredPermission = ['order-delivery-control-to-ship', 'order-delivery-control-to-finish', 'order-delivery-control-finished'];
     } else if (pathname?.startsWith('/pages/order-pickup-control')) {
         requiredPermission = 'order-pickup-control';
     } else if (pathname?.startsWith('/pages/order-table-control')) {

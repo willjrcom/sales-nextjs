@@ -85,7 +85,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
         { label: "Novo Pedido", icon: FaPlus, href: "/pages/new-order", permission: 'new-order' },
         { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process", permission: 'order-process' },
         // Produto é um caso especial, pode ter product, category ou process-rule
-        { label: "Cardápio", icon: MdFastfood, href: "/pages/product?tab=products", permission: 'product' },
+        { label: "Cardápio", icon: MdFastfood, href: "/pages/product?tab=products", permission: ['product', 'category', 'process-rule'] },
         { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/client", permission: 'client' },
         { label: "Funcionários", icon: FaUserTie, href: "/pages/employee", permission: 'employee' },
         { label: "Mesas", icon: FaTh, href: "/pages/place", permission: 'place' },
