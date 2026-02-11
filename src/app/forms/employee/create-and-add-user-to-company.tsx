@@ -44,7 +44,7 @@ const CreateAndAddUserToCompanyForm = ({ cpf }: CreateAndAddUserToCompanyFormPro
             await NewEmployee(userID, data!)
         },
         onSuccess: (_, newUser) => {
-            queryClient.invalidateQueries({ queryKey: ['users'] });
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
             notifySuccess(`Funcionário ${newUser.name} criado com sucesso`);
             modalHandler.hideModal(modalName);
         },

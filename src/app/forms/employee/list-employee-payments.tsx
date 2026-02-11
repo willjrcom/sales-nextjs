@@ -1,4 +1,3 @@
-import React from "react";
 import { Decimal } from "decimal.js";
 import { EmployeePayment } from "@/app/entities/employee/employee-payment";
 import { ToUtcDate, ToUtcDatetime } from "@/app/utils/date";

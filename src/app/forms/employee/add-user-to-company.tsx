@@ -167,16 +167,16 @@ const CardUser = ({ user }: CardUserProps) => {
                         <span className="block font-medium text-gray-400 text-xs uppercase">CPF</span>
                         {user.cpf}
                     </div>
-                    <div className="text-sm text-gray-600 md:col-span-2">
+                    {user.address && <div className="text-sm text-gray-600 md:col-span-2">
                         <span className="block font-medium text-gray-400 text-xs uppercase">Endereço</span>
-                        {user.address.street}, {user.address.number} - {user.address.neighborhood}
+                        {user.address?.street}, {user.address?.number} - {user.address?.neighborhood}
                         <br />
-                        {user.address.city} - CEP: {user.address.cep}
-                    </div>
-                    <div className="text-sm text-gray-600">
+                        {user.address?.city} - CEP: {user.address?.cep}
+                    </div>}
+                    {user.contact && <div className="text-sm text-gray-600">
                         <span className="block font-medium text-gray-400 text-xs uppercase">Telefone</span>
-                        {user.contact.number}
-                    </div>
+                        {user.contact?.number}
+                    </div>}
                 </div>
             </div>
 
