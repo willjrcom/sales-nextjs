@@ -72,6 +72,9 @@ const errorTranslations: Record<string, string> = {
     "total paid is invalid": "O total pago deve ser maior que 0",
     "group item category invalid": "Categoria inválida para esse grupo de itens",
     "start at must be before now": "A data de início deve ser anterior à data atual",
+    "size not active": "Tamanho não ativo",
+    "product not active": "Produto não ativo",
+    "product not available": "Produto indisponível",
 
     // Erros de Grupo de Itens (Group Item)
     "group item not staging": "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens.",

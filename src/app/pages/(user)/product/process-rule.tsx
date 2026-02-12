@@ -69,9 +69,9 @@ export default function PageProcessRules() {
             </ButtonIconTextFloat>
 
             <CrudLayout
-                title={<PageTitle title="Processos" tooltip="Defina as etapas de processamento para produtos, com ordem e tempo ideal." />}
+                title={<PageTitle title="Regras de Processo" tooltip="Defina as etapas de processamento para produtos, com ordem e tempo ideal." />}
                 searchButtonChildren={
-                    <div className="flex gap-4 items-center">
+                    <div className="flex gap-2">
                         <SelectField
                             friendlyName="Categoria"
                             name="categoria"

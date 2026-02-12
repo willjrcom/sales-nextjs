@@ -5,7 +5,6 @@ import PageTitle from '@/app/components/ui/page-title';
 import CrudLayout from "@/app/components/crud/crud-layout";
 import CrudTable from "@/app/components/crud/table";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { TextField, CheckboxField } from "@/app/components/modal/field";
 import { useEffect, useMemo, useState } from "react";
@@ -57,10 +56,10 @@ const PageDeliveryDriver = () => {
             <CrudLayout
                 title={<PageTitle title="Motoboys" tooltip="Gerencie motoboys e atribua entregas." />}
                 searchButtonChildren={
-                    <>
+                    <div className="flex gap-2">
                         <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do motoboy" setValue={setNome} value={nome} optional />
                         <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
-                    </>
+                    </div>
                 }
                 refreshButton={
                     <Refresh

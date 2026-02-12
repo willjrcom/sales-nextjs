@@ -57,10 +57,7 @@ const PagePlace = () => {
 
             <CrudLayout title={<PageTitle title="Ambientes" tooltip="Gerencie o cadastro de ambientes" />}
                 searchButtonChildren={
-                    <>
-                        {/* <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do ambiente" setValue={setNome} value={nome} optional /> */}
-                        <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
-                    </>
+                    <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
                 }
 
                 refreshButton={

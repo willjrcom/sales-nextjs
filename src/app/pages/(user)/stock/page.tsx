@@ -86,20 +86,18 @@ const PageStock = () => {
                     />
                 }
                 searchButtonChildren={
-                    <>
-                        <SelectField
-                            friendlyName="Status"
-                            name="status"
-                            removeDefaultOption
-                            selectedValue={stockFilter}
-                            setSelectedValue={setStockFilter}
-                            values={[
-                                { id: "all", name: "Mostrar Todos" },
-                                { id: "low", name: "Estoque Baixo" },
-                                { id: "out", name: "Sem Estoque" }
-                            ]}
-                        />
-                    </>
+                    <SelectField
+                        friendlyName="Status"
+                        name="status"
+                        removeDefaultOption
+                        selectedValue={stockFilter}
+                        setSelectedValue={setStockFilter}
+                        values={[
+                            { id: "all", name: "Mostrar Todos" },
+                            { id: "low", name: "Estoque Baixo" },
+                            { id: "out", name: "Sem Estoque" }
+                        ]}
+                    />
                 }
                 refreshButton={
                     <Refresh

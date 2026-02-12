@@ -73,7 +73,7 @@ const PageProducts = () => {
 
             <CrudLayout title={<PageTitle title="Produtos" tooltip="Cadastro e listagem de produtos disponíveis, filtre por categoria e gerencie detalhes." />}
                 searchButtonChildren={
-                    <div className="flex gap-4 items-center">
+                    <div className="flex gap-2">
                         <SelectField
                             friendlyName="Categoria" name="categoria" selectedValue={categoryID} setSelectedValue={setCategoryID} values={categories} optional />
                         <CheckboxField

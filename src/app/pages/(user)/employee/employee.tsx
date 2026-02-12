@@ -56,10 +56,10 @@ const PageEmployee = () => {
             <CrudLayout
                 title={<PageTitle title="Funcionários" tooltip="Gerencie funcionários, filtrando e editando registros." />}
                 searchButtonChildren={
-                    <>
+                    <div className="flex gap-2">
                         <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do funcionário" setValue={setNome} value={nome} optional />
                         <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
-                    </>
+                    </div>
                 }
                 refreshButton={
                     <Refresh

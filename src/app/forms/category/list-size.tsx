@@ -14,6 +14,7 @@ import {
 import GetSizesByCategoryID from "@/app/api/size/size";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { CheckboxField } from "@/app/components/modal/field";
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 interface ListSizeProps {
     categoryID: string;
@@ -47,19 +48,16 @@ const ListSize = ({ categoryID, isDefaultCategory }: ListSizeProps) => {
     };
 
     return (
-        <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold mb-4">Tamanhos</h2>
-                <div className="flex gap-4 items-center">
-                    <CheckboxField
-                        friendlyName="Mostrar inativos"
-                        name="show_inactive"
-                        value={showInactive}
-                        setValue={setShowInactive}
-                    />
-                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
-                </div>
-            </div>
+        <div className="w-full">
+            <ThreeColumnHeader left={<CheckboxField
+                friendlyName="Mostrar inativos"
+                name="show_inactive"
+                value={showInactive}
+                setValue={setShowInactive}
+            />}
+                center={<h2 className="text-xl font-bold mb-4">Tamanhos</h2>}
+                right={<Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />}></ThreeColumnHeader>
+
             <div className="flex flex-wrap gap-4">
                 {sortedSizes.map((size) => (
                     <Dialog key={size.id} open={editingSize?.id === size.id} onOpenChange={(open) => !open && setEditingSize(null)}>

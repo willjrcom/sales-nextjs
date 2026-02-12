@@ -196,7 +196,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
         </div>
       </div>
 
-      <ButtonsModal item={product} name="produto" onSubmit={submit} isAddItem={true} />
+      {product.is_available && <ButtonsModal item={product} name="produto" onSubmit={submit} isAddItem={true} />}
+      {!product.is_available && <p className="text-center font-bold text-red-600">Produto indisponível</p>}
     </div>
   )
 }

@@ -58,10 +58,10 @@ const PageClient = () => {
 
             <CrudLayout title={<PageTitle title="Clientes" tooltip="Gerencie o cadastro de clientes, incluindo busca e filtro por nome." />}
                 searchButtonChildren={
-                    <>
+                    <div className="flex gap-2">
                         <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome do cliente" setValue={setNome} value={nome} optional />
                         <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
-                    </>
+                    </div>
                 }
 
                 refreshButton={

@@ -52,10 +52,7 @@ const PageTable = () => {
 
             <CrudLayout title={<PageTitle title="Mesas" tooltip="Gerencie o cadastro de mesas, incluindo busca e filtro por nome." />}
                 searchButtonChildren={
-                    <>
-                        {/* <TextField friendlyName="Nome" name="nome" placeholder="Digite o nome da mesa" setValue={setNome} value={nome} optional /> */}
-                        <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
-                    </>
+                    <CheckboxField friendlyName="Mostrar inativos" name="show_inactive" value={showInactive} setValue={setShowInactive} />
                 }
 
                 refreshButton={

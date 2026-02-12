@@ -20,6 +20,8 @@ import { useRouter } from 'next/navigation';
 import printService from '@/app/utils/print-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ListSize from './list-size';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
@@ -175,7 +177,17 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
                     {category?.id && <>
                         <hr className="my-4" />
-                        <ListSize categoryID={category.id} isDefaultCategory={!category.is_complement && !category.is_additional} />
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="w-full">Gerenciar Tamanhos</Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Gerenciar Tamanhos da Categoria {category.name}</DialogTitle>
+                                </DialogHeader>
+                                <ListSize categoryID={category.id} isDefaultCategory={!category.is_complement && !category.is_additional} />
+                            </DialogContent>
+                        </Dialog>
                     </>}
                 </div>
             </div>
