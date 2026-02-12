@@ -17,17 +17,17 @@ const PageNewOrder = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full w-full items-center justify-center">
+    <div className="flex flex-col h-full w-full items-center py-4 sm:py-8 gap-4 sm:gap-8">
       <ThreeColumnHeader center={<PageTitle title="Novo Pedido" tooltip="Selecione o tipo de pedido: Mesa, Entrega ou Balcão/Retirada." />} />
 
-      <div className="w-full max-w-5xl px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="w-full max-w-5xl px-4 flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 h-full sm:h-auto pb-4 sm:pb-0">
         {options.map((option) => (
           <Link
             href={option.route}
             key={option.id}
             onClick={() => setSelectedOption(option.id)}
             className={
-              `rounded-lg bg-white shadow-lg flex flex-col items-center justify-center p-6 transform transition-all duration-200 aspect-square
+              `rounded-lg bg-white shadow-lg flex flex-col items-center justify-center p-4 transform transition-all duration-200 flex-1 w-full sm:aspect-square sm:flex-none sm:w-auto
               ${selectedOption === option.id
                 ? 'border-4 border-purple-500 bg-purple-50'
                 : 'hover:scale-105 hover:shadow-2xl hover:border-4 hover:border-purple-300 hover:bg-purple-100'
