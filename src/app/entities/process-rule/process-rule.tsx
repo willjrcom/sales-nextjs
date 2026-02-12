@@ -1,4 +1,5 @@
 import { z } from "zod";
+import Category from "../category/category";
 
 export default class ProcessRule {
     id: string = '';
@@ -8,6 +9,7 @@ export default class ProcessRule {
     image_path?: string = '';
     ideal_time: string = '00:00';
     category_id: string = '';
+    category?: Category = new Category();
     total_order_process_late: number = 0;
     total_order_queue: number = 0;
     is_active: boolean = true;

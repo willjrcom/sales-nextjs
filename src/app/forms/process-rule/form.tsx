@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import DeleteProcessRule from '@/app/api/process-rule/delete/process-rule';
 import NewProcessRule from '@/app/api/process-rule/new/process-rule';
+import { GetProcessRulesByCategoryID } from '@/app/api/process-rule/process-rule';
 import UpdateProcessRule from '@/app/api/process-rule/update/process-rule';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
@@ -33,6 +34,17 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
     const category = useMemo(() => categories.find(c => c.id === processRule.category_id), [categories, processRule.category_id]);
+
+    const { data: processRulesByCategory } = useQuery({
+        queryKey: ['process-rules', 'by-category', processRule.category_id],
+        queryFn: () => GetProcessRulesByCategoryID(data!, processRule.category_id),
+        enabled: !!data?.user?.access_token && !!processRule.category_id,
+    });
+
+    const isOrderDuplicate = useMemo(() => {
+        if (!processRulesByCategory) return false;
+        return processRulesByCategory.some(rule => rule.order === processRule.order && rule.id !== processRule.id);
+    }, [processRulesByCategory, processRule.order, processRule.id]);
 
     const handleInputChange = (field: keyof ProcessRule, value: any) => {
         setProcessRule(prev => ({ ...prev, [field]: value }));
@@ -86,6 +98,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={value => handleInputChange('order', value)} value={processRule.order} />
+                            {isOrderDuplicate && <span className="text-xs text-red-500 font-medium mt-1 block">Esta ordem já está em uso nesta categoria.</span>}
                         </div>
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">

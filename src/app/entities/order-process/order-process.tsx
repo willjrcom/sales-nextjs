@@ -12,6 +12,7 @@ export default class OrderProcess {
     order_number: number = 0;
     order_type: orderType = "Delivery";
     employee_id?: string = '';
+    order_id?: string = '';
     group_item_id: string = '';
     group_item?: GroupItem;
     process_rule_id: string = '';

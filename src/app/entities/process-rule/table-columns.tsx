@@ -15,6 +15,17 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
     accessorKey: 'name',
     header: 'Nome',
   },
+
+  {
+    id: 'Categoria',
+    accessorKey: 'category',
+    header: 'Categoria',
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <span>{row.original.category?.name || ""}</span>
+      </div>
+    ),
+  },
   {
     id: 'Tempo ideal',
     accessorKey: 'ideal_time',
