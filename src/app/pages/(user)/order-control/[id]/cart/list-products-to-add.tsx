@@ -16,6 +16,7 @@ import Refresh from "../../../../../components/crud/refresh";
 import GroupItem from "@/app/entities/order/group-item";
 import CartModal from "./cart-modal";
 import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
+import ThreeColumnHeader from "@/components/header/three-column-header";
 
 type ViewMode = 'grid' | 'list';
 
@@ -171,7 +172,7 @@ export const ListProductsToAdd = () => {
             <div className="flex-auto flex flex-col bg-gray-100 overflow-hidden">
                 <div className="flex-1 p-4 space-y-3 overflow-y-auto">
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex space-x-2">
                             <TextField placeholder="Pesquisar por sku"
                                 name="search"
                                 setValue={setSearchSKU}
@@ -184,30 +185,6 @@ export const ListProductsToAdd = () => {
                         </div>
 
                         <div className="flex items-center space-x-2">
-                            {/* View Toggle */}
-                            <div className="flex items-center gap-1 bg-white border rounded-lg p-1">
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                                        ? 'bg-blue-500 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                    title="Visualização em grade"
-                                >
-                                    <LayoutGrid className="h-4 w-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded transition-colors ${viewMode === 'list'
-                                        ? 'bg-blue-500 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                    title="Visualização em lista"
-                                >
-                                    <List className="h-4 w-4" />
-                                </button>
-                            </div>
-
                             <CartModal />
 
                             <Refresh
@@ -217,12 +194,12 @@ export const ListProductsToAdd = () => {
                         </div>
                     </div>
 
-                    <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">
+                    {groupItem?.category_id && <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">
                         <span aria-hidden="true">ℹ️</span>
                         <span title="Depois de escolher um item, o catálogo filtra os produtos para manter a mesma categoria e tamanho do grupo em edição.">
                             Ao selecionar um item, o catálogo mantém apenas produtos da mesma categoria e tamanho do grupo atual.
                         </span>
-                    </div>
+                    </div>}
 
                     {/* Grid View */}
                     {viewMode === 'grid' && (
@@ -255,42 +232,69 @@ export const ListProductsToAdd = () => {
 
                 {/* Pagination Controls */}
                 {totalCount > 0 && (
-                    <div className="flex-shrink-0 flex items-center justify-between bg-white border-t px-4 py-3">
-                        <div className="text-sm text-gray-700">
+                    <ThreeColumnHeader className="bg-white border-t px-4 py-3" left={
+                        <div className="text-sm text-gray-700 gap-2">
                             Mostrando <span className="font-medium">{startItem}</span> a{" "}
                             <span className="font-medium">{endItem}</span> de{" "}
                             <span className="font-medium">{totalCount}</span> produtos
                         </div>
+                    }
 
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handlePreviousPage}
-                                disabled={pagination.pageIndex === 0 || isPending}
-                                className="gap-1"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                                Anterior
-                            </Button>
+                        center={
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handlePreviousPage}
+                                    disabled={pagination.pageIndex === 0 || isPending}
+                                    className="gap-1"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                    Anterior
+                                </Button>
 
-                            <span className="text-sm text-gray-700">
-                                Página <span className="font-medium">{pagination.pageIndex + 1}</span> de{" "}
-                                <span className="font-medium">{totalPages}</span>
-                            </span>
+                                <span className="text-sm text-gray-700">
+                                    Página <span className="font-medium">{pagination.pageIndex + 1}</span> de{" "}
+                                    <span className="font-medium">{totalPages}</span>
+                                </span>
 
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleNextPage}
-                                disabled={pagination.pageIndex >= totalPages - 1 || isPending}
-                                className="gap-1"
-                            >
-                                Próxima
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleNextPage}
+                                    disabled={pagination.pageIndex >= totalPages - 1 || isPending}
+                                    className="gap-1"
+                                >
+                                    Próxima
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        }
+                        right={
+                            <div className="flex items-center gap-1 bg-white border rounded-lg p-1">
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`p-2 rounded transition-colors ${viewMode === 'grid'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                        }`}
+                                    title="Visualização em grade"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`p-2 rounded transition-colors ${viewMode === 'list'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                        }`}
+                                    title="Visualização em lista"
+                                >
+                                    <List className="h-4 w-4" />
+                                </button>
+                            </div>
+                        }
+                    />
                 )}
             </div>
         </div>

@@ -75,6 +75,7 @@ const errorTranslations: Record<string, string> = {
     "size not active": "Tamanho não ativo",
     "product not active": "Produto não ativo",
     "product not available": "Produto indisponível",
+    "group item size invalid": "O tamanho do item é diferente do grupo, adicione um novo grupo de itens.",
 
     // Erros de Grupo de Itens (Group Item)
     "group item not staging": "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens.",
