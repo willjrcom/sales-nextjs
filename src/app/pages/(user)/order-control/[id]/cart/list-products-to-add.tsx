@@ -120,7 +120,7 @@ export const ListProductsToAdd = () => {
     const endItem = Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalCount);
 
     return (
-        <div className="flex h-[85vh] overflow-hidden">
+        <div className="flex h-[75vh] overflow-hidden">
             {/* Category Sidebar */}
             <aside className="w-20 bg-white border-r border-gray-200 overflow-y-auto py-4 flex flex-col items-center gap-4 flex-shrink-0">
                 {/* All Categories Button */}
@@ -168,92 +168,94 @@ export const ListProductsToAdd = () => {
             </aside>
 
             {/* Main Content */}
-            <div className="flex-auto p-4 bg-gray-100 space-y-3 overflow-y-auto">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                        <TextField placeholder="Pesquisar por sku"
-                            name="search"
-                            setValue={setSearchCode}
-                            value={searchCode}
-                            key="search"
-                            onEnter={onSearch}
-                            optional
-                        />
-                        <Button onClick={onSearch} variant="outline">Buscar</Button>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        {/* View Toggle */}
-                        <div className="flex items-center gap-1 bg-white border rounded-lg p-1">
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                                    ? 'bg-blue-500 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
-                                    }`}
-                                title="Visualização em grade"
-                            >
-                                <LayoutGrid className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                className={`p-2 rounded transition-colors ${viewMode === 'list'
-                                    ? 'bg-blue-500 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
-                                    }`}
-                                title="Visualização em lista"
-                            >
-                                <List className="h-4 w-4" />
-                            </button>
+            <div className="flex-auto flex flex-col bg-gray-100 overflow-hidden">
+                <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                            <TextField placeholder="Pesquisar por sku"
+                                name="search"
+                                setValue={setSearchCode}
+                                value={searchCode}
+                                key="search"
+                                onEnter={onSearch}
+                                optional
+                            />
+                            <Button onClick={onSearch} variant="outline">Buscar</Button>
                         </div>
 
-                        <CartModal />
-
-                        <Refresh
-                            onRefresh={refetch}
-                            isPending={isPending}
-                        />
-                    </div>
-                </div>
-
-                <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">
-                    <span aria-hidden="true">ℹ️</span>
-                    <span title="Depois de escolher um item, o catálogo filtra os produtos para manter a mesma categoria e tamanho do grupo em edição.">
-                        Ao selecionar um item, o catálogo mantém apenas produtos da mesma categoria e tamanho do grupo atual.
-                    </span>
-                </div>
-
-                {/* Grid View */}
-                {viewMode === 'grid' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {productsFiltered.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                        {productsFiltered.length === 0 && (
-                            <div className="col-span-full text-center py-8 text-gray-500">
-                                Nenhum produto disponível
+                        <div className="flex items-center space-x-2">
+                            {/* View Toggle */}
+                            <div className="flex items-center gap-1 bg-white border rounded-lg p-1">
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`p-2 rounded transition-colors ${viewMode === 'grid'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                        }`}
+                                    title="Visualização em grade"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`p-2 rounded transition-colors ${viewMode === 'list'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                        }`}
+                                    title="Visualização em lista"
+                                >
+                                    <List className="h-4 w-4" />
+                                </button>
                             </div>
-                        )}
-                    </div>
-                )}
 
-                {/* List View */}
-                {viewMode === 'list' && (
-                    <div className="space-y-2">
-                        {productsFiltered.map((product) => (
-                            <ListProducts key={product.id} product={product} />
-                        ))}
-                        {productsFiltered.length === 0 && (
-                            <div className="text-center py-8 text-gray-500">
-                                Nenhum produto disponível
-                            </div>
-                        )}
+                            <CartModal />
+
+                            <Refresh
+                                onRefresh={refetch}
+                                isPending={isPending}
+                            />
+                        </div>
                     </div>
-                )}
+
+                    <div className="text-xs text-gray-600 bg-white/70 border border-gray-200 rounded-md px-3 py-2 flex items-center gap-2">
+                        <span aria-hidden="true">ℹ️</span>
+                        <span title="Depois de escolher um item, o catálogo filtra os produtos para manter a mesma categoria e tamanho do grupo em edição.">
+                            Ao selecionar um item, o catálogo mantém apenas produtos da mesma categoria e tamanho do grupo atual.
+                        </span>
+                    </div>
+
+                    {/* Grid View */}
+                    {viewMode === 'grid' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {productsFiltered.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                            {productsFiltered.length === 0 && (
+                                <div className="col-span-full text-center py-8 text-gray-500">
+                                    Nenhum produto disponível
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* List View */}
+                    {viewMode === 'list' && (
+                        <div className="space-y-2">
+                            {productsFiltered.map((product) => (
+                                <ListProducts key={product.id} product={product} />
+                            ))}
+                            {productsFiltered.length === 0 && (
+                                <div className="text-center py-8 text-gray-500">
+                                    Nenhum produto disponível
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {/* Pagination Controls */}
                 {totalCount > 0 && (
-                    <div className="flex items-center justify-between bg-white border rounded-lg px-4 py-3 mt-4">
+                    <div className="flex-shrink-0 flex items-center justify-between bg-white border-t px-4 py-3">
                         <div className="text-sm text-gray-700">
                             Mostrando <span className="font-medium">{startItem}</span> a{" "}
                             <span className="font-medium">{endItem}</span> de{" "}
