@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import ProductCard from "../product/product-card";
 import ListProducts from "../product/list-products";
 import { TextField } from "../../../../../components/modal/field";
-import GetProductByCode from "@/app/api/product/code/[code]";
+import GetProductBySKU from "@/app/api/product/sku/[sku]";
 import { useSession } from "next-auth/react";
 import RequestError from "@/app/utils/error";
 import { notifyError } from "@/app/utils/notifications";
@@ -20,7 +20,7 @@ import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 type ViewMode = 'grid' | 'list';
 
 export const ListProductsToAdd = () => {
-    const [searchCode, setSearchCode] = useState("");
+    const [searchSKU, setSearchSKU] = useState("");
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
     const { data } = useSession();
@@ -85,7 +85,7 @@ export const ListProductsToAdd = () => {
         if (!data) return
 
         try {
-            const product = await GetProductByCode(searchCode, data);
+            const product = await GetProductBySKU(searchSKU, data);
             const modalName = `add-item-${product.id}`
             const onClose = () => {
                 modalHandler.hideModal(modalName);
@@ -93,7 +93,7 @@ export const ListProductsToAdd = () => {
 
             modalHandler.showModal(modalName, "", <AddProductCard product={product} />, "md", onClose)
         } catch (error: RequestError | any) {
-            notifyError(error.message || "Erro ao buscar produto por codigo: " + searchCode);
+            notifyError(error.message || "Erro ao buscar produto por codigo: " + searchSKU);
         }
     }
 
@@ -174,8 +174,8 @@ export const ListProductsToAdd = () => {
                         <div className="flex items-center space-x-2">
                             <TextField placeholder="Pesquisar por sku"
                                 name="search"
-                                setValue={setSearchCode}
-                                value={searchCode}
+                                setValue={setSearchSKU}
+                                value={searchSKU}
                                 key="search"
                                 onEnter={onSearch}
                                 optional

@@ -101,7 +101,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField friendlyName='Código de busca' name='code' setValue={value => handleInputChange('code', value)} value={product.code} />
+                            <TextField friendlyName='SKU' name='sku' setValue={value => handleInputChange('sku', value)} value={product.sku} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={product.name} />

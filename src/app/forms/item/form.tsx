@@ -153,9 +153,9 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
             <h2 className="text-2xl font-bold text-gray-900 leading-tight flex-1 mr-4">
               {product.name}
             </h2>
-            {product.code && (
+            {product.sku && (
               <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded border border-gray-200 whitespace-nowrap">
-                SKU: {product.code}
+                SKU: {product.sku}
               </span>
             )}
           </div>

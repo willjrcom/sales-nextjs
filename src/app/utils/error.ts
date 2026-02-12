@@ -153,7 +153,7 @@ const errorTranslations: Record<string, string> = {
     "invalid client": "Cliente inválido",
 
     // Erros de Produto
-    "code product already exists": "Código do produto já cadastrado",
+    "sku product already exists": "SKU do produto já cadastrado",
     "product category not found": "Categoria do produto não encontrada",
     "size is invalid": "Tamanho inválido",
     "size not found": "Tamanho não encontrado",

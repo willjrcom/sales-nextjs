@@ -56,12 +56,12 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
                     </div>
                 )}
 
-                {/* Código do produto */}
+                {/* SKU do produto */}
                 <span
                     className="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-lg opacity-80"
-                    aria-label={`Código do produto ${product.code}`}
+                    aria-label={`SKU do produto ${product.sku}`}
                 >
-                    #&nbsp;{product.code}
+                    #&nbsp;{product.sku}
                 </span>
             </div>
 

@@ -30,12 +30,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     </div>
                 )}
 
-                {/* Código do produto */}
+                {/* SKU do produto */}
                 <span
                     className="absolute top-1 right-1 bg-black text-white text-xs px-1.5 py-0.5 rounded opacity-80"
-                    aria-label={`Código do produto ${product.code}`}
+                    aria-label={`SKU do produto ${product.sku}`}
                 >
-                    #{product.code}
+                    #{product.sku}
                 </span>
             </div>
 

@@ -6,23 +6,14 @@ import Decimal from "decimal.js";
 
 const ProductColumns = (): ColumnDef<Product>[] => [
   {
-    id: 'Código',
-    accessorKey: 'code',
-    header: 'Código',
+    id: 'SKU',
+    accessorKey: 'sku',
+    header: 'SKU',
   },
   {
     id: 'Nome',
     accessorKey: 'name',
     header: 'Nome',
-  },
-  {
-    id: 'Sabores',
-    accessorKey: 'flavors',
-    header: 'Sabores',
-    cell: (info) => {
-      const flavors = info.row.original.flavors || [];
-      return flavors.length > 0 ? flavors.join(', ') : 'Sem sabores';
-    },
   },
   {
     id: 'Preço',
@@ -57,11 +48,11 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Editar',
     cell: ({ row }) => {
       return (
-        <ButtonIcon modalName={"edit-product-" + row.original.id }
+        <ButtonIcon modalName={"edit-product-" + row.original.id}
           title={"Editar " + row.original.name}>
           <ProductForm
-            item={row.original} 
-            isUpdate={true}/>
+            item={row.original}
+            isUpdate={true} />
         </ButtonIcon>
       )
     },

@@ -5,7 +5,7 @@ import Size from "../size/size";
 
 export default class Product {
     id: string = '';
-    code: string = '';
+    sku: string = '';
     image_path: string = '';
     name: string = '';
     description: string = '';
@@ -26,7 +26,7 @@ export default class Product {
 }
 
 const SchemaProduct = z.object({
-    code: z.string().min(1, 'Código precisa ter pelo menos 1 caracteres').max(100, 'Código precisa ter no máximo 100 caracteres'),
+    sku: z.string().min(1, 'SKU precisa ter pelo menos 1 caracteres').max(100, 'Código precisa ter no máximo 100 caracteres'),
     image_path: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     description: z.string().optional(),
@@ -40,7 +40,7 @@ const SchemaProduct = z.object({
 
 export const ValidateProductForm = (product: Product) => {
     const validatedFields = SchemaProduct.safeParse({
-        code: product.code,
+        sku: product.sku,
         name: product.name,
         description: product.description,
         flavors: product.flavors,
