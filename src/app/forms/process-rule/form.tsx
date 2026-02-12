@@ -88,6 +88,15 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     return (
         <div className="text-black space-y-6">
+            {/* Seção: Categoria */}
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
+                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    {isUpdate && <TextField friendlyName='Categoria' name='category' value={category?.name || ""} setValue={() => { }} disabled />}
+                    {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={categories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
+                </div>
+            </div>
+
             {/* Seção: Informações Básicas */}
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
@@ -124,15 +133,6 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <TimeField friendlyName='Tempo ideal (mm:ss)' name='ideal_time' setValue={value => handleInputChange('ideal_time', value)} value={processRule.ideal_time} />
                     </div>
-                </div>
-            </div>
-
-            {/* Seção: Categoria */}
-            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
-                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    {isUpdate && <TextField friendlyName='Categoria' name='category' value={category?.name || ""} setValue={() => { }} disabled />}
-                    {!isUpdate && <SelectField friendlyName='Categoria' name='category' values={categories} selectedValue={processRule.category_id} setSelectedValue={value => handleInputChange('category_id', value)} />}
                 </div>
             </div>
 

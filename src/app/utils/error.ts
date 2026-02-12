@@ -179,6 +179,7 @@ const errorTranslations: Record<string, string> = {
     // Erros de Process Rule
     "ideal time is required": "O tempo ideal é obrigatório",
     "experimental error is required": "O erro experimental é obrigatório",
+    "order number already exists in this category": "Esse número de ordem já existe nesta categoria",
 
     // Erros de Funcionário
     "employee already exists": "Funcionário já existe",
