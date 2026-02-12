@@ -171,11 +171,10 @@ export const ListProductsToAdd = () => {
             <div className="flex-auto p-4 bg-gray-100 space-y-3 overflow-y-auto">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <TextField placeholder="Pesquisar por codigo"
+                        <TextField placeholder="Pesquisar por sku"
                             name="search"
                             setValue={setSearchCode}
                             value={searchCode}
-                            friendlyName="Busca por codigo"
                             key="search"
                             onEnter={onSearch}
                             optional

@@ -85,11 +85,11 @@ const ListProducts = ({ product }: ListProductsProps) => {
             </div>
 
             {/* Botão */}
-            <div className="flex-shrink-0 flex items-center justify-between">
-                <ButtonIconText modalName={`add-item-${product.id}`} isDisabled={!product.is_available} size="md">
+            <div className="flex-shrink-0 ml-2 flex items-center justify-between">
+                {product.is_available && <ButtonIconText modalName={`add-item-${product.id}`} size={product.image_path ? 'xl' : 'md'}>
                     <AddProductCard product={product} />
-                </ButtonIconText>
-                <span className="text-xs text-gray-500">{product.is_available ? 'Disponível' : 'Indisponível'}</span>
+                </ButtonIconText>}
+                {!product.is_available && <span className="text-xs text-gray-500">Indisponível</span>}
             </div>
         </div>
     );

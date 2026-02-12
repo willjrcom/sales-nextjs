@@ -3,10 +3,8 @@
 import RequestError from "@/app/utils/error";
 import NewItem, { NewItemProps } from "@/app/api/item/new/item";
 import GetProductByID from "@/app/api/product/[id]/product";
-import ButtonsModal from "@/app/components/modal/buttons-modal"
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import NumericField from "@/app/components/modal/fields/numeric";
-import { TextField } from "@/app/components/modal/field";
 import { useModal } from "@/app/context/modal/context";
 import Product from "@/app/entities/product/product";
 import { useSession } from "next-auth/react";
@@ -16,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
 import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
+import Image from "next/image";
 
 interface AddProductCardProps {
   product: Product;
@@ -31,6 +30,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);
   const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchProduct();
@@ -65,7 +65,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const submit = async () => {
     if (!data) return;
 
-    if (quantity == 0) return notifyError("Selecione uma quantidade para continuar");
+    if (quantity <= 0) return notifyError("Selecione uma quantidade válida");
 
     const requiresFlavorSelection = availableFlavors && availableFlavors.length > 0;
     if (requiresFlavorSelection && !selectedFlavor) {
@@ -73,6 +73,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       return;
     }
 
+    setIsSubmitting(true);
 
     const order = queryClient.getQueryData<Order>(['order', 'current']);
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
@@ -94,9 +95,14 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
       modalHandler.hideModal(modalName);
+      // Reset form
+      setQuantity(1);
+      setObservation('');
     } catch (error) {
       const err = error as RequestError;
       notifyError(err.message || 'Erro ao adicionar item');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -107,97 +113,166 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   }, [])
 
   if (!product.category) {
-    return notifyError("Produto sem categoria");
+    return <div className="p-4 text-center text-red-500">Erro: Produto sem categoria</div>;
   }
 
-  if (!product.size) {
-    return notifyError("Produto sem tamanho");
-  }
+
+  const unitPrice = new Decimal(product.price);
+  const totalAmount = unitPrice.times(quantity);
+
+  const hasImage = !!product.image_path;
 
   return (
-    <div className="overflow-y-auto text-black space-y-6">
-      {/* Seção: Informações do Produto */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">{product.name}</h3>
-        <div className="space-y-2">
-          <p className="text-sm font-bold">Descrição: <span className="font-normal">{product.description}</span></p>
-          <p className="text-sm font-bold">Tamanho: <span className="font-normal">{product.size.name}</span></p>
-          {product.flavors && product.flavors.length > 0 && (
-            <div>
-              <p className="text-sm font-bold mb-1">Sabores disponíveis:</p>
-              <div className="flex flex-wrap gap-2">
-                {product.flavors.map((flavor, index) => (
-                  <span
-                    key={`${product.id}-${index}-${flavor}`}
-                    className="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full border border-orange-200"
-                  >
-                    {flavor}
-                  </span>
-                ))}
+    <div className="bg-white text-gray-800 p-1 md:p-2 h-full flex flex-col">
+      <div className={`grid grid-cols-1 ${hasImage ? 'md:grid-cols-2' : ''} gap-6 h-full`}>
+        {/* Left Column: Image */}
+        {hasImage && (
+          <div className="relative h-64 md:h-auto w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+            <Image
+              src={product.image_path}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            {/* Overlay badge for Availability or Promo if needed */}
+            {!product.is_available && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="text-white font-bold text-lg border-2 border-white px-4 py-2 rounded uppercase tracking-widest">
+                  Indisponível
+                </span>
               </div>
-              {selectedFlavor && (
-                <p className="text-xs text-green-700 mt-2">
-                  Sabor selecionado: <span className="font-semibold">{selectedFlavor}</span>
+            )}
+          </div>
+        )}
+
+        {/* Right Column: Form Details */}
+        <div className="flex flex-col h-full overflow-hidden">
+          {/* Header */}
+          <div className="flex justify-between items-start mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 leading-tight flex-1 mr-4">
+              {product.name}
+            </h2>
+            {product.code && (
+              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded border border-gray-200 whitespace-nowrap">
+                SKU: {product.code}
+              </span>
+            )}
+          </div>
+
+          {/* Description */}
+          <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+            {product.description || "Sem descrição disponível para este produto."}
+          </p>
+
+          <div className="flex-1 overflow-y-auto pr-1">
+            {/* Flavor / Variant Selector */}
+            {availableFlavors.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                  SABOR SELECIONADO
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {availableFlavors.map((flavor) => {
+                    const isSelected = selectedFlavor === flavor;
+                    return (
+                      <button
+                        key={flavor}
+                        onClick={() => setSelectedFlavor(flavor)}
+                        className={`
+                          px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 border
+                          ${isSelected
+                            ? "bg-green-50 border-green-500 text-green-700 shadow-sm"
+                            : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                          }
+                        `}
+                      >
+                        {flavor}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity Selector */}
+            <NumericField name="quantity" friendlyName="Quantidade" placeholder="Digite a quantidade" setValue={setQuantity} value={quantity} />
+
+            {/* Observations */}
+            <div className="mb-6">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                OBSERVAÇÕES
+              </h3>
+              <textarea
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all resize-none"
+                placeholder="Adicione instruções especiais para o seu pedido..."
+                rows={3}
+                value={observation}
+                onChange={(e) => setObservation(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Footer / Actions */}
+          <div className="mt-auto pt-6 border-t border-gray-100">
+            <div className="flex justify-between items-end mb-4">
+              <div>
+                <span className="block text-xs text-gray-500 mb-1">Valor Unitário</span>
+                <span className="text-lg font-bold text-gray-900">
+                  R$ {unitPrice.toFixed(2)}
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="block text-xs text-gray-500 mb-1">Valor Total</span>
+                <span className="text-2xl font-bold text-gray-900">
+                  R$ {totalAmount.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            {product.is_available ? (
+              <button
+                onClick={submit}
+                disabled={isSubmitting}
+                className={`
+                  w-full py-3.5 px-4 rounded-lg font-bold text-white shadow-sm transition-all transform active:scale-[0.99]
+                  ${isSubmitting
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600 hover:shadow-md"
+                  }
+                  flex items-center justify-center gap-2
+                `}
+              >
+                {isSubmitting ? (
+                  <span>Adicionando...</span>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                    </svg>
+                    <span>Adicionar ao Carrinho</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  disabled
+                  className="w-full py-3.5 px-4 rounded-lg font-bold text-gray-500 bg-gray-200 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <span>Indisponível no momento</span>
+                </button>
+                <p className="text-center text-xs text-gray-500 italic">
+                  Avise-me quando este item estiver de volta ao estoque
                 </p>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Seção: Quantidade e Observação */}
-      <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Configurações</h3>
-        <div className="space-y-4">
-          {product.flavors && product.flavors.length > 0 && (
-            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Selecione um sabor:
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {product.flavors.map((flavor) => {
-                  const isSelected = selectedFlavor === flavor;
-                  return (
-                    <button
-                      type="button"
-                      key={`${product.id}-selector-${flavor}`}
-                      className={`px-3 py-1 rounded-full border text-sm transition
-                        ${isSelected ? "bg-orange-500 text-white border-orange-600" : "bg-white text-gray-700 border-gray-300"}
-                        hover:shadow focus:outline-none focus:ring-2 focus:ring-orange-400`}
-                      onClick={() => setSelectedFlavor(flavor)}
-                    >
-                      {flavor}
-                    </button>
-                  );
-                })}
               </div>
-              <p className="text-xs text-gray-500 mt-2">Obrigatório selecionar um sabor para produtos com variações.</p>
-            </div>
-          )}
-          <NumericField name="quantity" friendlyName="Quantidade" placeholder="Digite a quantidade" setValue={setQuantity} value={quantity} />
-          <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-            <TextField friendlyName="Observação" name="observation" placeholder="Digite a observação" setValue={setObservation} value={observation} optional />
+            )}
           </div>
         </div>
       </div>
-
-      {/* Seção: Valores */}
-      <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Valores</h3>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-            <p className="text-lg font-bold">Valor unitário:</p>
-            <p className="text-lg font-bold text-green-600">R$ {new Decimal(product.price).toFixed(2)}</p>
-          </div>
-          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-            <p className="text-lg font-bold">Total:</p>
-            <p className="text-lg font-bold text-green-600">R$ {new Decimal(product.price).times(quantity).toFixed(2)}</p>
-          </div>
-        </div>
-      </div>
-
-      {product.is_available && <ButtonsModal item={product} name="produto" onSubmit={submit} isAddItem={true} />}
-      {!product.is_available && <p className="text-center font-bold text-red-600">Produto indisponível</p>}
     </div>
   )
 }
