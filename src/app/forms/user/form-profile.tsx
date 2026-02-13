@@ -53,6 +53,9 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
 
         if (newUser.birthday) {
             newUser.birthday = ToIsoDate(newUser.birthday)
+        } else {
+            // Remove o campo birthday se estiver vazio, pois o backend usa ponteiro
+            delete newUser.birthday;
         }
 
         const validationErrors = ValidateUserForm(newUser);
