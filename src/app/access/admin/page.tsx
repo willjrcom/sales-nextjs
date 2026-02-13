@@ -1,6 +1,6 @@
 import AdminAccessClient from "./admin-access-client";
 
-const getWhitelist = () => {
+export const getWhitelist = () => {
   const raw =
     process.env.WHITE_LIST ??
     process.env.NEXT_PUBLIC_WHITE_LIST ??

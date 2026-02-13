@@ -16,6 +16,7 @@ import Link from 'next/link';
 import GetMeUser from '@/app/api/user/me/user';
 import { useQuery } from '@tanstack/react-query';
 import GetUserCompanies from '@/app/api/user/companies/user';
+import { getWhitelist } from '../admin/page';
 
 export default function Page() {
     return (
@@ -103,15 +104,18 @@ function CompanySelection() {
         modalHandler.showModal("new-company", "Nova empresa", <CompanyForm />, "md", onClose)
     }
 
+    const whitelist = getWhitelist();
+    const userEmail = data?.user?.email?.toLowerCase();
+
     return (
         <div className="relative flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100 text-black">
             <div className="absolute top-4 left-4 z-10">
-                <Link
+                {userEmail && whitelist.includes(userEmail) && <Link
                     href="/access/admin"
                     className="px-4 py-2 rounded-lg bg-yellow-500 text-white font-semibold shadow hover:bg-yellow-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 >
                     Acessar APIs públicas
-                </Link>
+                </Link>}
             </div>
             <div className="absolute top-4 right-4 z-10 flex items-center gap-4">
                 <div className="text-right">
