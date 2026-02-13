@@ -228,6 +228,10 @@ const RegisterForm = () => {
                     </div>
                 </div>
             </div>
+            <Link href="/home" className="fixed bottom-6 right-6 z-50 px-6 py-3 bg-white/90 backdrop-blur shadow-lg rounded-full font-bold text-brand-dark hover:scale-105 hover:shadow-xl transition-all flex items-center gap-2 group">
+                <span className="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Voltar para home
+            </Link>
         </div>
     );
 };

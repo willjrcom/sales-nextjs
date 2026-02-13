@@ -19,6 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="br" suppressHydrationWarning>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+      </head>
       <body className={inter.className + " text-black bg-gray-100"} suppressHydrationWarning>
         <AuthProvider>
           {children}
