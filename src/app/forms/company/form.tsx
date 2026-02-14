@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Company, { ValidateCompanyForm } from '@/app/entities/company/company';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -21,7 +21,8 @@ import FormArrayPattern from '@/app/components/modal/form-array-pattern';
 import printService from '@/app/utils/print-service';
 import Address from "@/app/entities/address/address";
 import AddressForm from "../address/form";
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import GetAllCompanyCategories, { CompanyCategory } from '@/app/api/company-category/list';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
@@ -45,6 +46,15 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const router = useRouter();
     const modalHandler = useModal();
     const queryClient = useQueryClient();
+
+    const { data: categoriesResponse } = useQuery<CompanyCategory[]>({
+        queryKey: ['company-categories'],
+        queryFn: () => GetAllCompanyCategories(data!),
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    });
+
+    const categories = useMemo(() => categoriesResponse || [], [categoriesResponse])
 
     // Carrega impressoras disponíveis via Print Agent (WebSocket) ou Electron
     const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
@@ -160,6 +170,21 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 <div className="space-y-4">
                     <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
                     <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} formatted={true} />
+                    {!isUpdate && <SelectField
+                        friendlyName="Categoria da Empresa"
+                        name="category_id"
+                        values={categories.map(cat => ({ id: cat.id, name: cat.name }))}
+                        selectedValue={company.category_id || ''}
+                        setSelectedValue={value => handleInputChange('category_id', value)}
+                        optional
+                    />}
+                    {isUpdate && <TextField
+                        friendlyName="Categoria da Empresa"
+                        name="category_id"
+                        value={company.category?.name || ''}
+                        setValue={value => handleInputChange('category_id', value)}
+                        optional disabled
+                    />}
                 </div>
             </div>
 

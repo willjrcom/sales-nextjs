@@ -1,5 +1,6 @@
 import { z } from "zod";
 import Address from "../address/address";
+import { CompanyCategory } from "@/app/api/company-category/list";
 
 export default class Company {
   id: string = "";
@@ -14,6 +15,8 @@ export default class Company {
   subscription_expires_at?: string | null;
   plan_type?: string;
   is_blocked: boolean = false;
+  category_id?: string;
+  category?: CompanyCategory;
 
   monthly_payment_due_day?: number;
   monthly_payment_due_day_updated_at?: string;
