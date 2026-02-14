@@ -52,10 +52,10 @@ const Home = () => {
                     <Link href="/login/sign-up" className="px-10 py-5 bg-brand-dark text-white rounded-xl font-black text-lg hover:scale-105 transition-transform shadow-2xl inline-block text-center">
                       Começar agora
                     </Link>
-                    <button className="px-10 py-5 bg-white border-2 border-brand-dark/10 rounded-xl font-black text-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2">
+                    {/* <button className="px-10 py-5 bg-white border-2 border-brand-dark/10 rounded-xl font-black text-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2">
                       <span className="material-symbols-outlined">play_circle</span>
                       Ver demo
-                    </button>
+                    </button> */}
                   </div>
                 </div>
                 <div className="w-full lg:w-1/2">
