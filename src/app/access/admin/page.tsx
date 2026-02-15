@@ -1,15 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import CrudLayout from "@/app/components/crud/crud-layout";
 import CrudTable from "@/app/components/crud/table";
 import Loading from "@/app/components/loading/Loading";
 import Company from "@/app/entities/company/company";
-import User from "@/app/entities/user/user";
 import ListPublicCompanies from "@/app/api/public/companies";
 import ListPublicUsers from "@/app/api/public/users";
-import { notifyError } from "@/app/utils/notifications";
 import Link from "next/link";
 import { getCompanyColumns } from "./company-columns";
 import { userColumns } from "./user-columns";
@@ -20,9 +18,7 @@ import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import GetAllCompanyCategories from "@/app/api/company-category/list";
 import { CompanyCategoryColumns } from "./company-category-columns";
 import CompanyCategoryForm from "@/app/forms/company-category/form";
-import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { ModalProvider } from "@/app/context/modal/context";
-import ButtonIcon from "@/app/components/button/button-icon";
 import { FaPlus } from "react-icons/fa";
 import ButtonIconText from "@/app/components/button/button-icon-text";
 

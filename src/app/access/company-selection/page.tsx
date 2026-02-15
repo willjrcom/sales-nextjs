@@ -6,7 +6,7 @@ import { ModalProvider, useModal } from '@/app/context/modal/context';
 import CompanyForm from '@/app/forms/company/form';
 import Loading from '@/app/components/loading/Loading';
 import { signOut, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
@@ -57,14 +57,10 @@ function CompanySelection() {
         refetchInterval: 30000,
     });
 
-    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-        const schemaName = event.currentTarget.getAttribute('data-schema-name');
+    const searchParams = useSearchParams();
+    const autoSchema = searchParams.get('schema');
 
-        if (!schemaName) {
-            notifyError('Schema inválido!');
-            return;
-        }
-
+    const accessCompany = async (schemaName: string) => {
         if (!data) {
             notifyError('Sessão inválida!');
             return;
@@ -95,6 +91,27 @@ function CompanySelection() {
             setSelecting(false);
         }
     }
+
+    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        const schemaName = event.currentTarget.getAttribute('data-schema-name');
+
+        if (!schemaName) {
+            notifyError('Schema inválido!');
+            return;
+        }
+
+        await accessCompany(schemaName);
+    }
+
+    // Auto-select effect
+    useEffect(() => {
+        if (autoSchema && companies.length > 0 && !selecting) {
+            const company = companies.find(c => c.schema_name === autoSchema);
+            if (company) {
+                accessCompany(autoSchema);
+            }
+        }
+    }, [autoSchema, companies, selecting]);
 
     const newCompany = () => {
         const onClose = () => {

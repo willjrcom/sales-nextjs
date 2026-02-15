@@ -5,6 +5,7 @@ import PageProducts from './product';
 import PageCategories from './category';
 import PageProcessRules from './process-rule';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PageMenuDigital from './menu-digital';
 
 const PageWithTabs = () => {
     const searchParams = useSearchParams();
@@ -17,10 +18,11 @@ const PageWithTabs = () => {
 
     return (
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="categories">Categorias</TabsTrigger>
                 <TabsTrigger value="products">Produtos</TabsTrigger>
                 <TabsTrigger value="process-rules">Processos</TabsTrigger>
+                <TabsTrigger value="menu-digital">Menu Digital</TabsTrigger>
             </TabsList>
             <TabsContent value="categories">
                 <PageCategories />
@@ -30,6 +32,9 @@ const PageWithTabs = () => {
             </TabsContent>
             <TabsContent value="process-rules">
                 <PageProcessRules />
+            </TabsContent>
+            <TabsContent value="menu-digital">
+                <PageMenuDigital />
             </TabsContent>
         </Tabs>
     );
