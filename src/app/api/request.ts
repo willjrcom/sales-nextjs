@@ -34,6 +34,10 @@ const AddAccessToken = (session: Session) => {
 }
 
 const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormData }: RequestApiProps<T>): Promise<Response<TR>> => {
+    if (!path) {
+        throw new Error(`path is required`);
+    }
+
     if (!path.startsWith("/")) {
         throw new Error(`path: ${path} must start with /`);
     }

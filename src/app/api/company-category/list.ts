@@ -1,5 +1,6 @@
 'use server'
 
+import { Session } from "next-auth"
 import RequestApi, { AddAccessToken } from "../request"
 
 export interface CompanyCategory {
