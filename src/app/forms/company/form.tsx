@@ -22,7 +22,9 @@ import printService from '@/app/utils/print-service';
 import Address from "@/app/entities/address/address";
 import AddressForm from "../address/form";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import GetAllCompanyCategories, { CompanyCategory } from '@/app/api/company-category/list';
+import GetAllCompanyCategories from '@/app/api/company-category/list';
+import { CompanyCategory } from '@/app/entities/company/company-category';
+import { MultiSelect } from '@/app/components/ui/multi-select';
 
 const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const modalName = isUpdate ? 'edit-company-' + item?.id : 'new-company'
@@ -161,21 +163,30 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 <div className="space-y-4">
                     <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={value => handleInputChange('trade_name', value)} />
                     <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={value => handleInputChange('cnpj', value)} formatted={true} />
-                    {!isUpdate && <SelectField
-                        friendlyName="Categoria da Empresa"
-                        name="category_id"
-                        values={categories.map(cat => ({ id: cat.id, name: cat.name }))}
-                        selectedValue={company.category_id || ''}
-                        setSelectedValue={value => handleInputChange('category_id', value)}
-                        optional
-                    />}
-                    {isUpdate && <TextField
-                        friendlyName="Categoria da Empresa"
-                        name="category_id"
-                        value={company.category?.name || ''}
-                        setValue={value => handleInputChange('category_id', value)}
-                        optional disabled
-                    />}
+                    {!isUpdate && (
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-700">Categorias da Empresa</label>
+                            <MultiSelect
+                                options={categories}
+                                selected={company.categories || []}
+                                onChange={(selected) => handleInputChange('categories', selected)}
+                                placeholder="Selecione as categorias"
+                                emptyMessage="Nenhuma categoria encontrada."
+                            />
+                        </div>
+                    )}
+                    {isUpdate && (
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-700">Categorias da Empresa</label>
+                            <MultiSelect
+                                options={categories}
+                                selected={company.categories || []}
+                                onChange={(selected) => handleInputChange('categories', selected)}
+                                placeholder="Selecione as categorias"
+                                emptyMessage="Nenhuma categoria encontrada."
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 

@@ -3,7 +3,6 @@ import Button from "@/app/components/ui/button";
 import Company from "@/app/entities/company/company";
 import RequestError from "@/app/utils/error";
 import { notifyError } from "@/app/utils/notifications";
-import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
@@ -24,6 +23,11 @@ export const getCompanyColumns = (
         {
             accessorKey: "schema_name",
             header: "Schema",
+        },
+        {
+            id: "categories",
+            header: "Categorias",
+            accessorFn: (row) => row.categories?.map(c => c.name).join(", ") || "",
         },
         {
             accessorKey: "email",

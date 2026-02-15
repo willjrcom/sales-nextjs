@@ -9,9 +9,12 @@ interface NewCompanyResponseProps {
 
 const NewCompany = async (company: Company, session: Session): Promise<NewCompanyResponseProps> => {
     const response = await RequestApi<Company, NewCompanyResponseProps>({
-        path: "/company/new", 
+        path: "/company/new",
         method: "POST",
-        body: company,
+        body: {
+            ...company,
+            category_ids: company.categories.map(c => c.id)
+        } as Company,
         headers: AddAccessToken(session),
     });
 
