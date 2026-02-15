@@ -1,5 +1,5 @@
 import Access from "@/app/api/auth/access/access";
-import Button from "@/app/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Company from "@/app/entities/company/company";
 import RequestError from "@/app/utils/error";
 import { notifyError } from "@/app/utils/notifications";
