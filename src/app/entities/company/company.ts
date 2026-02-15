@@ -16,7 +16,6 @@ export default class Company {
   plan_type?: string;
   is_blocked: boolean = false;
   categories: CompanyCategory[] = [];
-  category_ids?: string[];
 
   monthly_payment_due_day?: number;
   monthly_payment_due_day_updated_at?: string;

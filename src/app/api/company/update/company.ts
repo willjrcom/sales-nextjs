@@ -7,10 +7,7 @@ const UpdateCompany = async (company: Company, session: Session): Promise<string
     const response = await RequestApi<Company, string>({
         path: "/company/update",
         method: "PUT",
-        body: {
-            ...company,
-            category_ids: company.categories.map(c => c.id)
-        } as Company,
+        body: company,
         headers: AddAccessToken(session),
     });
 
