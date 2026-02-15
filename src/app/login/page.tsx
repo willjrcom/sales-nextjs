@@ -3,20 +3,17 @@
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Loading from '../components/loading/Loading';
 import { TextField } from '../components/modal/field';
 import PasswordField from '../components/modal/fields/password';
 import { Button } from '@/components/ui/button';
 import { notifyError } from '../utils/notifications';
 import { translateError } from '../utils/error';
+import { useState } from 'react';
 
-import { Suspense } from 'react';
-
-const LoginFormContent = () => {
+const LoginForm = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -42,17 +39,7 @@ const LoginFormContent = () => {
       }
 
       // Redirect on successful login
-      const q = searchParams.get('q');
-      if (q) {
-        try {
-          const id = atob(q);
-          router.push(`/access/company-selection?company_id=${id}`);
-        } catch (e) {
-          router.push('/access/company-selection');
-        }
-      } else {
-        router.push('/access/company-selection');
-      }
+      router.push('/access/company-selection');
 
     } catch (err) {
       notifyError('Algo deu errado: ' + err);
@@ -121,14 +108,6 @@ const LoginFormContent = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-const LoginForm = () => {
-  return (
-    <Suspense fallback={<Loading />}>
-      <LoginFormContent />
-    </Suspense>
   );
 };
 

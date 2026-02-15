@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Check, Copy, Info } from "lucide-react";
+import { Check, Copy, ExternalLink, Info } from "lucide-react";
 import { notify } from "@/app/utils/notifications";
 
 const PageMenuDigital = () => {
@@ -83,6 +83,22 @@ const PageMenuDigital = () => {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>{copied ? "Copiado!" : "Copiar link"}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => window.open(urlCompany, '_blank')}
+                                    >
+                                        <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Acessar link</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
