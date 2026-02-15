@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { TextField, CheckboxField, SelectField, HiddenField, ImageField } from '../../components/modal/field';
 import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -18,7 +18,7 @@ import ComplementCategorySelector from './complement-category';
 import RemovableItensComponent from './removable-ingredients';
 import { useRouter } from 'next/navigation';
 import printService from '@/app/utils/print-service';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ListSize from './list-size';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -30,9 +30,17 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const [selectedType, setSelectedType] = useState<"Normal" | "Adicional" | "Complemento">("Normal");
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
     const queryClient = useQueryClient();
     const router = useRouter();
+
+    const { data: printersResponse } = useQuery({
+        queryKey: ['printers'],
+        queryFn: () => printService.getPrinters(),
+        enabled: !!data?.user?.access_token && category.need_print,
+        refetchInterval: 30000,
+    })
+
+    const printers = useMemo(() => printersResponse?.map((p: any) => ({ id: p.name, name: p.name })) || [], [printersResponse])
 
     const createMutation = useMutation({
         mutationFn: (newCategory: Category) => NewCategory(newCategory, data!),
@@ -91,20 +99,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
             handleInputChange('need_print', false);
         }
     }, [selectedType])
-
-    useEffect(() => {
-        if (category.need_print) {
-            (async () => {
-                try {
-                    // Tenta usar Print Agent (WebSocket) primeiro
-                    const list = await printService.getPrinters();
-                    setPrinters(list.map((p: any) => ({ id: p.name, name: p.name })));
-                } catch (err) {
-                    console.warn('Erro ao carregar impressoras via Print Agent', err);
-                }
-            })();
-        }
-    }, [category.need_print]);
 
     const handleInputChange = (field: keyof Category, value: any) => {
         setCategory(prev => ({ ...prev, [field]: value }));

@@ -17,6 +17,14 @@ import { useRouter } from "next/navigation";
 import { getWhitelist } from "@/app/utils/whitelist";
 import { useQuery } from "@tanstack/react-query";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import GetAllCompanyCategories from "@/app/api/company-category/list";
+import { CompanyCategoryColumns } from "./company-category-columns";
+import CompanyCategoryForm from "@/app/forms/company-category/form";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import { ModalProvider } from "@/app/context/modal/context";
+import ButtonIcon from "@/app/components/button/button-icon";
+import { FaPlus } from "react-icons/fa";
+import ButtonIconText from "@/app/components/button/button-icon-text";
 
 const SectionCard = ({
   title,
@@ -64,6 +72,19 @@ export default function AdminAccessPage() {
   })
 
   const companies = useMemo(() => companiesResponse || [], [companiesResponse])
+
+  const [lastUpdateCompanyCategories, setLastUpdateCompanyCategories] = useState<string>(FormatRefreshTime(new Date()));
+  const { data: companyCategoriesResponse, isLoading: companyCategoriesLoading, error: companyCategoriesError, refetch: refetchCompanyCategories } = useQuery({
+    queryKey: ['public-company-categories'],
+    queryFn: () => {
+      setLastUpdateCompanyCategories(FormatRefreshTime(new Date()));
+      return GetAllCompanyCategories(session!);
+    },
+    enabled: !!session?.user.access_token,
+  })
+
+  const companyCategories = useMemo(() => companyCategoriesResponse || [], [companyCategoriesResponse])
+
 
   const [lastUpdateUsers, setLastUpdateUsers] = useState<string>(FormatRefreshTime(new Date()));
   const { data: usersResponse, isLoading: usersLoading, error: usersError, refetch: refetchUsers } = useQuery({
@@ -133,68 +154,107 @@ export default function AdminAccessPage() {
   }
 
   return (
-    <div className="space-y-8 p-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-yellow-600">Acesso Administrativo</p>
-          <h1 className="text-3xl font-bold text-gray-900">APIs públicas monitoradas</h1>
-          <p className="text-gray-600 max-w-3xl">
-            Visualize rapidamente os metadados expostos pelos endpoints <code className="bg-gray-100 px-1 rounded">/public/companies</code>{" "}
-            e <code className="bg-gray-100 px-1 rounded">/public/users</code>. Os dados são apenas para leitura.
-          </p>
-        </div>
-        {backButton}
-      </header>
-
-      <SectionCard
-        title="Empresas públicas"
-        description="Resultado direto do endpoint /public/companies"
-        action={
-          <Refresh
-            onRefresh={refetchCompanies}
-            isPending={companiesLoading}
-            lastUpdate={lastUpdateCompanies}
-          />
-        }
-      >
-        {companiesLoading ? (
-          <div className="flex justify-center py-6">
-            <Loading />
+    <ModalProvider>
+      <div className="space-y-8 p-6">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2">
+            <p className="text-sm uppercase tracking-wide text-yellow-600">Acesso Administrativo</p>
+            <h1 className="text-3xl font-bold text-gray-900">APIs públicas monitoradas</h1>
+            <p className="text-gray-600 max-w-3xl">
+              Visualize rapidamente os metadados expostos pelos endpoints <code className="bg-gray-100 px-1 rounded">/public/companies</code>{" "}
+              e <code className="bg-gray-100 px-1 rounded">/public/users</code>. Os dados são apenas para leitura.
+            </p>
           </div>
-        ) : companiesError ? (
-          <p className="text-sm text-red-600">{companiesError.message}</p>
-        ) : (
-          <CrudLayout
-            title="Empresas"
-            tableChildren={<CrudTable columns={companyColumns} data={companies} />}
-          />
-        )}
-      </SectionCard>
+          {backButton}
+        </header>
 
-      <SectionCard
-        title="Usuários públicos"
-        description="Resultado direto do endpoint /public/users"
-        action={
-          <Refresh
-            onRefresh={refetchUsers}
-            isPending={usersLoading}
-            lastUpdate={lastUpdateUsers}
-          />
-        }
-      >
-        {usersLoading ? (
-          <div className="flex justify-center py-6">
-            <Loading />
+        <SectionCard
+          title="Empresas públicas"
+          description="Resultado direto do endpoint /public/companies"
+          action={
+            <Refresh
+              onRefresh={refetchCompanies}
+              isPending={companiesLoading}
+              lastUpdate={lastUpdateCompanies}
+            />
+          }
+        >
+          {companiesLoading ? (
+            <div className="flex justify-center py-6">
+              <Loading />
+            </div>
+          ) : companiesError ? (
+            <p className="text-sm text-red-600">{companiesError.message}</p>
+          ) : (
+            <CrudLayout
+              title="Empresas"
+              tableChildren={<CrudTable columns={companyColumns} data={companies} />}
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard
+          title="Categorias de Empresa"
+          description="Gerencie as categorias de empresa disponíveis no sistema"
+          action={
+            <div className="flex gap-2">
+              <Refresh
+                onRefresh={refetchCompanyCategories}
+                isPending={companyCategoriesLoading}
+                lastUpdate={lastUpdateCompanyCategories}
+              />
+            </div>
+          }
+        >
+          {companyCategoriesLoading ? (
+            <div className="flex justify-center py-6">
+              <Loading />
+            </div>
+          ) : companyCategoriesError ? (
+            <p className="text-sm text-red-600">{(companyCategoriesError as Error).message || "Erro ao carregar categorias"}</p>
+          ) : (
+            <CrudLayout
+              title="Categorias"
+              tableChildren={<CrudTable columns={CompanyCategoryColumns()} data={companyCategories} />}
+            />
+          )}
+
+          <div className="flex justify-end">
+            <ButtonIconText
+              title="Nova Categoria"
+              modalName="new-company-category"
+              icon={FaPlus}
+            >
+              <CompanyCategoryForm />
+            </ButtonIconText>
           </div>
-        ) : usersError ? (
-          <p className="text-sm text-red-600">{usersError.message}</p>
-        ) : (
-          <CrudLayout
-            title="Usuários"
-            tableChildren={<CrudTable columns={userColumns} data={users} />}
-          />
-        )}
-      </SectionCard>
-    </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Usuários públicos"
+          description="Resultado direto do endpoint /public/users"
+          action={
+            <Refresh
+              onRefresh={refetchUsers}
+              isPending={usersLoading}
+              lastUpdate={lastUpdateUsers}
+            />
+          }
+        >
+          {usersLoading ? (
+            <div className="flex justify-center py-6">
+              <Loading />
+            </div>
+          ) : usersError ? (
+            <p className="text-sm text-red-600">{usersError.message}</p>
+          ) : (
+            <CrudLayout
+              title="Usuários"
+              tableChildren={<CrudTable columns={userColumns} data={users} />}
+            />
+          )}
+        </SectionCard>
+      </div>
+    </ModalProvider>
   );
 }

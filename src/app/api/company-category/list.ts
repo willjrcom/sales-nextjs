@@ -2,12 +2,9 @@
 
 import { Session } from "next-auth"
 import RequestApi, { AddAccessToken } from "../request"
+import { CompanyCategory } from "@/app/entities/company/company-category"
 
-export interface CompanyCategory {
-    id: string
-    name: string
-    image_path?: string
-}
+
 
 export default async function GetAllCompanyCategories(session: Session): Promise<CompanyCategory[]> {
     const response = await RequestApi<null, CompanyCategory[]>({

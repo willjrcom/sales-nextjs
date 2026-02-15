@@ -56,8 +56,14 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse])
 
-    // Carrega impressoras disponíveis via Print Agent (WebSocket) ou Electron
-    const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
+    const { data: printersResponse } = useQuery({
+        queryKey: ['printers'],
+        queryFn: () => printService.getPrinters(),
+        enabled: !!data?.user?.access_token,
+        refetchInterval: 30000,
+    })
+
+    const printers = useMemo(() => printersResponse?.map((p: any) => ({ id: p.name, name: p.name })) || [], [printersResponse])
 
     const handleInputChange = (field: keyof Company, value: any) => {
         setCompany(prev => ({ ...prev, [field]: value }));
@@ -98,21 +104,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             },
         }));
     };
-
-
-    useEffect(() => {
-        (async () => {
-            try {
-                // Tenta usar Print Agent (WebSocket) primeiro
-                const list = await printService.getPrinters();
-                setPrinters(
-                    list.map((p: any) => ({ id: p.name, name: p.name }))
-                );
-            } catch (err) {
-                console.warn('Erro ao carregar impressoras via Print Agent', err);
-            }
-        })();
-    }, []);
 
     const handleSubmit = async () => {
         if (!data) return;
