@@ -19,9 +19,11 @@ const translateError = (errorMessage: string): string => {
 
     // Verificar correspondências parciais para mensagens dinâmicas
     for (const [key, translation] of Object.entries(errorTranslations)) {
-        if (errorMessage.startsWith(key)) {
-            return translation;
-        }
+        try {
+            if (errorMessage.startsWith(key)) {
+                return translation;
+            }
+        } catch (error) { }
     }
 
     return errorMessage;
