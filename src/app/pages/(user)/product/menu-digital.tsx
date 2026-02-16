@@ -39,7 +39,7 @@ const PageMenuDigital = () => {
     }
 
     const encodedSchemaName = btoa(company.schema_name)
-    const urlCompany = `${appUrl}/login?q=${encodedSchemaName}`
+    const urlCompany = `${appUrl}/pages/delivery?q=${encodedSchemaName}`
 
     const handleCopy = () => {
         navigator.clipboard.writeText(urlCompany);
@@ -61,7 +61,7 @@ const PageMenuDigital = () => {
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="menu-link">Link de Acesso</Label>
+                    <Label htmlFor="menu-link">Link de Entregas</Label>
                     <div className="flex gap-2">
                         <Input
                             id="menu-link"
