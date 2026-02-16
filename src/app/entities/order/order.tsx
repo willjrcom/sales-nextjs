@@ -25,12 +25,12 @@ export default class Order {
     delivery?: OrderDelivery;
     table?: OrderTable;
     pickup?: OrderPickup;
-    created_at: Date = new Date();
-    pending_at?: Date;
-    finished_at?: Date;
-    ready_at?: Date;
-    cancelled_at?: Date;
-    archived_at?: Date;
+    created_at: string = '';
+    pending_at?: string;
+    finished_at?: string;
+    ready_at?: string;
+    cancelled_at?: string;
+    archived_at?: string;
 
     constructor(data: Partial<Order> = {}) {
         Object.assign(this, data);

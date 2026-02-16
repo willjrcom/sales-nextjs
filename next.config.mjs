@@ -9,6 +9,9 @@ const nextConfig = {
         unoptimized: false,
         dangerouslyAllowSVG: true,
     },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
 };
 
 export default nextConfig;

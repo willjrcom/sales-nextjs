@@ -1,5 +1,5 @@
 const showStatus: Record<string, string> = {
-    Staging: "Em Escolha",
+    Staging: "Em Aberto",
     Pending: "Pendente",
     Started: "Iniciado",
     Ready: "Pronto",
