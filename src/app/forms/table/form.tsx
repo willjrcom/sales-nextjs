@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import QRCode from 'react-qr-code';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import Table, { ValidateTableForm } from '@/app/entities/table/table';
@@ -85,23 +86,112 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         deleteMutation.mutate(table.id);
     }
 
+    const qrCodeRef = useRef<HTMLDivElement>(null);
+
+    // Generate table URL for QR code
+    const tableUrl = table.id
+        ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/pages/table?id=${table.id}`
+        : '';
+
+    // Download QR code as PNG
+    const downloadQRCode = () => {
+        if (!qrCodeRef.current) return;
+
+        const svg = qrCodeRef.current.querySelector('svg');
+        if (!svg) return;
+
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+
+        // Set canvas size (adding padding)
+        const padding = 40;
+        canvas.width = 200 + padding * 2;
+        canvas.height = 200 + padding * 2;
+
+        img.onload = () => {
+            if (!ctx) return;
+
+            // Fill white background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw QR code with padding
+            ctx.drawImage(img, padding, padding, 200, 200);
+
+            // Convert to PNG and download
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = `mesa-${table.name}-qrcode.png`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+        };
+
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    };
+
     return (
         <div className="text-black space-y-6">
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações da Mesa</h3>
-                <div className="space-y-4">
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
-                    </div>
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
-                    </div>
-                    {isUpdate && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column - Form */}
+                <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações da Mesa</h3>
+                    <div className="space-y-4">
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={table.is_active} />
+                            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
                         </div>
-                    )}
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
+                        </div>
+                        {isUpdate && (
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={table.is_active} />
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+                {/* Right Column - QR Code */}
+                {isUpdate && table.id && (
+                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-orange-100 p-6 transition-all duration-300 hover:shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-orange-200">QR Code da Mesa</h3>
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <div ref={qrCodeRef} className="bg-white p-4 rounded-lg shadow-inner">
+                                <QRCode
+                                    value={tableUrl}
+                                    size={200}
+                                    level="H"
+                                    fgColor="#000000"
+                                />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-sm font-medium text-gray-700">Mesa: {table.name}</p>
+                                <p className="text-xs text-gray-500 mt-1 break-all px-2">{tableUrl}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={downloadQRCode}
+                                    className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded-lg transition-colors font-medium shadow-sm"
+                                >
+                                    📥 Baixar QR Code
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => window.open(tableUrl, '_blank')}
+                                    className="text-xs text-orange-600 hover:text-orange-800 underline transition-colors"
+                                >
+                                    Testar link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name} />
