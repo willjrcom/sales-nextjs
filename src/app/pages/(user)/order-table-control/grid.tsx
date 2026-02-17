@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
 import GetOrderTables from '@/app/api/order-table/order-table';
 import ThreeColumnHeader from "@/components/header/three-column-header";
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 
 // Sidebar listing active tables and showing elapsed usage time
 const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
@@ -80,11 +81,16 @@ const DragAndDropGrid = () => {
         queryKey: ['places'],
         queryFn: () => GetPlaces(data!),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 120000,
     });
 
-    const { data: tableOrdersResponse } = useQuery({
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const { isLoading, data: tableOrdersResponse, refetch } = useQuery({
         queryKey: ['table-orders'],
-        queryFn: () => GetOrderTables(data!),
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetOrderTables(data!);
+        },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
@@ -134,8 +140,9 @@ const DragAndDropGrid = () => {
             <div className="flex-1">
                 <ThreeColumnHeader
                     center={<PageTitle title="Controle de Mesas" tooltip="Gerencie mesas e pedidos em cada local." />}
-                    right={<SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
-                        optional />} />
+                    left={<SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
+                        optional />}
+                    right={<Refresh onRefresh={refetch} isPending={isLoading} lastUpdate={lastUpdate} />} />
                 <div
                     style={{
                         display: "grid",
