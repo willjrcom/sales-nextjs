@@ -39,10 +39,12 @@ const PageMenuDigital = () => {
     }
 
     const encodedSchemaName = btoa(company.schema_name)
-    const urlCompany = `${appUrl}/pages/delivery?q=${encodedSchemaName}`
+    const urlDelivery = `${appUrl}/pages/delivery?q=${encodedSchemaName}`
+    const urlTable = `${appUrl}/pages/table?q=${encodedSchemaName}`
+    const urlPickup = `${appUrl}/pages/pickup?q=${encodedSchemaName}`
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(urlCompany);
+        navigator.clipboard.writeText(urlDelivery);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         notify("Link copiado para a área de transferência!");
@@ -65,7 +67,7 @@ const PageMenuDigital = () => {
                     <div className="flex gap-2">
                         <Input
                             id="menu-link"
-                            value={urlCompany}
+                            value={urlDelivery}
                             readOnly
                             className="bg-gray-50 font-mono text-sm"
                         />
@@ -92,7 +94,7 @@ const PageMenuDigital = () => {
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        onClick={() => window.open(urlCompany, '_blank')}
+                                        onClick={() => window.open(urlDelivery, '_blank')}
                                     >
                                         <ExternalLink className="h-4 w-4" />
                                     </Button>
@@ -108,7 +110,115 @@ const PageMenuDigital = () => {
                 <div className="bg-blue-50 border border-blue-100 rounded-md p-4 text-sm text-blue-700 flex gap-3 items-start">
                     <Info className="h-5 w-5 shrink-0 mt-0.5" />
                     <p>
-                        Este link permite que seus clientes acessem diretamente o cardápio da <strong>{company.trade_name}</strong> sem precisar buscar pelo nome da empresa.
+                        Este link permite que seus clientes acessem a página de entregas da <strong>{company.trade_name}</strong>.
+                    </p>
+                </div>
+            </CardContent>
+
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="menu-link">Link de Mesas</Label>
+                    <div className="flex gap-2">
+                        <Input
+                            id="menu-link"
+                            value={urlTable}
+                            readOnly
+                            className="bg-gray-50 font-mono text-sm"
+                        />
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={handleCopy}
+                                        className={copied ? "text-green-600 border-green-600 bg-green-50" : ""}
+                                    >
+                                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{copied ? "Copiado!" : "Copiar link"}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => window.open(urlTable, '_blank')}
+                                    >
+                                        <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Acessar link</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-100 rounded-md p-4 text-sm text-blue-700 flex gap-3 items-start">
+                    <Info className="h-5 w-5 shrink-0 mt-0.5" />
+                    <p>
+                        Este link permite que seus clientes acessem a página de mesas da <strong>{company.trade_name}</strong>.
+                    </p>
+                </div>
+            </CardContent>
+
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="menu-link">Link de Retirada/Balcão</Label>
+                    <div className="flex gap-2">
+                        <Input
+                            id="menu-link"
+                            value={urlPickup}
+                            readOnly
+                            className="bg-gray-50 font-mono text-sm"
+                        />
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={handleCopy}
+                                        className={copied ? "text-green-600 border-green-600 bg-green-50" : ""}
+                                    >
+                                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{copied ? "Copiado!" : "Copiar link"}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => window.open(urlPickup, '_blank')}
+                                    >
+                                        <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Acessar link</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-100 rounded-md p-4 text-sm text-blue-700 flex gap-3 items-start">
+                    <Info className="h-5 w-5 shrink-0 mt-0.5" />
+                    <p>
+                        Este link permite que seus clientes acessem a página de retirada/balcão da <strong>{company.trade_name}</strong>.
                     </p>
                 </div>
             </CardContent>
