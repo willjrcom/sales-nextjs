@@ -1,5 +1,7 @@
 'use client';
 
+import GetCompany from "@/app/api/company/company";
+
 import React, { useState, useRef } from 'react';
 import QRCode from 'react-qr-code';
 import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
@@ -14,7 +16,7 @@ import UpdateTable from '@/app/api/table/update/table';
 import { useModal } from '@/app/context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
@@ -86,11 +88,18 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         deleteMutation.mutate(table.id);
     }
 
+    const { data: company } = useQuery({
+        queryKey: ["company"],
+        queryFn: () => GetCompany(data!),
+        enabled: !!data?.user?.access_token,
+    })
+
     const qrCodeRef = useRef<HTMLDivElement>(null);
 
     // Generate table URL for QR code
-    const tableUrl = table.id
-        ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/pages/table?id=${table.id}`
+    const encodedSchemaName = company?.schema_name ? btoa(company.schema_name) : ""
+    const tableUrl = table.id && company
+        ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/pages/table?id=${table.id}&q=${encodedSchemaName}`
         : '';
 
     // Download QR code as PNG
@@ -194,7 +203,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 )}
             </div>
 
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.name} />
+            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal item={table} name="Table" onSubmit={submit} />
