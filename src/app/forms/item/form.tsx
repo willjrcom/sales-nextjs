@@ -10,11 +10,15 @@ import Product from "@/app/entities/product/product";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
 import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
 import Image from "next/image";
+import GetCategoryByID from "@/app/api/category/[id]/category";
+import { GetAdditionalProducts } from "@/app/api/product/product";
+import NewAdditionalItem from "@/app/api/item/update/additional/item";
+import AddRemovedItem from "@/app/api/item/update/removed-item/add/item";
 
 interface AddProductCardProps {
   product: Product;
@@ -32,11 +36,32 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // New state for additionals and removables
+  const [selectedAdditionals, setSelectedAdditionals] = useState<Record<string, number>>({});
+  const [selectedRemovables, setSelectedRemovables] = useState<string[]>([]);
+
   useEffect(() => {
     fetchProduct();
   }, [data?.user?.access_token, reloadProduct]);
 
   const availableFlavors = useMemo(() => product.flavors || [], [product.flavors]);
+
+  // Fetch Category for Removables
+  const { data: category } = useQuery({
+    queryKey: ['category', product.category_id],
+    queryFn: () => GetCategoryByID(data!, product.category_id),
+    enabled: !!data && !!product.category_id,
+  });
+
+  // Fetch Additional Products
+  const { data: additionalProductsResponse } = useQuery({
+    queryKey: ['additional-products', product.category_id],
+    queryFn: () => GetAdditionalProducts(data!, product.category_id),
+    enabled: !!data && !!product.category_id,
+  });
+
+  const additionalProducts = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse]);
+  const removableIngredients = useMemo(() => category?.removable_ingredients || [], [category]);
 
   useEffect(() => {
     if (!availableFlavors.length) {
@@ -61,6 +86,28 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       setProduct(productFound);
     }
   }
+
+  const updateAdditional = (productId: string, delta: number) => {
+    setSelectedAdditionals(prev => {
+      const currentQty = prev[productId] || 0;
+      const newQty = Math.max(0, Math.min(5, currentQty + delta));
+      if (newQty === 0) {
+        const { [productId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [productId]: newQty };
+    });
+  };
+
+  const toggleRemovable = (name: string) => {
+    setSelectedRemovables(prev => {
+      if (prev.includes(name)) {
+        return prev.filter(i => i !== name);
+      } else {
+        return [...prev, name];
+      }
+    });
+  };
 
   const submit = async () => {
     if (!data) return;
@@ -90,6 +137,20 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       const response = await NewItem(body, data)
 
+      // 2. Add Additionals
+      const additionalPromises = Object.entries(selectedAdditionals).map(async ([productId, addQty]) => {
+        if (addQty > 0) {
+          await NewAdditionalItem(response.item_id, { product_id: productId, quantity: addQty }, data);
+        }
+      });
+
+      // 3. Add Removables
+      const removablePromises = selectedRemovables.map(async (name) => {
+        await AddRemovedItem(response.item_id, name, data);
+      });
+
+      await Promise.all([...additionalPromises, ...removablePromises]);
+
       const updatedGroupItem = await GetGroupItemByID(response.group_item_id, data);
       queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
 
@@ -98,6 +159,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       // Reset form
       setQuantity(1);
       setObservation('');
+      setSelectedAdditionals({}); // Reset additionals
+      setSelectedRemovables([]); // Reset removables
     } catch (error) {
       const err = error as RequestError;
       notifyError(err.message || 'Erro ao adicionar item');
@@ -116,9 +179,21 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
     return <div className="p-4 text-center text-red-500">Erro: Produto sem categoria</div>;
   }
 
+  const calculateTotal = () => {
+    let total = new Decimal(product.price).times(quantity);
+
+    // Add additionals cost
+    Object.entries(selectedAdditionals).forEach(([productId, addQty]) => {
+      const additional = additionalProducts.find(p => p.id === productId);
+      if (additional) {
+        total = total.plus(new Decimal(additional.price).times(addQty));
+      }
+    });
+    return total;
+  };
 
   const unitPrice = new Decimal(product.price);
-  const totalAmount = unitPrice.times(quantity);
+  const totalAmount = calculateTotal();
 
   const hasImage = !!product.image_path;
 
@@ -190,6 +265,81 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                         {flavor}
                       </button>
                     );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Adicionais */}
+            {additionalProducts.length > 0 && (
+              <div className='mb-6'>
+                <div className='flex items-center gap-2 mb-3'>
+                  <span className="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg></span>
+                  <h3 className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
+                    ADICIONAIS
+                  </h3>
+                </div>
+
+                <div className="space-y-3">
+                  {additionalProducts.map((additional: Product) => {
+                    const qty = selectedAdditionals[additional.id] || 0;
+                    return (
+                      <div key={additional.id} className="flex items-center justify-between p-3 border rounded-lg hover:border-green-200 transition-colors bg-white">
+                        <div>
+                          <p className="font-medium text-gray-900">{additional.name}</p>
+                          <p className="text-sm text-green-600 font-semibold">+ R$ {new Decimal(additional.price).toFixed(2)}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          {qty > 0 && (
+                            <button
+                              onClick={() => updateAdditional(additional.id, -1)}
+                              className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors"
+                            >
+                              -
+                            </button>
+                          )}
+                          {qty > 0 && <span className="font-semibold w-4 text-center">{qty}</span>}
+                          <button
+                            onClick={() => updateAdditional(additional.id, 1)}
+                            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${qty > 0 ? 'bg-green-50 text-green-600 border border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 hover:text-gray-600'}`}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Remover Ingredientes */}
+            {removableIngredients.length > 0 && (
+              <div className='mb-6'>
+                <div className='flex items-center gap-2 mb-3'>
+                  <span className="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg></span>
+                  <h3 className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
+                    REMOVER DO PRODUTO
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {removableIngredients.map((item: string) => {
+                    const isRemoved = selectedRemovables.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => toggleRemovable(item)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium border transition-all flex items-center gap-2 ${isRemoved
+                          ? 'bg-red-50 border-red-200 text-red-700 shadow-sm'
+                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                          }`}
+                      >
+                        <span>{item}</span>
+                        {isRemoved ? (
+                          <span className="text-xs">✕</span>
+                        ) : null}
+                      </button>
+                    )
                   })}
                 </div>
               </div>
