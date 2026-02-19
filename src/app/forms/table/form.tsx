@@ -96,6 +96,8 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
     const qrCodeRef = useRef<HTMLDivElement>(null);
 
+    if (!company) return <div>Carregando...</div>;
+
     // Generate table URL for QR code
     const encodedSchemaName = btoa(company.schema_name)
     const tableUrl = table.id && company
