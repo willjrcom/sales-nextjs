@@ -8,7 +8,6 @@ import PageTitle from '@/app/components/ui/page-title';
 import CrudTable from "@/app/components/crud/table";
 import CategoryColumns from "@/app/entities/category/table-columns";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { FaFilter } from "react-icons/fa";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";

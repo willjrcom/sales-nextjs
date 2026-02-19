@@ -3,7 +3,7 @@
 import RequestError from "@/app/utils/error";
 import NewOrderTable from "@/app/api/order-table/new/order-table";
 import Table from "@/app/entities/table/table";
-import { SelectField } from "@/app/components/modal/field";
+import { SelectField, TextField } from "@/app/components/modal/field";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -13,10 +13,13 @@ import { notifyError } from "@/app/utils/notifications";
 import { useQuery } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
 import ThreeColumnHeader from "@/components/header/three-column-header";
+import PatternField from "@/app/components/modal/fields/pattern";
 
 const PageNewOrderTable = () => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
+    const [name, setName] = useState<string>("");
+    const [contact, setContact] = useState<string>("");
     const router = useRouter();
     const { data } = useSession();
 
@@ -43,7 +46,7 @@ const PageNewOrderTable = () => {
     const newOrder = async (tableID: string) => {
         if (!data) return;
         try {
-            const response = await NewOrderTable(tableID, data);
+            const response = await NewOrderTable(data, tableID, name, contact);
             router.push('/pages/order-control/' + response.order_id);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
@@ -71,6 +74,9 @@ const PageNewOrderTable = () => {
                     setSelectedValue={setTableID}
                     values={tables}
                 />
+
+                <TextField name="name" value={name} setValue={setName} />
+                <PatternField name="contact" value={contact} setValue={setContact} patternName="full-phone" />
 
                 <button
                     disabled={!tableID}

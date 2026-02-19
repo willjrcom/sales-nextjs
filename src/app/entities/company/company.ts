@@ -15,6 +15,7 @@ export default class Company {
   subscription_expires_at?: string | null;
   plan_type?: string;
   is_blocked: boolean = false;
+  image_path: string = '';
   categories: CompanyCategory[] = [];
 
   monthly_payment_due_day?: number;

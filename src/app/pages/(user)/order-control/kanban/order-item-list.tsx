@@ -115,7 +115,8 @@ function getSecondaryInfo(order: Order) {
     }
 
     if (order.table) {
-        const tableName = order.table.table?.name || order.table.name || "";
+        const tableName = order.table.table?.name || "";
+        const clientName = order.table.name || "";
         const flags: { label: string; variant: BadgeVariant }[] = [];
 
         if (order.table.status === "Pending") flags.push({ label: "Mesa Pendente", variant: "yellow" });
@@ -123,7 +124,7 @@ function getSecondaryInfo(order: Order) {
         if (order.table.status === "Cancelled") flags.push({ label: "Mesa Cancelada", variant: "red" });
 
         return {
-            title: tableName,
+            title: tableName + ' ' + clientName,
             flags,
             timeRef: formatTimeAgo(order.table.pending_at),
             timeLabel: order.table.pending_at ? "pendente" : null,

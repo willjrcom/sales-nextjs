@@ -2,11 +2,11 @@ import Company from "@/app/entities/company/company";
 import RequestApi, { AddAccessToken } from "../request";
 import { Session } from "next-auth";
 
-const GetCompany = async (session: Session, token?: string): Promise<Company> => {
+const GetCompany = async (session: Session): Promise<Company> => {
     const response = await RequestApi<null, Company>({
-        path: "/company", 
+        path: "/company",
         method: "GET",
-        headers: token ? { "id-token": token } : AddAccessToken(session),
+        headers: AddAccessToken(session),
     });
     return response.data
 };

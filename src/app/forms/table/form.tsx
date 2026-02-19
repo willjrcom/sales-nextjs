@@ -97,7 +97,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const qrCodeRef = useRef<HTMLDivElement>(null);
 
     // Generate table URL for QR code
-    const encodedSchemaName = company?.schema_name ? btoa(company.schema_name) : ""
+    const encodedSchemaName = btoa(company.schema_name)
     const tableUrl = table.id && company
         ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/pages/table?id=${table.id}&q=${encodedSchemaName}`
         : '';

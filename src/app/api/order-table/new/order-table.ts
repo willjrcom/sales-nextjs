@@ -6,11 +6,11 @@ interface NewOrderProps {
     order_id: string
 }
 
-const NewOrderTable = async (table_id: string, session: Session): Promise<NewOrderProps> => {
+const NewOrderTable = async (session: Session, table_id: string, name?: string, contact?: string): Promise<NewOrderProps> => {
     const response = await RequestApi<Object, NewOrderProps>({
-        path: "/order-table/new", 
+        path: "/order-table/new",
         method: "POST",
-        body: { table_id: table_id },
+        body: { table_id: table_id, name: name, contact: contact },
         headers: AddAccessToken(session),
     });
 

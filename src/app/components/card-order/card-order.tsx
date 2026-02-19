@@ -235,8 +235,9 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Mesa</h3>
                         <StatusComponent status={order.table.status} />
                     </div>
-                    <p><strong>Mesa:</strong> {order.table.name}</p>
-                    <p><strong>Contato:</strong> {order.table.contact}</p>
+                    <p><strong>Mesa:</strong> {order.table.table?.name}</p>
+                    {order.table.name && <p><strong>Nome:</strong> {order.table.name}</p>}
+                    {order.table.contact && <p><strong>Contato:</strong> {order.table.contact}</p>}
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>
                         <ul className="list-disc ml-4">

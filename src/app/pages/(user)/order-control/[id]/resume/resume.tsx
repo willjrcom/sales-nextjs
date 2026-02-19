@@ -32,7 +32,7 @@ export default function CardOrderResume() {
     const getOrderTypeName = () => {
         if (order?.delivery) return "Delivery";
         if (order?.pickup) return "Retirada";
-        if (order?.table) return `Mesa ${order.table.name}`;
+        if (order?.table) return `Mesa ${order.table.table?.name}`;
         return "Pedido";
     };
 

@@ -4,7 +4,7 @@ import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import PageTitle from "@/app/components/ui/page-title";
 import PlaceTable from "@/app/entities/place/place_table";
-import { SelectField } from "@/app/components/modal/field";
+import { SelectField, TextField } from "@/app/components/modal/field";
 import RequestError from "@/app/utils/error";
 import { useModal } from "@/app/context/modal/context";
 import CardOrder from "@/app/components/card-order/card-order";
@@ -18,6 +18,7 @@ import GetPlaces from '@/app/api/place/place';
 import GetOrderTables from '@/app/api/order-table/order-table';
 import ThreeColumnHeader from "@/components/header/three-column-header";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import PatternField from "@/app/components/modal/fields/pattern";
 
 // Sidebar listing active tables and showing elapsed usage time
 const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
@@ -185,6 +186,8 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
     const { data } = useSession();
     const router = useRouter();
     const modalHandler = useModal();
+    const [name, setName] = useState<string>("");
+    const [contact, setContact] = useState<string>("");
     const style = {
         width: "80px",
         height: "60px",
@@ -201,7 +204,7 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
             const newOrder = async (tableID: string) => {
                 if (!data) return
                 try {
-                    const response = await NewOrderTable(tableID, data)
+                    const response = await NewOrderTable(data, tableID, name, contact)
                     router.push('/pages/order-control/' + response.order_id)
                     onClose()
                 } catch (error: RequestError | any) {
@@ -212,6 +215,9 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
             const button = () => (
                 <>
                     <p className="mb-4"><strong>Mesa:</strong> {placeTable.table.name}</p>
+                    <TextField name="name" value={name} setValue={setName} />
+                    <PatternField name="contact" value={contact} setValue={setContact} patternName="full-phone" />
+
                     <p className="mb-4">Deseja iniciar um novo pedido?</p>
                     <button onClick={() => newOrder(placeTable.table_id)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
                         <FaPlus />

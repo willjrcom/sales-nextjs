@@ -9,7 +9,7 @@ import CreateFormsProps from '../create-forms-props';
 import NewCompany from '@/app/api/company/new/company';
 import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { HiddenField, TextField, CheckboxField, NumberField, SelectField } from '@/app/components/modal/field';
+import { HiddenField, TextField, CheckboxField, NumberField, SelectField, ImageField } from '@/app/components/modal/field';
 import PriceField from '@/app/components/modal/fields/price';
 import Decimal from 'decimal.js';
 import Access from '@/app/api/auth/access/access';
@@ -187,6 +187,15 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             />
                         </div>
                     )}
+
+                    <ImageField
+                        friendlyName="Logo"
+                        name="image_path"
+                        setValue={value => handleInputChange('image_path', value)}
+                        value={company.image_path}
+                        optional
+                        onUploadError={(error) => notifyError(error)}
+                    />
                 </div>
             </div>
 
