@@ -12,7 +12,7 @@ const DeleteComplementItemModal = () => {
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const modalHandler = useModal();
     const { data } = useSession();
-    const modalName = "delete-complement-item-" + groupItem?.id;
+    const modalName = "delete-complement-" + groupItem?.id;
 
     const onDelete = async () => {
         if (!data || !groupItem?.id) return;
@@ -20,6 +20,7 @@ const DeleteComplementItemModal = () => {
             await DeleteComplementGroupItem(groupItem.id, data)
             const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
             queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
 
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {

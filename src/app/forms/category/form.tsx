@@ -163,12 +163,31 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     {!isUpdate && (
                         <TypeCategorySelector selectedType={selectedType} setSelectedType={setSelectedType} />
                     )}
+
+                    {/* Mostrar tipo de Categoria */}
+                    {isUpdate && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-500">Tipo:</span>
+                            {category.is_complement ? (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                                    Complemento
+                                </span>
+                            ) : category.is_additional ? (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                    Adicional
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                    Normal
+                                </span>
+                            )}
+                        </div>
+                    )}
                     {isUpdate && (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                             <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={category.is_active} />
                         </div>
                     )}
-
                     {category?.id && <>
                         <hr className="my-4" />
                         <Dialog>
@@ -179,7 +198,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                 <DialogHeader>
                                     <DialogTitle>Gerenciar Tamanhos da Categoria {category.name}</DialogTitle>
                                 </DialogHeader>
-                                <ListSize categoryID={category.id} isDefaultCategory={!category.is_complement && !category.is_additional} />
+                                <ListSize categoryID={category.id} isAdditional={category.is_additional} />
                             </DialogContent>
                         </Dialog>
                     </>}

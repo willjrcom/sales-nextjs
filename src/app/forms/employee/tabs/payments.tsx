@@ -26,7 +26,6 @@ export default function EmployeePaymentsTab({ item }: EmployeePaymentsTabProps) 
 
     const handlePaymentSuccess = (newPayment: any) => {
         queryClient.invalidateQueries({ queryKey: ['employee-payments', item.id] });
-        notifySuccess('Pagamento atualizado com sucesso');
         setShowPaymentModal(false);
     };
 

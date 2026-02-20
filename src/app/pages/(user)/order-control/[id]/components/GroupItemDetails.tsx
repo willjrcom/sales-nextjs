@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import GroupItem from '@/app/entities/order/group-item';
 import { useSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -21,6 +21,13 @@ export const GroupItemDetails = ({ groupItem, isStaging }: GroupItemDetailsProps
     const { data: session } = useSession();
     const queryClient = useQueryClient();
     const [complementModalOpen, setComplementModalOpen] = useState(false);
+
+    // Reset modal state if complement is already present to prevent auto-reopening after deletion
+    useEffect(() => {
+        if (groupItem.complement_item) {
+            setComplementModalOpen(false);
+        }
+    }, [groupItem.complement_item]);
 
     const handleOpenComplementModal = () => {
         // Set current group item so ListComplementItems can use it

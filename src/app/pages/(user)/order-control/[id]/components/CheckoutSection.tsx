@@ -55,7 +55,6 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
-            notifySuccess('Pagamento atualizado!');
         },
         onError: (error: any) => {
             notifyError(error?.message || 'Erro ao atualizar pagamento');

@@ -18,10 +18,10 @@ import ThreeColumnHeader from "@/components/header/three-column-header";
 
 interface ListSizeProps {
     categoryID: string;
-    isDefaultCategory: boolean;
+    isAdditional: boolean;
 }
 
-const ListSize = ({ categoryID, isDefaultCategory }: ListSizeProps) => {
+const ListSize = ({ categoryID, isAdditional }: ListSizeProps) => {
     const { data: session } = useSession();
     const [editingSize, setEditingSize] = useState<Size | null>(null);
     const [isNewOpen, setIsNewOpen] = useState(false);
@@ -83,7 +83,7 @@ const ListSize = ({ categoryID, isDefaultCategory }: ListSizeProps) => {
                     </Dialog>
                 ))}
 
-                {isDefaultCategory && (
+                {!isAdditional && (
                     <Dialog open={isNewOpen} onOpenChange={setIsNewOpen}>
                         <DialogTrigger asChild>
                             <div className="border p-2 rounded-md text-center bg-blue-500 text-white w-32 cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">

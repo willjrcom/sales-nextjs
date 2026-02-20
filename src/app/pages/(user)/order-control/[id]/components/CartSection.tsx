@@ -25,6 +25,7 @@ import { OrderControlView } from '../page';
 import { useSession } from 'next-auth/react';
 import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
 import { GroupItemDetails } from './GroupItemDetails';
+import { getStatusColor, showStatus } from '@/app/utils/status';
 
 interface CartSectionProps {
     orderID: string;
@@ -147,6 +148,11 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
             </div>
 
             <div className='mx-auto max-w-md px-4 space-y-4'>
+                {/* Order Number Header */}
+                <div className="flex justify-between items-center mb-4 px-2">
+                    <h2 className="text-xl font-bold text-gray-800">Pedido #{order?.order_number}</h2>
+                </div>
+
                 {!hasItems ? (
                     <Card className='p-8 text-center flex flex-col items-center justify-center min-h-[300px]'>
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-3xl">🛒</div>
@@ -175,7 +181,10 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                             {/* Group Header */}
                                             <div className='flex items-center justify-between mb-3 border-b border-gray-100 pb-2'>
                                                 <div>
-                                                    <h3 className='font-semibold text-base'>{category?.name || 'Categoria'}</h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className='font-semibold text-base'>{category?.name || 'Categoria'}</h3>
+                                                        <span className={`ml-2 px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor[groupItem.status]}`}>{showStatus[groupItem.status]}</span>
+                                                    </div>
                                                     {groupItem.size && (
                                                         <p className='text-xs text-gray-500'>Tamanho: {groupItem.size}</p>
                                                     )}
@@ -224,7 +233,16 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                                     ))}
                                                                 </div>
                                                             )}
-                                                            <div className="flex justify-between items-center mt-2">
+                                                            {item.removed_items && item.removed_items.length > 0 && (
+                                                                <div className="mt-1">
+                                                                    {item.removed_items.map((removed, idx) => (
+                                                                        <p key={idx} className="text-xs text-red-500 line-through">
+                                                                            - Sem {removed}
+                                                                        </p>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                            <div className="flex justify-end items-center mt-2 gap-2">
                                                                 <p className='text-xs text-gray-600 bg-white px-2 py-0.5 rounded border'>x{item.quantity}</p>
 
                                                                 {groupItem.status === "Staging" &&
@@ -243,14 +261,14 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                 ))}
                                             </div>
 
+                                            {/* Group Details (Complement, Obs, Schedule) */}
+                                            <GroupItemDetails groupItem={groupItem} isStaging={groupItem.status === 'Staging'} />
+
                                             {/* Group Total */}
-                                            <div className='mt-3 pt-2 text-right'>
+                                            <div className='mt-3 pt-2 text-right border-t border-gray-100'>
                                                 <span className='text-xs text-gray-500 mr-2'>Subtotal do grupo</span>
                                                 <span className='font-semibold text-gray-900'>{new Decimal(groupItem.total_price || 0).toFixed(2)}</span>
                                             </div>
-
-                                            {/* Group Details (Complement, Obs, Schedule) */}
-                                            <GroupItemDetails groupItem={groupItem} isStaging={groupItem.status === 'Staging'} />
                                         </Card>
                                     );
                                 })}
@@ -270,9 +288,11 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
 
                             {
                                 <>
-                                    <Button className='mt-6 w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
-                                        Enviar pedido
-                                    </Button>
+                                    {order?.group_items?.some(g => g.status === 'Staging') && (
+                                        <Button className='mt-6 w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
+                                            Enviar pedido
+                                        </Button>
+                                    )}
                                     <Button
                                         className='mt-3 w-full'
                                         variant='outline'
