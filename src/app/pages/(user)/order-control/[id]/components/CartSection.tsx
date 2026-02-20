@@ -271,7 +271,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                             {
                                 <>
                                     <Button className='mt-6 w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
-                                        Finalizar pedido
+                                        Enviar pedido
                                     </Button>
                                     <Button
                                         className='mt-3 w-full'
