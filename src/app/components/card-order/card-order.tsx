@@ -366,7 +366,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         {order.group_items
                             .sort((a, b) => a.category_id.localeCompare(b.category_id))
                             .map((group) => (
-                                <GroupItemCard key={group.id} group={group} />
+                                <GroupItemCard key={group.id} group={group} session={data!} />
                             ))}
                     </ul>
                 ) : (
