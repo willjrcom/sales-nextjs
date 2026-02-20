@@ -151,8 +151,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       await Promise.all([...additionalPromises, ...removablePromises]);
 
-      const updatedGroupItem = await GetGroupItemByID(response.group_item_id, data);
-      queryClient.setQueryData(['group-item', 'current'], updatedGroupItem);
+      queryClient.setQueryData(['group-item', 'current'], null);
+      queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
 
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
       modalHandler.hideModal(modalName);

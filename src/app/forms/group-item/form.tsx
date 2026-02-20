@@ -20,7 +20,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-const GroupItemForm = ({ item }: CreateFormsProps<GroupItem>) => {
+interface GroupItemFormProps extends CreateFormsProps<GroupItem> {
+    onSuccess?: () => void;
+}
+
+const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
     const [groupItem, setGroupItem] = useState<GroupItem>(new GroupItem(item));
     const [observation, setObservation] = useState<string>(item?.observation || '');
     const [startAt, setStartAt] = useState<string | null | undefined>(item?.start_at);
