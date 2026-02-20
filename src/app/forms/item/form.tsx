@@ -169,21 +169,19 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       const response = await NewItem(body, data)
 
-      // 2. Add Additionals
-      const additionalPromises = Object.entries(selectedAdditionals).map(async ([productId, addQty]) => {
+      // 2. Add Additionals (Sequentially to avoid race conditions)
+      for (const [productId, addQty] of Object.entries(selectedAdditionals)) {
         if (addQty > 0) {
           const additionalProduct = additionalProducts.find(p => p.id === productId);
           const variationId = additionalProduct?.variations?.[0]?.id;
           await NewAdditionalItem(response.item_id, { product_id: productId, variation_id: variationId, quantity: addQty }, data);
         }
-      });
+      }
 
-      // 3. Add Removables
-      const removablePromises = selectedRemovables.map(async (name) => {
+      // 3. Add Removables (Sequentially to avoid race conditions)
+      for (const name of selectedRemovables) {
         await AddRemovedItem(response.item_id, name, data);
-      });
-
-      await Promise.all([...additionalPromises, ...removablePromises]);
+      }
 
       queryClient.setQueryData(['group-item', 'current'], null);
       queryClient.invalidateQueries({ queryKey: ['order', 'current'] });

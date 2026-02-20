@@ -10,11 +10,11 @@ import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
-import ObservationCard from '@/app/components/order/observation-card';
 import printGroupItem from '@/app/components/print/print-group-item';
 import GetCompany from '@/app/api/company/company';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ItemProcessCard from './item-process-card';
+import RemovedItemCard from '@/app/components/order/removed-item-card';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
@@ -89,7 +89,7 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
             <div className="px-6 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center space-x-2 py-2">
                     <span className="text-gray-600 font-semibold">Pedido #{orderProcess.order_number} - {orderProcess.order_type}</span>
-                    {groupItem.observation && <ObservationCard observation={groupItem.observation} />}
+                    {groupItem.observation && <RemovedItemCard value={groupItem.observation} key={groupItem.observation} />}
                 </div>
                 <div className="flex items-center space-x-2">
                     <button

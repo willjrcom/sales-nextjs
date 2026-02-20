@@ -1,5 +1,4 @@
 import AdditionalItemCard from "@/app/components/order/additional-item-card";
-import ObservationCard from "@/app/components/order/observation-card";
 import RemovedItemCard from "@/app/components/order/removed-item-card";
 import Item from "@/app/entities/order/item";
 
@@ -18,15 +17,15 @@ const ItemProcessCard = ({ item }: ItemProcessProps) => {
                 {item.flavor && (
                     <p className="text-sm text-orange-700 mt-1">Sabor selecionado: <span className="font-semibold">{item.flavor}</span></p>
                 )}
-                {item.observation && (
-                    <ObservationCard observation={item.observation} />
-                )}
-                <div className="flex flex-wrap mt-2 space-x-2">
+                <div className="flex">
+                    {item.observation && (
+                        <RemovedItemCard value={item.observation} key={item.observation} />
+                    )}
                     {item.additional_items?.map(add => (
                         <AdditionalItemCard item={add} key={add.id} />
                     ))}
                     {item.removed_items?.map(rem => (
-                        <RemovedItemCard item={rem} key={rem} />
+                        <RemovedItemCard value={rem} key={rem} />
                     ))}
                 </div>
             </div>

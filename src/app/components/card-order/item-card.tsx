@@ -1,4 +1,3 @@
-import ObservationCard from "../order/observation-card";
 import AdditionalItemCard from "@/app/components/order/additional-item-card";
 import RemovedItemCard from "@/app/components/order/removed-item-card";
 import Item from "@/app/entities/order/item";
@@ -19,16 +18,15 @@ export default function ItemCard({ item }: ItemCardProps) {
                 </RoundComponent>
             </div>
 
-            {item.observation && <ObservationCard observation={item.observation} />}
-
             <div className="flex">
+                {item.observation && <RemovedItemCard value={item.observation} />}
+
                 {item.additional_items?.map((add) => (
                     <AdditionalItemCard item={add} key={add.id} />
                 ))}
-            </div>
-            <div className="flex">
+
                 {item.removed_items?.map((rem) => (
-                    <RemovedItemCard item={rem} key={rem} />
+                    <RemovedItemCard value={rem} key={rem} />
                 ))}
             </div>
         </div>

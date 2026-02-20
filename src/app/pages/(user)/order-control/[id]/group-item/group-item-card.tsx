@@ -6,8 +6,8 @@ import { ToUtcDatetime } from "@/app/utils/date";
 import { FaClock } from "react-icons/fa";
 import StatusComponent from "../../../../../components/button/show-status";
 import Decimal from "decimal.js";
-import ObservationCard from "../../../../../components/order/observation-card";
 import { useQueryClient } from "@tanstack/react-query";
+import RemovedItemCard from "@/app/components/order/removed-item-card";
 
 interface GroupItemCardProps {
   groupItem: GroupItem;
@@ -71,7 +71,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
       {/* Observation */}
       {
         groupItem.observation && (
-          <ObservationCard observation={groupItem.observation} />
+          <RemovedItemCard value={groupItem.observation} />
         )
       }
 
@@ -86,7 +86,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
                 <p className="text-sm text-orange-700">Sabor: <span className="font-semibold">{item.flavor}</span></p>
               )}
               {item.observation && (
-                <ObservationCard observation={item.observation} />
+                <RemovedItemCard value={item.observation} />
               )}
               {item.additional_items && item.additional_items?.length > 0 && (
                 <ul className="mt-2 list-disc list-inside text-sm text-green-700">

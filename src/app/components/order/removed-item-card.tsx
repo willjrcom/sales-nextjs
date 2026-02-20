@@ -1,14 +1,14 @@
 import { Badge } from "@/components/ui/badge"
 
 interface RemovedItemsProps {
-    item: string;
+    value: string;
 }
 
-const RemovedItemCard = ({ item }: RemovedItemsProps) => {
+const RemovedItemCard = ({ value }: RemovedItemsProps) => {
     return (
-        <div className="px-2 py-1">
+        <div className="px-2 py-1 text-sm">
             <Badge variant="destructive">
-                {item}
+                {value}
             </Badge>
         </div>
     )

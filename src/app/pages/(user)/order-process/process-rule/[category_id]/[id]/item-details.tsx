@@ -5,7 +5,6 @@ import RemovedItemCard from '../../../../../../components/order/removed-item-car
 import Product from '@/app/entities/product/product';
 import { FaRegImage } from 'react-icons/fa';
 import { useModal } from '@/app/context/modal/context';
-import ObservationCard from '@/app/components/order/observation-card';
 import Image from 'next/image';
 
 interface ItemDetailsProps {
@@ -75,14 +74,14 @@ const ItemDetails = ({ item, product }: ItemDetailsProps) => {
 
                         <div className='bg-gray-50 rounded-lg shadow p-3 space-y-2 space-x-2'>
                             {item.observation && (
-                                <ObservationCard observation={item.observation} />
+                                <RemovedItemCard value={item.observation} key={item.observation} />
                             )}
 
                             {item.additional_items?.map((add) => (
                                 <AdditionalItemCard item={add} key={add.id} />
                             ))}
                             {item.removed_items?.map((rem) => (
-                                <RemovedItemCard item={rem} key={rem} />
+                                <RemovedItemCard value={rem} key={rem} />
                             ))}
                         </div>
                     </div>

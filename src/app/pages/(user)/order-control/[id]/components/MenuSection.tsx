@@ -38,10 +38,8 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
         enabled: !!session
     });
 
-    const refetchAll = () => {
-        refetchCategories()
-        refetchProducts()
-    }
+    const isLoading = categoriesLoading || productsLoading;
+    const isError = !session; // Simple check for session as well
 
     const products = useMemo(() => productsResponse?.items || [], [productsResponse]);
 
@@ -76,10 +74,17 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
     // Filter categories based on group item
     const visibleCategories = useMemo(() => {
         if (currentGroupItem?.category_id) {
-            return categories.filter((c) => c.id === currentGroupItem.category_id);
+            const filtered = categories.filter((c) => c.id === currentGroupItem.category_id);
+            // If we have a filter but it yields no results from a loaded list, we might have a data mismatch
+            if (filtered.length === 0 && categories.length > 0) return categories;
+            return filtered;
         }
         return categories;
     }, [categories, currentGroupItem]);
+
+    const handleClearFilter = () => {
+        queryClient.setQueryData(['group-item', 'current'], null);
+    };
 
     return (
         <div className='min-h-screen bg-gray-50 pb-24'>
@@ -94,10 +99,13 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                             </p>
                         </div>
                         <button
-                            onClick={() => setView('cart')}
+                            onClick={() => {
+                                handleClearFilter();
+                                setView('cart');
+                            }}
                             className='text-blue-600 hover:text-blue-800 underline font-medium'
                         >
-                            Voltar
+                            Limpar e Voltar
                         </button>
                     </div>
                 )}
@@ -122,8 +130,11 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                         </div>
                         <div className='shrink-0'>
                             <Refresh
-                                onRefresh={refetchAll}
-                                isPending={categoriesLoading || productsLoading}
+                                onRefresh={() => {
+                                    refetchCategories();
+                                    refetchProducts();
+                                }}
+                                isPending={isLoading}
                             />
                         </div>
                     </div>
@@ -149,16 +160,30 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                 </div>
 
                 {/* Loading state */}
-                {visibleCategories.length === 0 && filteredProducts.length === 0 && (
+                {isLoading && (
                     <div className='mt-10 text-center text-gray-500'>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
                         <p>Carregando cardápio...</p>
                     </div>
                 )}
 
-                {/* Empty state */}
-                {visibleCategories.length > 0 && filteredProducts.length === 0 && (
+                {/* Empty state (No products at all) */}
+                {!isLoading && products.length === 0 && (
                     <div className='mt-10 text-center text-gray-500'>
                         <p>Nenhum produto disponível no momento</p>
+                    </div>
+                )}
+
+                {/* Filtered Empty state (Products exist but none match filter) */}
+                {!isLoading && products.length > 0 && filteredProducts.length === 0 && (
+                    <div className='mt-10 text-center text-gray-500'>
+                        <p className="mb-4">Nenhum item compatível com {currentGroupItem?.size || 'os filtros'} foi encontrado.</p>
+                        <button
+                            onClick={handleClearFilter}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                        >
+                            Ver todos os produtos
+                        </button>
                     </div>
                 )}
             </div>
