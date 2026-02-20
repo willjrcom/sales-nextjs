@@ -72,7 +72,7 @@ const ItemDetails = ({ item, product }: ItemDetailsProps) => {
                             </div>
                         )}
 
-                        <div className='bg-gray-50 rounded-lg shadow p-3 space-y-2 space-x-2'>
+                        <div className='bg-gray-50 flex'>
                             {item.observation && (
                                 <RemovedItemCard value={item.observation} key={item.observation} />
                             )}

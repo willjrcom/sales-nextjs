@@ -106,6 +106,9 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                         {groupItem.items.map((item) => {
                             return <ItemProcessCard item={item} key={item.id} />;
                         })}
+                        {groupItem.complement_item && (
+                            <ItemProcessCard item={groupItem.complement_item} key={groupItem.complement_item.id} />
+                        )}
                     </ul>
                 </div>
                 <div className="flex flex-col justify-between items-center md:items-end">

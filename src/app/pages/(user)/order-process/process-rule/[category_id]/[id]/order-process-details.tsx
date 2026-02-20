@@ -33,6 +33,9 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                         const product = orderProcess.products.find(p => p.id === item.product_id);
                         return <ItemDetails key={item.id} item={item} product={product} />;
                     })}
+                    {groupItem.complement_item && (
+                        <ItemDetails key={groupItem.complement_item.id} item={groupItem.complement_item} />
+                    )}
                 </div>
             )}
 
