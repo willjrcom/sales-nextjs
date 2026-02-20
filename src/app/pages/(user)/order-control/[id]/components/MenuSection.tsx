@@ -2,13 +2,14 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetCategoriesMap } from '@/app/api/category/category';
 import { GetDefaultProducts } from '@/app/api/product/product';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import GroupItem from '@/app/entities/order/group-item';
 import { useSession } from 'next-auth/react';
 import { ProductCard } from './ProductCard';
 import Product from '@/app/entities/product/product';
 import { BottomCartBar } from './BottomCartBar';
 import { OrderControlView } from '../page';
+import Refresh from "@/app/components/crud/refresh";
 
 interface MenuSectionProps {
     orderID: string;
@@ -23,7 +24,7 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
     const currentGroupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
     // Fetch categories
-    const { data: categories = [] } = useQuery({
+    const { isLoading: categoriesLoading, data: categories = [], refetch: refetchCategories } = useQuery({
         queryKey: ['categories', 'map', 'product'],
         queryFn: () => GetCategoriesMap(session!, true, false, false),
         enabled: !!session
@@ -31,11 +32,16 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
 
     // Fetch all products
     // Using existing fetching strategy from sales-nextjs
-    const { data: productsResponse } = useQuery({
+    const { isLoading: productsLoading, data: productsResponse, refetch: refetchProducts } = useQuery({
         queryKey: ['products', 'all'],
         queryFn: () => GetDefaultProducts(session!, 0, 100, true),
         enabled: !!session
     });
+
+    const refetchAll = () => {
+        refetchCategories()
+        refetchProducts()
+    }
 
     const products = useMemo(() => productsResponse?.items || [], [productsResponse]);
 
@@ -47,7 +53,7 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
             return products.filter(
                 (product) =>
                     product.category_id === currentGroupItem.category_id &&
-                    product.size?.name === currentGroupItem.size
+                    product.variations.some(v => v.size?.name === currentGroupItem.size)
             );
         }
 
@@ -98,20 +104,28 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
 
                 {/* Categories Scroll */}
                 {visibleCategories.length > 0 && (
-                    <div className='sticky top-0 bg-gray-50 z-10 py-2 -mx-4 px-4 overflow-x-auto flex gap-2 no-scrollbar'>
-                        {visibleCategories.map(c => (
-                            <a
-                                key={c.id}
-                                href={`#cat-${c.id}`}
-                                className='shrink-0 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap hover:bg-gray-50 hover:border-gray-300 transition-colors'
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    document.getElementById(`cat-${c.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }}
-                            >
-                                {c.name}
-                            </a>
-                        ))}
+                    <div className='sticky top-0 bg-gray-50 z-10 py-2 -mx-4 px-4 flex justify-between items-center gap-2'>
+                        <div className='overflow-x-auto flex gap-2 no-scrollbar w-full'>
+                            {visibleCategories.map(c => (
+                                <a
+                                    key={c.id}
+                                    href={`#cat-${c.id}`}
+                                    className='shrink-0 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap hover:bg-gray-50 hover:border-gray-300 transition-colors'
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        document.getElementById(`cat-${c.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }}
+                                >
+                                    {c.name}
+                                </a>
+                            ))}
+                        </div>
+                        <div className='shrink-0'>
+                            <Refresh
+                                onRefresh={refetchAll}
+                                isPending={categoriesLoading || productsLoading}
+                            />
+                        </div>
                     </div>
                 )}
 

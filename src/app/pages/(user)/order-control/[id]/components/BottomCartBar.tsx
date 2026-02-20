@@ -24,18 +24,10 @@ export function BottomCartBar({ orderID, setView }: BottomCartBarProps) {
     // Also try getting from cache directly if query above is same key
     // const order = queryClient.getQueryData<Order>(['order', 'current']); // Or use the ID based key
 
-    const count = useMemo(() => {
-        if (!order?.group_items) return 0;
-        return order.group_items.reduce((total, groupItem) => {
-            // Only count active items
-            if (groupItem.status === 'Cancelled') return total;
-            return total + (groupItem.items?.length || 0);
-        }, 0);
-    }, [order?.group_items]);
+    const count = order?.quantity_items || 0;
 
     const totalCents = useMemo(() => {
-        if (!order?.total_payable) return 0; // Use total_payable from order which is usually calculated backend side, or calc manual if needed
-        // adapting manual calc to match gfood logic if backend total_payable is reliable
+        if (!order?.total_payable) return 0;
         return new Decimal(order.total_payable).toNumber();
     }, [order?.total_payable]);
 

@@ -23,6 +23,11 @@ export function ProductCard({ product, showQuickAdd = false }: ProductCardProps)
         modalHandler.showModal(modalName, "", <AddProductCard product={product} />, "md", onClose);
     };
 
+    const variations = product.variations || [];
+    const availablePrices = variations.map(v => new Decimal(v.price).toNumber());
+    const minPrice = availablePrices.length > 0 ? Math.min(...availablePrices) : 0;
+    const maxPrice = availablePrices.length > 0 ? Math.max(...availablePrices) : 0;
+
     return (
         <Card className='p-3 flex flex-col h-full overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer' onClick={handleOpenModal}>
             <div className='relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3] group'>
@@ -60,9 +65,23 @@ export function ProductCard({ product, showQuickAdd = false }: ProductCardProps)
                     </h3>
                 </div>
 
-                <div className='mt-2 flex items-center justify-between gap-2'>
-                    <p className='text-xs text-gray-500 line-clamp-1 flex-1'>{product.description}</p>
-                    <p className='font-semibold text-blue-600 whitespace-nowrap text-sm'>R$ {new Decimal(product.price || 0).toFixed(2)}</p>
+                <div className='mt-2 flex items-center justify-end gap-2'>
+                    <div className='flex flex-col items-end justify-center'>
+                        {variations.length > 0 ? (
+                            <>
+                                <span className='text-[10px] text-gray-400 font-normal leading-none mb-0.5'>A partir de:</span>
+                                <p className='font-semibold text-blue-600 whitespace-nowrap text-sm leading-none'>
+                                    {minPrice === maxPrice ? (
+                                        `R$ ${minPrice.toFixed(2)}`
+                                    ) : (
+                                        `R$ ${minPrice.toFixed(2)} - ${maxPrice.toFixed(2)}`
+                                    )}
+                                </p>
+                            </>
+                        ) : (
+                            <p className='font-semibold text-gray-400 whitespace-nowrap text-sm'>Indisponível</p>
+                        )}
+                    </div>
                 </div>
             </div>
 

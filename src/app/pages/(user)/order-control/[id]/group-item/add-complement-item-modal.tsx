@@ -68,7 +68,13 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
             {/* Informações do Produto */}
             <div className="text-center">
                 <h2 className="font-bold text-lg mb-1">{product.name}</h2>
-                <p className="text-gray-600 mb-2">R$ {new Decimal(product.price).toFixed(2)}</p>
+                <p className="text-gray-600 mb-2">
+                    {product.variations?.length > 0 ? (
+                        `R$ ${new Decimal(Math.min(...product.variations.map(v => new Decimal(v.price).toNumber()))).toFixed(2)}`
+                    ) : (
+                        'Indisponível'
+                    )}
+                </p>
             </div>
 
             {/* botão */}

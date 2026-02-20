@@ -64,7 +64,7 @@ export default function AdminAccessPage() {
       setLastUpdateCompanies(FormatRefreshTime(new Date()));
       return ListPublicCompanies(session!);
     },
-    enabled: !!session?.user.access_token,
+    enabled: !!session?.user?.access_token,
   })
 
   const companies = useMemo(() => companiesResponse || [], [companiesResponse])
@@ -76,7 +76,7 @@ export default function AdminAccessPage() {
       setLastUpdateCompanyCategories(FormatRefreshTime(new Date()));
       return GetAllCompanyCategories(session!);
     },
-    enabled: !!session?.user.access_token,
+    enabled: !!session?.user?.access_token,
   })
 
   const companyCategories = useMemo(() => companyCategoriesResponse || [], [companyCategoriesResponse])
@@ -89,7 +89,7 @@ export default function AdminAccessPage() {
       setLastUpdateUsers(FormatRefreshTime(new Date()));
       return ListPublicUsers(session!);
     },
-    enabled: !!session?.user.access_token,
+    enabled: !!session?.user?.access_token,
   })
 
   const users = useMemo(() => usersResponse || [], [usersResponse])

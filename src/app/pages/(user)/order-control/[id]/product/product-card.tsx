@@ -9,6 +9,13 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+    const variations = product.variations || [];
+    const prices = variations.map(v => new Decimal(v.price));
+    const minPrice = prices.length > 0 ? Decimal.min(...prices) : new Decimal(0);
+    const maxPrice = prices.length > 0 ? Decimal.max(...prices) : new Decimal(0);
+    const sizes = Array.from(new Set(variations.map(v => v.size?.name).filter(Boolean))).join(', ');
+    const isAvailable = variations.some(v => v.is_available);
+
     return (
         <div className="relative p-3 bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200 w-full">
             {/* Imagem do produto */}
@@ -42,7 +49,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {/* Informações do Produto */}
             <div className="text-center">
                 <h2 className="font-semibold text-sm mb-1 line-clamp-1" title={product.name}>{product.name}</h2>
-                <p className="text-gray-700 font-bold text-sm mb-1.5">R$ {new Decimal(product.price).toFixed(2)}</p>
+                <div className="text-gray-700 font-bold text-sm mb-1.5">
+                    {minPrice.equals(maxPrice) ? (
+                        `R$ ${minPrice.toFixed(2)}`
+                    ) : (
+                        `R$ ${minPrice.toFixed(2)} - ${maxPrice.toFixed(2)}`
+                    )}
+                </div>
 
                 {/* Chips de categoria e tamanho */}
                 <div className="flex flex-wrap justify-center gap-1 mb-2">
@@ -51,9 +64,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             {product.category.name}
                         </span>
                     )}
-                    {product.size?.name && (
+                    {sizes && (
                         <span className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-300">
-                            {product.size.name}
+                            {sizes}
                         </span>
                     )}
                 </div>
@@ -80,10 +93,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
             {/* Botão */}
             <div className="mt-2 flex items-center justify-between">
-                {product.is_available && <ButtonIconText modalName={`add-item-${product.id}`} size={product.image_path ? 'xl' : 'md'}>
+                {isAvailable && <ButtonIconText modalName={`add-item-${product.id}`} size={product.image_path ? 'xl' : 'md'}>
                     <AddProductCard product={product} />
                 </ButtonIconText>}
-                {!product.is_available && <span className="text-xs text-gray-500">Indisponível</span>}
+                {!isAvailable && <span className="text-xs text-gray-500">Indisponível</span>}
             </div>
         </div>
     );

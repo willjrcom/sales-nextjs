@@ -25,24 +25,7 @@ const authOptions: NextAuthOptions = {
     debug: process.env.NODE_ENV === "development",
 };
 
-declare module "next-auth/jwt" {
-    interface JWT {
-        id: string;
-        access_token?: string;
-        exp?: number;
-        error?: string;
-    }
-}
-
-declare module "next-auth" {
-    interface Session {
-        user: User
-    }
-
-    interface User {
-        access_token?: string;
-    }
-}
+// Type declarations moved to src/types/next-auth.d.ts
 
 const handler = NextAuth(authOptions);
 

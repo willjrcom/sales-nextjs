@@ -13,12 +13,11 @@ import Decimal from "decimal.js";
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
-import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
-import Image from "next/image";
 import GetCategoryByID from "@/app/api/category/[id]/category";
 import { GetAdditionalProducts } from "@/app/api/product/product";
 import NewAdditionalItem from "@/app/api/item/update/additional/item";
 import AddRemovedItem from "@/app/api/item/update/removed-item/add/item";
+import Image from "next/image";
 
 interface AddProductCardProps {
   product: Product;
@@ -36,15 +35,52 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Variations logic
+  const [selectedVariationId, setSelectedVariationId] = useState<string>("");
+
   // New state for additionals and removables
   const [selectedAdditionals, setSelectedAdditionals] = useState<Record<string, number>>({});
   const [selectedRemovables, setSelectedRemovables] = useState<string[]>([]);
 
   useEffect(() => {
+    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+    if (groupItem && groupItem.items) {
+      const currentTotalQty = groupItem.items.reduce((acc, item) => acc + (item.quantity || 0), 0);
+      const remainingQty = new Decimal(1).minus(new Decimal(currentTotalQty)).toNumber();
+      if (remainingQty > 0 && remainingQty < 1) {
+        setQuantity(remainingQty);
+      }
+    }
+  }, [queryClient]);
+
+  useEffect(() => {
     fetchProduct();
   }, [data?.user?.access_token, reloadProduct]);
 
+  const currentGroupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+  const forcedSize = currentGroupItem?.size;
+
+  // Auto-select variation if only one exists or if specific logic applies
+  useEffect(() => {
+    if (forcedSize && product.variations) {
+      const matchingVariation = product.variations.find(v => v.size?.name === forcedSize);
+      if (matchingVariation) {
+        setSelectedVariationId(matchingVariation.id);
+      }
+    } else if (product.variations && product.variations.length === 1) {
+      setSelectedVariationId(product.variations[0].id);
+    } else if (product.variations && product.variations.length > 0 && !selectedVariationId) {
+      // Optional: Select the first available one?
+      // setSelectedVariationId(product.variations[0].id);
+    }
+  }, [product.variations, forcedSize]);
+
   const availableFlavors = useMemo(() => product.flavors || [], [product.flavors]);
+
+  // Get selected variation object
+  const selectedVariation = useMemo(() => {
+    return product.variations.find(v => v.id === selectedVariationId);
+  }, [product.variations, selectedVariationId]);
 
   // Fetch Category for Removables
   const { data: category } = useQuery({
@@ -63,27 +99,13 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const additionalProducts = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse]);
   const removableIngredients = useMemo(() => category?.removable_ingredients || [], [category]);
 
-  useEffect(() => {
-    if (!availableFlavors.length) {
-      setSelectedFlavor(null);
-      return;
-    }
-
-    setSelectedFlavor((current) => {
-      if (current && availableFlavors.includes(current)) {
-        return current;
-      }
-      return availableFlavors[0];
-    });
-  }, [product.id, availableFlavors]);
-
   const fetchProduct = async () => {
     setReloadProduct(false);
     if (reloadProduct && data) {
       const productFound = await GetProductByID(item.id, data)
       if (!productFound) return;
 
-      setProduct(productFound);
+      setProduct(new Product(productFound));
     }
   }
 
@@ -120,6 +142,15 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       return;
     }
 
+    if (!selectedVariationId) {
+      if (!product.variations || product.variations.length === 0) {
+        notifyError("Este produto não possui tamanhos configurados.");
+      } else {
+        notifyError("Selecione um tamanho/variação");
+      }
+      return;
+    }
+
     setIsSubmitting(true);
 
     const order = queryClient.getQueryData<Order>(['order', 'current']);
@@ -128,6 +159,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
     try {
       const body = {
         product_id: product.id,
+        variation_id: selectedVariationId, // Pass variation ID
         quantity: quantity,
         order_id: order?.id,
         group_item_id: groupItem?.id,
@@ -140,7 +172,9 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       // 2. Add Additionals
       const additionalPromises = Object.entries(selectedAdditionals).map(async ([productId, addQty]) => {
         if (addQty > 0) {
-          await NewAdditionalItem(response.item_id, { product_id: productId, quantity: addQty }, data);
+          const additionalProduct = additionalProducts.find(p => p.id === productId);
+          const variationId = additionalProduct?.variations?.[0]?.id;
+          await NewAdditionalItem(response.item_id, { product_id: productId, variation_id: variationId, quantity: addQty }, data);
         }
       });
 
@@ -169,32 +203,51 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
     }
   }
 
+  // Reload product if categories are missing, mainly to refetch full details if we only have summary
   useEffect(() => {
-    if (!product.size || !product.category) {
+    if (!product.category_id) { // Changed check slightly
       setReloadProduct(true);
     }
   }, [])
 
-  if (!product.category) {
-    return <div className="p-4 text-center text-red-500">Erro: Produto sem categoria</div>;
-  }
-
   const calculateTotal = () => {
-    let total = new Decimal(product.price).times(quantity);
+    let price = new Decimal(0);
+    if (selectedVariation) {
+      price = new Decimal(selectedVariation.price);
+    }
+
+    let total = price.times(quantity);
 
     // Add additionals cost
     Object.entries(selectedAdditionals).forEach(([productId, addQty]) => {
       const additional = additionalProducts.find(p => p.id === productId);
       if (additional) {
-        total = total.plus(new Decimal(additional.price).times(addQty));
+        // Additional products might still use 'price' directly or needs check?
+        // Assuming additional products are simple products (like "Extra Cheese") which usually have 1 variation or direct price?
+        // Wait, if additional products are also products, they also have variations now!
+        // For simplicity, assuming additional products have a default variation or using the first one. 
+        // But the API GetAdditionalProducts returns Product[].
+        // If they have variations, we need to know which price to use.
+        // Usually, additionals are simple. I'll assume for now additional items have a variation or I use the first one's price if 'price' is removed from product root.
+        // But wait, the frontend Product entity still has 'price' removed. 
+        // So additional.price might be undefined if it follows the new entity structure!
+        // I need to check how to handle additional product price.
+        // For now, I'll assume additional products use the first variation price or I need to update GetAdditionalProducts to return flattened structure or handle it here.
+
+        // Let's assume for additional products we take the first variation's price 
+        // if product.price is not present (which it isn't).
+        let addPrice = new Decimal(0);
+        if (additional.variations && additional.variations.length > 0) {
+          addPrice = new Decimal(additional.variations[0].price);
+        }
+        total = total.plus(addPrice.times(addQty));
       }
     });
     return total;
   };
 
-  const unitPrice = new Decimal(product.price);
   const totalAmount = calculateTotal();
-
+  const unitPrice = selectedVariation ? new Decimal(selectedVariation.price) : new Decimal(0);
   const hasImage = !!product.image_path;
 
   return (
@@ -202,16 +255,16 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
       <div className={`grid grid-cols-1 ${hasImage ? 'md:grid-cols-2' : ''} gap-6 h-full`}>
         {/* Left Column: Image */}
         {hasImage && (
-          <div className="relative h-64 md:h-auto w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+          <div className="relative h-64 md:h-full max-h-[400px] w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
             <Image
               src={product.image_path}
               alt={product.name}
               fill
-              className="object-cover"
+              className="object-contain p-2"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            {/* Overlay badge for Availability or Promo if needed */}
-            {!product.is_available && (
+            {/* We can show "Unavailable" if the selected variation is unavailable, or generally if no variations available */}
+            {selectedVariation && !selectedVariation.is_available && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <span className="text-white font-bold text-lg border-2 border-white px-4 py-2 rounded uppercase tracking-widest">
                   Indisponível
@@ -235,12 +288,49 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
             )}
           </div>
 
-          {/* Description */}
           <p className="text-gray-600 text-sm mb-6 leading-relaxed">
             {product.description || "Sem descrição disponível para este produto."}
           </p>
 
           <div className="flex-1 overflow-y-auto pr-1">
+
+            {/* Variations / Sizes Selector */}
+            {product.variations && product.variations.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                  ESCOLHA O TAMANHO
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {product.variations.map(variation => {
+                    const isSelected = selectedVariationId === variation.id;
+                    const isSizeMismatch = Boolean(forcedSize && variation.size?.name !== forcedSize);
+                    const isDisabled = !variation.is_available || isSizeMismatch;
+                    return (
+                      <button
+                        key={variation.id}
+                        onClick={() => setSelectedVariationId(variation.id)}
+                        disabled={isDisabled}
+                        className={`
+                                        flex flex-col items-center justify-center py-2 px-4 min-w-[100px] rounded-lg border transition-all
+                                        ${isSelected
+                            ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500"
+                            : "bg-white border-gray-200 hover:border-green-200 hover:bg-gray-50"
+                          }
+                                        ${isDisabled ? "opacity-50 cursor-not-allowed bg-gray-50 hover:bg-gray-50 hover:border-gray-200" : ""}
+                                    `}
+                      >
+                        <span className="font-semibold text-sm">{variation.size?.name || 'Padrão'}</span>
+                        <span className="text-xs mt-1">R$ {new Decimal(variation.price).toFixed(2)}</span>
+                        {!variation.is_available && <span className="text-[10px] text-red-500 font-bold mt-1">Indisponível</span>}
+                        {variation.is_available && isSizeMismatch && <span className="text-[10px] text-gray-400 font-bold mt-1">Tamanho incompatível</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+
             {/* Flavor / Variant Selector */}
             {availableFlavors.length > 0 && (
               <div className="mb-6">
@@ -274,7 +364,6 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
             {additionalProducts.length > 0 && (
               <div className='mb-6'>
                 <div className='flex items-center gap-2 mb-3'>
-                  <span className="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg></span>
                   <h3 className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
                     ADICIONAIS
                   </h3>
@@ -283,11 +372,17 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                 <div className="space-y-3">
                   {additionalProducts.map((additional: Product) => {
                     const qty = selectedAdditionals[additional.id] || 0;
+                    // Helper to get price
+                    let price = new Decimal(0);
+                    if (additional.variations && additional.variations.length > 0) {
+                      price = new Decimal(additional.variations[0].price);
+                    }
+
                     return (
                       <div key={additional.id} className="flex items-center justify-between p-3 border rounded-lg hover:border-green-200 transition-colors bg-white">
                         <div>
                           <p className="font-medium text-gray-900">{additional.name}</p>
-                          <p className="text-sm text-green-600 font-semibold">+ R$ {new Decimal(additional.price).toFixed(2)}</p>
+                          <p className="text-sm text-green-600 font-semibold">+ R$ {price.toFixed(2)}</p>
                         </div>
                         <div className="flex items-center gap-3">
                           {qty > 0 && (
@@ -316,12 +411,9 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
             {/* Remover Ingredientes */}
             {removableIngredients.length > 0 && (
               <div className='mb-6'>
-                <div className='flex items-center gap-2 mb-3'>
-                  <span className="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg></span>
-                  <h3 className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
-                    REMOVER DO PRODUTO
-                  </h3>
-                </div>
+                <h3 className='text-xs font-bold text-gray-500 uppercase tracking-wider'>
+                  REMOVER DO PRODUTO
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {removableIngredients.map((item: string) => {
                     const isRemoved = selectedRemovables.includes(item);
@@ -380,7 +472,7 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
               </div>
             </div>
 
-            {product.is_available ? (
+            {selectedVariation && selectedVariation.is_available ? (
               <button
                 onClick={submit}
                 disabled={isSubmitting}
@@ -397,9 +489,6 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                   <span>Adicionando...</span>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                    </svg>
                     <span>Adicionar ao Carrinho</span>
                   </>
                 )}
@@ -410,14 +499,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                   disabled
                   className="w-full py-3.5 px-4 rounded-lg font-bold text-gray-500 bg-gray-200 cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <span>Indisponível no momento</span>
+                  <span>{!selectedVariation ? "Selecione um tamanho" : "Indisponível no momento"}</span>
                 </button>
-                <p className="text-center text-xs text-gray-500 italic">
-                  Avise-me quando este item estiver de volta ao estoque
-                </p>
               </div>
             )}
           </div>

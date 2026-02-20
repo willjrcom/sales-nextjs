@@ -76,7 +76,7 @@ export const ListProductsToAdd = () => {
         if (!products.length) return [];
 
         if (groupItem?.category_id) {
-            return products.filter((product) => product.category_id === groupItem.category_id && product.size?.name === groupItem.size);
+            return products.filter((product) => product.category_id === groupItem.category_id && product.variations.some(v => v.size?.name === groupItem.size));
         }
 
         return products;

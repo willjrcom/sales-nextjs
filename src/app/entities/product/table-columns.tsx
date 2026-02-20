@@ -17,11 +17,20 @@ const ProductColumns = (): ColumnDef<Product>[] => [
   },
   {
     id: 'Preço',
-    accessorKey: 'price',
+    accessorKey: 'variations',
     header: 'Preço',
-    cell: info => {
-      const value = new Decimal(info.getValue() as any);
-      return `R$ ${typeof value === 'object' && value.toFixed ? value.toFixed(2) : value}`;
+    cell: ({ row }) => {
+      const variations = row.original.variations || [];
+      if (variations.length === 0) return "Sem preço";
+
+      const prices = variations.map(v => new Decimal(v.price));
+      const min = Decimal.min(...prices);
+      const max = Decimal.max(...prices);
+
+      if (min.equals(max)) {
+        return `R$ ${min.toFixed(2)}`;
+      }
+      return `R$ ${min.toFixed(2)} - ${max.toFixed(2)}`;
     },
   },
   {
@@ -32,15 +41,23 @@ const ProductColumns = (): ColumnDef<Product>[] => [
   },
   {
     id: 'Tamanho',
-    accessorKey: 'size.name',
-    header: 'Tamanho',
-    cell: (info) => info.row.original.size?.name || "Sem tamanho",
+    accessorKey: 'variations',
+    header: 'Tamanhos',
+    cell: ({ row }) => {
+      const variations = row.original.variations || [];
+      if (variations.length === 0) return "Semariações";
+      const sizes = Array.from(new Set(variations.map(v => v.size?.name || "Padrão"))).join(", ");
+      return sizes;
+    },
   },
   {
     id: 'Disponível?',
-    accessorKey: 'is_available',
     header: 'Disponível?',
-    cell: info => (info.getValue() ? 'Sim' : 'Não'),
+    cell: ({ row }) => {
+      const variations = row.original.variations || [];
+      const isAvailable = variations.some(v => v.is_available);
+      return isAvailable ? 'Sim' : 'Não';
+    },
   },
   {
     id: 'Editar',

@@ -8,6 +8,7 @@ export interface NewItemProps {
     group_item_id?: string;
     observation: string;
     flavor?: string;
+    variation_id: string;
 }
 
 export interface NewItemResponse {

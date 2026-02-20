@@ -1,7 +1,7 @@
 import { z } from "zod";
 import Decimal from 'decimal.js';
 import Category from "../category/category";
-import Size from "../size/size";
+import ProductVariation from "./variation";
 
 export default class Product {
     id: string = '';
@@ -10,18 +10,16 @@ export default class Product {
     name: string = '';
     description: string = '';
     flavors: string[] = [];
-    price: Decimal = new Decimal(0);
-    cost: Decimal = new Decimal(0);
     category_id: string = '';
     category: Category = new Category();
-    size_id: string = '';
-    size: Size = new Size();
-    is_available: boolean = true;
     is_active: boolean = true;
-
+    variations: ProductVariation[] = [];
 
     constructor(data: Partial<Product> = {}) {
         Object.assign(this, data);
+        if (data.variations) {
+            this.variations = data.variations.map(v => new ProductVariation(v));
+        }
     }
 }
 
@@ -31,11 +29,13 @@ const SchemaProduct = z.object({
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     description: z.string().optional(),
     flavors: z.array(z.string().trim().min(1, 'Sabor inválido')).optional(),
-    price: z.coerce.number().optional(),
-    cost: z.coerce.number().optional(),
     category_id: z.string().uuid("Categoria inválida"),
-    size_id: z.string().uuid("Tamanho inválido"),
-    is_available: z.boolean(),
+    variations: z.array(z.object({
+        size_id: z.string().uuid("Tamanho inválido"),
+        price: z.coerce.number().min(0, "Preço deve ser maior ou igual a 0"),
+        cost: z.coerce.number().min(0, "Custo deve ser maior ou igual a 0"),
+        is_available: z.boolean(),
+    })).min(1, "Adicione pelo menos uma variação"),
 });
 
 export const ValidateProductForm = (product: Product) => {
@@ -44,11 +44,13 @@ export const ValidateProductForm = (product: Product) => {
         name: product.name,
         description: product.description,
         flavors: product.flavors,
-        price: new Decimal(product.price).toNumber(),
-        cost: new Decimal(product.cost).toNumber(),
         category_id: product.category_id,
-        size_id: product.size_id,
-        is_available: product.is_available,
+        variations: product.variations.map(v => ({
+            size_id: v.size_id,
+            price: new Decimal(v.price).toNumber(),
+            cost: new Decimal(v.cost).toNumber(),
+            is_available: v.is_available
+        }))
     });
 
     if (!validatedFields.success) {

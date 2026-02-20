@@ -4,13 +4,23 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import GetOrderByID from '@/app/api/order/[id]/order';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { GetCategoriesMap } from '@/app/api/category/category';
 import GroupItem from '@/app/entities/order/group-item';
 import Decimal from 'decimal.js';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import DeleteItem from '@/app/api/item/delete/item';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { OrderControlView } from '../page';
 import { useSession } from 'next-auth/react';
 import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
@@ -39,6 +49,7 @@ function groupBy(array: GroupItem[], key: keyof GroupItem): Record<string, Group
 export function CartSection({ orderID, setView }: CartSectionProps) {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
+    const [itemToDelete, setItemToDelete] = useState<{ id: string, name: string } | null>(null);
 
     // Using the same query keys as MenuSection and BottomBar ensuring cache hits
     const { data: order } = useQuery({
@@ -95,9 +106,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
     });
 
     const handleDeleteItem = (itemId: string, itemName: string) => {
-        if (confirm(`Deseja remover "${itemName}" do carrinho?`)) {
-            deleteItemMutation.mutate(itemId);
-        }
+        setItemToDelete({ id: itemId, name: itemName });
     };
 
     const handleAddToGroup = async (groupItem: GroupItem) => {
@@ -172,7 +181,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                     )}
                                                     {canAddMore && groupItem.quantity > 0 && (
                                                         <p className='text-xs text-orange-600 font-medium mt-0.5'>
-                                                            Meio a Meio ({groupItem.quantity}/1)
+                                                            Fracionado ({groupItem.quantity}/1)
                                                         </p>
                                                     )}
                                                 </div>
@@ -192,17 +201,6 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                             <div className='space-y-3'>
                                                 {groupItem.items.map(item => (
                                                     <div key={item.id} className='flex gap-3 items-start p-2 bg-gray-50 rounded-lg'>
-                                                        {/*  {item.product?.image_path && (
-                              <div className='relative w-12 h-12 rounded-lg overflow-hidden bg-black/5 shrink-0'>
-                                <Image
-                                  src={item.product.image_path}
-                                  alt={item.product.name}
-                                  fill
-                                  className='object-cover'
-                                />
-                              </div>
-                            )} */}
-
                                                         <div className='min-w-0 flex-1'>
                                                             <div className="flex justify-between items-start">
                                                                 <p className='font-medium text-sm leading-tight'>{item.name}</p>
@@ -270,7 +268,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                 <p className='text-2xl font-extrabold text-blue-600'>R$ {new Decimal(total.toNumber()).toFixed(2)}</p>
                             </div>
 
-                            {order?.status === "Staging" &&
+                            {
                                 <>
                                     <Button className='mt-6 w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
                                         Finalizar pedido
@@ -287,6 +285,31 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                     </>
                 )}
             </div>
+
+            <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Remover item</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Deseja realmente remover "{itemToDelete?.name}" do carrinho?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (itemToDelete) {
+                                    deleteItemMutation.mutate(itemToDelete.id);
+                                    setItemToDelete(null);
+                                }
+                            }}
+                            className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
+                        >
+                            Remover
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

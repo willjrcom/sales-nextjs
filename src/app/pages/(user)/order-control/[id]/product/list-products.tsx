@@ -46,7 +46,11 @@ const ListProducts = ({ product }: ListProductsProps) => {
                         {product.name}
                     </h3>
                     <p className="text-gray-700 font-bold text-sm whitespace-nowrap">
-                        R$ {new Decimal(product.price).toFixed(2)}
+                        {product.variations?.length > 0 ? (
+                            `R$ ${new Decimal(Math.min(...product.variations.map(v => new Decimal(v.price).toNumber()))).toFixed(2)}`
+                        ) : (
+                            'Indisponível'
+                        )}
                     </p>
                 </div>
 
@@ -57,11 +61,11 @@ const ListProducts = ({ product }: ListProductsProps) => {
                             {product.category.name}
                         </span>
                     )}
-                    {product.size?.name && (
-                        <span className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-300">
-                            {product.size.name}
+                    {Array.from(new Set(product.variations?.map(v => v.size?.name).filter(Boolean))).map(sizeName => (
+                        <span key={sizeName} className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-300">
+                            {sizeName}
                         </span>
-                    )}
+                    ))}
                 </div>
 
                 {/* Sabores */}
@@ -86,10 +90,10 @@ const ListProducts = ({ product }: ListProductsProps) => {
 
             {/* Botão */}
             <div className="flex-shrink-0 ml-2 flex items-center justify-between">
-                {product.is_available && <ButtonIconText modalName={`add-item-${product.id}`} size={product.image_path ? 'xl' : 'md'}>
+                {product.variations?.some(v => v.is_available) && <ButtonIconText modalName={`add-item-${product.id}`} size={product.image_path ? 'xl' : 'md'}>
                     <AddProductCard product={product} />
                 </ButtonIconText>}
-                {!product.is_available && <span className="text-xs text-gray-500">Indisponível</span>}
+                {!product.variations?.some(v => v.is_available) && <span className="text-xs text-gray-500">Indisponível</span>}
             </div>
         </div>
     );

@@ -55,7 +55,9 @@ export const getCompanyColumns = (
                             },
                         });
 
-                        data.user.access_token = response;
+                        if (data.user) {
+                            data.user.access_token = response;
+                        }
                         router.push('/pages/new-order');
                     } catch (error) {
                         const err = error as RequestError;

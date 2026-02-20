@@ -4,6 +4,7 @@ import { Session } from "next-auth";
 export interface NewItemProps {
     product_id: string;
     quantity: number;
+    variation_id?: string;
 }
 
 const NewAdditionalItem = async (itemId: string, body: NewItemProps, session: Session): Promise<string> => {

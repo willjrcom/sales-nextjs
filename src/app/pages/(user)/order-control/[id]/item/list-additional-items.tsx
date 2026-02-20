@@ -140,7 +140,10 @@ const ListAdditionalItems = ({ item }: ListAdditionalItemsProps) => {
         const qty = quantities[product.id]?.quantity ?? 0;
 
         let name = product.name;
-        if (isStaging) name += " - R$" + new Decimal(product.price).toFixed(2);
+        if (isStaging && product.variations?.length > 0) {
+            const minPrice = Math.min(...product.variations.map(v => new Decimal(v.price).toNumber()));
+            name += " - R$" + new Decimal(minPrice).toFixed(2);
+        }
 
         return (
             <div className="flex items-center space-x-4">

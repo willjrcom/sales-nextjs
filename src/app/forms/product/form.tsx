@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { TextField, CheckboxField, RadioField, HiddenField, ImageField } from '../../components/modal/field';
 import Product, { ValidateProductForm } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';
@@ -17,6 +17,10 @@ import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetCategoriesMap } from '@/app/api/category/category';
 import GetSizesByCategoryID from '@/app/api/size/size';
+import ProductVariation from '@/app/entities/product/variation';
+import Size from '@/app/entities/size/size';
+import { Trash, Plus } from 'lucide-react';
+import Decimal from 'decimal.js';
 
 const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const modalName = isUpdate ? 'edit-product-' + item?.id : 'new-product'
@@ -55,6 +59,49 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             .map(flavor => flavor.trim())
             .filter((flavor) => flavor.length > 0);
         setProduct(prev => ({ ...prev, flavors: parsedFlavors }));
+    };
+
+    // Sync variations with available sizes from the category
+    useEffect(() => {
+        if (!filteredSizes.length) return;
+
+        setProduct(prev => {
+            // Create a map of existing variations for quick lookup
+            const existingVariationsMap = new Map(
+                prev.variations.map((v: ProductVariation) => [v.size_id, v])
+            );
+
+            const newVariations = filteredSizes.map((size: Size) => {
+                // If variation exists for this size, keep it (preserve price, cost, etc.)
+                if (existingVariationsMap.has(size.id)) {
+                    const existing = existingVariationsMap.get(size.id)!;
+                    // Update size object in case it changed, but keep price/cost/availability
+                    return new ProductVariation({
+                        ...existing,
+                        size: size // Update size details
+                    });
+                }
+
+                // Otherwise create new variation for this size
+                return new ProductVariation({
+                    size_id: size.id,
+                    size: size,
+                    price: new Decimal(0),
+                    cost: new Decimal(0),
+                    is_available: true
+                });
+            });
+
+            return { ...prev, variations: newVariations };
+        });
+    }, [filteredSizes]);
+
+    const handleVariationChange = (index: number, field: keyof ProductVariation, value: any) => {
+        setProduct(prev => {
+            const newVariations = [...prev.variations];
+            newVariations[index] = { ...newVariations[index], [field]: value };
+            return { ...prev, variations: newVariations };
+        });
     };
 
     const submit = async () => {
@@ -124,22 +171,9 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 </div>
             </div>
 
-            {/* Seção: Preços e Custos */}
-            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Preços e Custos</h3>
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                        <PriceField friendlyName='Preço' name='price' setValue={value => handleInputChange('price', value)} value={product.price} />
-                    </div>
-                    <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                        <PriceField friendlyName='Custo' name='cost' setValue={value => handleInputChange('cost', value)} value={product.cost} optional />
-                    </div>
-                </div>
-            </div>
-
-            {/* Seção: Imagem e Disponibilidade */}
+            {/* Seção: Imagem e Disponibilidade Geral */}
             <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Imagem e Disponibilidade</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Imagem e Opções</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <ImageField
@@ -151,9 +185,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                             onUploadError={(error) => notifyError(error)}
                         />
                     </div>
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={product.is_available} />
-                    </div>
                     {isUpdate && (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                             <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={product.is_active} />
@@ -162,16 +193,69 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                 </div>
             </div>
 
-            {/* Seção: Categoria e Tamanho */}
+            {/* Seção: Categoria */}
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria e Tamanho</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={value => handleInputChange('category_id', value)} selectedValue={product.category_id} values={categories} />
                     </div>
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <RadioField friendlyName='Tamanhos' name='size_id' setSelectedValue={value => handleInputChange('size_id', value)} selectedValue={product.size_id} values={filteredSizes} />
-                    </div>
+                </div>
+            </div>
+
+            {/* Seção: Variações (Tamanhos e Preços) */}
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <div className="flex justify-between items-center mb-4 pb-2 border-b border-green-200">
+                    <h3 className="text-lg font-semibold text-gray-800">Variações (Tamanhos e Preços)</h3>
+                    {/* Botão de adicionar removido pois é automático baseado na categoria */}
+                </div>
+
+                <div className="space-y-6">
+                    {product.variations.map((variation: ProductVariation, index: number) => {
+                        // Encontra o tamanho correspondente para exibir o nome
+                        const sizeName = variation.size?.name || filteredSizes.find((s: Size) => s.id === variation.size_id)?.name || 'Tamanho desconhecido';
+
+                        return (
+                            <div key={index} className="bg-white/50 p-4 rounded-lg border border-green-100 relative group">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Tamanho</label>
+                                        <div className="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm p-2 border text-gray-700">
+                                            {sizeName}
+                                        </div>
+                                        <HiddenField name={`variations.${index}.size_id`} setValue={() => { }} value={variation.size_id} />
+                                    </div>
+                                    <div className="flex items-center mt-6">
+                                        <CheckboxField
+                                            friendlyName='Disponível'
+                                            name={`variations.${index}.is_available`}
+                                            setValue={value => handleVariationChange(index, 'is_available', value)}
+                                            value={variation.is_available}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <PriceField
+                                        friendlyName='Preço'
+                                        name={`variations.${index}.price`}
+                                        setValue={value => handleVariationChange(index, 'price', value)}
+                                        value={variation.price}
+                                    />
+                                    <PriceField
+                                        friendlyName='Custo'
+                                        name={`variations.${index}.cost`}
+                                        setValue={value => handleVariationChange(index, 'cost', value)}
+                                        value={variation.cost}
+                                        optional
+                                    />
+                                </div>
+                            </div>
+                        )
+                    })}
+                    {product.variations.length === 0 && (
+                        <p className="text-center text-gray-500 py-4">Selecione uma categoria para ver os tamanhos disponíveis.</p>
+                    )}
                 </div>
             </div>
 
