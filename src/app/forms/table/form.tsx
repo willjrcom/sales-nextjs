@@ -116,10 +116,12 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         const ctx = canvas.getContext('2d');
         const img = new Image();
 
-        // Set canvas size (adding padding)
+        // Set canvas size (adding padding and space for text)
         const padding = 40;
-        canvas.width = 200 + padding * 2;
-        canvas.height = 200 + padding * 2;
+        const qrSize = 200;
+        const textHeight = 40;
+        canvas.width = qrSize + padding * 2;
+        canvas.height = qrSize + padding * 2 + textHeight;
 
         img.onload = () => {
             if (!ctx) return;
@@ -129,7 +131,17 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Draw QR code with padding
-            ctx.drawImage(img, padding, padding, 200, 200);
+            ctx.drawImage(img, padding, padding, qrSize, qrSize);
+
+            // Draw table name
+            ctx.font = 'bold 20px Inter, sans-serif';
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            if (table.name.toLowerCase().includes('mesa'))
+                ctx.fillText(`${table.name}`, canvas.width / 2, qrSize + padding + 30);
+            else {
+                ctx.fillText(`Mesa: ${table.name}`, canvas.width / 2, qrSize + padding + 30);
+            }
 
             // Convert to PNG and download
             canvas.toBlob((blob) => {
