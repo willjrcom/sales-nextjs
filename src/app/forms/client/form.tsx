@@ -183,6 +183,8 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                     item={client}
                     name="Cliente"
                     onSubmit={submit}
+                    deleteItem={onDelete}
+                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
                 />
             </div>
         </div>

@@ -14,10 +14,13 @@ import { notifyError } from "@/app/utils/notifications";
 const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
     const [client, setClient] = useState<Client | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const { data } = useSession();
 
     const search = async () => {
-        if (!data) return
+        if (!data || isSearching) return
+        setIsSearching(true);
         try {
             const clientFound = await GetClientByContact(contact, data);
             if (clientFound.id !== '') {
@@ -27,6 +30,8 @@ const PageNewOrderDelivery = () => {
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao buscar o cliente');
             setClient(null);
+        } finally {
+            setIsSearching(false);
         }
     }
 
@@ -58,31 +63,34 @@ const PageNewOrderDelivery = () => {
 
                         <button
                             onClick={search}
-                            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                            disabled={isSearching}
+                            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <FaSearch />
-                            <span>Buscar</span>
+                            <span>{isSearching ? 'Buscando...' : 'Buscar'}</span>
                         </button>
                     </div>
 
-                    {client && <CardClient client={client} />}
+                    {client && <CardClient client={client} isCreating={isCreating} setIsCreating={setIsCreating} />}
                 </div>
             </div>
         </div>
     );
 };
 
-const CardClient = ({ client }: { client: Client | null | undefined }) => {
+const CardClient = ({ client, isCreating, setIsCreating }: { client: Client | null | undefined, isCreating: boolean, setIsCreating: (v: boolean) => void }) => {
     const router = useRouter();
     const { data } = useSession();
 
     const newOrder = async (client: Client) => {
-        if (!data) return;
+        if (!data || isCreating) return;
+        setIsCreating(true);
         try {
             const response = await NewOrderDelivery(client.id, data);
             router.push('/pages/order-control/' + response.order_id);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
+            setIsCreating(false);
         }
     }
 
@@ -110,10 +118,11 @@ const CardClient = ({ client }: { client: Client | null | undefined }) => {
 
             <button
                 onClick={() => newOrder(client)}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                disabled={isCreating}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <FaCheck />
-                <span>Confirmar Cliente</span>
+                <span>{isCreating ? 'Iniciando...' : 'Confirmar Cliente'}</span>
             </button>
         </div>
     );

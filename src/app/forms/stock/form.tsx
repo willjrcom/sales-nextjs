@@ -248,6 +248,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                 item={stock}
                 name="stock"
                 onSubmit={submit}
+                isPending={isUpdate ? updateMutation.isPending : createMutation.isPending}
             />
         </div>
     )

@@ -17,18 +17,21 @@ interface RedeemCardProps {
 const RedeemCard = ({ fetchShift }: RedeemCardProps) => {
     const [name, setName] = useState<string>("");
     const [value, setValue] = useState<Decimal>(new Decimal(0));
+    const [isProcessing, setIsProcessing] = useState(false);
     const { data } = useSession();
     const modalHandler = useModal();
 
     const handleAddRedeem = async (name: string, value: Decimal) => {
-        if (!data) return;
-
+        if (!data || isProcessing) return;
+        setIsProcessing(true);
         try {
             await AddRedeemToShift(name, value.toNumber(), data)
             fetchShift();
             modalHandler.hideModal("add-redeem")
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao adicionar resgate");
+        } finally {
+            setIsProcessing(false);
         }
     }
 
@@ -36,7 +39,7 @@ const RedeemCard = ({ fetchShift }: RedeemCardProps) => {
         <>
             <TextField friendlyName='Motivo' name='name' value={name} setValue={setName} />
             <PriceField friendlyName='Valor' name='value' value={value} setValue={setValue} />
-            <ButtonsModal item={{ id: "", name: "Adicionar resgate" }} onSubmit={() => handleAddRedeem(name, value)} name='Adcionar resgate' />
+            <ButtonsModal item={{ id: "", name: "Adicionar resgate" }} onSubmit={() => handleAddRedeem(name, value)} name='Adcionar resgate' isPending={isProcessing} />
         </>
     )
 }
@@ -51,25 +54,25 @@ const Redeems = ({ shift }: RedeemsProps) => {
             <h3 className="text-lg font-semibold mb-4">Resgates</h3>
             <div className="max-h-64 overflow-y-auto">
                 <table className="w-full text-left">
-                <thead>
-                    <tr>
-                        <th className="pb-2">Motivo</th>
-                        <th className="pb-2">Valor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {!shift?.redeems?.length && (
+                    <thead>
                         <tr>
-                            <td colSpan={2} className="py-2 text-center">Nenhum resgate encontrado</td>
+                            <th className="pb-2">Motivo</th>
+                            <th className="pb-2">Valor</th>
                         </tr>
-                    )}
-                    {shift?.redeems?.map((redeem, index) => (
-                        <tr key={index} className="border-t">
-                            <td className="py-2">{redeem.name}</td>
-                            <td className="py-2">R$ {new Decimal(redeem.value).toFixed(2)}</td>
-                        </tr>
-                    ))}
-                </tbody>
+                    </thead>
+                    <tbody>
+                        {!shift?.redeems?.length && (
+                            <tr>
+                                <td colSpan={2} className="py-2 text-center">Nenhum resgate encontrado</td>
+                            </tr>
+                        )}
+                        {shift?.redeems?.map((redeem, index) => (
+                            <tr key={index} className="border-t">
+                                <td className="py-2">{redeem.name}</td>
+                                <td className="py-2">R$ {new Decimal(redeem.value).toFixed(2)}</td>
+                            </tr>
+                        ))}
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -77,4 +80,4 @@ const Redeems = ({ shift }: RedeemsProps) => {
 }
 
 export default RedeemCard
-export { Redeems}
+export { Redeems }

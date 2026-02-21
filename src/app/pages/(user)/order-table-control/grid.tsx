@@ -188,6 +188,7 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
     const modalHandler = useModal();
     const [name, setName] = useState<string>("");
     const [contact, setContact] = useState<string>("");
+    const [isCreating, setIsCreating] = useState(false);
     const style = {
         width: "80px",
         height: "60px",
@@ -202,13 +203,15 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
             }
 
             const newOrder = async (tableID: string) => {
-                if (!data) return
+                if (!data || isCreating) return
+                setIsCreating(true);
                 try {
                     const response = await NewOrderTable(data, tableID, name, contact)
                     router.push('/pages/order-control/' + response.order_id)
                     onClose()
                 } catch (error: RequestError | any) {
                     notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
+                    setIsCreating(false);
                 }
             }
 
@@ -219,9 +222,13 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
                     <PatternField name="contact" value={contact} setValue={setContact} patternName="full-phone" />
 
                     <p className="mb-4">Deseja iniciar um novo pedido?</p>
-                    <button onClick={() => newOrder(placeTable.table_id)} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max">
+                    <button
+                        onClick={() => newOrder(placeTable.table_id)}
+                        disabled={isCreating}
+                        className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-max disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         <FaPlus />
-                        <span>Iniciar</span>
+                        <span>{isCreating ? 'Iniciando...' : 'Iniciar'}</span>
                     </button>
                 </>
             )

@@ -13,16 +13,19 @@ import ThreeColumnHeader from "@/components/header/three-column-header";
 
 const PageNewOrderPickup = () => {
     const [orderName, setOrderName] = useState('');
+    const [isCreating, setIsCreating] = useState(false);
     const router = useRouter();
     const { data } = useSession();
 
     const newOrder = async (name: string) => {
-        if (!data) return
+        if (!data || isCreating) return
+        setIsCreating(true);
         try {
             const response = await NewOrderPickup(name, data)
             router.push('/pages/order-control/' + response.order_id)
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
+            setIsCreating(false);
         }
     }
 
@@ -42,12 +45,12 @@ const PageNewOrderPickup = () => {
                 />
             </div>
             <button
-                disabled={orderName.length === 0}
+                disabled={orderName.length === 0 || isCreating}
                 onClick={() => newOrder(orderName)}
                 className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed w-full max-w-md"
             >
                 <FaPlus />
-                <span>Iniciar pedido</span>
+                <span>{isCreating ? 'Iniciando...' : 'Iniciar pedido'}</span>
             </button>
         </div>
     );

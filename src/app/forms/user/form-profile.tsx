@@ -30,6 +30,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const { data } = useSession();
     const queryClient = useQueryClient();
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleInputChange = useCallback((field: keyof User, value: any) => {
         setUser(prev => ({
@@ -61,6 +62,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
         const validationErrors = ValidateUserForm(newUser);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             await UpdateUser(newUser, data)
             queryClient.invalidateQueries({ queryKey: ['me-user'] });
@@ -70,6 +72,8 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao atualizar perfil');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -127,7 +131,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
             </div>
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={user} name="Usuário" onSubmit={submit} />
+            <ButtonsModal item={user} name="Usuário" onSubmit={submit} isPending={isSaving} />
         </div>
     );
 };

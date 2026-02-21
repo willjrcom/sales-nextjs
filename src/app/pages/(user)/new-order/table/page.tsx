@@ -20,6 +20,7 @@ const PageNewOrderTable = () => {
     const [tableID, setTableID] = useState<string>('');
     const [name, setName] = useState<string>("");
     const [contact, setContact] = useState<string>("");
+    const [isCreating, setIsCreating] = useState(false);
     const router = useRouter();
     const { data } = useSession();
 
@@ -44,12 +45,15 @@ const PageNewOrderTable = () => {
     }, [selectedPlace]);
 
     const newOrder = async (tableID: string) => {
-        if (!data) return;
+        if (!data || isCreating) return;
+        setIsCreating(true);
         try {
             const response = await NewOrderTable(data, tableID, name, contact);
             router.push('/pages/order-control/' + response.order_id);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
+        } finally {
+            setIsCreating(false);
         }
     }
 
@@ -79,12 +83,12 @@ const PageNewOrderTable = () => {
                 <PatternField name="contact" value={contact} setValue={setContact} patternName="full-phone" />
 
                 <button
-                    disabled={!tableID}
+                    disabled={!tableID || isCreating}
                     onClick={() => newOrder(tableID)}
                     className="flex items-center justify-center w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed space-x-2"
                 >
                     <FaPlus />
-                    <span>Iniciar Pedido</span>
+                    <span>{isCreating ? 'Iniciando...' : 'Iniciar Pedido'}</span>
                 </button>
             </div>
         </div>

@@ -84,6 +84,7 @@ const CreateAndAddUserToCompanyForm = ({ cpf }: CreateAndAddUserToCompanyFormPro
                     item={user}
                     name="Funcionário"
                     onSubmit={createUserAndUser}
+                    isPending={createMutation.isPending}
                 />
             </div>
         </div>

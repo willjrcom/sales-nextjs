@@ -144,6 +144,7 @@ interface ModalData {
 export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
     const queryClient = useQueryClient();
     const [selectedDriver, setSelectedDriver] = useState<DeliveryDriver | null>();
+    const [isProcessing, setIsProcessing] = useState(false);
     const { data } = useSession();
     const modalHandler = useModal();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
@@ -183,6 +184,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
 
         const deliveryOrderIds = Array.from(deliveryIDs);
 
+        setIsProcessing(true);
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
             queryClient.invalidateQueries({ queryKey: ['delivery-orders'] });
@@ -209,6 +211,8 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao enviar entregas");
             console.error(err);
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -249,7 +253,15 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
                 </Carousel>
             </div>
 
-            {deliveryDrivers.length > 0 && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}>Enviar entregas</button>}
+            {deliveryDrivers.length > 0 && (
+                <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={submit}
+                    disabled={isProcessing}
+                >
+                    {isProcessing ? 'Enviando...' : 'Enviar entregas'}
+                </button>
+            )}
         </>
     )
 }

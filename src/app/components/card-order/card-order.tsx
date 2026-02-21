@@ -60,6 +60,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
     const queryClient = useQueryClient();
     const { data } = useSession();
+    const [isProcessing, setIsProcessing] = useState(false);
     const modalHandler = useModal();
 
     const { data: company } = useQuery({
@@ -92,45 +93,48 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     });
 
     const handleReady = async () => {
-        if (!order || !data) return;
-
+        if (!order || !data || isProcessing) return;
+        setIsProcessing(true);
         try {
             await ReadyOrder(order.id, data);
             refetch();
+            modalHandler.hideModal("ready-order-" + order.id);
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao marcar como pronto");
+        } finally {
+            setIsProcessing(false);
         }
-
-        modalHandler.hideModal("ready-order-" + order.id);
     };
 
     const handleFinished = async () => {
-        if (!order || !data) return;
-
+        if (!order || !data || isProcessing) return;
+        setIsProcessing(true);
         try {
             await FinishOrder(order.id, data);
             refetch();
+            modalHandler.hideModal("finish-order-" + order.id);
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao marcar como finalizado");
+        } finally {
+            setIsProcessing(false);
         }
-
-        modalHandler.hideModal("finish-order-" + order.id);
     };
 
     const handleCancel = async () => {
-        if (!order || !data) return;
-
+        if (!order || !data || isProcessing) return;
+        setIsProcessing(true);
         try {
             await CancelOrder(order.id, data);
             refetch();
+            modalHandler.hideModal("cancel-order-" + order.id);
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao cancelar pedido");
+        } finally {
+            setIsProcessing(false);
         }
-
-        modalHandler.hideModal("cancel-order-" + order.id);
     };
 
     if (!order) return null;
@@ -216,8 +220,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
         }
         if (order.table) {
             const closeTable = async () => {
-                if (!order.table?.id || !data) return
-
+                if (!order.table?.id || !data || isProcessing) return
+                setIsProcessing(true);
                 try {
                     await CloseTable(order.table?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -226,6 +230,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 } catch (error) {
                     const err = error as RequestError;
                     notifyError(err.message || "Erro ao fechar mesa");
+                } finally {
+                    setIsProcessing(false);
                 }
             }
 
@@ -254,13 +260,24 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                 'Fechar Mesa',
                                 <>
                                     <div className="text-center mb-4"><h2>Tem certeza que deseja fechar a mesa?</h2></div>
-                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onConfirm}>Fechar Mesa</button>
-                                </>,
+                                    <button
+                                        disabled={isProcessing}
+                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                                        onClick={onConfirm}
+                                    >
+                                        {isProcessing ? 'Fechando...' : 'Fechar Mesa'}
+                                    </button>
+                                </>
+                                ,
                                 'md',
                                 () => modalHandler.hideModal('close-table-' + order.id)
                             )
                         }}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Fechar Mesa</button>
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isProcessing}
+                        >
+                            Fechar Mesa
+                        </button>
                         }
                     </div>
                 </div>
@@ -269,8 +286,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
 
         if (order.pickup) {
             const deliveryPickup = async () => {
-                if (!order.pickup?.id || !data) return
-
+                if (!order.pickup?.id || !data || isProcessing) return
+                setIsProcessing(true);
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -280,6 +297,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 } catch (error) {
                     const err = error as RequestError;
                     notifyError(err.message || "Erro ao entregar retirada");
+                } finally {
+                    setIsProcessing(false);
                 }
             }
             return (
@@ -306,13 +325,24 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                 'Entregar pedido',
                                 <>
                                     <div className="text-center mb-4"><h2>Tem certeza que deseja entregar o pedido?</h2></div>
-                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onConfirm}>Entregar pedido</button>
-                                </>,
+                                    <button
+                                        disabled={isProcessing}
+                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                                        onClick={onConfirm}
+                                    >
+                                        {isProcessing ? 'Entregando...' : 'Entregar pedido'}
+                                    </button>
+                                </>
+                                ,
                                 'md',
                                 () => modalHandler.hideModal('delivery-pickup-' + order.id)
                             )
                         }}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Entregar pedido</button>
+                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isProcessing}
+                        >
+                            Entregar pedido
+                        </button>
                         }
                     </div>
                 </div>
@@ -486,9 +516,10 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
                             <button
                                 onClick={handleReady}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200"
+                                disabled={isProcessing}
+                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Confirmar
+                                {isProcessing ? 'Processando...' : 'Confirmar'}
                             </button>
                         </ButtonIconText>}
 
@@ -497,9 +528,10 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
                             <button
                                 onClick={handleFinished}
-                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+                                disabled={isProcessing}
+                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Confirmar
+                                {isProcessing ? 'Processando...' : 'Confirmar'}
                             </button>
                         </ButtonIconText>}
 
@@ -508,9 +540,10 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
                             <button
                                 onClick={handleCancel}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                                disabled={isProcessing}
+                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Confirmar
+                                {isProcessing ? 'Processando...' : 'Confirmar'}
                             </button>
                         </ButtonIconText>}
                     {/* Botão de impressão */}

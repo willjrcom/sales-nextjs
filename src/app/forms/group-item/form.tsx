@@ -30,6 +30,7 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
     const [startAt, setStartAt] = useState<string | null | undefined>(item?.start_at);
     const [observationOpen, setObservationOpen] = useState(false);
     const [scheduleOpen, setScheduleOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const { data } = useSession();
     const queryClient = useQueryClient();
 
@@ -37,6 +38,7 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
         if (!data) return;
         if (newStartAt === null) newStartAt = "";
 
+        setIsProcessing(true);
         try {
             const prev = groupItem.start_at;
             await ScheduleGroupItem(groupItem, data, newStartAt);
@@ -54,6 +56,8 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao agendar');
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -61,6 +65,7 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
         if (!data) return;
         if (observation === null) observation = "";
 
+        setIsProcessing(true);
         try {
             const prev = groupItem.observation;
             await ObservationGroupItem(groupItem, data, observation);
@@ -79,6 +84,8 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao alterar observação');
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -133,9 +140,9 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
                         <DialogClose asChild>
                             <Button variant="outline">Cancelar</Button>
                         </DialogClose>
-                        <Button onClick={() => onSaveObservation(observation)}>
+                        <Button onClick={() => onSaveObservation(observation)} disabled={isProcessing}>
                             <FaSave className="mr-2 h-4 w-4" />
-                            Salvar
+                            {isProcessing ? 'Salvando...' : 'Salvar'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -167,17 +174,17 @@ const GroupItemForm = ({ item, onSuccess }: GroupItemFormProps) => {
                     </div>
                     <DialogFooter className="gap-2">
                         {groupItem.start_at && (
-                            <Button variant="destructive" onClick={handleRemoveSchedule}>
+                            <Button variant="destructive" onClick={handleRemoveSchedule} disabled={isProcessing}>
                                 <FaTrash className="mr-2 h-4 w-4" />
-                                Remover
+                                {isProcessing ? 'Removendo...' : 'Remover'}
                             </Button>
                         )}
                         <DialogClose asChild>
                             <Button variant="outline">Cancelar</Button>
                         </DialogClose>
-                        <Button onClick={handleSaveSchedule}>
+                        <Button onClick={handleSaveSchedule} disabled={isProcessing}>
                             <FaSave className="mr-2 h-4 w-4" />
-                            Salvar
+                            {isProcessing ? 'Salvando...' : 'Salvar'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

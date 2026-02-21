@@ -112,7 +112,7 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
                     />
                 </div>
             </div>
-            <ButtonsModal item={employee} name="Funcionário" onSubmit={onUpdate} />
+            <ButtonsModal item={employee} name="Funcionário" onSubmit={onUpdate} isPending={updateMutation.isPending} />
         </>
     );
 }

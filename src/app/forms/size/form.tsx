@@ -135,7 +135,13 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
             <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={size} name="Tamanho" onSubmit={submit} />
+            <ButtonsModal
+                item={size}
+                name="Tamanho"
+                onSubmit={submit}
+                deleteItem={onDelete}
+                isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+            />
         </div>
     );
 };

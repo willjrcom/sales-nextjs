@@ -21,6 +21,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const [place, setPlace] = useState<Place>(new Place(item));
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [isSaving, setIsSaving] = useState(false);
     const queryClient = useQueryClient();
 
     const handleInputChange = (field: keyof Place, value: any) => {
@@ -33,6 +34,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
         const validationErrors = ValidatePlaceForm(place);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             const response = isUpdate ? await UpdatePlace(place, data) : await NewPlace(place, data)
 
@@ -48,11 +50,14 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao salvar local');
+        } finally {
+            setIsSaving(false);
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
+        setIsSaving(true);
         try {
             await DeletePlace(place.id, data);
             queryClient.invalidateQueries({ queryKey: ['places'] });
@@ -60,6 +65,8 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || `Erro ao remover local ${place.name}`);
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -92,7 +99,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={place.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={place} name="Local" onSubmit={submit} />
+            <ButtonsModal item={place} name="Local" onSubmit={submit} deleteItem={onDelete} isPending={isSaving} />
         </div>
     );
 };

@@ -21,6 +21,7 @@ interface ShiftProps {
 const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
     const { data } = useSession();
     const [startChange, setStartChange] = useState<Decimal>(new Decimal(shift?.start_change || 0));
+    const [isProcessing, setIsProcessing] = useState(false);
     const modalHandler = useModal();
 
 
@@ -34,13 +35,15 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
     });
 
     const handleOpenShift = async () => {
-        if (!data) return;
-
+        if (!data || isProcessing) return;
+        setIsProcessing(true);
         try {
             await OpenShift(startChange.toNumber(), data)
             fetchShift();
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao abrir turno");
+        } finally {
+            setIsProcessing(false);
         }
     }
 
@@ -70,8 +73,13 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
 
                 <div className="ml-auto text-right justify-around block">
                     <PriceField friendlyName='Troco inicial' name='start_change' value={startChange} setValue={setStartChange} />
-                    <button className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                        onClick={handleOpenShift}>Abrir turno</button>
+                    <button
+                        className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleOpenShift}
+                        disabled={isProcessing}
+                    >
+                        {isProcessing ? 'Abrindo...' : 'Abrir turno'}
+                    </button>
                 </div>
             </div>
         )
@@ -93,8 +101,8 @@ const ShiftManager = ({ shift, fetchShift }: ShiftProps) => {
                     >Resgatar Dinheiro</button>
                 </div>
 
-                <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                    onClick={() => onOpenModal(shift)}>Fechar Turno</button>
+                <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => onOpenModal(shift)} disabled={isProcessing}>Fechar Turno</button>
             </div>
         </div >
     )

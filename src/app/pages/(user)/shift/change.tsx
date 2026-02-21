@@ -16,25 +16,28 @@ interface ChangeCardProps {
 
 const ChangeCard = ({ openedAt, fetchShift }: ChangeCardProps) => {
     const [endChange, setEndChange] = useState<Decimal>(new Decimal(0));
+    const [isProcessing, setIsProcessing] = useState(false);
     const { data } = useSession();
     const modalHandler = useModal();
 
     const handleCloseShift = async (endChange: Decimal) => {
-        if (!data) return;
-
+        if (!data || isProcessing) return;
+        setIsProcessing(true);
         try {
             await CloseShift(endChange.toNumber(), data)
             fetchShift();
             modalHandler.hideModal("close-shift")
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao fechar turno");
+        } finally {
+            setIsProcessing(false);
         }
     }
 
     return (
         <>
             <PriceField friendlyName='Troco final' name='end_change' value={endChange} setValue={setEndChange} />
-            <ButtonsModal item={{ id: "", name: "Fechar turno" }} onSubmit={() => handleCloseShift(endChange)} name={'Turno: ' + ToUtcDatetime(openedAt)} isAddItem={true} />
+            <ButtonsModal item={{ id: "", name: "Fechar turno" }} onSubmit={() => handleCloseShift(endChange)} name={'Turno: ' + ToUtcDatetime(openedAt)} isAddItem={true} isPending={isProcessing} />
         </>
     )
 }

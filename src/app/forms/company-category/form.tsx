@@ -119,6 +119,7 @@ const CompanyCategoryForm = ({ item, isUpdate }: CreateFormsProps<CompanyCategor
                     name="Categoria de Cliente"
                     onSubmit={submit}
                     deleteItem={isUpdate ? onDelete : undefined}
+                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
                 />
             </div>
         </div>

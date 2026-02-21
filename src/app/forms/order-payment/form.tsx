@@ -2,16 +2,16 @@
 
 import React, { useState } from 'react';
 import { HiddenField, SelectField } from '../../components/modal/field';
-import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import PriceField from '@/app/components/modal/fields/price';
+import { notifySuccess, notifyError } from '../../utils/notifications';
+import PriceField from '../../components/modal/fields/price';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
-import { useModal } from '@/app/context/modal/context';
+import { useModal } from '../../context/modal/context';
 import ErrorForms from '../../components/modal/error-forms';
-import RequestError from '@/app/utils/error';
-import { PaymentOrder, payMethodsWithId, ValidatePaymentForm } from '@/app/entities/order/order-payment';
-import PayOrder from '@/app/api/order/payment/order';
+import RequestError from '../../utils/error';
+import { PaymentOrder, payMethodsWithId, ValidatePaymentForm } from '../../entities/order/order-payment';
+import PayOrder from '../../api/order/payment/order';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface PaymentFormProps extends CreateFormsProps<PaymentOrder> {
@@ -25,6 +25,7 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
     const { data } = useSession();
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleInputChange = (field: keyof PaymentOrder, value: any) => {
         setPayment(prev => ({ ...prev, [field]: value }));
@@ -38,6 +39,7 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
         const validationErrors = ValidatePaymentForm(payment);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             await PayOrder(payment, data)
 
@@ -48,6 +50,8 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao processar pagamento');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -69,7 +73,7 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
             <HiddenField name='order_id' setValue={value => handleInputChange('order_id', value)} value={orderId} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={payment} name="Tamanho" onSubmit={submit} isAddItem />
+            <ButtonsModal item={payment} name="Tamanho" onSubmit={submit} isAddItem isPending={isSaving} />
         </div>
     );
 };

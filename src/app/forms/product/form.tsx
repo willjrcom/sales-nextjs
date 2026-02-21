@@ -30,6 +30,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const [product, setProduct] = useState<Product>(new Product(item));
     const [flavorsInput, setFlavorsInput] = useState<string>(item?.flavors?.join(', ') || '');
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [isSaving, setIsSaving] = useState(false);
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories', 'map', 'product'],
@@ -109,6 +110,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         const validationErrors = ValidateProductForm(product);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             if (isUpdate) {
                 await UpdateProduct(product, data);
@@ -124,12 +126,15 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao salvar produto');
+        } finally {
+            setIsSaving(false);
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
 
+        setIsSaving(true);
         try {
             await DeleteProduct(product.id, data);
             queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -137,6 +142,8 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             notifySuccess(`Produto ${product.name} removido com sucesso`);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao remover produto');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -262,7 +269,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={product.id} />
 
             <ErrorForms errors={errors} setErrors={setErrors} />
-            <ButtonsModal item={product} name='produto' onSubmit={submit} />
+            <ButtonsModal item={product} name='produto' onSubmit={submit} isPending={isSaving} />
         </div>
     );
 };

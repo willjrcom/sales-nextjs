@@ -24,6 +24,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     const queryClient = useQueryClient();
     const { data } = useSession();
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [isSaving, setIsSaving] = useState(false);
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories', 'map', 'process-rule'],
@@ -56,6 +57,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         const validationErrors = ValidateProcessRuleForm(processRule);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             const response = isUpdate ? await UpdateProcessRule(processRule, data) : await NewProcessRule(processRule, data);
 
@@ -71,11 +73,14 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao salvar regra de processo');
+        } finally {
+            setIsSaving(false);
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
+        setIsSaving(true);
         try {
             await DeleteProcessRule(processRule.id, data);
             notifySuccess(`Regra de processo ${processRule.name} removida com sucesso`);
@@ -83,6 +88,8 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || `Erro ao remover regra de processo ${processRule.name}`);
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -153,7 +160,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
                 </div>
             </div>
 
-            <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} />
+            <ButtonsModal item={processRule} name="Regras de processos" onSubmit={submit} deleteItem={onDelete} isPending={isSaving} />
         </div>
     );
 };

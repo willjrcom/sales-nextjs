@@ -160,6 +160,7 @@ interface FinishDeliveryProps {
 }
 export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
     const queryClient = useQueryClient();
+    const [isProcessing, setIsProcessing] = useState(false);
     const { data } = useSession();
     const modalHandler = useModal();
 
@@ -186,6 +187,7 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
             return;
         }
 
+        setIsProcessing(true);
         try {
             await DeliveryOrderDelivery(deliveryID, data);
 
@@ -198,8 +200,10 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
             const err = error as RequestError;
             notifyError(err.message || "Erro ao receber entrega");
             console.error(err);
+        } finally {
+            setIsProcessing(false);
         }
-    }
+    };
 
     const paymentMethod = order.delivery?.payment_method || 'N/A';
     const change = order.delivery?.change ? new Decimal(order.delivery.change).toFixed(2) : '0.00';
@@ -213,10 +217,11 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
                 <p className="text-sm"><strong>Valor total (R$):</strong> {total}</p>
             </div>
             <button
-                className="w-full inline-flex justify-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={submit}
+                disabled={isProcessing}
             >
-                Confirmar entrega
+                {isProcessing ? 'Confirmando...' : 'Confirmar Recebimento'}
             </button>
         </div>
     );

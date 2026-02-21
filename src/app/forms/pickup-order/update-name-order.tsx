@@ -19,6 +19,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
     const modalHandler = useModal();
     const queryClient = useQueryClient();
     const [name, setName] = useState<string>(item?.name || '');
+    const [isSaving, setIsSaving] = useState(false);
     const { data } = useSession();
 
     const submit = async () => {
@@ -29,6 +30,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
             return;
         }
 
+        setIsSaving(true);
         try {
             await UpdatePickupOrderName(pickupOrderId, name, data);
             // Invalidar queries do pedido
@@ -38,6 +40,8 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao atualizar nome');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -48,6 +52,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
                 item={item!}
                 name='Atualizar nome'
                 onSubmit={submit}
+                isPending={isSaving}
             />
         </>
     );

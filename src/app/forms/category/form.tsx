@@ -118,22 +118,8 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     }
 
     const onDelete = async () => {
-        if (!data) return;
-
-        try {
-            await DeleteCategory(category.id, data);
-
-            if (!isUpdate) {
-                modalHandler.hideModal(modalName);
-                notifySuccess(`Categoria ${category.name} removida com sucesso`);
-            } else {
-                router.back();
-                notifySuccess(`Categoria ${category.name} removida com sucesso`);
-            }
-
-        } catch (error: RequestError | any) {
-            notifyError(error.message || 'Erro ao remover categoria');
-        }
+        if (!data || !category.id) return;
+        deleteMutation.mutate(category.id);
     }
 
     const isUpdated = JSON.stringify(category) !== JSON.stringify(item)
@@ -279,9 +265,20 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
             {/* Botões para Atualizar ou Excluir */}
             {isUpdated ? (
-                <ButtonsModal item={category} name="category" onSubmit={submit} />
+                <ButtonsModal
+                    item={category}
+                    name="category"
+                    onSubmit={submit}
+                    deleteItem={onDelete}
+                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                />
             ) : (
-                <ButtonsModal item={category} name="category" />
+                <ButtonsModal
+                    item={category}
+                    name="category"
+                    deleteItem={onDelete}
+                    isPending={deleteMutation.isPending}
+                />
             )}
         </div>
     );

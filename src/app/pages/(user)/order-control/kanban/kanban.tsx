@@ -25,14 +25,11 @@ function OrderKanban({ orders }: OrderKanbanProps) {
         [allOrders]
     );
     const [activeId, setActiveId] = useState<string | null>(null);
-    const [preventDrag, setPreventDrag] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const queryClient = useQueryClient();
 
     const { data } = useSession();
 
-    useEffect(() => {
-        setPreventDrag(false); // Ativa a flag para prevenir o arrasto
-    }, [preventDrag]);
 
 
     const handleDragStart = (event: { active: any }) => {
@@ -40,6 +37,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
     };
 
     const handleDragEnd = async (event: { active: any; over: any }) => {
+        if (isProcessing) return;
         setActiveId(null); // Reseta o ID ativo ao final do arrasto
 
         const { active, over } = event;
@@ -57,19 +55,25 @@ function OrderKanban({ orders }: OrderKanbanProps) {
         if (over.id === "Ready" && active.id.startsWith("Pending-")) {
             if (!orderId || !data) return;
             try {
+                setIsProcessing(true);
                 await ReadyOrder(orderId, data);
                 queryClient.invalidateQueries({ queryKey: ['orders'] });
             } catch (error: RequestError | any) {
                 notifyError(error.message || 'erro ao deixar pedido pronto')
+            } finally {
+                setIsProcessing(false);
             }
 
         } else if (over.id === "Finished" && active.id.startsWith("Ready-")) {
             if (!orderId || !data) return;
             try {
+                setIsProcessing(true);
                 await FinishOrder(orderId, data);
                 queryClient.invalidateQueries({ queryKey: ['orders'] });
             } catch (error: RequestError | any) {
                 notifyError(error.message || 'erro ao finalizar pedido')
+            } finally {
+                setIsProcessing(false);
             }
         }
     };
@@ -77,7 +81,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint: {
-                distance: preventDrag ? Infinity : 5,
+                distance: isProcessing ? Infinity : 5,
             },
         })
     );

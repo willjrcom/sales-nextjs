@@ -48,6 +48,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const router = useRouter();
     const modalHandler = useModal();
     const queryClient = useQueryClient();
+    const [isSaving, setIsSaving] = useState(false);
 
     const { data: categoriesResponse } = useQuery<CompanyCategory[]>({
         queryKey: ['company-categories'],
@@ -113,6 +114,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         const validationErrors = ValidateCompanyForm(company);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             const responseNewCompany = await NewCompany(company, data);
             company.id = responseNewCompany.company_id;
@@ -133,6 +135,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao criar empresa');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -142,6 +146,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         const validationErrors = ValidateCompanyForm(company);
         if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
 
+        setIsSaving(true);
         try {
             await UpdateCompany(company, data);
             setCompany(company);
@@ -152,6 +157,8 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao atualizar empresa');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -401,11 +408,13 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 item={company}
                 name="Empresa"
                 onSubmit={handleSubmit}
+                isPending={isSaving}
             />}
             {isUpdate && <ButtonsModal
                 item={company}
                 name="Empresa"
                 onSubmit={handleUpdate}
+                isPending={isSaving}
             />}
         </div>
     );

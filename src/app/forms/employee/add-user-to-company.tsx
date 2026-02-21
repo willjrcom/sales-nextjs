@@ -17,17 +17,21 @@ const AddUserToCompanyForm = () => {
     const [userFound, setUserFound] = useState<User | null>();
     const [cpfToSearch, setCpfToSearch] = useState<string>('');
     const [notFound, setNotFound] = useState<boolean>(false);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
     const { data } = useSession();
 
     const searchUserByCpf = async () => {
         if (!data) return;
         setNotFound(false);
+        setIsSearching(true);
         try {
             const user = await SearchUser({ cpf: cpfToSearch }, data);
             setUserFound(user);
         } catch (error) {
             setUserFound(null);
             setNotFound(true);
+        } finally {
+            setIsSearching(false);
         }
     }
 
@@ -62,10 +66,10 @@ const AddUserToCompanyForm = () => {
                             onClick={searchUserByCpf}
                             className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow flex items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Buscar CPF"
-                            disabled={!cpfToSearch || cpfToSearch.length < 14}
+                            disabled={!cpfToSearch || cpfToSearch.length < 14 || isSearching}
                         >
-                            <FaSearch />
-                            <span>Buscar</span>
+                            <FaSearch className={isSearching ? "animate-spin" : ""} />
+                            <span>{isSearching ? "Buscando..." : "Buscar"}</span>
                         </button>
                     </div>
                 </div>
@@ -183,10 +187,11 @@ const CardUser = ({ user }: CardUserProps) => {
             <div className="flex items-end justify-end md:w-48">
                 <button
                     onClick={() => newEmployee(user)}
-                    className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 font-semibold shadow-md transition-transform transform active:scale-95"
+                    disabled={addEmployeeMutation.isPending}
+                    className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 font-semibold shadow-md transition-transform transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <FaCheck />
-                    <span>Confirmar</span>
+                    <FaCheck className={addEmployeeMutation.isPending ? "animate-spin" : ""} />
+                    <span>{addEmployeeMutation.isPending ? "Confirmando..." : "Confirmar"}</span>
                 </button>
             </div>
         </div>

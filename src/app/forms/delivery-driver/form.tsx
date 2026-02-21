@@ -21,6 +21,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>(item?.employee_id || "");
     const [deliveryDriver, setDeliveryDriver] = useState<DeliveryDriver>(new DeliveryDriver(item));
     const { data } = useSession();
+    const [isSaving, setIsSaving] = useState(false);
 
     const { data: employeesWithoutDriversResponse } = useQuery({
         queryKey: ['employees-without-delivery-drivers'],
@@ -37,7 +38,7 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             notifyError('Selecione um motoboy');
             return
         }
-
+        setIsSaving(true);
         try {
             deliveryDriver.employee_id = selectedEmployeeId
             const response = isUpdate ? await UpdateDeliveryDriver(deliveryDriver, data) : await NewDeliveryDriver(deliveryDriver.employee_id, data)
@@ -59,11 +60,14 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao salvar motoboy');
+        } finally {
+            setIsSaving(false);
         }
     }
 
     const onDelete = async () => {
         if (!data) return;
+        setIsSaving(true);
         try {
             await DeleteDeliveryDriver(deliveryDriver.id, data);
             notifySuccess(`Motoboy ${deliveryDriver.employee.name} removido com sucesso`);
@@ -71,6 +75,8 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Erro ao remover motoboy');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -92,8 +98,8 @@ const DeliveryDriverForm = ({ item, isUpdate }: CreateFormsProps<DeliveryDriver>
                     </div>
                 </div>
             )}
-            {isUpdate && <ButtonsModal item={deliveryDriver.employee} name="Motoboy" onSubmit={submit} />}
-            {!isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} />}
+            {isUpdate && <ButtonsModal item={deliveryDriver.employee} name="Motoboy" onSubmit={submit} deleteItem={onDelete} isPending={isSaving} />}
+            {!isUpdate && <ButtonsModal item={deliveryDriver} name="Motoboy" onSubmit={submit} isPending={isSaving} />}
         </div>
     );
 };
