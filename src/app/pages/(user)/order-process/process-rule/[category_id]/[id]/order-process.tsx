@@ -4,26 +4,26 @@ import StartOrderProcess from '@/app/api/order-process/start/order-process';
 import { useModal } from '@/app/context/modal/context';
 import OrderProcess from '@/app/entities/order-process/order-process';
 import { useSession } from 'next-auth/react';
-import { useEffect, useMemo, useState } from 'react';
-import { HiEye, HiPlay, HiCheckCircle, HiX } from 'react-icons/hi';
+import { useEffect, useState } from 'react';
+import { HiEye, HiPlay, HiCheckCircle } from 'react-icons/hi';
 import GroupItem from '@/app/entities/order/group-item';
 import OrderProcessDetails from './order-process-details';
 import { ToUtcMinutesSeconds } from '@/app/utils/date';
 import { notifyError } from '@/app/utils/notifications';
 import printGroupItem from '@/app/components/print/print-group-item';
 import GetCompany from '@/app/api/company/company';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import ItemProcessCard from './item-process-card';
 import RemovedItemCard from '@/app/components/order/removed-item-card';
 
 interface OrderProcessCardProps {
     orderProcess: OrderProcess;
+    onRefetch: () => Promise<any>;
 };
 
-const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
+const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) => {
     const { data } = useSession();
     const modalHandler = useModal();
-    const queryClient = useQueryClient();
 
     const { data: company } = useQuery({
         queryKey: ['company'],
@@ -31,8 +31,8 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         enabled: !!data?.user?.access_token,
     })
 
-    // atualiza o timer a cada segundo para mostrar duração dinâmica
     const [now, setNow] = useState(new Date());
+    const [isProcessing, setIsProcessing] = useState(false);
     useEffect(() => {
         if (orderProcess.status === "Started") {
             const timer = setInterval(() => setNow(new Date()), 1000);
@@ -40,35 +40,38 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
         }
     }, [orderProcess.status]);
 
-    const groupItem = useMemo(() => orderProcess.group_item, [orderProcess.group_item]);
+    const groupItem = orderProcess.group_item;
     if (!groupItem) {
         return <p className="text-gray-500 mt-4">Nenhum item no pedido</p>
     };
 
     const startProcess = async (id: string) => {
-        if (!data) return
-
+        if (!data || isProcessing) return
+        setIsProcessing(true);
         try {
             await StartOrderProcess(id, data)
-            queryClient.invalidateQueries({ queryKey: ['order-processes'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao iniciar o pedido');
+        } finally {
+            await onRefetch();
+            setIsProcessing(false);
         }
     }
 
     const finishProcess = async (id: string) => {
-        if (!data) return
-
+        if (!data || isProcessing) return
+        setIsProcessing(true);
         try {
             const nextProcessID = await FinishOrderProcess(id, data)
 
             if (!nextProcessID && company?.preferences?.["enable_print_items_on_finish_process"]) {
                 await printGroupItem({ groupItemID: groupItem.id, printerName: groupItem.printer_name, session: data })
             }
-
-            queryClient.invalidateQueries({ queryKey: ['order-processes'] });
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');
+        } finally {
+            await onRefetch();
+            setIsProcessing(false);
         }
     }
 
@@ -120,17 +123,19 @@ const OrderProcessCard = ({ orderProcess }: OrderProcessCardProps) => {
                         {orderProcess.status === "Pending" && (
                             <button
                                 onClick={() => startProcess(orderProcess.id)}
-                                className="w-full mt-4 inline-flex justify-center items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded"
+                                disabled={isProcessing}
+                                className="w-full mt-4 inline-flex justify-center items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded"
                             >
-                                <HiPlay className="mr-2" /> Iniciar
+                                <HiPlay className="mr-2" /> {isProcessing ? 'Iniciando...' : 'Iniciar'}
                             </button>
                         )}
                         {orderProcess.status === "Started" && (
                             <button
                                 onClick={() => finishProcess(orderProcess.id)}
-                                className="w-full mt-4 inline-flex justify-center items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded"
+                                disabled={isProcessing}
+                                className="w-full mt-4 inline-flex justify-center items-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded"
                             >
-                                <HiCheckCircle className="mr-2" /> Finalizar
+                                <HiCheckCircle className="mr-2" /> {isProcessing ? 'Finalizando...' : 'Finalizar'}
                             </button>
                         )}
                     </div>

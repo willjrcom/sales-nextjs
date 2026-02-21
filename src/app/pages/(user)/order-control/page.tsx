@@ -41,7 +41,7 @@ const PageOrder = () => {
         const onClose = () => {
             modalHandler.hideModal("show-staging-orders")
         }
-        modalHandler.showModal("show-staging-orders", "Pedidos em aberto", <ListItemsCard orders={stagingOrders} />, "sm", onClose);
+        modalHandler.showModal("show-staging-orders", "Pedidos Não Enviados", <ListItemsCard orders={stagingOrders} />, "sm", onClose);
     }
 
     const classOrderStaging = stagingOrders.length > 0 ? "text-white bg-red-400 hover:bg-red-500" : "bg-gray-200 hover:bg-gray-300";
@@ -59,7 +59,7 @@ const PageOrder = () => {
                         className={`px-3 py-1.5 text-sm rounded whitespace-nowrap ${classOrderStaging}`}
                         onClick={openStagingOrders}
                     >
-                        {stagingOrders.length} pedidos em aberto
+                        {stagingOrders.length} Pedidos Não Enviados
                     </button>
 
                     <ThreeColumnHeader center={<div className="flex items-center gap-2">

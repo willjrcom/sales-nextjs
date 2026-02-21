@@ -107,7 +107,7 @@ const Topbar = () => {
                 <MenubarTrigger asChild className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:bg-destructive/90 focus:text-destructive-foreground data-[state=open]:bg-destructive/90 data-[state=open]:text-destructive-foreground">
                   <Link href={"/pages/order-control/" + currentOrder.id} className="flex items-center">
                     <FaExclamationCircle className="mr-2" />
-                    Pedido em aberto
+                    Pedido Não Enviado
                   </Link>
                 </MenubarTrigger>
               </MenubarMenu>

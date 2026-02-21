@@ -27,6 +27,7 @@ const PageProcessRule = () => {
     const { data } = useSession();
     const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>(id as string);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const router = useRouter();
 
     const { data: processRulesResponse } = useQuery({
@@ -35,16 +36,22 @@ const PageProcessRule = () => {
         enabled: !!data?.user?.access_token,
     });
 
-    const { data: orderProcessesResponse, refetch, isPending } = useQuery({
+    const { data: orderProcessesResponse, refetch } = useQuery({
         queryKey: ['order-processes', currentProcessRuleID],
         queryFn: () => GetProcessesByProcessRuleID(currentProcessRuleID, data!),
         enabled: !!data?.user?.access_token && !!currentProcessRuleID,
         refetchInterval: 5000,
+        refetchIntervalInBackground: true,
     });
 
     const handleRefresh = async () => {
-        await refetch();
-        setLastUpdate(FormatRefreshTime(new Date()));
+        setIsRefreshing(true);
+        try {
+            await refetch();
+            setLastUpdate(FormatRefreshTime(new Date()));
+        } finally {
+            setIsRefreshing(false);
+        }
     };
 
     const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse?.items]);
@@ -52,15 +59,18 @@ const PageProcessRule = () => {
     const processRules = useMemo(() => processRulesResponse || [], [processRulesResponse]);
     const processRule = useMemo(() => processRules.find((pr) => pr.id === currentProcessRuleID), [processRules, currentProcessRuleID]);
 
-    useEffect(() => router.replace(`/pages/order-process/process-rule/${category_id}/${currentProcessRuleID}`), [category_id, currentProcessRuleID]);
+    // Sync URL when user picks a different process rule from the dropdown
+    useEffect(() => {
+        router.replace(`/pages/order-process/process-rule/${category_id}/${currentProcessRuleID}`);
+    }, [currentProcessRuleID]);
+
+    // Sync state when user navigates directly (browser back/forward, external link)
     useEffect(() => {
         setCurrentProcessRuleID(id as string);
     }, [id]);
 
-    if (isPending || !processRule) {
-        return <>
-            <Loading />
-        </>
+    if (!processRule) {
+        return <><Loading /></>;
     };
 
     const body = (
@@ -73,10 +83,13 @@ const PageProcessRule = () => {
             {(!orderProcesses || orderProcesses.length === 0) ? (
                 <p className="text-gray-500 mt-4">Nenhum processo na fila</p>
             ) : (
-                orderProcesses
-                    .sort((a, b) => a.status === "Started" ? -1 : 1)
-                    .sort((a, b) => a.created_at.localeCompare(b.created_at))
-                    .map((process) => <OrderProcessCard key={process.id} orderProcess={process} />)
+                ([...orderProcesses])
+                    .sort((a, b) => {
+                        if (a.status === "Started" && b.status !== "Started") return -1;
+                        if (a.status !== "Started" && b.status === "Started") return 1;
+                        return a.created_at.localeCompare(b.created_at);
+                    })
+                    .map((process) => <OrderProcessCard key={process.id} orderProcess={process} onRefetch={refetch} />)
             )}
         </>
     )
@@ -107,7 +120,7 @@ const PageProcessRule = () => {
                     <SelectField friendlyName="Processo Atual" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional removeDefaultOption />
                 }
                 refreshButton={
-                    <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
+                    <Refresh onRefresh={handleRefresh} isPending={isRefreshing} lastUpdate={lastUpdate} />
                 }
                 tableChildren={body}
             />
