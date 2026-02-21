@@ -5,6 +5,7 @@ import Product from "../product/product";
 export default class Stock {
     id: string = '';
     product_id: string = '';
+    product_variation_id?: string;
     current_stock: Decimal = new Decimal(0);
     min_stock: Decimal = new Decimal(0);
     max_stock: Decimal = new Decimal(1000);
@@ -21,6 +22,7 @@ export default class Stock {
 
 const SchemaStock = z.object({
     product_id: z.string().uuid("Produto inválido"),
+    product_variation_id: z.string().uuid("Variação inválida").optional(),
     current_stock: z.coerce.number().min(0, 'Estoque atual deve ser maior ou igual a 0'),
     min_stock: z.coerce.number().min(0, 'Estoque mínimo deve ser maior ou igual a 0'),
     max_stock: z.coerce.number().min(0, 'Estoque máximo deve ser maior ou igual a 0'),
@@ -30,6 +32,7 @@ const SchemaStock = z.object({
 export const ValidateStockForm = (stock: Stock) => {
     const validatedFields = SchemaStock.safeParse({
         product_id: stock.product_id,
+        product_variation_id: stock.product_variation_id,
         current_stock: new Decimal(stock.current_stock).toNumber(),
         min_stock: new Decimal(stock.min_stock).toNumber(),
         max_stock: new Decimal(stock.max_stock).toNumber(),

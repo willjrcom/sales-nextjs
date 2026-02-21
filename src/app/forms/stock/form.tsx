@@ -16,6 +16,7 @@ import Decimal from 'decimal.js';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetDefaultProductsByCategory } from '@/app/api/product/product';
 import { GetCategoriesMap } from '@/app/api/category/category';
+import { GetAllStocksWithProduct, GetStockByProductID } from '@/app/api/stock/stock';
 
 const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const modalName = isUpdate ? 'edit-stock-' + item?.id : 'new-stock'
@@ -29,19 +30,63 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories', 'map', 'product'],
         queryFn: () => GetCategoriesMap(data!, true),
-        enabled: !!data?.user?.access_token,
+        enabled: !!(data as any)?.user?.access_token,
         refetchInterval: 60000,
     });
 
     const { data: productsResponse } = useQuery({
         queryKey: ['products', 'map', categoryID],
-        queryFn: () => GetDefaultProductsByCategory(data!, categoryID, true),
-        enabled: !!data?.user?.access_token && !!categoryID,
+        queryFn: () => GetDefaultProductsByCategory(data!, categoryID, false),
+        enabled: !!(data as any)?.user?.access_token && !!categoryID,
+    });
+
+    const { data: stocksResponse } = useQuery({
+        queryKey: ['stocks', 'with-product'],
+        queryFn: () => GetAllStocksWithProduct(data!),
+        enabled: !!(data as any)?.user?.access_token && !isUpdate && !!categoryID, // Fetch all for filtering the product list
+        refetchInterval: 60000,
+    });
+
+    const { data: productStocksResponse } = useQuery({
+        queryKey: ['stocks', 'product', stock.product_id],
+        queryFn: () => GetStockByProductID(stock.product_id, data!),
+        enabled: !!(data as any)?.user?.access_token && !!stock.product_id && !isUpdate,
     });
 
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
     const products = useMemo(() => productsResponse || [], [productsResponse]);
-    const recordProducts = useMemo(() => products.map(product => ({ id: product.id, name: product.name })), [products]);
+    const stocks = useMemo(() => stocksResponse?.items || [], [stocksResponse]);
+    const productStocks = useMemo(() => productStocksResponse || [], [productStocksResponse]);
+
+    const recordProducts = useMemo(() => {
+        if (isUpdate) return products.map(product => ({ id: product.id, name: product.name }));
+
+        return products
+            .filter(product => {
+                const productStocks = stocks.filter(s => s.product_id === product.id);
+
+                // Se o produto não tem variações, ele não deve estar no estoque
+                if (product.variations.length === 0) {
+                    return !productStocks.some(s => !s.product_variation_id);
+                }
+
+                // Se o produto tem variações, pelo menos uma variação não deve estar no estoque
+                return product.variations.some(v => !productStocks.some(s => s.product_variation_id === v.id));
+            })
+            .map(product => ({ id: product.id, name: product.name }));
+    }, [products, stocks, isUpdate]);
+
+    const variations = useMemo(() => {
+        const selectedProduct = products.find(p => p.id === stock.product_id);
+        const productVariations = selectedProduct?.variations || [];
+
+        if (isUpdate) return productVariations;
+
+        // Use specific product stocks for more accurate variation filtering
+        return productVariations.filter(v => !productStocks.some(s => s.product_variation_id === v.id));
+    }, [products, stock.product_id, productStocks, isUpdate]);
+
+    const recordVariations = useMemo(() => variations.map(v => ({ id: v.id, name: v.size?.name || 'Padrão' })), [variations]);
 
     const createMutation = useMutation({
         mutationFn: (newStock: Stock) => NewStock(newStock, data!),
@@ -107,8 +152,19 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                         friendlyName="Produto"
                         name="product_id"
                         selectedValue={stock.product_id}
-                        setSelectedValue={(value) => handleInputChange('product_id', value)}
+                        setSelectedValue={(value) => {
+                            handleInputChange('product_id', value);
+                            handleInputChange('product_variation_id', '');
+                        }}
                         values={recordProducts}
+                    />}
+
+                    {!isUpdate && variations.length > 0 && <RadioField
+                        friendlyName="Variação / Tamanho"
+                        name="product_variation_id"
+                        selectedValue={stock.product_variation_id || ""}
+                        setSelectedValue={(value) => handleInputChange('product_variation_id', value)}
+                        values={recordVariations}
                     />}
 
                     {isUpdate && <TextField
@@ -116,6 +172,14 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                         name="product_id"
                         setValue={(value) => handleInputChange('product_id', value)}
                         value={stock.product?.name || ""}
+                        disabled
+                    />}
+
+                    {isUpdate && stock.product_variation_id && <TextField
+                        friendlyName="Variação / Tamanho"
+                        name="product_variation_id"
+                        setValue={(value) => handleInputChange('product_variation_id', value)}
+                        value={stock.product?.variations?.find(v => v.id === stock.product_variation_id)?.size?.name || "Padrão"}
                         disabled
                     />}
                 </div>

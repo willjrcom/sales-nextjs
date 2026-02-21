@@ -11,6 +11,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { GetAllStocks } from "@/app/api/stock/stock";
+import StockEntity from "@/app/entities/stock/stock";
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
 import GetCategoryByID from "@/app/api/category/[id]/category";
@@ -98,6 +100,25 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
   const additionalProducts = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse]);
   const removableIngredients = useMemo(() => category?.removable_ingredients || [], [category]);
+
+  // Fetch Stocks to check availability
+  const { data: stocksResponse } = useQuery({
+    queryKey: ['stocks', 'all'],
+    queryFn: () => GetAllStocks(data!, 0, 1000), // Fetch all stocks (up to 1000)
+    enabled: !!(data as any)?.user?.access_token,
+  });
+
+  const stocks = useMemo(() => stocksResponse?.items || [], [stocksResponse]);
+
+  const getStockAvailability = (productId: string, variationId: string) => {
+    const stock = stocks.find(s =>
+      s.product_id === productId &&
+      (s.product_variation_id === variationId || (!s.product_variation_id && !variationId))
+    );
+
+    if (!stock) return true; // Se não tem controle de estoque, assumir disponível
+    return new Decimal(stock.current_stock).greaterThan(0);
+  };
 
   const fetchProduct = async () => {
     setReloadProduct(false);
@@ -302,7 +323,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                   {product.variations.map(variation => {
                     const isSelected = selectedVariationId === variation.id;
                     const isSizeMismatch = Boolean(forcedSize && variation.size?.name !== forcedSize);
-                    const isDisabled = !variation.is_available || isSizeMismatch;
+                    const isOutOfStock = !getStockAvailability(product.id, variation.id);
+                    const isDisabled = !variation.is_available || isSizeMismatch || isOutOfStock;
                     return (
                       <button
                         key={variation.id}
@@ -320,7 +342,8 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
                         <span className="font-semibold text-sm">{variation.size?.name || 'Padrão'}</span>
                         <span className="text-xs mt-1">R$ {new Decimal(variation.price).toFixed(2)}</span>
                         {!variation.is_available && <span className="text-[10px] text-red-500 font-bold mt-1">Indisponível</span>}
-                        {variation.is_available && isSizeMismatch && <span className="text-[10px] text-gray-400 font-bold mt-1">Tamanho incompatível</span>}
+                        {variation.is_available && isOutOfStock && <span className="text-[10px] text-red-500 font-bold mt-1">Sem Estoque</span>}
+                        {variation.is_available && !isOutOfStock && isSizeMismatch && <span className="text-[10px] text-gray-400 font-bold mt-1">Tamanho incompatível</span>}
                       </button>
                     )
                   })}

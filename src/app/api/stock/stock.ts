@@ -43,8 +43,8 @@ const GetStockWithProduct = async (id: string, session: Session): Promise<Stock>
     return response.data
 };
 
-const GetStockByProductID = async (productID: string, session: Session): Promise<Stock> => {
-    const response = await RequestApi<null, Stock>({
+const GetStockByProductID = async (productID: string, session: Session): Promise<Stock[]> => {
+    const response = await RequestApi<null, Stock[]>({
         path: `/stock/product/${productID}`,
         method: "GET",
         headers: AddAccessToken(session),
@@ -83,12 +83,23 @@ const GetStockReport = async (session: Session): Promise<StockReportComplete> =>
     return response.data
 };
 
+const GetStockByVariationID = async (variationID: string, session: Session): Promise<Stock> => {
+    const response = await RequestApi<null, Stock>({
+        path: `/stock/variation/${variationID}`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data
+};
+
 export {
     GetAllStocks,
     GetAllStocksWithProduct,
     GetStockByID,
     GetStockWithProduct,
     GetStockByProductID,
+    GetStockByVariationID,
     GetLowStockProducts,
     GetOutOfStockProducts,
     GetStockReport

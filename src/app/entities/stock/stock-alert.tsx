@@ -1,3 +1,6 @@
+import Product from "../product/product";
+import ProductVariation from "../product/variation";
+
 export default class StockAlert {
     id: string = '';
     stock_id: string = '';
@@ -7,8 +10,10 @@ export default class StockAlert {
     resolved_at?: string;
     resolved_by?: string;
     created_at: string = '';
-    product_name: string = '';
-    product_sku: string = '';
+    product_id: string = '';
+    product?: Product;
+    product_variation_id: string = '';
+    product_variation?: ProductVariation;
 
     constructor(data: Partial<StockAlert> = {}) {
         Object.assign(this, data);

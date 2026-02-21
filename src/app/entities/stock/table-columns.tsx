@@ -14,7 +14,12 @@ const StockColumns = (): ColumnDef<Stock>[] => [
     id: 'Produto',
     accessorKey: 'product.name',
     header: 'Produto',
-    cell: (info) => info.row.original.product?.name || "Produto não encontrado",
+    cell: (info) => {
+      const stock = info.row.original;
+      const productName = stock.product?.name || "Produto não encontrado";
+      const variationName = stock.product?.variations?.find(v => v.id === stock.product_variation_id)?.size?.name;
+      return variationName ? `${productName} (${variationName})` : productName;
+    },
   },
   {
     id: 'Estoque Atual',

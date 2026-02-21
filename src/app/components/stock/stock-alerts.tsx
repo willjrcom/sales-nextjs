@@ -125,7 +125,10 @@ const StockAlerts = () => {
                                                 {new Date(alert.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <h4 className="font-semibold mb-1">{alert.product_name || 'Produto não encontrado'}</h4>
+                                        <h4 className="font-semibold mb-1">
+                                            {alert.product?.name || 'Produto não encontrado'}
+                                            {alert.product_variation?.size?.name && ` (${alert.product_variation.size.name})`}
+                                        </h4>
                                         <p className="text-gray-600">{alert.message}</p>
                                     </div>
                                     <div className="flex gap-2">
@@ -168,7 +171,10 @@ const StockAlerts = () => {
                                                 {new Date(alert.resolved_at || '').toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <h4 className="font-semibold mb-1">{alert.product_name || 'Produto não encontrado'}</h4>
+                                        <h4 className="font-semibold mb-1">
+                                            {alert.product?.name || 'Produto não encontrado'}
+                                            {alert.product_variation?.size?.name && ` (${alert.product_variation.size.name})`}
+                                        </h4>
                                         <p className="text-gray-600">{alert.message}</p>
                                     </div>
                                     <button
