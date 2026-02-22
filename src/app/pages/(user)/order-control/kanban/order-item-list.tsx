@@ -88,10 +88,10 @@ function getSecondaryInfo(order: Order) {
         const flags: { label: string; variant: BadgeVariant }[] = [];
 
         if (deliveryStatus === "Pending") flags.push({ label: "Entrega Pendente", variant: "yellow" });
-        if (deliveryStatus === "Ready") flags.push({ label: "Entrega Pronto", variant: "purple" });
-        if (deliveryStatus === "Shipped") flags.push({ label: "Entrega Enviado", variant: "blue" });
-        if (deliveryStatus === "Delivered") flags.push({ label: "Entrega Entregue", variant: "green" });
-        if (deliveryStatus === "Cancelled") flags.push({ label: "Entrega Cancelado", variant: "red" });
+        if (deliveryStatus === "Ready") flags.push({ label: "Entrega Pronta", variant: "purple" });
+        if (deliveryStatus === "Shipped") flags.push({ label: "Entrega Enviada", variant: "blue" });
+        if (deliveryStatus === "Delivered") flags.push({ label: "Entrega Recebida", variant: "green" });
+        if (deliveryStatus === "Cancelled") flags.push({ label: "Entrega Cancelada", variant: "red" });
 
         const timeRef =
             formatTimeAgo(order.delivery.shipped_at) ||

@@ -367,7 +367,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                     <div className='flex flex-col sm:flex-row gap-4 justify-between'>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <CheckboxField
-                                friendlyName="Deseja imprimir ao lançar a entrega?"
+                                friendlyName="Deseja imprimir ao Enviar a entrega?"
                                 name="enable_print_order_on_ship_delivery"
                                 value={company.preferences.enable_print_order_on_ship_delivery === 'true'}
                                 setValue={value => handlePreferenceChange('enable_print_order_on_ship_delivery', value)}
