@@ -158,7 +158,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-3xl">🛒</div>
                         <p className='font-semibold text-lg'>Seu carrinho está vazio</p>
                         <p className='mt-2 text-sm text-gray-500'>Escolha itens no menu para continuar.</p>
-                        <Button className='mt-6 w-full' onClick={() => setView('menu')}>
+                        <Button className='mt-6 w-full' onClick={() => GoToMenu()}>
                             Voltar ao menu
                         </Button>
                     </Card>
@@ -174,10 +174,10 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                     if (!groupItem.items || groupItem.items.length === 0) return null;
 
                                     // Show + button only if total quantity < 1 (incomplete meio a meio)
-                                    const canAddMore = groupItem.quantity < 1 && groupItem.status === 'Staging';
+                                    const isGroupIncomplete = groupItem.quantity < 1 && groupItem.status === 'Staging';
 
                                     return (
-                                        <Card key={groupItem.id} className='p-4 border shadow-sm'>
+                                        <Card key={groupItem.id} className={`p-4 border shadow-sm transition-all ${isGroupIncomplete ? 'border-orange-500 shadow-orange-100 ring-1 ring-orange-200 animate-pulse-subtle' : ''}`}>
                                             {/* Group Header */}
                                             <div className='flex items-center justify-between mb-3 border-b border-gray-100 pb-2'>
                                                 <div>
@@ -188,13 +188,17 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                     {groupItem.size && (
                                                         <p className='text-xs text-gray-500'>Tamanho: {groupItem.size}</p>
                                                     )}
-                                                    {canAddMore && groupItem.quantity > 0 && (
-                                                        <p className='text-xs text-orange-600 font-medium mt-0.5'>
-                                                            Fracionado ({groupItem.quantity}/1)
+                                                    {isGroupIncomplete && (
+                                                        <p className='text-xs text-orange-600 font-bold mt-0.5 flex items-center gap-1'>
+                                                            <span className="relative flex h-2 w-2">
+                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                                            </span>
+                                                            Incompleto ({groupItem.quantity}/1) - Adicione mais itens!
                                                         </p>
                                                     )}
                                                 </div>
-                                                {canAddMore && (
+                                                {isGroupIncomplete && (
                                                     <button
                                                         onClick={() => handleAddToGroup(groupItem)}
                                                         className='flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded bg-blue-50'
@@ -205,7 +209,6 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                     </button>
                                                 )}
                                             </div>
-
                                             {/* Group Items */}
                                             <div className='space-y-3'>
                                                 {groupItem.items.map(item => (
@@ -263,7 +266,6 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
 
                                             {/* Group Details (Complement, Obs, Schedule) */}
                                             <GroupItemDetails groupItem={groupItem} isStaging={groupItem.status === 'Staging'} />
-
                                             {/* Group Total */}
                                             <div className='mt-3 pt-2 text-right border-t border-gray-100'>
                                                 <span className='text-xs text-gray-500 mr-2'>Subtotal do grupo</span>
@@ -289,13 +291,23 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                             {
                                 <>
                                     {order?.group_items?.some(g => g.status === 'Staging') && (
-                                        <Button className='mt-6 w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
-                                            Enviar pedido
-                                        </Button>
+                                        <div className="space-y-3 mt-6">
+                                            {order.group_items.some(g => g.status === 'Staging' && g.quantity < 1) ? (
+                                                <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-800 text-sm font-medium flex items-center gap-2">
+                                                    <span className="material-symbols-outlined text-orange-500 text-lg">warning</span>
+                                                    Finalize os itens fracionados incompletos para enviar o pedido.
+                                                </div>
+                                            ) : (
+                                                <Button className='w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
+                                                    Enviar pedido
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                     <Button
                                         className='mt-3 w-full'
                                         variant='outline'
+                                        disabled={order?.group_items?.some(g => g.status === 'Staging' && g.quantity < 1)}
                                         onClick={handleAddNewGroup}
                                     >
                                         Adicionar mais itens

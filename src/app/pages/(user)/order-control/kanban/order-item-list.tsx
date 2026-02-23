@@ -94,22 +94,26 @@ function getSecondaryInfo(order: Order) {
         if (deliveryStatus === "Cancelled") flags.push({ label: "Entrega Cancelada", variant: "red" });
 
         const timeRef =
+            formatTimeAgo(order.delivery.cancelled_at) ||
+            formatTimeAgo(order.delivery.delivered_at) ||
             formatTimeAgo(order.delivery.shipped_at) ||
             formatTimeAgo(order.delivery.ready_at) ||
-            formatTimeAgo(order.delivery.pending_at);
+            formatTimeAgo(order.delivery.pending_at) ||
+            formatTimeAgo(order.created_at);
 
         const timeLabel =
-            order.delivery.pending_at
-                ? "pendente"
-                : order.delivery.ready_at
-                    ? "pronto"
+            order.delivery.cancelled_at
+                ? "cancelado"
+                : order.delivery.delivered_at
+                    ? "entregue"
                     : order.delivery.shipped_at
                         ? "enviado"
-                        : order.delivery.delivered_at
-                            ? "entregue"
-                            : order.delivery.cancelled_at
-                                ? "cancelado"
-                                : null;
+                        : order.delivery.ready_at
+                            ? "pronto"
+                            : order.delivery.pending_at
+                                ? "pendente"
+                                : order.created_at
+                                    ? "criado" : "";
 
         return { title: clientName, flags, timeRef, timeLabel };
     }
@@ -123,11 +127,27 @@ function getSecondaryInfo(order: Order) {
         if (order.table.status === "Closed") flags.push({ label: "Mesa Fechada", variant: "green" });
         if (order.table.status === "Cancelled") flags.push({ label: "Mesa Cancelada", variant: "red" });
 
+        const timeRef =
+            formatTimeAgo(order.table.cancelled_at) ||
+            formatTimeAgo(order.table.closed_at) ||
+            formatTimeAgo(order.table.pending_at) ||
+            formatTimeAgo(order.created_at);
+
+        const timeLabel =
+            order.table.cancelled_at
+                ? "cancelada"
+                : order.table.closed_at
+                    ? "fechada"
+                    : order.table.pending_at
+                        ? "pendente"
+                        : order.created_at
+                            ? "criado" : "";
+
         return {
             title: tableName + ' ' + clientName,
             flags,
-            timeRef: formatTimeAgo(order.table.pending_at),
-            timeLabel: order.table.pending_at ? "pendente" : null,
+            timeRef,
+            timeLabel,
         };
     }
 
@@ -142,20 +162,23 @@ function getSecondaryInfo(order: Order) {
         if (pickupStatus === "Cancelled") flags.push({ label: "Balcão Cancelado", variant: "red" });
 
         const timeRef =
+            formatTimeAgo(order.pickup.cancelled_at) ||
             formatTimeAgo(order.pickup.delivered_at) ||
             formatTimeAgo(order.pickup.ready_at) ||
-            formatTimeAgo(order.pickup.pending_at);
+            formatTimeAgo(order.pickup.pending_at) ||
+            formatTimeAgo(order.created_at);
 
         const timeLabel =
-            order.pickup.delivered_at
-                ? "retirado"
-                : order.pickup.ready_at
-                    ? "pronto"
-                    : order.pickup.pending_at
-                        ? "pendente"
-                        : order.pickup.cancelled_at
-                            ? "cancelado"
-                            : null;
+            order.pickup.cancelled_at
+                ? "cancelado"
+                : order.pickup.delivered_at
+                    ? "retirado"
+                    : order.pickup.ready_at
+                        ? "pronto"
+                        : order.pickup.pending_at
+                            ? "pendente"
+                            : order.created_at
+                                ? "criado" : "";
 
         return { title: pickupName, flags, timeRef, timeLabel };
     }

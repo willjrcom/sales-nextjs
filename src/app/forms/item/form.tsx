@@ -157,6 +157,29 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
     });
   };
 
+  const order = queryClient.getQueryData<Order>(['order', 'current']);
+  const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+
+  const hasIncompleteGroup = order?.group_items?.some(g => g.status === 'Staging' && g.quantity < 1);
+  const isBlockedByFractional = !!(hasIncompleteGroup && !groupItem);
+
+  const currentFilledQty = useMemo(() => {
+    return groupItem?.items?.reduce((acc: Decimal, i: any) => acc.plus(i.quantity || 0), new Decimal(0)) || new Decimal(0);
+  }, [groupItem]);
+
+  const isQuantityExceeded = useMemo(() => {
+    if (!groupItem) return false;
+    return currentFilledQty.plus(quantity || 0).greaterThan(1);
+  }, [currentFilledQty, quantity, groupItem]);
+
+  const canSubmit = useMemo(() => {
+    if (isSubmitting) return false;
+    if (isBlockedByFractional) return false;
+    if (isQuantityExceeded) return false;
+    if (!selectedVariation || !selectedVariation.is_available) return false;
+    return true;
+  }, [isSubmitting, isBlockedByFractional, isQuantityExceeded, selectedVariation]);
+
   const submit = async () => {
     if (!data) return;
 
@@ -178,9 +201,6 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
     }
 
     setIsSubmitting(true);
-
-    const order = queryClient.getQueryData<Order>(['order', 'current']);
-    const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
     try {
       const body = {
@@ -465,6 +485,11 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
             {/* Quantity Selector */}
             <NumericField name="quantity" friendlyName="Quantidade" placeholder="Digite a quantidade" setValue={setQuantity} value={quantity} />
+            {isQuantityExceeded && (
+              <p className="text-red-600 text-[10px] font-bold mt-[-20px] mb-4 animate-pulse">
+                Limite do grupo excedido! (Ocupado: {currentFilledQty.toNumber()}, Disponível: {new Decimal(1).minus(currentFilledQty).toNumber()})
+              </p>
+            )}
 
             {/* Observations */}
             <div className="mb-6">
@@ -501,11 +526,11 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
             {selectedVariation && selectedVariation.is_available ? (
               <button
                 onClick={submit}
-                disabled={isSubmitting}
+                disabled={!canSubmit}
                 className={`
                   w-full py-3.5 px-4 rounded-lg font-bold text-white shadow-sm transition-all transform active:scale-[0.99]
-                  ${isSubmitting
-                    ? "bg-green-400 cursor-not-allowed"
+                  ${!canSubmit
+                    ? "bg-gray-400 cursor-not-allowed"
                     : "bg-green-500 hover:bg-green-600 hover:shadow-md"
                   }
                   flex items-center justify-center gap-2
@@ -513,6 +538,10 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
               >
                 {isSubmitting ? (
                   <span>Adicionando...</span>
+                ) : isBlockedByFractional ? (
+                  <span>Finalize o item fracionado primeiro</span>
+                ) : isQuantityExceeded ? (
+                  <span>Quantidade excede o limite (1.0)</span>
                 ) : (
                   <>
                     <span>Adicionar ao Carrinho</span>
