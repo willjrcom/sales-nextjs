@@ -123,10 +123,15 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
   const fetchProduct = async () => {
     setReloadProduct(false);
     if (reloadProduct && data) {
-      const productFound = await GetProductByID(item.id, data)
-      if (!productFound) return;
+      try {
+        const productFound = await GetProductByID(item.id, data)
+        if (!productFound) return;
 
-      setProduct(new Product(productFound));
+        setProduct(new Product(productFound));
+      } catch (error) {
+        const err = error as RequestError;
+        notifyError(err.message || 'Erro ao carregar detalhes do produto');
+      }
     }
   }
 

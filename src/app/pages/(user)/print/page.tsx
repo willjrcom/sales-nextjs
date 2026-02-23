@@ -37,7 +37,7 @@ export default function Page() {
             print({ printer: selected, text })
             notifySuccess(`Impressão enviada${selected ? ` para ${selected}` : ' para impressora padrão'}`)
         } catch (error) {
-            notifyError('Erro ao enviar impressão')
+            notifyError('Erro ao enviar impressão: ' + error)
         } finally {
             setTimeout(() => setLoading(false), 1000)
         }

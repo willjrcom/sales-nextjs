@@ -35,7 +35,7 @@ const PageStock = () => {
     });
 
     useEffect(() => {
-        if (stockError) notifyError('Erro ao carregar relatório de estoque');
+        if (stockError) notifyError('Erro ao carregar relatório de estoque: ' + stockError.message);
     }, [stockError]);
 
     const stocks = useMemo(() => stocksResponse?.items || [], [stocksResponse?.items]);

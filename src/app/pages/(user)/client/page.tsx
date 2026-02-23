@@ -33,7 +33,7 @@ const PageClient = () => {
 
     useEffect(() => {
         if (error) {
-            notifyError('Erro ao carregar clientes');
+            notifyError('Erro ao carregar clientes: ' + error.message);
         }
     }, [error]);
 

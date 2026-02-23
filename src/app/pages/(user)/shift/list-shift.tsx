@@ -26,7 +26,7 @@ const ListShift = () => {
     });
 
     useEffect(() => {
-        if (error) notifyError('Erro ao carregar turnos');
+        if (error) notifyError('Erro ao carregar turnos: ' + error.message);
     }, [error]);
 
     const shifts = useMemo(() => shiftsResponse?.items || [], [shiftsResponse?.items]);

@@ -30,7 +30,7 @@ const PageOrder = () => {
     });
 
     useEffect(() => {
-        if (error) notifyError('Erro ao carregar pedidos');
+        if (error) notifyError('Erro ao carregar pedidos: ' + error.message);
     }, [error]);
 
     const orders = useMemo(() => ordersResponse?.items || [], [ordersResponse?.items]);

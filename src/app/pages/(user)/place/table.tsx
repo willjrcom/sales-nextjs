@@ -32,7 +32,7 @@ const PageTable = () => {
 
     useEffect(() => {
         if (error) {
-            notifyError('Erro ao carregar tables');
+            notifyError('Erro ao carregar mesas: ' + error.message);
         }
     }, [error]);
 

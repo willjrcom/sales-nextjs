@@ -33,7 +33,7 @@ const PagePlace = () => {
 
     useEffect(() => {
         if (error) {
-            notifyError('Erro ao carregar ambientes');
+            notifyError('Erro ao carregar ambientes: ' + error.message);
         }
     }, [error]);
 

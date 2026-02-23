@@ -10,6 +10,7 @@ import { MenuSection } from "./components/MenuSection";
 import { CartSection } from "./components/CartSection";
 import { CheckoutSection } from "./components/CheckoutSection";
 import Order from "@/app/entities/order/order";
+import RequestError from "@/app/utils/error";
 
 export type OrderControlView = 'menu' | 'cart' | 'checkout';
 
@@ -35,7 +36,8 @@ const PageEditOrderControl = () => {
             try {
                 return await GetOrderByID(id as string, data);
             } catch (error) {
-                notifyError('Erro ao buscar pedido: ' + error);
+                const err = error as RequestError;
+                notifyError(err.message || 'Erro ao buscar pedido');
                 return null;
             }
         },

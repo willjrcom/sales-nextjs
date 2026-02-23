@@ -50,11 +50,11 @@ const PickupOrderPage = () => {
     });
 
     useEffect(() => {
-        if (errorReady) notifyError('Erro ao carregar pedidos prontos para retirada');
+        if (errorReady) notifyError('Erro ao carregar pedidos prontos para retirada: ' + errorReady.message);
     }, [errorReady]);
 
     useEffect(() => {
-        if (errorDelivered) notifyError('Erro ao carregar últimos pedidos entregues');
+        if (errorDelivered) notifyError('Erro ao carregar últimos pedidos entregues: ' + errorDelivered.message);
     }, [errorDelivered]);
 
     const readyOrders = useMemo(() => readyOrdersResponse?.items || [], [readyOrdersResponse?.items]);

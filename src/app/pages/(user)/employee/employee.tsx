@@ -32,7 +32,7 @@ const PageEmployee = () => {
     });
 
     useEffect(() => {
-        if (error) notifyError('Erro ao carregar funcionários');
+        if (error) notifyError('Erro ao carregar funcionários: ' + error.message);
     }, [error]);
 
     const employees = useMemo(() => employeesResponse?.items || [], [employeesResponse?.items]);

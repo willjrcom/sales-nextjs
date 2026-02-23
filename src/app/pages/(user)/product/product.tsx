@@ -41,7 +41,7 @@ const PageProducts = () => {
     });
 
     useEffect(() => {
-        if (error) notifyError('Erro ao carregar categorias');
+        if (error) notifyError('Erro ao carregar categorias: ' + error.message);
     }, [error]);
 
 

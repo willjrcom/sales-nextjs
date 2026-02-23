@@ -32,7 +32,7 @@ const PageDeliveryDriver = () => {
     });
 
     useEffect(() => {
-        if (error) notifyError('Erro ao carregar motoboys');
+        if (error) notifyError('Erro ao carregar motoboys: ' + error.message);
     }, [error]);
 
     const drivers = useMemo(() => (deliveryDriversResponse?.items || []).filter((driver) => !!driver.employee), [deliveryDriversResponse?.items]);
