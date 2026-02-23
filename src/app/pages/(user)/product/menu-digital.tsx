@@ -2,16 +2,22 @@ import GetCompany from "@/app/api/company/company";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Check, Copy, ExternalLink, Info } from "lucide-react";
+import { Check, Copy, ExternalLink, Info, Lock, AlertTriangle } from "lucide-react";
 import { notify } from "@/app/utils/notifications";
+import { useUser } from "@/app/context/user-context";
+import AccessDenied from "@/app/components/access-denied";
+import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
+import { useRouter } from "next/navigation";
 
 const PageMenuDigital = () => {
     const { data: session } = useSession();
+    const router = useRouter();
+    const { hasPermission, user } = useUser();
     const [copied, setCopied] = useState(false);
 
     const { data: company } = useQuery({
@@ -20,7 +26,70 @@ const PageMenuDigital = () => {
         enabled: !!session?.user?.access_token,
     })
 
+    const { data: subscriptionStatus, isLoading: isLoadingStatus } = useQuery({
+        queryKey: ["subscription-status"],
+        queryFn: () => GetSubscriptionStatus(session!),
+        enabled: !!session?.user?.access_token,
+    });
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
+
+    if (!user) {
+        return <AccessDenied message="Usuário não encontrado ou sessão expirada." />;
+    }
+
+    if (!hasPermission('menu-digital')) {
+        return <AccessDenied />
+    }
+
+    if (isLoadingStatus) {
+        return (
+            <div className="flex justify-center p-8">
+                <span className="loading loading-spinner loading-md"></span>
+            </div>
+        )
+    }
+
+    const currentPlan = subscriptionStatus?.current_plan?.toLowerCase() || 'free';
+    const isPlanInferior = currentPlan === 'basic';
+
+    if (isPlanInferior) {
+        return (
+            <div className="p-6 max-w-2xl mx-auto space-y-6">
+                <Card className="border-orange-200 bg-orange-50/50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-orange-700">
+                            <AlertTriangle className="h-5 w-5" />
+                            Plano Básico Detectado
+                        </CardTitle>
+                        <CardDescription className="text-orange-600">
+                            O recurso de **Menu Digital** está disponível apenas para os planos **Intermediário** e **Avançado**.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-sm text-orange-700">
+                        <p>O seu plano atual (Básico) não permite a geração de links para menus digitais. Faça o upgrade agora para desbloquear este e outros recursos fiscais.</p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button
+                            variant="default"
+                            className="bg-orange-600 hover:bg-orange-700 w-full flex gap-2"
+                            onClick={() => router.push('/pages/billing?tab=plans')}
+                        >
+                            Ver Planos de Upgrade
+                            <ExternalLink className="h-4 w-4" />
+                        </Button>
+                    </CardFooter>
+                </Card>
+
+                <div className="opacity-40 pointer-events-none grayscale select-none">
+                    <Label className="flex items-center gap-2 mb-2">
+                        <Lock className="h-4 w-4" /> Link de Entregas (Bloqueado)
+                    </Label>
+                    <Input value="https://app.gfood.com.br/pages/delivery?q=..." readOnly />
+                </div>
+            </div>
+        )
+    }
 
     if (!appUrl) {
         return (

@@ -100,8 +100,12 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
     // Generate table URL for QR code
     const encodedSchemaName = btoa(company.schema_name)
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    if (!appUrl) return <div>Url do app não configurada</div>
+
     const tableUrl = table.id && company
-        ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/pages/table?id=${table.id}&q=${encodedSchemaName}`
+        ? `${appUrl}/pages/table?id=${table.id}&q=${encodedSchemaName}`
         : '';
 
     // Download QR code as PNG

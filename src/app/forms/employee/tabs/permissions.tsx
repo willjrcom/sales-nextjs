@@ -66,6 +66,7 @@ export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabP
                 { key: 'product', label: 'Gerenciar Produtos' },
                 { key: 'category', label: 'Gerenciar Categorias' },
                 { key: 'process-rule', label: 'Gerenciar Regras de Processos' },
+                { key: 'menu-digital', label: 'Menu Digital' },
                 { key: 'manage-stock', label: 'Gerenciar Estoques' },
             ]
         },
