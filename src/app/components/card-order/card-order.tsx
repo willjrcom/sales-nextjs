@@ -84,7 +84,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             try {
                 return await GetOrderByID(orderId, data);
             } catch (error) {
-                notifyError('Erro ao buscar pedido');
+                const err = error as RequestError;
+                notifyError(err.message || 'Erro ao buscar pedido');
                 return null;
             }
         },
@@ -252,8 +253,13 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         </ul>
                         {!editBlocked && order.table.status === "Pending" && <button onClick={() => {
                             const onConfirm = async () => {
-                                await closeTable();
-                                modalHandler.hideModal('close-table-' + order.id);
+                                try {
+                                    await closeTable();
+                                    modalHandler.hideModal('close-table-' + order.id);
+                                } catch (error) {
+                                    const err = error as RequestError;
+                                    notifyError(err.message || "Erro ao fechar mesa");
+                                }
                             }
                             modalHandler.showModal(
                                 'close-table-' + order.id,
@@ -317,8 +323,13 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
 
                         {!editBlocked && order.pickup.status === "Ready" && <button onClick={() => {
                             const onConfirm = async () => {
-                                await deliveryPickup();
-                                modalHandler.hideModal('delivery-pickup-' + order.id);
+                                try {
+                                    await deliveryPickup();
+                                    modalHandler.hideModal('delivery-pickup-' + order.id);
+                                } catch (error) {
+                                    const err = error as RequestError;
+                                    notifyError(err.message || "Erro ao entregar retirada");
+                                }
                             }
                             modalHandler.showModal(
                                 'delivery-pickup-' + order.id,

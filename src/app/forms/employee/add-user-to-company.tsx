@@ -128,7 +128,8 @@ const CardUser = ({ user }: CardUserProps) => {
                 await AddUserToCompany(user.email, data!);
             } catch (error: any) {
                 if (error.message !== 'user already added to company' && error.message !== 'Usuário já foi adicionado à empresa') {
-                    throw error;
+                    notifyError(error.message || 'Erro ao adicionar usuário à empresa');
+                    return;
                 }
             }
             const response = await NewEmployee(user.id, data!);

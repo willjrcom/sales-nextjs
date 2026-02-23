@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { emitNFCe, type FiscalInvoice } from "@/app/api/fiscal/invoices";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useModal } from "@/app/context/modal/context";
+import RequestError from "@/app/utils/error";
 
 interface EmitNFCeModalProps {
     orderId: string;
@@ -25,8 +26,9 @@ const EmitNFCeModal = ({ orderId, onSuccess }: EmitNFCeModalProps) => {
             setResult(invoice);
             notifySuccess("NFC-e emitida com sucesso!");
             onSuccess?.();
-        } catch (error: any) {
-            notifyError(error?.message ?? "Erro ao emitir NFC-e.");
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || "Erro ao emitir NFC-e.");
         } finally {
             setLoading(false);
         }

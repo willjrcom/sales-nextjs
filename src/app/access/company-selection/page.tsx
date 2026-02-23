@@ -100,7 +100,12 @@ function CompanySelection() {
             return;
         }
 
-        await accessCompany(schemaName);
+        try {
+            await accessCompany(schemaName);
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Ocorreu um erro ao selecionar a empresa');
+        }
     }
 
     // Auto-select effect

@@ -4,6 +4,7 @@ import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
 import printService from '@/app/utils/print-service';
 import Company from "@/app/entities/company/company";
+import RequestError from "@/app/utils/error";
 
 interface PrintOrderProps {
     orderID: string;
@@ -23,8 +24,9 @@ const printOrder = async ({ orderID, session, company, printerKey }: PrintOrderP
         } else {
             printContent = String(result);
         }
-    } catch (fetchError: any) {
-        notifyError(`Erro ao obter conteúdo de impressão: ${fetchError?.message || "Erro desconhecido"}`);
+    } catch (error) {
+        const err = error as RequestError;
+        notifyError(err.message || "Erro ao obter conteúdo de impressão");
         return;
     }
 

@@ -3,6 +3,7 @@ import GetGroupItemPrintByID from "@/app/api/print/print-group-item";
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { Session } from "next-auth";
 import printService from '@/app/utils/print-service';
+import RequestError from "@/app/utils/error";
 
 interface PrintGroupItemProps {
     groupItemID: string;
@@ -21,8 +22,9 @@ const printGroupItem = async ({ groupItemID, printerName, session }: PrintGroupI
         } else {
             printContent = String(result);
         }
-    } catch (fetchError: any) {
-        notifyError(`Erro ao obter conteúdo de impressão: ${fetchError?.message || "Erro desconhecido"}`);
+    } catch (error) {
+        const err = error as RequestError;
+        notifyError(err.message || "Erro ao obter conteúdo de impressão");
         return;
     }
 
