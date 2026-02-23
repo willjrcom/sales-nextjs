@@ -211,6 +211,9 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                     {groupItem.size && (
                                                         <p className='text-xs text-gray-500'>Tamanho: {groupItem.size}</p>
                                                     )}
+                                                    {isCancelled && groupItem.cancelled_reason && (
+                                                        <p className='text-xs text-red-600 mt-1 italic'>Motivo: {groupItem.cancelled_reason}</p>
+                                                    )}
                                                     {isGroupIncomplete && (
                                                         <p className='text-xs text-orange-600 font-bold mt-0.5 flex items-center gap-1'>
                                                             <span className="relative flex h-2 w-2">

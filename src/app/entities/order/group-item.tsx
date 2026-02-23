@@ -27,6 +27,7 @@ export default class GroupItem {
   started_at?: string;
   ready_at?: string;
   cancelled_at?: string;
+  cancelled_reason: string = '';
 
   constructor(data: Partial<GroupItem> = {}) {
     Object.assign(this, data);
