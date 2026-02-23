@@ -12,8 +12,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { GetAllStocks } from "@/app/api/stock/stock";
-import StockEntity from "@/app/entities/stock/stock";
+import { GetStockByProductID } from "@/app/api/stock/stock";
 import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
 import GetCategoryByID from "@/app/api/category/[id]/category";
@@ -106,13 +105,15 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
   const removableIngredients = useMemo(() => category?.removable_ingredients || [], [category]);
 
   // Fetch Stocks to check availability
-  const { data: stocksResponse } = useQuery({
-    queryKey: ['stocks', 'all'],
-    queryFn: () => GetAllStocks(data!, 0, 1000), // Fetch all stocks (up to 1000)
-    enabled: !!(data as any)?.user?.access_token,
+  const { data: stocksResponse, refetch: refetchStocks } = useQuery({
+    queryKey: ['stocks', 'product', item.id],
+    queryFn: () => GetStockByProductID(item.id, data!),
+    enabled: !!data?.user?.access_token,
+    staleTime: 0,
+    refetchOnWindowFocus: true
   });
 
-  const stocks = useMemo(() => stocksResponse?.items || [], [stocksResponse]);
+  const stocks = useMemo(() => stocksResponse || [], [stocksResponse]);
 
   const getStockAvailability = (productId: string, variationId: string) => {
     const stock = stocks.find(s =>
