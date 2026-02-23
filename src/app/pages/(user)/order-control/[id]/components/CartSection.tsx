@@ -26,6 +26,10 @@ import { useSession } from 'next-auth/react';
 import GetGroupItemByID from '@/app/api/group-item/[id]/group-item';
 import { GroupItemDetails } from './GroupItemDetails';
 import { getStatusColor, showStatus } from '@/app/utils/status';
+import CancelGroupItem from '@/app/api/group-item/status/group-item-cancel';
+import { MdCancel } from 'react-icons/md';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface CartSectionProps {
     orderID: string;
@@ -51,6 +55,8 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
     const [itemToDelete, setItemToDelete] = useState<{ id: string, name: string } | null>(null);
+    const [groupToCancel, setGroupToCancel] = useState<{ id: string, category: string } | null>(null);
+    const [cancelReason, setCancelReason] = useState('Cancelado pelo atendente');
 
     // Using the same query keys as MenuSection and BottomBar ensuring cache hits
     const { data: order } = useQuery({
@@ -77,7 +83,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
     );
 
     const groupedItems = useMemo(
-        () => groupBy((order?.group_items || []).filter(g => g.status !== 'Cancelled'), "category_id"),
+        () => groupBy(order?.group_items || [], "category_id"),
         [order?.group_items]
     );
 
@@ -103,6 +109,22 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
         },
         onError: (error: any) => {
             notifyError(error?.message || 'Erro ao remover item');
+        },
+    });
+
+    const cancelGroupMutation = useMutation({
+        mutationFn: async ({ id, reason }: { id: string, reason: string }) => {
+            if (!session) return;
+            return await CancelGroupItem(id, reason, session);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
+            notifySuccess('Grupo cancelado com sucesso!');
+            setGroupToCancel(null);
+            setCancelReason('Cancelado pelo atendente');
+        },
+        onError: (error: any) => {
+            notifyError(error?.message || 'Erro ao cancelar grupo');
         },
     });
 
@@ -167,8 +189,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                         {/* Group Items */}
                         <div className='space-y-4'>
                             {order?.group_items
-                                ?.filter(g => g.status !== 'Cancelled')
-                                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                                ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                                 .map((groupItem) => {
                                     const category = categoriesMap.find(cat => cat.id === groupItem.category_id);
                                     if (!groupItem.items || groupItem.items.length === 0) return null;
@@ -176,8 +197,10 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                     // Show + button only if total quantity < 1 (incomplete meio a meio)
                                     const isGroupIncomplete = groupItem.quantity < 1 && groupItem.status === 'Staging';
 
+                                    const isCancelled = groupItem.status === 'Cancelled';
+
                                     return (
-                                        <Card key={groupItem.id} className={`p-4 border shadow-sm transition-all ${isGroupIncomplete ? 'border-orange-500 shadow-orange-100 ring-1 ring-orange-200 animate-pulse-subtle' : ''}`}>
+                                        <Card key={groupItem.id} className={`p-4 border shadow-sm transition-all ${isGroupIncomplete ? 'border-orange-500 shadow-orange-100 ring-1 ring-orange-200 animate-pulse-subtle' : ''} ${isCancelled ? 'opacity-60 bg-gray-50' : ''}`}>
                                             {/* Group Header */}
                                             <div className='flex items-center justify-between mb-3 border-b border-gray-100 pb-2'>
                                                 <div>
@@ -206,6 +229,17 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                     >
                                                         <FaPlus size={12} />
                                                         Adicionar
+                                                    </button>
+                                                )}
+                                                {groupItem.status !== 'Staging' && groupItem.status !== 'Cancelled' && (
+                                                    <button
+                                                        onClick={() => setGroupToCancel({ id: groupItem.id, category: category?.name || 'Grupo' })}
+                                                        className='flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-medium px-2 py-1 rounded bg-red-50 transition-colors'
+                                                        title='Cancelar itens deste grupo'
+                                                        disabled={cancelGroupMutation.isPending}
+                                                    >
+                                                        <MdCancel size={14} />
+                                                        Cancelar
                                                     </button>
                                                 )}
                                             </div>
@@ -338,6 +372,40 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                             className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
                         >
                             Remover
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={!!groupToCancel} onOpenChange={(open) => !open && setGroupToCancel(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Cancelar {groupToCancel?.category}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Deseja realmente cancelar todos os itens deste grupo? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="py-2 space-y-2">
+                        <Label htmlFor="reason">Motivo do cancelamento</Label>
+                        <Input
+                            id="reason"
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            placeholder="Ex: Cliente desistiu"
+                        />
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Voltar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (groupToCancel) {
+                                    cancelGroupMutation.mutate({ id: groupToCancel.id, reason: cancelReason });
+                                }
+                            }}
+                            className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
+                            disabled={cancelGroupMutation.isPending || !cancelReason}
+                        >
+                            {cancelGroupMutation.isPending ? 'Cancelando...' : 'Confirmar Cancelamento'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
