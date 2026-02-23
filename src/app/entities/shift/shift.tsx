@@ -12,8 +12,8 @@ export default class Shift {
     redeems: Redeem[] = [];
     start_change: Decimal = new Decimal(0);
     end_change: Decimal = new Decimal(0);
-    attendant_id: string = '';
-    attendant: Employee = new Employee();
+    attendant_id?: string;
+    attendant?: Employee;
     opened_at: string = '';
     closed_at: string = '';
 

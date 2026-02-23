@@ -45,7 +45,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
             const rabbitmqUrl = process.env.NEXT_PUBLIC_RABBITMQ_URL;
 
-            if (schemaName) {
+            if (schemaName && backendUrl && rabbitmqUrl) {
                 printService.setConfig({
                     access_token: session.user.access_token,
                     schema_name: schemaName,

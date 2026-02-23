@@ -19,9 +19,9 @@ export default class Order {
     total_change: Decimal = new Decimal(0);
     quantity_items: number = 0;
     observation: string = '';
-    attendant_id: string = '';
+    attendant_id?: string;
     attendant?: Employee;
-    shift_id?: string = '';
+    shift_id?: string;
     delivery?: OrderDelivery;
     table?: OrderTable;
     pickup?: OrderPickup;
