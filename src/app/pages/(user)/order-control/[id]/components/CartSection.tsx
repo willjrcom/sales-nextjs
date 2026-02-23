@@ -327,9 +327,9 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
 
                             {
                                 <>
-                                    {order?.group_items?.some(g => g.status === 'Staging') && (
+                                    {order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0) && (
                                         <div className="space-y-3 mt-6">
-                                            {order.group_items.some(g => g.status === 'Staging' && g.quantity < 1) ? (
+                                            {order.group_items.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1) ? (
                                                 <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-800 text-sm font-medium flex items-center gap-2">
                                                     <span className="material-symbols-outlined text-orange-500 text-lg">warning</span>
                                                     Finalize os itens fracionados incompletos para enviar o pedido.
@@ -344,7 +344,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                     <Button
                                         className='mt-3 w-full'
                                         variant='outline'
-                                        disabled={order?.group_items?.some(g => g.status === 'Staging' && g.quantity < 1)}
+                                        disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
                                         onClick={handleAddNewGroup}
                                     >
                                         Adicionar mais itens

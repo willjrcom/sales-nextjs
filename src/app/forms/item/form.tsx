@@ -167,7 +167,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
   const order = queryClient.getQueryData<Order>(['order', 'current']);
   const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
-  const hasIncompleteGroup = order?.group_items?.some(g => g.status === 'Staging' && g.quantity < 1);
+  const hasIncompleteGroup = order?.group_items?.some(g => g.status === 'Staging' && (g.items?.length || 0) > 0 && g.quantity < 1);
   const isBlockedByFractional = !!(hasIncompleteGroup && !groupItem);
 
   const currentFilledQty = useMemo(() => {
