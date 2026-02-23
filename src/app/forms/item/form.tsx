@@ -92,6 +92,8 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
     queryKey: ['category', product.category_id],
     queryFn: () => GetCategoryByID(data!, product.category_id),
     enabled: !!data && !!product.category_id,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   // Fetch Additional Products
@@ -169,26 +171,39 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
   const isBlockedByFractional = !!(hasIncompleteGroup && !groupItem);
 
   const currentFilledQty = useMemo(() => {
-    return groupItem?.items?.reduce((acc: Decimal, i: any) => acc.plus(i.quantity || 0), new Decimal(0)) || new Decimal(0);
-  }, [groupItem]);
+    if (!currentGroupItem?.items) return new Decimal(0);
+    return currentGroupItem.items.reduce((acc, item) => acc.plus(new Decimal(item.quantity || 0)), new Decimal(0));
+  }, [currentGroupItem?.items]);
 
   const isQuantityExceeded = useMemo(() => {
-    if (!groupItem) return false;
-    return currentFilledQty.plus(quantity || 0).greaterThan(1);
-  }, [currentFilledQty, quantity, groupItem]);
+    return currentFilledQty.plus(new Decimal(quantity)).greaterThan(1);
+  }, [currentFilledQty, quantity]);
+
+  const isFractional = useMemo(() => {
+    return !new Decimal(quantity || 0).isInteger();
+  }, [quantity]);
+
+  const showFractionalWarning = useMemo(() => {
+    return isFractional && !category?.allow_fractional;
+  }, [isFractional, category?.allow_fractional]);
 
   const canSubmit = useMemo(() => {
     if (isSubmitting) return false;
     if (isBlockedByFractional) return false;
     if (isQuantityExceeded) return false;
+    if (showFractionalWarning) return false;
     if (!selectedVariation || !selectedVariation.is_available) return false;
     return true;
-  }, [isSubmitting, isBlockedByFractional, isQuantityExceeded, selectedVariation]);
+  }, [isSubmitting, isBlockedByFractional, isQuantityExceeded, selectedVariation, showFractionalWarning]);
 
   const submit = async () => {
     if (!data) return;
 
     if (quantity <= 0) return notifyError("Selecione uma quantidade válida");
+
+    if (showFractionalWarning) {
+      return notifyError("Esta categoria não permite números com vírgula.");
+    }
 
     const requiresFlavorSelection = availableFlavors && availableFlavors.length > 0;
     if (requiresFlavorSelection && !selectedFlavor) {
@@ -499,8 +514,13 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
             {/* Quantity Selector */}
             <NumericField name="quantity" friendlyName="Quantidade" placeholder="Digite a quantidade" setValue={setQuantity} value={quantity} />
             {isQuantityExceeded && (
-              <p className="text-red-600 text-[10px] font-bold mt-[-20px] mb-4 animate-pulse">
+              <p className="text-red-600 text-[10px] font-bold mt-2 animate-pulse text-center">
                 Limite do grupo excedido! (Ocupado: {currentFilledQty.toNumber()}, Disponível: {new Decimal(1).minus(currentFilledQty).toNumber()})
+              </p>
+            )}
+            {showFractionalWarning && (
+              <p className="text-red-600 text-[10px] font-bold mt-2 animate-pulse text-center">
+                Esta categoria não permite números com vírgula!
               </p>
             )}
 

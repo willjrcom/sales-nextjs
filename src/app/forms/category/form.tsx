@@ -227,6 +227,16 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                     optional
                                 />
                             </div>
+
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <CheckboxField
+                                    friendlyName="Permitir fracionado?"
+                                    name="allow_fractional"
+                                    setValue={value => handleInputChange('allow_fractional', value)}
+                                    value={category.allow_fractional}
+                                    optional
+                                />
+                            </div>
                         </div>
                     </div>
 

@@ -13,6 +13,7 @@ export default class Category {
     removable_ingredients: string[] = [];
     is_additional: boolean = false;
     is_complement: boolean = false;
+    allow_fractional: boolean = false;
     is_active: boolean = true;
     sizes: Size[] = [];
     products: Product[] = [];
