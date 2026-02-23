@@ -4,6 +4,7 @@ import { usePrintAgent } from './print'
 import React from 'react'
 import { notifyError, notifySuccess } from "./../../../utils/notifications";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { FaApple, FaLinux, FaWindows } from 'react-icons/fa';
 
 export default function Page() {
     const [mounted, setMounted] = useState(false)
@@ -225,28 +226,67 @@ export default function Page() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <a
-                                    href="https://drive.google.com/file/d/1b_s1p2vIyujJsLsmawohzjLImhNyLadr/view?usp=sharing"
+                                    href="https://drive.google.com/file/d/1ki31wVupmmyJyeJbsaafe4PgHFz-JLkn/view?usp=sharing"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center justify-center gap-3 p-5 bg-white border-2 border-blue-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all shadow-sm hover:shadow-lg group"
                                 >
-                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all">🪟</span>
+                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all"><FaWindows className="inline" /></span>
                                     <div className="text-left">
-                                        <div className="font-bold text-gray-800">Windows</div>
+                                        <div className="font-bold text-gray-800">Windows x64</div>
                                         <div className="text-xs text-gray-500">Download .exe</div>
                                     </div>
                                 </a>
 
                                 <a
-                                    href="https://drive.google.com/file/d/1wpEPPGixJ_BMZCszW3Rgi36vK29c64bS/view?usp=sharing"
+                                    href="https://drive.google.com/file/d/1jJ6CQ3wxVqtZC9htFwTQKj9kNPWFMsiz/view?usp=sharing"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-3 p-5 bg-white border-2 border-blue-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all shadow-sm hover:shadow-lg group"
+                                >
+                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all"><FaWindows className="inline" /></span>
+                                    <div className="text-left">
+                                        <div className="font-bold text-gray-800">Windows x86</div>
+                                        <div className="text-xs text-gray-500">Download .exe</div>
+                                    </div>
+                                </a>
+
+                                <a
+                                    href="https://drive.google.com/file/d/1vwwhQ55jYMadiATXsc8UuYCwOG8rhAhz/view?usp=sharing"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center justify-center gap-3 p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-gray-800 hover:bg-gray-50 transition-all shadow-sm hover:shadow-lg group"
                                 >
-                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all">🍎</span>
+                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all"><FaApple className="inline" /></span>
                                     <div className="text-left">
-                                        <div className="font-bold text-gray-800">macOS</div>
+                                        <div className="font-bold text-gray-800">macOS Intel</div>
                                         <div className="text-xs text-gray-500">Download .dmg</div>
+                                    </div>
+                                </a>
+
+                                <a
+                                    href="https://drive.google.com/file/d/1LYjP7cZGjmhefY6DWaZoqzqHJ4dCTNyZ/view?usp=sharing"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-3 p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-gray-800 hover:bg-gray-50 transition-all shadow-sm hover:shadow-lg group"
+                                >
+                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all"><FaApple className="inline" /></span>
+                                    <div className="text-left">
+                                        <div className="font-bold text-gray-800">macOS Apple Silicon (ARM)</div>
+                                        <div className="text-xs text-gray-500">Download .dmg</div>
+                                    </div>
+                                </a>
+
+                                <a
+                                    href="https://drive.google.com/file/d/1-KzNJiAM2CHygwh3_ngpOj505YHcYQq8/view?usp=sharing"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-3 p-5 bg-white border-2 border-gray-100 rounded-xl hover:border-gray-800 hover:bg-gray-50 transition-all shadow-sm hover:shadow-lg group"
+                                >
+                                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all"><FaLinux className="inline" /></span>
+                                    <div className="text-left">
+                                        <div className="font-bold text-gray-800">Linux</div>
+                                        <div className="text-xs text-gray-500">Download .deb</div>
                                     </div>
                                 </a>
                             </div>
