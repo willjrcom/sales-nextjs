@@ -5,14 +5,16 @@ import Product from '@/app/entities/product/product';
 import Decimal from 'decimal.js';
 import { FaPlus } from 'react-icons/fa';
 import { useModal } from '@/app/context/modal/context';
+import { OrderControlView } from '../page';
 import AddProductCard from '@/app/forms/item/form';
 
 interface ProductCardProps {
     product: Product;
     showQuickAdd?: boolean;
+    setView?: (view: OrderControlView) => void;
 }
 
-export function ProductCard({ product, showQuickAdd = false }: ProductCardProps) {
+export function ProductCard({ product, showQuickAdd = false, setView }: ProductCardProps) {
     const modalHandler = useModal();
 
     const handleOpenModal = () => {
@@ -20,7 +22,7 @@ export function ProductCard({ product, showQuickAdd = false }: ProductCardProps)
         const onClose = () => {
             modalHandler.hideModal(modalName);
         }
-        modalHandler.showModal(modalName, "", <AddProductCard product={product} />, "md", onClose);
+        modalHandler.showModal(modalName, "", <AddProductCard product={product} setView={setView} />, "md", onClose);
     };
 
     const variations = product.variations || [];

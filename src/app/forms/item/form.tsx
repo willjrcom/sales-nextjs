@@ -2,6 +2,7 @@
 
 import RequestError from "@/app/utils/error";
 import NewItem, { NewItemProps } from "@/app/api/item/new/item";
+import { useRouter } from "next/navigation";
 import GetProductByID from "@/app/api/product/[id]/product";
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import NumericField from "@/app/components/modal/fields/numeric";
@@ -20,12 +21,15 @@ import { GetAdditionalProducts } from "@/app/api/product/product";
 import NewAdditionalItem from "@/app/api/item/update/additional/item";
 import AddRemovedItem from "@/app/api/item/update/removed-item/add/item";
 import Image from "next/image";
+import { OrderControlView } from "@/app/pages/(user)/order-control/[id]/page";
 
 interface AddProductCardProps {
   product: Product;
+  setView?: (view: OrderControlView) => void;
 }
 
-const AddProductCard = ({ product: item }: AddProductCardProps) => {
+const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
+  const router = useRouter();
   const modalName = 'add-item-' + item.id
   const modalHandler = useModal();
   const queryClient = useQueryClient();
@@ -234,6 +238,14 @@ const AddProductCard = ({ product: item }: AddProductCardProps) => {
 
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
       modalHandler.hideModal(modalName);
+
+      // Redirecionar para o carrinho/controle do pedido
+      if (setView) {
+        setView('cart');
+      } else if (order?.id) {
+        router.push('/pages/order-control/' + order.id);
+      }
+
       // Reset form
       setQuantity(1);
       setObservation('');

@@ -151,7 +151,7 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                                 <h3 className='text-xl font-bold mb-4 text-gray-800'>{category.name}</h3>
                                 <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
                                     {categoryProducts.map(p => (
-                                        <ProductCard key={p.id} product={p} showQuickAdd={!!currentGroupItem} />
+                                        <ProductCard key={p.id} product={p} showQuickAdd={!!currentGroupItem} setView={setView} />
                                     ))}
                                 </div>
                             </section>
