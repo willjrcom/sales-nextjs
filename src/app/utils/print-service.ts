@@ -9,6 +9,12 @@ interface PrintResponse {
 interface Request {
     action: string;
     data?: any;
+    config?: {
+        access_token: string;
+        schema_name: string;
+        backend_url: string;
+        rabbitmq_url: string;
+    };
 }
 
 class PrintService {
@@ -271,6 +277,16 @@ class PrintService {
      */
     get connected(): boolean {
         return this.isConnected && this.ws?.readyState === WebSocket.OPEN;
+    }
+
+    /**
+     * Envia configurações para o Print Agent (Token, Schema, URLs)
+     */
+    async setConfig(config: { access_token: string; schema_name: string; backend_url: string; rabbitmq_url: string }): Promise<void> {
+        return this.sendMessage({
+            action: "config",
+            data: config
+        });
     }
 
     /**
