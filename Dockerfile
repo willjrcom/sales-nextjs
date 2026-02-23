@@ -55,7 +55,6 @@ RUN addgroup -g 1001 -S nodejs \
 
 # Copiar servidor standalone
 COPY --from=builder /app/build/standalone ./
-
 # 👉 ESSENCIAL: copiar assets estáticos
 COPY --from=builder /app/build/static ./build/static
 COPY --from=builder /app/public ./public
