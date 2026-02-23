@@ -5,11 +5,11 @@ interface NewPickupProps {
     order_id: string
 }
 
-const NewOrderPickup = async (name: string, session: Session): Promise<NewPickupProps> => {
+const NewOrderPickup = async (name: string, contact: string, session: Session): Promise<NewPickupProps> => {
     const response = await RequestApi<Object, NewPickupProps>({
-        path: "/order-pickup/new", 
+        path: "/order-pickup/new",
         method: "POST",
-        body: { name: name },
+        body: { name: name, contact: contact },
         headers: AddAccessToken(session),
     });
 

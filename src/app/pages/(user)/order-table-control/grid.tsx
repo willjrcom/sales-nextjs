@@ -218,8 +218,22 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
             const button = () => (
                 <>
                     <p className="mb-4"><strong>Mesa:</strong> {placeTable.table.name}</p>
-                    <TextField name="name" value={name} setValue={setName} />
-                    <PatternField name="contact" value={contact} setValue={setContact} patternName="full-phone" />
+                    <TextField
+                        friendlyName="Nome"
+                        placeholder="Digite o nome do cliente"
+                        name="name"
+                        value={name}
+                        setValue={setName}
+                    />
+                    <PatternField
+                        friendlyName="Contato (WhatsApp)"
+                        placeholder="(00) 00000-0000"
+                        name="contact"
+                        value={contact}
+                        setValue={setContact}
+                        patternName="full-phone"
+                        optional
+                    />
 
                     <p className="mb-4">Deseja iniciar um novo pedido?</p>
                     <button
@@ -290,7 +304,6 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
     }
 
     const hasOrders = ordersForTable.length > 0;
-    const hasMultipleOrders = ordersForTable.length > 1;
 
     return (
         <div
@@ -308,7 +321,7 @@ const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ord
             }}
         >
             <p className="text-sm">{placeTable?.table.name || "Sem Nome"}</p>
-            {hasMultipleOrders && (
+            {hasOrders && (
                 <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     {ordersForTable.length}
                 </div>

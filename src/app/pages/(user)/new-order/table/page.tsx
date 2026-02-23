@@ -79,8 +79,22 @@ const PageNewOrderTable = () => {
                     values={tables}
                 />
 
-                <TextField name="name" value={name} setValue={setName} />
-                <PatternField name="contact" value={contact} setValue={setContact} patternName="full-phone" />
+                <TextField
+                    friendlyName="Nome"
+                    placeholder="Digite o nome do cliente"
+                    name="name"
+                    value={name}
+                    setValue={setName}
+                />
+                <PatternField
+                    friendlyName="Contato (WhatsApp)"
+                    placeholder="(00) 00000-0000"
+                    name="contact"
+                    value={contact}
+                    setValue={setContact}
+                    patternName="full-phone"
+                    optional
+                />
 
                 <button
                     disabled={!tableID || isCreating}
