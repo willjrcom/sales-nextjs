@@ -229,12 +229,12 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
                 {/* LEFT */}
                 <div className="flex flex-col gap-2 min-w-0 flex-1">
                     {/* Linha 1 */}
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="text-lg font-bold truncate">
+                    <div className="flex items-center gap-2 flex-wrap min-w-0">
+                        <div className="text-lg font-bold">
                             Pedido {order.order_number}
                         </div>
 
-                        <div className="text-sm text-gray-600 truncate">
+                        <div className="text-sm text-gray-600 flex items-center gap-1 flex-wrap">
                             {info.flags?.slice(0, 2).map((f, idx) => (
                                 <Badge key={idx} label={f.label} variant={f.variant} />
                             ))}
