@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import ListProcessRule from './process-rule';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
@@ -203,6 +204,18 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                     <DialogTitle>Gerenciar Tamanhos da Categoria {category.name}</DialogTitle>
                                 </DialogHeader>
                                 <ListSize categoryID={category.id} isAdditional={category.is_additional} />
+                            </DialogContent>
+                        </Dialog>
+
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="w-full">Gerenciar Regras de Processo</Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Gerenciar Regras de Processos da Categoria {category.name}</DialogTitle>
+                                </DialogHeader>
+                                <ListProcessRule category={category} />
                             </DialogContent>
                         </Dialog>
                     </>}

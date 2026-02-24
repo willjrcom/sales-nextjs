@@ -3,8 +3,9 @@ import ButtonIcon from "@/app/components/button/button-icon";
 import ProcessRuleForm from "@/app/forms/process-rule/form";
 import ProcessRule from "./process-rule";
 import { FaClock } from "react-icons/fa";
+import Category from "../category/category";
 
-const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
+const ProcessRuleColumns = (category: Category): ColumnDef<ProcessRule>[] => [
   {
     id: 'Ordem',
     accessorKey: 'order',
@@ -47,7 +48,8 @@ const ProcessRuleColumns = (): ColumnDef<ProcessRule>[] => [
           title={"Editar " + row.original.name}>
           <ProcessRuleForm
             item={row.original}
-            isUpdate={true} />
+            isUpdate={true}
+            category={category} />
         </ButtonIcon>
       )
     },

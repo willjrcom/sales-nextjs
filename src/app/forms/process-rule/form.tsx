@@ -17,8 +17,13 @@ import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetCategoriesMap } from '@/app/api/category/category';
+import Category from '@/app/entities/category/category';
 
-const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
+interface ProcessRuleFormProps extends CreateFormsProps<ProcessRule> {
+    category: Category;
+}
+
+const ProcessRuleForm = ({ item, isUpdate, category }: ProcessRuleFormProps) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
@@ -34,7 +39,7 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
             description: prod.description || '',
             image_path: prod.image_path || '',
             ideal_time: prod.ideal_time || '00:00',
-            category_id: prod.category_id,
+            category_id: category.id,
             is_active: prod.is_active,
         }
     }, [item]);
@@ -59,12 +64,10 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
     });
 
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
-    const category = useMemo(() => categories.find(c => c.id === processRule.category_id), [categories, processRule.category_id]);
-
     const { data: processRulesByCategory } = useQuery({
-        queryKey: ['process-rules', 'by-category', processRule.category_id],
-        queryFn: () => GetProcessRulesByCategoryID(session as any, processRule.category_id),
-        enabled: !!(session as any)?.user?.access_token && !!processRule.category_id,
+        queryKey: ['process-rules', 'by-category', category.id],
+        queryFn: () => GetProcessRulesByCategoryID(session as any, category.id),
+        enabled: !!(session as any)?.user?.access_token && !!category.id,
     });
 
     const isOrderDuplicate = useMemo(() => {
@@ -118,15 +121,6 @@ const ProcessRuleForm = ({ item, isUpdate }: CreateFormsProps<ProcessRule>) => {
 
     return (
         <div className="text-black space-y-6">
-            {/* Seção: Categoria */}
-            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
-                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    {isUpdate && <TextField friendlyName='Categoria' name='category' value={category?.name || ""} setValue={() => { }} disabled />}
-                    {!isUpdate && <SelectField friendlyName='Categoria' name='category_id' values={categories} selectedValue={processRule.category_id} setSelectedValue={(value: any) => setValue('category_id', value)} error={errors.category_id?.message as string} />}
-                </div>
-            </div>
-
             {/* Seção: Informações Básicas */}
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
