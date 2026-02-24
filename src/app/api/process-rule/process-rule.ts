@@ -22,3 +22,25 @@ export const GetProcessRulesByCategoryID = async (session: Session, categoryID: 
 };
 
 export default GetProcessRules
+
+export interface ProcessRuleOrder {
+    id: string;
+    order: number;
+}
+
+interface ProcessRuleReorderDTO {
+    process_rules: ProcessRuleOrder[];
+}
+
+export const ReorderProcessRules = async (session: Session, processRules: ProcessRuleOrder[]) => {
+    const response = await RequestApi<ProcessRuleReorderDTO, any>({
+        path: `/product-category/process-rule/reorder`,
+        method: "PATCH",
+        headers: AddAccessToken(session),
+        body: {
+            process_rules: processRules
+        }
+    });
+
+    return response.data;
+}
