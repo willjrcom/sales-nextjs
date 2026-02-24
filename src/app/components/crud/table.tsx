@@ -77,7 +77,7 @@ const CrudTable = <T extends BaseRow,>({
                 return new Set();
             } else {
                 // Marca todos
-                const allRowIds = new Set(table.getRowModel().rows.map(row => row.original.id));
+                const allRowIds = new Set(table.getRowModel().rows.map(row => row.id));
                 return allRowIds;
             }
         });
@@ -91,6 +91,7 @@ const CrudTable = <T extends BaseRow,>({
     const table = useReactTable({
         columns,
         data,
+        getRowId: row => row.id,
         getCoreRowModel: getCoreRowModel(),
         manualPagination: hasTotalCount,
         getPaginationRowModel: hasTotalCount ? getPaginationRowModel() : undefined,
@@ -179,14 +180,14 @@ const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRow
     return (
         <tbody className="bg-white divide-y divide-gray-200">
             {rows.map(row => (
-                <tr key={row.original.id} className="hover:bg-gray-100">
+                <tr key={row.id} className="hover:bg-gray-100">
                     {rowSelectionType === "checkbox" && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <input
                                 type="checkbox"
                                 className="form-checkbox"
-                                checked={isRowSelected(row.original.id)}
-                                onChange={() => toggleRowSelection(row.original.id)}
+                                checked={isRowSelected(row.id)}
+                                onChange={() => toggleRowSelection(row.id)}
                             />
                         </td>
                     )}
@@ -195,8 +196,8 @@ const tBody = <T extends BaseRow,>({ table, rowSelectionType, columns, toggleRow
                             <input
                                 type="radio"
                                 className="form-radio"
-                                checked={isRowSelected(row.original.id)}
-                                onChange={() => toggleRowSelection(row.original.id)}
+                                checked={isRowSelected(row.id)}
+                                onChange={() => toggleRowSelection(row.id)}
                             />
                         </th>
                     )}

@@ -68,17 +68,23 @@ const RequestApi = async <T, TR>({ path, body, method, headers, isLogin, isFormD
     });
 
     if (!response.ok) {
-        const body = await response.json();
+        const responseText = await response.text();
+        let body: any;
+
+        try {
+            body = JSON.parse(responseText);
+        } catch (e) {
+            body = { error: { message: responseText || response.statusText } };
+        }
+
         if (isLogin) {
             throw body.error ? body.error : body;
         }
 
-        const error = body.error as RequestError;
+        const error = (body.error || { message: body.message || "Unknown error" }) as RequestError;
 
         if (typeof window !== "undefined") {
             error.message = translateError(error.message)
-        } else {
-            error.message = error.message;
         }
 
         error.status = response.status;

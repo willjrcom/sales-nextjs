@@ -18,7 +18,6 @@ const ButtonDelete = ({ size = 'md', modalName, additionalModals, name, children
 
     const onClose = () => {
         if (onCloseModal) onCloseModal();
-        modalHandler.hideModal(modalName)
         additionalModals?.forEach(modal => modalHandler.hideModal(modal))
     }
 

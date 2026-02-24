@@ -19,7 +19,6 @@ const ButtonIconText = ({ icon: Icon = FaPlus, size = 'md', modalName, title = "
 
     const onClose = () => {
         if (onCloseModal) onCloseModal();
-        modalHandler.hideModal(modalName)
     }
 
     if (isDisabled) {

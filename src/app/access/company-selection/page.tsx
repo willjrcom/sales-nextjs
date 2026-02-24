@@ -17,6 +17,8 @@ import GetMeUser from '@/app/api/user/me/user';
 import { useQuery } from '@tanstack/react-query';
 import GetUserCompanies from '@/app/api/user/companies/user';
 import { getWhitelist } from '@/app/utils/whitelist';
+import GetActiveAdvertisements from '@/app/api/advertising/active';
+import AdvertisingPopup from '@/app/components/advertising/popup';
 
 export default function Page() {
     return (
@@ -59,6 +61,16 @@ function CompanySelection() {
 
     const searchParams = useSearchParams();
     const autoSchema = searchParams.get('schema');
+
+    const { isPending: loadingAds, data: adsResponse, isSuccess: adsSuccess } = useQuery({
+        queryKey: ['advertisements-active'],
+        queryFn: async () => {
+            return GetActiveAdvertisements(data!);
+        },
+        enabled: !!data?.user?.access_token,
+    });
+
+    const ads = useMemo(() => adsResponse || [], [adsResponse]);
 
     const accessCompany = async (schemaName: string) => {
         if (!data) {
@@ -117,6 +129,21 @@ function CompanySelection() {
             }
         }
     }, [autoSchema, companies, selecting]);
+
+    const [hasOpenedAds, setHasOpenedAds] = useState(false);
+
+    // Advertising popup effect
+    useEffect(() => {
+        if (adsSuccess && ads.length > 0 && !hasOpenedAds) {
+            setHasOpenedAds(true);
+            modalHandler.showModal(
+                "advertising-popup",
+                "", // No title for premium design
+                <AdvertisingPopup ads={ads} onClose={() => modalHandler.hideModal("advertising-popup")} />,
+                "xl"
+            );
+        }
+    }, [adsSuccess, ads, hasOpenedAds, modalHandler]);
 
     const newCompany = () => {
         const onClose = () => {

@@ -18,11 +18,12 @@ interface DateFieldProps {
     name: string;
     disabled?: boolean;
     value?: string | null | undefined;
-    setValue: Dispatch<SetStateAction<string | null | undefined>>;
+    setValue: (value: string | null | undefined) => void;
     optional?: boolean;
+    error?: string;
 }
 
-const DateField = ({ friendlyName, name, disabled, setValue, value, optional }: DateFieldProps) => {
+const DateField = ({ friendlyName, name, disabled, setValue, value, optional, error }: DateFieldProps) => {
     const date = value ? new Date(value) : undefined;
 
     const handleSelect = (selectedDate: Date | undefined) => {
@@ -67,6 +68,7 @@ const DateField = ({ friendlyName, name, disabled, setValue, value, optional }: 
                     />
                 </PopoverContent>
             </Popover>
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
         </div>
     );
 };

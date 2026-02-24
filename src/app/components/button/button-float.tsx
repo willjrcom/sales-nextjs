@@ -30,7 +30,6 @@ const ButtonIconTextFloat = ({
 
     const onClose = () => {
         if (onCloseModal) onCloseModal();
-        modalHandler.hideModal(modalName);
     };
 
     // Gerar classes de Tailwind para o posicionamento (responsivo)

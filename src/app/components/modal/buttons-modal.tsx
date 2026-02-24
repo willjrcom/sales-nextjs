@@ -48,13 +48,9 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
         )
     }
 
-    const onClose = () => {
-        modalHandler.hideModal(modalName)
-    }
-
     const onCloseModal = () => {
         const title = (deleteLabel || (isRemoveItem ? 'Remover' : 'Excluir')) + ' ' + item.name;
-        modalHandler.showModal(modalName, title, <ModalDelete />, "md", onClose)
+        modalHandler.showModal(modalName, title, <ModalDelete />, "md")
     }
 
     let buttonName = item.id !== '' ? 'Atualizar' : 'Cadastrar'

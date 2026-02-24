@@ -18,7 +18,6 @@ const ButtonIcon = ({ icon: Icon = FaEdit, size = 'md', modalName, title = "", o
 
     const onClose = () => {
         if (onCloseModal) onCloseModal();
-        modalHandler.hideModal(modalName)
     }
 
     return (

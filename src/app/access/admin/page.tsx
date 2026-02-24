@@ -17,10 +17,16 @@ import { useQuery } from "@tanstack/react-query";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import GetAllCompanyCategories from "@/app/api/company-category/list";
 import { CompanyCategoryColumns } from "./company-category-columns";
+import { SponsorColumns } from "./sponsor-columns";
+import { AdvertisingColumns } from "./advertising-columns";
 import CompanyCategoryForm from "@/app/forms/company-category/form";
+import SponsorForm from "@/app/forms/sponsor/form";
+import AdvertisingForm from "@/app/forms/advertising/form";
 import { ModalProvider } from "@/app/context/modal/context";
 import { FaPlus } from "react-icons/fa";
 import ButtonIconText from "@/app/components/button/button-icon-text";
+import GetAllSponsors from "@/app/api/sponsor/list";
+import GetAllAdvertisements from "@/app/api/advertising/list";
 
 const SectionCard = ({
   title,
@@ -55,7 +61,7 @@ export default function AdminAccessPage() {
   const isAllowed = userEmail && allowedEmails.has(userEmail);
 
   // Generate company columns with dependencies
-  const companyColumns = getCompanyColumns(session, update, router);
+  const companyColumns = useMemo(() => getCompanyColumns(session, update, router), [session, update, router]);
 
   const [lastUpdateCompanies, setLastUpdateCompanies] = useState<string>(FormatRefreshTime(new Date()));
   const { data: companiesResponse, isLoading: companiesLoading, error: companiesError, refetch: refetchCompanies } = useQuery<Company[]>({
@@ -93,6 +99,30 @@ export default function AdminAccessPage() {
   })
 
   const users = useMemo(() => usersResponse || [], [usersResponse])
+
+  const [lastUpdateSponsors, setLastUpdateSponsors] = useState<string>(FormatRefreshTime(new Date()));
+  const { data: sponsorsResponse, isLoading: sponsorsLoading, error: sponsorsError, refetch: refetchSponsors } = useQuery({
+    queryKey: ['public-sponsors'],
+    queryFn: () => {
+      setLastUpdateSponsors(FormatRefreshTime(new Date()));
+      return GetAllSponsors(session!);
+    },
+    enabled: !!session?.user?.access_token,
+  })
+
+  const sponsors = useMemo(() => sponsorsResponse || [], [sponsorsResponse])
+
+  const [lastUpdateAdvertisements, setLastUpdateAdvertisements] = useState<string>(FormatRefreshTime(new Date()));
+  const { data: adsResponse, isLoading: adsLoading, error: adsError, refetch: refetchAds } = useQuery({
+    queryKey: ['public-advertisements'],
+    queryFn: () => {
+      setLastUpdateAdvertisements(FormatRefreshTime(new Date()));
+      return GetAllAdvertisements(session!);
+    },
+    enabled: !!session?.user?.access_token,
+  })
+
+  const advertisements = useMemo(() => adsResponse || [], [adsResponse])
 
   const backButton = (
     <Link
@@ -227,6 +257,80 @@ export default function AdminAccessPage() {
         </SectionCard>
 
         <SectionCard
+          title="Patrocinadores"
+          description="Gerencie os patrocinadores do sistema"
+          action={
+            <div className="flex gap-2">
+              <Refresh
+                onRefresh={refetchSponsors}
+                isPending={sponsorsLoading}
+                lastUpdate={lastUpdateSponsors}
+              />
+            </div>
+          }
+        >
+          {sponsorsLoading ? (
+            <div className="flex justify-center py-6">
+              <Loading />
+            </div>
+          ) : sponsorsError ? (
+            <p className="text-sm text-red-600">{(sponsorsError as Error).message || "Erro ao carregar patrocinadores"}</p>
+          ) : (
+            <CrudLayout
+              title="Patrocinadores"
+              tableChildren={<CrudTable columns={SponsorColumns()} data={sponsors} />}
+            />
+          )}
+
+          <div className="flex justify-end">
+            <ButtonIconText
+              title="Novo Patrocinador"
+              modalName="new-sponsor"
+              icon={FaPlus}
+            >
+              <SponsorForm />
+            </ButtonIconText>
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Propagandas"
+          description="Gerencie as propagandas e anúncios"
+          action={
+            <div className="flex gap-2">
+              <Refresh
+                onRefresh={refetchAds}
+                isPending={adsLoading}
+                lastUpdate={lastUpdateAdvertisements}
+              />
+            </div>
+          }
+        >
+          {adsLoading ? (
+            <div className="flex justify-center py-6">
+              <Loading />
+            </div>
+          ) : adsError ? (
+            <p className="text-sm text-red-600">{(adsError as Error).message || "Erro ao carregar propagandas"}</p>
+          ) : (
+            <CrudLayout
+              title="Propagandas"
+              tableChildren={<CrudTable columns={AdvertisingColumns()} data={advertisements} />}
+            />
+          )}
+
+          <div className="flex justify-end">
+            <ButtonIconText
+              title="Nova Propaganda"
+              modalName="new-advertising"
+              icon={FaPlus}
+            >
+              <AdvertisingForm />
+            </ButtonIconText>
+          </div>
+        </SectionCard>
+
+        <SectionCard
           title="Usuários públicos"
           description="Resultado direto do endpoint /public/users"
           action={
@@ -246,7 +350,7 @@ export default function AdminAccessPage() {
           ) : (
             <CrudLayout
               title="Usuários"
-              tableChildren={<CrudTable columns={userColumns} data={users} />}
+              tableChildren={<CrudTable columns={userColumns()} data={users} />}
             />
           )}
         </SectionCard>

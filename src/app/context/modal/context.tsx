@@ -36,8 +36,7 @@ const sizeClasses = {
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [modals, setModals] = useState<Record<string, ModalData>>({});
-
-    const showModal = (
+    const showModal = React.useCallback((
         modalName: string,
         title: string,
         content: ReactNode,
@@ -48,25 +47,30 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
             ...prev,
             [modalName]: { title, content, size, onClose },
         }));
-    };
+    }, []);
 
-    const hideModal = (modalName: string) => {
-        const onClose = modals[modalName]?.onClose;
-
-        if (onClose) {
-            onClose(); // Executa a função customizada de fechamento, se fornecida
-        }
-
+    const hideModal = React.useCallback((modalName: string) => {
         setModals((prev) => {
+            if (!prev[modalName]) return prev;
+
+            const modalData = prev[modalName];
             const { [modalName]: _, ...rest } = prev;
+
+            if (modalData.onClose) {
+                // Executar onClose fora do ciclo de renderização atual
+                setTimeout(() => modalData.onClose?.(), 0);
+            }
+
             return rest;
         });
-    };
+    }, []);
 
-    const isModalOpen = (modalName: string) => !!modals[modalName];
+    const isModalOpen = React.useCallback((modalName: string) => !!modals[modalName], [modals]);
+
+    const contextValue = React.useMemo(() => ({ modals, showModal, hideModal, isModalOpen }), [modals, showModal, hideModal, isModalOpen]);
 
     return (
-        <ContextModal.Provider value={{ modals, showModal, hideModal, isModalOpen }}>
+        <ContextModal.Provider value={contextValue}>
             {children}
 
             {/* Renderizar modais dinâmicos usando shadcn/ui Dialog */}
@@ -78,15 +82,20 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                 >
                     <DialogContent
                         className={cn(
-                            'max-h-[90vh] overflow-y-auto bg-white p-5 rounded-lg shadow-lg',
+                            'max-h-[95vh] overflow-y-auto p-0 rounded-xl shadow-2xl border-none outline-none',
+                            title ? 'bg-white' : 'bg-transparent',
                             sizeClasses[size]
                         )}
                     >
-                        <DialogHeader className="mb-4">
-                            <DialogTitle>{title}</DialogTitle>
-                        </DialogHeader>
-                        <div>
-                            <hr className="mb-4" />
+                        {title && (
+                            <div className="p-5 pb-0">
+                                <DialogHeader className="mb-4">
+                                    <DialogTitle>{title}</DialogTitle>
+                                </DialogHeader>
+                                <hr className="mb-4" />
+                            </div>
+                        )}
+                        <div className={cn(title ? "p-5 pt-0" : "h-full")}>
                             {content}
                         </div>
                     </DialogContent>
