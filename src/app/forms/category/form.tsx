@@ -21,7 +21,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import ListProcessRule from './process-rule';
+import ListProcessRule from './list-process-rule';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'

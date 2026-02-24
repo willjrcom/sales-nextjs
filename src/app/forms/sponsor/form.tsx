@@ -108,7 +108,7 @@ const SponsorForm = ({ item, isUpdate }: CreateFormsProps<Sponsor>) => {
                         friendlyName="Nome"
                         placeholder="Nome do patrocinador"
                         setValue={value => setValue('name', value)}
-                        value={watch('name')}
+                        value={watch('name') || ""}
                         error={errors.name?.message}
                     />
                     <TextField
@@ -116,7 +116,7 @@ const SponsorForm = ({ item, isUpdate }: CreateFormsProps<Sponsor>) => {
                         friendlyName="CNPJ"
                         placeholder="CNPJ"
                         setValue={value => setValue('cnpj', value)}
-                        value={watch('cnpj')}
+                        value={watch('cnpj') || ""}
                         error={errors.cnpj?.message}
                     />
                     <TextField
@@ -124,7 +124,7 @@ const SponsorForm = ({ item, isUpdate }: CreateFormsProps<Sponsor>) => {
                         friendlyName="Email"
                         placeholder="Email de contato"
                         setValue={value => setValue('email', value)}
-                        value={watch('email')}
+                        value={watch('email') || ""}
                         error={errors.email?.message}
                     />
                     <TextField
@@ -132,7 +132,7 @@ const SponsorForm = ({ item, isUpdate }: CreateFormsProps<Sponsor>) => {
                         friendlyName="Contato"
                         placeholder="Telefone/Celular"
                         setValue={value => setValue('contact', value)}
-                        value={watch('contact')}
+                        value={watch('contact') || ""}
                         error={errors.contact?.message}
                     />
                 </div>
