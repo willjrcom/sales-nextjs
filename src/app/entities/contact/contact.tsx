@@ -15,8 +15,3 @@ export enum ContactType {
     Client = "Client",
     Employee = "Employee",
 }
-
-export const SchemaContact = z.object({
-    number: z.string().min(9, 'Celular: Número inválido').max(15, 'Celular: Número inválido').or(z.literal('')),
-    type: z.nativeEnum(ContactType),
-});

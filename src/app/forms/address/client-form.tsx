@@ -104,22 +104,6 @@ const AddressClientForm = ({ addressParent, setAddressParent, isHidden }: Addres
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <SelectField name="address_type" friendlyName="Tipo de endereço" setSelectedValue={value => handleInputChange('address_type', value)} selectedValue={address.address_type} values={AddressTypesWithId} disabled={isHidden} />
-                </div>
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <PriceField
-                        name="delivery_tax"
-                        friendlyName="Taxa de entrega"
-                        placeholder="Digite a taxa de entrega"
-                        setValue={value => handleInputChange('delivery_tax', value)}
-                        value={address.delivery_tax}
-                        disabled={isHidden}
-                    />
-                </div>
-            </div>
-
             <HiddenField name="object_id" setValue={value => handleInputChange('object_id', value)} value={address.object_id} />
             <HiddenField name="id" setValue={value => handleInputChange('id', value)} value={address.id} />
         </div>
