@@ -6,15 +6,16 @@ interface NumberFieldProps {
     placeholder?: string
     disabled?: boolean
     value?: number
-    setValue: Dispatch<SetStateAction<number>>
+    setValue: ((value: number) => void) | Dispatch<SetStateAction<number>>
     optional?: boolean;
     min?: number;
-    max?: number
+    max?: number;
+    error?: string;
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 
-const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue, optional, min, max}: NumberFieldProps) => {
+const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValue, optional, min, max, error }: NumberFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={friendlyName}>
@@ -22,7 +23,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
             </label>
 
             <input
-                className={InputClassName}
+                className={`${InputClassName} ${error ? 'border-red-500' : ''}`}
                 id={name}
                 type="number"
                 placeholder={placeholder}
@@ -32,6 +33,7 @@ const NumberField = ({ friendlyName, name, placeholder, disabled, value, setValu
                 value={value === undefined || value === null || isNaN(value) ? '' : value}
                 onChange={e => setValue(e.target.valueAsNumber)}
             />
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     )
 }

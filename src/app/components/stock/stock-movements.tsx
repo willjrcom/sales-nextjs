@@ -14,17 +14,18 @@ interface StockMovementsProps {
 const StockMovements = ({ stockID }: StockMovementsProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const { isPending, data: stockMovementsResponse, refetch } = useQuery({
-        queryKey: ['stock-movements'],
+        queryKey: ['stock-movements', stockID, selectedDate],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetMovementsByStockID(data!, stockID);
+            return GetMovementsByStockID(data!, stockID, selectedDate);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
 
-    const movements = useMemo(() => stockMovementsResponse || [], [stockMovementsResponse]);
+    const movements = stockMovementsResponse || [];
 
     const getMovementTypeLabel = (type: string) => {
         switch (type) {
@@ -69,7 +70,15 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold mb-6">Histórico de Movimentos</h2>
-                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                <div className="flex items-center gap-4">
+                    <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                </div>
             </div>
             {movements.length === 0 ? (
                 <p className="text-gray-500">Nenhum movimento encontrado</p>

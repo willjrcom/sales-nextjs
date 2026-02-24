@@ -10,9 +10,10 @@ interface FormArrayProps {
     onAdd: () => void;
     onRemove: (index: number) => void;
     onChange: (index: number, value: string) => void;
+    errors?: any[];
 }
 
-const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, onRemove, onChange }: FormArrayProps) => {
+const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, onRemove, onChange, errors }: FormArrayProps) => {
     // Garantir que items seja sempre um array
     const safeItems = Array.isArray(items) ? items : [];
 
@@ -42,6 +43,7 @@ const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, on
                                         value={item}
                                         setValue={(value) => onChange(index, value)}
                                         formatted={true}
+                                        error={errors?.[index]?.value?.message || errors?.[index]?.message}
                                     />
                                 </div>
                                 {safeItems.length > 1 && (

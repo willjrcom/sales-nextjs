@@ -7,7 +7,7 @@ export interface RemoveStockRequest {
     id: string;
     new_stock: number;
     reason: string;
-    employee_id: string;
+    employee_id?: string;
     quantity: Decimal;
     price: Decimal;
     total_price: Decimal;
@@ -15,7 +15,7 @@ export interface RemoveStockRequest {
 
 const RemoveStock = async (id: string, movement: RemoveStockRequest, session: Session): Promise<StockMovement> => {
     const response = await RequestApi<RemoveStockRequest, StockMovement>({
-        path: "/stock/"+id+"/movement/remove", 
+        path: "/stock/" + id + "/movement/remove",
         method: "POST",
         body: movement,
         headers: AddAccessToken(session),

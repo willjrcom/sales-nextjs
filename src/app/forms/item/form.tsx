@@ -107,7 +107,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
   const removableIngredients = useMemo(() => category?.removable_ingredients || [], [category]);
 
   // Fetch Stocks to check availability
-  const { data: stocksResponse, refetch: refetchStocks } = useQuery({
+  const { data: stocksResponse } = useQuery({
     queryKey: ['stocks', 'product', item.id],
     queryFn: () => GetStockByProductID(item.id, data!),
     enabled: !!data?.user?.access_token,

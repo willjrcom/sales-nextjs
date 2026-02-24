@@ -5,11 +5,12 @@ interface TimeFieldProps {
     name: string;
     disabled?: boolean;
     value?: string | null | undefined; // Permitir undefined além de string e null
-    setValue: Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
+    setValue: ((value: string | null | undefined) => void) | Dispatch<SetStateAction<string | null | undefined>>; // Continua permitindo null como valor inicial
     optional?: boolean;
+    error?: string;
 }
 
-const TimeField = ({ friendlyName, name, disabled, setValue, value, optional }: TimeFieldProps) => {
+const TimeField = ({ friendlyName, name, disabled, setValue, value, optional, error }: TimeFieldProps) => {
     return (
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
@@ -17,13 +18,15 @@ const TimeField = ({ friendlyName, name, disabled, setValue, value, optional }: 
             </label>
 
             <input
-                className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${error ? 'border-red-500 text-red-600' : 'border-gray-300 text-gray-700'}`}
                 id={name}
-                type="time"
+                type="text"
+                placeholder="00:00"
                 disabled={disabled}
-                value={value ? new Date(`1970-01-01T${value}Z`).toISOString().split('T')[1].slice(0, 5) : ""}
+                value={value || ""}
                 onChange={e => setValue(e.target.value)}
             />
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     );
 };

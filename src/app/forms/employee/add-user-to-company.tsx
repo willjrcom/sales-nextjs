@@ -18,11 +18,27 @@ const AddUserToCompanyForm = () => {
     const [cpfToSearch, setCpfToSearch] = useState<string>('');
     const [notFound, setNotFound] = useState<boolean>(false);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+    const [cpfError, setCpfError] = useState<string>('');
     const { data } = useSession();
 
-    const searchUserByCpf = async () => {
-        if (!data) return;
+    const handleCpfChange = (value: string) => {
+        setCpfToSearch(value);
+        setCpfError('');
+        setUserFound(undefined);
         setNotFound(false);
+    }
+
+    const searchUserByCpf = async () => {
+        const rawCpf = cpfToSearch.replace(/\D/g, '');
+        if (!data) return;
+
+        if (rawCpf.length < 11) {
+            setCpfError('Digite o CPF completo');
+            return;
+        }
+
+        setNotFound(false);
+        setCpfError('');
         setIsSearching(true);
         try {
             const user = await SearchUser({ cpf: cpfToSearch }, data);
@@ -54,19 +70,20 @@ const AddUserToCompanyForm = () => {
                     <div className="flex gap-3 [&>div]:mb-0 [&>div]:flex-1">
                         <PatternField
                             name="cpf-search"
+                            onKeyDown={(e) => e.key === 'Enter' && searchUserByCpf()}
                             placeholder="000.000.000-00"
                             patternName="cpf"
-                            setValue={setCpfToSearch}
+                            setValue={handleCpfChange}
                             value={cpfToSearch}
                             formatted={true}
-                            optional
+                            error={cpfError}
                         />
                         <button
                             type="button"
                             onClick={searchUserByCpf}
                             className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow flex items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Buscar CPF"
-                            disabled={!cpfToSearch || cpfToSearch.length < 14 || isSearching}
+                            disabled={cpfToSearch.replace(/\D/g, '').length < 11 || isSearching}
                         >
                             <FaSearch className={isSearching ? "animate-spin" : ""} />
                             <span>{isSearching ? "Buscando..." : "Buscar"}</span>

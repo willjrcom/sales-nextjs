@@ -32,3 +32,21 @@ export class EmployeePayment {
         Object.assign(this, data);
     }
 }
+
+import { z } from "zod";
+
+export const SchemaEmployeePayment = z.object({
+    amount: z.number().min(0.01, "O valor deve ser maior que zero"),
+    payment_date: z.string().min(10, "Data inválida"),
+    method: z.string().min(1, "Selecione um método"),
+    status: z.string().min(1, "Selecione um status"),
+    notes: z.string().optional(),
+});
+
+export const SchemaEmployeeSalaryHistory = z.object({
+    start_date: z.string().min(10, "Data inválida"),
+    salary_type: z.string().min(1, "Selecione um tipo"),
+    base_salary: z.number().min(0.01, "O salário base deve ser maior que zero"),
+    hourly_rate: z.number().min(0.01, "A taxa horária deve ser maior que zero"),
+    commission: z.number().optional(),
+});

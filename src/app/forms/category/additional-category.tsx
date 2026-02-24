@@ -7,36 +7,22 @@ import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { MultiSelect } from "@/app/components/ui/multi-select";
 
 interface CategorySelectorProps {
-    selectedCategory: Category;
-    setSelectedCategory: Dispatch<SetStateAction<Category>>;
+    value: Category[];
+    onChange: (categories: Category[]) => void;
 }
 
-const AdditionalCategorySelector = ({ selectedCategory, setSelectedCategory }: CategorySelectorProps) => {
+const AdditionalCategorySelector = ({ value, onChange }: CategorySelectorProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const { isPending, data: additionalCategoriesResponse, refetch } = useQuery({
         queryKey: ['additional-categories'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetCategoriesAdditional(data!);
+            return GetCategoriesAdditional((data as any)!);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
     });
-
-    const [selectedCategories, setSelectedCategories] = useState<Category[]>(selectedCategory.additional_categories || []);
-
-    useEffect(() => {
-        setSelectedCategories(selectedCategory.additional_categories || []);
-    }, [selectedCategory]);
-
-    const handleCategorySelection = (categories: Category[]) => {
-        setSelectedCategories(categories);
-        setSelectedCategory(prev => ({
-            ...prev,
-            additional_categories: categories
-        }));
-    };
 
     const additionalCategories = useMemo(() => additionalCategoriesResponse || [], [additionalCategoriesResponse]);
 
@@ -52,8 +38,8 @@ const AdditionalCategorySelector = ({ selectedCategory, setSelectedCategory }: C
             </div>
             <MultiSelect
                 options={additionalCategories}
-                selected={selectedCategories}
-                onChange={(selected) => handleCategorySelection(selected as Category[])}
+                selected={value || []}
+                onChange={(selected) => onChange(selected as Category[])}
                 placeholder="Selecione categorias adicionais"
                 emptyMessage="Nenhuma categoria adicional encontrada."
             />

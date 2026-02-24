@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
-import Size, { ValidateSizeForm } from '@/app/entities/size/size';
-import { notifyError } from '@/app/utils/notifications';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { TextField, CheckboxField } from '../../components/modal/field';
+import Size, { SchemaSize } from '@/app/entities/size/size';
+import { notifyError, notifySuccess } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -11,9 +13,7 @@ import DeleteSize from '@/app/api/size/delete/size';
 import NewSize from '@/app/api/size/new/size';
 import UpdateSize from '@/app/api/size/update/size';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { notifySuccess } from '@/app/utils/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import GetCategoryByID from '@/app/api/category/[id]/category';
 
@@ -26,90 +26,97 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
     const modalName = isUpdate ? 'edit-size-' + item?.id : 'new-size'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
-    const [size, setSize] = useState<Size>(new Size(item));
-    const { data } = useSession();
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const { data: session } = useSession();
+    const [isSaving, setIsSaving] = useState(false);
+
+    const initialValues = useMemo(() => {
+        const s = new Size(item);
+        return {
+            id: s.id,
+            name: s.name,
+            is_active: s.is_active,
+            category_id: categoryID || s.category_id,
+        }
+    }, [item, categoryID]);
+
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors }
+    } = useForm<any>({
+        resolver: zodResolver(SchemaSize),
+        defaultValues: initialValues
+    });
+
+    const size = watch();
 
     const { data: category } = useQuery({
         queryKey: ['category', categoryID],
-        queryFn: () => GetCategoryByID(data!, categoryID),
-        enabled: !!data?.user?.access_token && !!categoryID,
+        queryFn: () => GetCategoryByID(session as any, categoryID),
+        enabled: !!(session as any)?.user?.access_token && !!categoryID,
     });
 
-    const handleInputChange = (field: keyof Size, value: any) => {
-        setSize(prev => ({ ...prev, [field]: value }));
+    const onInvalid = () => {
+        notifyError('Verifique os campos obrigatórios');
     };
 
     const createMutation = useMutation({
-        mutationFn: (newSize: Size) => NewSize(newSize, data!),
-
+        mutationFn: (newSize: Size) => NewSize(newSize, session!),
         onSuccess: (response, newSize) => {
             newSize.id = response;
-
             queryClient.invalidateQueries({ queryKey: ['sizes', categoryID] });
             notifySuccess(`Tamanho ${newSize.name} criado com sucesso`);
-            if (onSuccess) {
-                onSuccess();
-            } else {
-                modalHandler.hideModal(modalName);
-            }
+            if (onSuccess) onSuccess(); else modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar tamanho');
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
     const updateMutation = useMutation({
-        mutationFn: (updatedSize: Size) => UpdateSize(updatedSize, data!),
+        mutationFn: (updatedSize: Size) => UpdateSize(updatedSize, session!),
         onSuccess: (_, updatedSize) => {
             queryClient.invalidateQueries({ queryKey: ['sizes', categoryID] });
-
             notifySuccess(`Tamanho ${updatedSize.name} atualizado com sucesso`);
-            if (onSuccess) {
-                onSuccess();
-            } else {
-                modalHandler.hideModal(modalName);
-            }
+            if (onSuccess) onSuccess(); else modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar tamanho');
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (sizeId: string) => DeleteSize(sizeId, data!),
+        mutationFn: (sizeId: string) => DeleteSize(sizeId, session!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['sizes', categoryID] });
-
             notifySuccess(`Tamanho ${size.name} removido com sucesso`);
-            if (onSuccess) {
-                onSuccess();
-            } else {
-                modalHandler.hideModal(modalName);
-            }
+            if (onSuccess) onSuccess(); else modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
             notifyError(error.message || `Erro ao remover tamanho ${size.name}`);
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
-    const submit = async () => {
-        if (!data || !category) return;
-
-        size.category_id = category.id
-
-        const validationErrors = ValidateSizeForm(size);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
+    const submit = async (formData: any) => {
+        if (!session || !category) return;
+        setIsSaving(true);
+        const sizeToSave = new Size(formData);
+        sizeToSave.category_id = category.id;
 
         if (isUpdate) {
-            updateMutation.mutate(size);
+            updateMutation.mutate(sizeToSave);
         } else {
-            createMutation.mutate(size);
+            createMutation.mutate(sizeToSave);
         }
     }
 
     const onDelete = async () => {
-        if (!data || !size.id) return;
+        if (!session || !size.id) return;
+        setIsSaving(true);
         deleteMutation.mutate(size.id);
     }
 
@@ -121,26 +128,22 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações do Tamanho</h3>
                 <div className="space-y-4">
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={size.name} />
+                        <TextField friendlyName='Nome' name='name' setValue={(value: any) => setValue('name', value)} value={size.name} error={errors.name?.message as string} />
                     </div>
                     {isDefaultCategory && (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <CheckboxField friendlyName='Disponivel' name='is_active' setValue={value => handleInputChange('is_active', value)} value={size.is_active} />
+                            <CheckboxField friendlyName='Disponível' name='is_active' setValue={(value: any) => setValue('is_active', value)} value={size.is_active} error={errors.is_active?.message as string} />
                         </div>
                     )}
                 </div>
             </div>
 
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={size.id} />
-            <HiddenField name='category_id' setValue={value => handleInputChange('category_id', value)} value={category?.id} />
-
-            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal
                 item={size}
                 name="Tamanho"
-                onSubmit={submit}
+                onSubmit={handleSubmit(submit, onInvalid)}
                 deleteItem={onDelete}
-                isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                isPending={isSaving}
             />
         </div>
     );

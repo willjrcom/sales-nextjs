@@ -20,27 +20,25 @@ export default class StockMovement {
     }
 }
 
-const SchemaStockMovement = z.object({
-    stock_id: z.string().uuid("Estoque inválido"),
-    product_id: z.string().uuid("Produto inválido"),
-    type: z.enum(['in', 'out', 'adjust'], { required_error: 'Tipo é obrigatório' }),
-    quantity: z.coerce.number().min(0.001, 'Quantidade deve ser maior que 0'),
+export const SchemaAddStockMovement = z.object({
+    quantity: z.coerce.number().gt(0, 'Quantidade deve ser maior que 0'),
     reason: z.string().min(1, 'Motivo é obrigatório').max(255, 'Motivo deve ter no máximo 255 caracteres'),
-    unit_cost: z.coerce.number().min(0, 'Custo unitário deve ser maior ou igual a 0'),
-    notes: z.string().optional(),
+    price: z.coerce.number().gt(0, 'Custo unitário deve ser maior que 0'),
+    total_price: z.coerce.number().gt(0, 'Custo total deve ser maior que 0'),
 });
 
-export const ValidateStockMovementForm = (movement: StockMovement) => {
-    const validatedFields = SchemaStockMovement.safeParse({
-        stock_id: movement.stock_id,
-        type: movement.type,
-        quantity: new Decimal(movement.quantity).toNumber(),
-        reason: movement.reason,
-        unit_cost: new Decimal(movement.price).toNumber(),
-    });
+export type AddStockMovementFormData = z.infer<typeof SchemaAddStockMovement>;
 
-    if (!validatedFields.success) {
-        return validatedFields.error.flatten().fieldErrors;
-    } 
-    return {}
-}; 
+export const SchemaAdjustStockMovement = z.object({
+    new_stock: z.coerce.number().min(0, 'Novo estoque deve ser maior ou igual a 0'),
+    reason: z.string().min(1, 'Motivo é obrigatório').max(255, 'Motivo deve ter no máximo 255 caracteres'),
+});
+
+export type AdjustStockMovementFormData = z.infer<typeof SchemaAdjustStockMovement>;
+
+export const SchemaRemoveStockMovement = z.object({
+    quantity: z.coerce.number().gt(0, 'Quantidade deve ser maior que 0'),
+    reason: z.string().min(1, 'Motivo é obrigatório').max(255, 'Motivo deve ter no máximo 255 caracteres'),
+});
+
+export type RemoveStockMovementFormData = z.infer<typeof SchemaRemoveStockMovement>;

@@ -19,26 +19,19 @@ export default class ProcessRule {
     }
 }
 
-const SchemaProcessRule = z.object({
+export const SchemaProcessRule = z.object({
+    id: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
     order: z.number().min(1, 'A primeira ordem deve ser 1'),
-    description: z.string().optional(),
-    ideal_time: z.string().min(2, 'Tempo ideal inválido'),
+    description: z.string().optional().or(z.literal('')),
+    ideal_time: z.string().min(5, 'Informe o tempo ideal (mm:ss)')
+        .refine(t => t !== '00:00', 'Tempo ideal deve ser maior que zero')
+        .refine(t => {
+            const [m, s] = t.split(':').map(Number);
+            return (m < 60) || (m === 60 && s === 0);
+        }, 'Tempo ideal não pode ultrapassar 60 minutos'),
     category_id: z.string().uuid("Categoria inválida"),
+    is_active: z.boolean().optional(),
 });
 
-export const ValidateProcessRuleForm = (category: ProcessRule) => {
-    const validatedFields = SchemaProcessRule.safeParse({
-        name: category.name,
-        order: category.order,
-        description: category.description,
-        ideal_time: category.ideal_time,
-        category_id: category.category_id
-    });
-
-    if (!validatedFields.success) {
-        // Usa o método flatten para simplificar os erros
-        return validatedFields.error.flatten().fieldErrors;
-    }
-    return {}
-};
+export type ProcessRuleFormData = z.infer<typeof SchemaProcessRule>;

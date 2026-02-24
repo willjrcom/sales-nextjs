@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useSession } from 'next-auth/react';
@@ -9,23 +9,32 @@ import DeleteCompanyCategory from '@/app/api/company-category/delete';
 import CreateCompanyCategory from '@/app/api/company-category/create';
 import UpdateCompanyCategory from '@/app/api/company-category/update';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HiddenField, ImageField, TextField } from '@/app/components/modal/field';
-import { CompanyCategory } from '@/app/entities/company/company-category';
+import { CompanyCategory, CompanyCategoryFormData, SchemaCompanyCategory } from '@/app/entities/company/company-category';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const CompanyCategoryForm = ({ item, isUpdate }: CreateFormsProps<CompanyCategory>) => {
     const modalName = isUpdate ? 'edit-company-category-' + item?.id : 'new-company-category';
     const modalHandler = useModal();
-    const [category, setCategory] = useState<CompanyCategory>(item || { id: '', name: '', image_path: '' });
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const { data } = useSession();
     const queryClient = useQueryClient();
 
-    const handleInputChange = (field: keyof CompanyCategory, value: any) => {
-        setCategory(prev => ({ ...prev, [field]: value }));
-    };
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors, isSubmitting }
+    } = useForm<CompanyCategoryFormData>({
+        resolver: zodResolver(SchemaCompanyCategory),
+        defaultValues: {
+            name: item?.name || '',
+            image_path: item?.image_path || '',
+        }
+    });
 
     const createMutation = useMutation({
         mutationFn: (newCategory: CompanyCategory) => CreateCompanyCategory(newCategory, data!),
@@ -55,32 +64,32 @@ const CompanyCategoryForm = ({ item, isUpdate }: CreateFormsProps<CompanyCategor
         mutationFn: (categoryId: string) => DeleteCompanyCategory(categoryId, data!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['public-company-categories'] });
-            notifySuccess(`Categoria ${category.name} removida com sucesso`);
+            notifySuccess(`Categoria ${item?.name} removida com sucesso`);
             modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
-            notifyError(error.message || `Erro ao remover categoria ${category.name}`);
+            notifyError(error.message || `Erro ao remover categoria ${item?.name}`);
         }
     });
 
-    const submit = async () => {
+    const onSubmit = (formData: CompanyCategoryFormData) => {
         if (!data) return;
 
-        if (!category.name) {
-            setErrors({ name: ['Nome é obrigatório'] });
-            return;
-        }
+        const categoryPayload = {
+            id: item?.id || '',
+            ...formData,
+        } as CompanyCategory;
 
         if (!isUpdate) {
-            createMutation.mutate(category as CompanyCategory);
+            createMutation.mutate(categoryPayload);
         } else {
-            updateMutation.mutate(category as CompanyCategory);
+            updateMutation.mutate(categoryPayload);
         }
     }
 
     const onDelete = async () => {
-        if (!data || !category.id) return;
-        deleteMutation.mutate(category.id);
+        if (!data || !item?.id) return;
+        deleteMutation.mutate(item.id);
     }
 
     return (
@@ -91,35 +100,29 @@ const CompanyCategoryForm = ({ item, isUpdate }: CreateFormsProps<CompanyCategor
                         name="name"
                         friendlyName="Nome"
                         placeholder="Digite o nome da categoria"
-                        setValue={value => handleInputChange('name', value)}
-                        value={category.name}
+                        setValue={value => setValue('name', value)}
+                        value={watch('name')}
+                        error={errors.name?.message}
                     />
 
                     <ImageField
                         friendlyName='Imagem'
                         name='image_path'
-                        setValue={value => handleInputChange('image_path', value)}
-                        value={category.image_path || ''}
+                        setValue={value => setValue('image_path', value || '')}
+                        value={watch('image_path') || ''}
                         optional
                         onUploadError={(error) => notifyError(error)}
                     />
                 </div>
             </div>
 
-            <HiddenField
-                name="id"
-                setValue={(value) => handleInputChange("id", value)}
-                value={category.id}
-            />
-            <ErrorForms errors={errors} setErrors={setErrors} />
-
             <div className="mt-6">
                 <ButtonsModal
-                    item={category}
+                    item={item || { id: '', name: '', image_path: '' }}
                     name="Categoria de Cliente"
-                    onSubmit={submit}
+                    onSubmit={handleSubmit(onSubmit)}
                     deleteItem={isUpdate ? onDelete : undefined}
-                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || isSubmitting}
                 />
             </div>
         </div>

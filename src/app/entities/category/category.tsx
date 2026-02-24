@@ -26,29 +26,21 @@ export default class Category {
     }
 }
 
-const SchemaCategory = z.object({
+export const SchemaCategory = z.object({
+    id: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    image_path: z.string().optional(),
+    image_path: z.string().optional().or(z.literal('')),
     need_print: z.boolean(),
-    printer_name: z.string().optional(),
+    printer_name: z.string().optional().or(z.literal('')),
     use_process_rule: z.boolean(),
+    is_additional: z.boolean().optional(),
+    is_complement: z.boolean().optional(),
+    allow_fractional: z.boolean().optional(),
+    is_active: z.boolean().optional(),
+    removable_ingredients: z.array(z.string()).optional(),
+    additional_categories: z.array(z.any()).optional(),
+    complement_categories: z.array(z.any()).optional(),
 });
-
-export const ValidateCategoryForm = (category: Category) => {
-    const validatedFields = SchemaCategory.safeParse({
-        name: category.name,
-        image_path: category.image_path,
-        need_print: category.need_print,
-        printer_name: category.printer_name,
-        use_process_rule: category.use_process_rule,
-    });
-
-    if (!validatedFields.success) {
-        // Usa o método flatten para simplificar os erros
-        return validatedFields.error.flatten().fieldErrors;
-    }
-    return {}
-};
 
 export class CategoryMap {
     id: string = '';

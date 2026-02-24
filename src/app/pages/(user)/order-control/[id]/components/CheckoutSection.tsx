@@ -9,10 +9,15 @@ import UpdateChangeOrderDelivery from '@/app/api/order-delivery/update/change/or
 import { payMethodsWithId } from '@/app/entities/order/order-payment';
 import Decimal from 'decimal.js';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import { FaTruck, FaCreditCard, FaArrowLeft } from 'react-icons/fa';
+import { FaTruck, FaCreditCard, FaArrowLeft, FaEdit, FaExchangeAlt } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
 import { OrderControlView } from '../page';
 import { useRouter } from 'next/navigation';
+import { useModal } from '@/app/context/modal/context';
+import ClientAddressForm from '@/app/forms/client/update-address-order';
+import PickupNameForm from '@/app/forms/pickup-order/update-name-order';
+import TableNameForm from '@/app/forms/table-order/update-name-order';
+import { ChangeTableModal } from '../type/table-card';
 
 // Simple Input component if not available in shared
 const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
@@ -26,8 +31,9 @@ interface CheckoutSectionProps {
 
 export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
     const { data: session } = useSession();
-    const router = useRouter(); // Use router to refresh or redirect if needed
+    const router = useRouter();
     const queryClient = useQueryClient();
+    const modalHandler = useModal();
     const [paymentMethod, setPaymentMethod] = useState<string>('Dinheiro');
     const [changeFor, setChangeFor] = useState<string>('');
 
@@ -151,7 +157,18 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                 <FaTruck className='text-green-600' />
                                 Informações de Entrega
                             </h3>
-                            {/* Add edit button if needed */}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-700 h-8 gap-1 p-0 px-2"
+                                onClick={() => {
+                                    if (client) {
+                                        modalHandler.showModal('edit-address-order-' + client.id, 'Atualizar Endereço', <ClientAddressForm item={client} />)
+                                    }
+                                }}
+                            >
+                                <FaEdit size={14} /> Editar
+                            </Button>
                         </div>
                         <div className='space-y-1 text-sm'>
                             <p className='font-medium'>{client?.name}</p>
@@ -174,9 +191,37 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                 {/* Table Information */}
                 {order.table && (
                     <Card className='p-4 shadow-sm border border-gray-100'>
-                        <h3 className='font-semibold text-lg mb-3 flex items-center gap-2'>
-                            🍽️ Informações da Mesa
-                        </h3>
+                        <div className='flex items-center justify-between mb-3'>
+                            <h3 className='font-semibold text-lg flex items-center gap-2'>
+                                🍽️ Informações da Mesa
+                            </h3>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-blue-600 hover:text-blue-700 h-8 gap-1 p-0 px-2"
+                                    onClick={() => {
+                                        if (order.table) {
+                                            modalHandler.showModal('change-table-' + order.table.id, 'Alterar Mesa', <ChangeTableModal orderTableId={order.table.id} />)
+                                        }
+                                    }}
+                                >
+                                    <FaExchangeAlt size={14} /> Mesa
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-blue-600 hover:text-blue-700 h-8 gap-1 p-0 px-2"
+                                    onClick={() => {
+                                        if (order.table) {
+                                            modalHandler.showModal('edit-table-order-name-' + order.table.id, 'Atualizar Nome', <TableNameForm item={order.table} tableOrderId={order.table.id} />)
+                                        }
+                                    }}
+                                >
+                                    <FaEdit size={14} /> Cliente
+                                </Button>
+                            </div>
+                        </div>
                         <div className='space-y-1 text-sm'>
                             <p className='text-gray-600'>Mesa: <span className='font-bold text-gray-900'>{order.table.table?.name || 'N/A'}</span></p>
                             <p className='text-gray-600'>Cliente: {order.table.name || 'N/A'}</p>
@@ -187,9 +232,23 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                 {/* Pickup Information */}
                 {order.pickup && (
                     <Card className='p-4 shadow-sm border border-gray-100'>
-                        <h3 className='font-semibold text-lg mb-3 flex items-center gap-2'>
-                            🛍️ Retirada no Balcão
-                        </h3>
+                        <div className='flex items-center justify-between mb-3'>
+                            <h3 className='font-semibold text-lg flex items-center gap-2'>
+                                🛍️ Retirada no Balcão
+                            </h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-700 h-8 gap-1 p-0 px-2"
+                                onClick={() => {
+                                    if (order.pickup) {
+                                        modalHandler.showModal('edit-pickup-order-name-' + order.pickup.id, 'Atualizar Nome', <PickupNameForm item={order.pickup} pickupOrderId={order.pickup.id} />)
+                                    }
+                                }}
+                            >
+                                <FaEdit size={14} /> Editar
+                            </Button>
+                        </div>
                         <div className='space-y-1 text-sm'>
                             <p className='text-gray-600'>Cliente: <span className='font-bold text-gray-900'>{order.pickup.name}</span></p>
                         </div>
@@ -219,7 +278,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                     onBlur={() => updatePaymentMutation.mutate()} // Trigger update on blur of select
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
                                 >
-                                    {payMethodsWithId.map((method) => (
+                                    {payMethodsWithId.map((method: { id: string, name: string }) => (
                                         <option key={method.id} value={method.id}>
                                             {method.name}
                                         </option>
@@ -266,6 +325,6 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                     {submitOrderMutation.isPending ? 'Enviando...' : (order.table ? '👨‍🍳 Enviar para Cozinha' : '🚀 Enviar Pedido')}
                 </Button>
             </div>
-        </div>
+        </div >
     );
 }

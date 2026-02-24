@@ -7,7 +7,7 @@ export interface AddStockRequest {
     id: string;
     new_stock: number;
     reason: string;
-    employee_id: string;
+    employee_id?: string;
     quantity: Decimal;
     price: Decimal;
     total_price: Decimal;
@@ -15,7 +15,7 @@ export interface AddStockRequest {
 
 const AddStock = async (id: string, movement: AddStockRequest, session: Session): Promise<StockMovement> => {
     const response = await RequestApi<AddStockRequest, StockMovement>({
-        path: "/stock/"+id+"/movement/add", 
+        path: "/stock/" + id + "/movement/add",
         method: "POST",
         body: movement,
         headers: AddAccessToken(session),

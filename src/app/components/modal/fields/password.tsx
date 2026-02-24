@@ -13,9 +13,10 @@ interface TextFieldProps {
     showStrengthIndicator?: boolean;
     confirmPassword?: string;
     showConfirmValidation?: boolean;
+    error?: string;
 }
 
-const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+const InputClassName = (error?: string) => `shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline ${error ? 'border-red-500 text-red-600' : 'text-gray-700'}`
 
 // Função para calcular a força da senha
 const calculatePasswordStrength = (password: string) => {
@@ -37,18 +38,19 @@ const calculatePasswordStrength = (password: string) => {
     return { score, checks };
 };
 
-const PasswordField = ({ 
-    friendlyName, 
-    name, 
-    placeholder, 
-    disabled, 
-    value, 
-    setValue, 
-    pattern, 
+const PasswordField = ({
+    friendlyName,
+    name,
+    placeholder,
+    disabled,
+    value,
+    setValue,
+    pattern,
     optional,
     showStrengthIndicator = false,
     confirmPassword,
-    showConfirmValidation = false
+    showConfirmValidation = false,
+    error
 }: TextFieldProps) => {
     const [showPassword, setShowPassword] = useState(false);
     const { score, checks } = calculatePasswordStrength(value);
@@ -77,7 +79,7 @@ const PasswordField = ({
 
             <div className="relative">
                 <input
-                    className={InputClassName}
+                    className={InputClassName(error)}
                     id={name}
                     type={showPassword ? "text" : "password"}
                     placeholder={placeholder}
@@ -104,16 +106,15 @@ const PasswordField = ({
                     {/* Barra de força da senha */}
                     <div className="flex items-center gap-2 mb-2">
                         <div className="flex-1 bg-gray-200 rounded-full h-2">
-                            <div 
+                            <div
                                 className={`h-2 rounded-full transition-all duration-300 ${getStrengthColor()}`}
                                 style={{ width: `${(score / 5) * 100}%` }}
                             ></div>
                         </div>
-                        <span className={`text-xs font-medium ${
-                            score <= 2 ? 'text-red-600' : 
-                            score <= 3 ? 'text-yellow-600' : 
-                            score <= 4 ? 'text-blue-600' : 'text-green-600'
-                        }`}>
+                        <span className={`text-xs font-medium ${score <= 2 ? 'text-red-600' :
+                            score <= 3 ? 'text-yellow-600' :
+                                score <= 4 ? 'text-blue-600' : 'text-green-600'
+                            }`}>
                             {getStrengthText()}
                         </span>
                     </div>
@@ -147,25 +148,25 @@ const PasswordField = ({
             {/* Validação de confirmação de senha */}
             {showConfirmValidation && confirmPassword !== undefined && (
                 <div className="mt-2">
-                    <div className={`flex items-center gap-1 text-xs ${
-                        value === confirmPassword && value.length > 0 
-                            ? 'text-green-600' 
-                            : value.length > 0 
-                                ? 'text-red-600' 
-                                : 'text-gray-400'
-                    }`}>
+                    <div className={`flex items-center gap-1 text-xs ${value === confirmPassword && value.length > 0
+                        ? 'text-green-600'
+                        : value.length > 0
+                            ? 'text-red-600'
+                            : 'text-gray-400'
+                        }`}>
                         {value === confirmPassword && value.length > 0 ? (
                             <HiOutlineCheck size={12} />
                         ) : value.length > 0 ? (
                             <HiOutlineX size={12} />
                         ) : null}
-                        {value.length > 0 
+                        {value.length > 0
                             ? (value === confirmPassword ? 'Senhas conferem' : 'Senhas não conferem')
                             : 'Digite a senha para confirmar'
                         }
                     </div>
                 </div>
             )}
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     );
 };

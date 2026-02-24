@@ -6,12 +6,12 @@ export interface AdjustStockRequest {
     id: string;
     new_stock: number;
     reason: string;
-    employee_id: string;
+    employee_id?: string;
 }
 
 const AdjustStock = async (id: string, request: AdjustStockRequest, session: Session): Promise<StockMovement> => {
     const response = await RequestApi<AdjustStockRequest, StockMovement>({
-        path: "/stock/"+id+"/movement/adjust", 
+        path: "/stock/" + id + "/movement/adjust",
         method: "POST",
         body: request,
         headers: AddAccessToken(session),

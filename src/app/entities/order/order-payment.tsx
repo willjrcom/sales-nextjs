@@ -33,28 +33,16 @@ export class PaymentOrder {
     order_id: string = '';
     order_number: number = 0;
 
-    
+
     constructor(data: Partial<PaymentOrder> = {}) {
         Object.assign(this, data);
     }
 }
 
-const SchemaPayment = z.object({
-    total_paid: z.coerce.number().nonnegative("Total inválido"),
+export const SchemaPayment = z.object({
+    total_paid: z.coerce.number().positive("Total precisa ser maior que zero"),
     method: z.enum(payMethods).refine((value) => value !== undefined, "Método inválido"),
     order_id: z.string().uuid("Categoria inválida"),
 });
 
-export const ValidatePaymentForm = (payment: PaymentOrder) => {
-    const validatedFields = SchemaPayment.safeParse({
-        total_paid: new Decimal(payment.total_paid).toNumber(),
-        method: payment.method,
-        order_id: payment.order_id,
-    });
-
-    if (!validatedFields.success) {
-        // Usa o método flatten para simplificar os erros
-        return validatedFields.error.flatten().fieldErrors;
-    } 
-    return {}
-};
+export type PaymentFormData = z.infer<typeof SchemaPayment>;

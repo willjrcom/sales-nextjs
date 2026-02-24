@@ -186,7 +186,7 @@ function PermissionNode({ node, permissions, setPermissions, item, employee, pro
             name={node.key}
             value={permissions[node.key] || false}
             disabled={isDisabled}
-            setValue={(val) => {
+            setValue={(val: any) => {
                 const boolVal = typeof val === 'function' ? val(permissions[node.key] || false) : val;
                 setPermissions(prev => ({ ...prev, [node.key]: boolVal }));
             }}

@@ -17,7 +17,7 @@ const DeliveryCard = () => {
             <div className="flex justify-between items-center">
                 <h2 className="font-bold mb-2">Entrega</h2>
                 <ButtonIcon modalName={"edit-client-" + delivery?.client_id} title="Editar cliente" size="md">
-                    <ClientAddressForm item={delivery?.client} deliveryOrderId={delivery?.id} />
+                    {delivery?.client && <ClientAddressForm item={delivery.client} />}
                 </ButtonIcon>
             </div>
 

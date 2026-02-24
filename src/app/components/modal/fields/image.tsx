@@ -16,18 +16,21 @@ interface ImageFieldProps {
     onUploadComplete?: (url: string) => void;
     /** Callback fired when upload fails */
     onUploadError?: (error: string) => void;
+    /** External error message from validation */
+    error?: string;
 }
 
-const ImageField = ({ 
-    friendlyName, 
-    name, 
-    disabled, 
-    value, 
-    setValue, 
+const ImageField = ({
+    friendlyName,
+    name,
+    disabled,
+    value,
+    setValue,
     optional,
     onUploadStart,
     onUploadComplete,
-    onUploadError
+    onUploadError,
+    error
 }: ImageFieldProps) => {
     const [uploading, setUploading] = useState<boolean>(false);
     const [imgError, setImgError] = useState<boolean>(false);
@@ -82,9 +85,9 @@ const ImageField = ({
             onUploadComplete?.(public_url);
         } catch (error: any) {
             console.error('Error uploading image:', error);
-            
+
             let formattedError = 'Erro ao enviar imagem';
-            
+
             // Handle specific error cases
             if (error.name === 'NetworkError' || error.message?.includes('Failed to fetch')) {
                 formattedError = 'Erro de conexão. Verifique sua internet e tente novamente.';
@@ -93,7 +96,7 @@ const ImageField = ({
             } else if (error.message) {
                 formattedError = error.message;
             }
-            
+
             emitError(formattedError);
         } finally {
             setUploading(false);
@@ -164,9 +167,9 @@ const ImageField = ({
                 )}
 
                 {/* Error Message */}
-                {errorMessage && (
+                {(errorMessage || error) && (
                     <div className="text-sm text-red-600" role="alert">
-                        {errorMessage}
+                        {errorMessage || error}
                     </div>
                 )}
 

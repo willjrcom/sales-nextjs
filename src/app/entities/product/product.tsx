@@ -23,13 +23,15 @@ export default class Product {
     }
 }
 
-const SchemaProduct = z.object({
+export const SchemaProduct = z.object({
+    id: z.string().optional(),
     sku: z.string().min(1, 'SKU precisa ter pelo menos 1 caracteres').max(100, 'Código precisa ter no máximo 100 caracteres'),
-    image_path: z.string().optional(),
+    image_path: z.string().optional().or(z.literal('')),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    description: z.string().optional(),
+    description: z.string().optional().or(z.literal('')),
     flavors: z.array(z.string().trim().min(1, 'Sabor inválido')).optional(),
     category_id: z.string().uuid("Categoria inválida"),
+    is_active: z.boolean().optional(),
     variations: z.array(z.object({
         size_id: z.string().uuid("Tamanho inválido"),
         price: z.coerce.number().min(0, "Preço deve ser maior ou igual a 0"),
@@ -38,24 +40,4 @@ const SchemaProduct = z.object({
     })).min(1, "Adicione pelo menos uma variação"),
 });
 
-export const ValidateProductForm = (product: Product) => {
-    const validatedFields = SchemaProduct.safeParse({
-        sku: product.sku,
-        name: product.name,
-        description: product.description,
-        flavors: product.flavors,
-        category_id: product.category_id,
-        variations: product.variations.map(v => ({
-            size_id: v.size_id,
-            price: new Decimal(v.price).toNumber(),
-            cost: new Decimal(v.cost).toNumber(),
-            is_available: v.is_available
-        }))
-    });
-
-    if (!validatedFields.success) {
-        // Usa o método flatten para simplificar os erros
-        return validatedFields.error.flatten().fieldErrors;
-    }
-    return {}
-};
+export type ProductFormData = z.infer<typeof SchemaProduct>;

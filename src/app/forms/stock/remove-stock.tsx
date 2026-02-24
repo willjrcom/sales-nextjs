@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { TextField } from '../../components/modal/field';
-import StockMovement from '@/app/entities/stock/stock-movement';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
+import { SchemaRemoveStockMovement, RemoveStockMovementFormData } from '@/app/entities/stock/stock-movement';
 import Stock from '@/app/entities/stock/stock';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import RemoveStock from '@/app/api/stock/movement/remove';
+import RemoveStock, { RemoveStockRequest } from '@/app/api/stock/movement/remove';
 import Decimal from 'decimal.js';
-import { RemoveStockRequest } from '@/app/api/stock/movement/remove';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface RemoveStockFormProps {
@@ -20,29 +20,33 @@ interface RemoveStockFormProps {
 }
 
 const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
-    const modalName = 'remove-stock-'+stock?.id;
+    const modalName = 'remove-stock-' + stock?.id;
     const modalHandler = useModal();
-    const [movement, setMovement] = useState<RemoveStockRequest>({} as RemoveStockRequest);
-    const { data } = useSession();
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const { data: session } = useSession();
     const queryClient = useQueryClient();
+    const [isSaving, setIsSaving] = useState(false);
 
-    useEffect(() => {
-        if (stock) {
-            setMovement(prev => ({
-                ...prev,
-                stock_id: stock.id,
-                product_id: stock.product_id
-            }));
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors }
+    } = useForm<RemoveStockMovementFormData>({
+        resolver: zodResolver(SchemaRemoveStockMovement),
+        defaultValues: {
+            quantity: 0,
+            reason: '',
         }
-    }, [stock]);
+    });
 
-    const handleInputChange = (field: keyof StockMovement, value: any) => {
-        setMovement(prev => ({ ...prev, [field]: value }));
+    const formData = watch();
+
+    const onInvalid = () => {
+        notifyError('Verifique os campos obrigatórios');
     };
 
     const createMutation = useMutation({
-        mutationFn: (movement: RemoveStockRequest) => RemoveStock(stock?.id!, movement, data!),
+        mutationFn: (request: RemoveStockRequest) => RemoveStock(stock?.id!, request, session!),
         onSuccess: () => {
             notifySuccess(`Estoque removido com sucesso`);
             queryClient.invalidateQueries({ queryKey: ['stocks'] });
@@ -50,40 +54,53 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao remover estoque');
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
-    const submit = async () => {
-        if (!data || !stock?.id) return;
-        createMutation.mutate(movement);
+    const submit = async (data: RemoveStockMovementFormData) => {
+        if (!session || !stock?.id) return;
+        setIsSaving(true);
+
+        const request: RemoveStockRequest = {
+            id: stock.id,
+            quantity: new Decimal(data.quantity),
+            reason: data.reason,
+            price: new Decimal(0),
+            total_price: new Decimal(0),
+            new_stock: 0,
+        } as RemoveStockRequest;
+
+        createMutation.mutate(request);
     }
 
     return (
-        <>
+        <div className="space-y-4">
             <TextField
                 friendlyName="Quantidade"
                 name="quantity"
-                setValue={(value) => handleInputChange('quantity', new Decimal(value || 0))}
-                value={new Decimal(movement.quantity || 0).toString()}
+                setValue={(value: any) => setValue('quantity', value)}
+                value={formData.quantity.toString()}
+                error={errors.quantity?.message}
             />
 
             <TextField
                 friendlyName="Motivo"
                 name="reason"
-                setValue={(value) => handleInputChange('reason', value)}
-                value={movement.reason || ""}
+                setValue={(value: any) => setValue('reason', value)}
+                value={formData.reason}
                 placeholder="ex: Venda, Perda, Ajuste"
+                error={errors.reason?.message}
             />
-
-            <ErrorForms errors={errors} setErrors={setErrors} />
 
             <ButtonsModal
-                item={movement}
+                item={{ ...formData, id: stock?.id || '' }}
                 name="stock-movement"
-                onSubmit={submit}
+                onSubmit={handleSubmit(submit, onInvalid)}
+                isPending={isSaving}
             />
-        </>
+        </div>
     )
 }
 
-export default RemoveStockForm 
+export default RemoveStockForm;

@@ -11,20 +11,11 @@ export default class Table {
     }
 }
 
-const SchemaTable = z.object({
+export const SchemaTable = z.object({
+    id: z.string().optional(),
     name: z.string().min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    is_available: z.boolean(),
+    is_available: z.boolean().optional(),
+    is_active: z.boolean().optional(),
 });
 
-export const ValidateTableForm = (table: Table) => {
-    const validatedFields = SchemaTable.safeParse({
-        name: table.name,
-        is_available: table.is_available,
-    });
-
-    if (!validatedFields.success) {
-        // Usa o método flatten para simplificar os erros
-        return validatedFields.error.flatten().fieldErrors;
-    }
-    return {}
-};
+export type TableFormData = z.infer<typeof SchemaTable>;

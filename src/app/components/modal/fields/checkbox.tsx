@@ -5,8 +5,9 @@ interface CheckboxFieldProps {
     name: string;
     disabled?: boolean;
     value?: boolean;
-    setValue: Dispatch<SetStateAction<boolean>>;
+    setValue: ((value: boolean) => void) | Dispatch<SetStateAction<boolean>>;
     optional?: boolean;
+    error?: string;
 }
 
 const CheckboxField = ({
@@ -16,6 +17,7 @@ const CheckboxField = ({
     value = false,
     setValue,
     optional,
+    error,
 }: CheckboxFieldProps) => {
     return (
         <div className="mb-4 mr-6">
@@ -48,6 +50,7 @@ const CheckboxField = ({
                         }`}
                 ></span>
             </div>
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     );
 };

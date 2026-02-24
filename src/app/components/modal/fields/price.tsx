@@ -9,11 +9,12 @@ interface PriceFieldProps {
     value: Decimal.Value;
     setValue: (value: Decimal) => void;
     optional?: boolean;
+    error?: string;
 }
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
 
-const PriceField = ({ friendlyName, name, disabled, value, setValue, placeholder, optional }: PriceFieldProps) => {
+const PriceField = ({ friendlyName, name, disabled, value, setValue, placeholder, optional, error }: PriceFieldProps) => {
     return (
         <div className="mb-4">
             {friendlyName && (
@@ -27,7 +28,7 @@ const PriceField = ({ friendlyName, name, disabled, value, setValue, placeholder
                 decimalSeparator=","
                 prefix="R$ "
                 decimalScale={2}
-                fixedDecimalScale={true} 
+                fixedDecimalScale={true}
                 allowNegative={false}
                 id={name}
                 name={name}
@@ -35,8 +36,9 @@ const PriceField = ({ friendlyName, name, disabled, value, setValue, placeholder
                 value={new Decimal(value).toNumber()}
                 onValueChange={(values) => setValue(new Decimal(values.floatValue || 0))}
                 placeholder={placeholder}
-                className={InputClassName}
+                className={`${InputClassName} ${error ? 'border-red-500' : ''}`}
             />
+            {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
         </div>
     );
 };

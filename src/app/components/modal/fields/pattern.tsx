@@ -1,13 +1,13 @@
 import { PatternFormat } from 'react-number-format';
 
-interface PatternFieldProps {
+interface PatternFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'name'> {
     friendlyName?: string;
     name: string;
     placeholder?: string;
     disabled?: boolean;
     value: string;
     setValue: (value: string) => void;
-    patternName: keyof typeof patterns;  // Definindo que patternName deve ser uma chave de 'patterns'
+    patternName: keyof typeof patterns;
     optional?: boolean;
     /** If true, setValue will receive the formatted value including mask symbols; otherwise receives raw digits */
     formatted?: boolean;
@@ -45,11 +45,15 @@ export const patterns = {
         pattern: "##/##/####",
         placeholder: "00/00/0000"
     },
-} as const; // Garantindo que o objeto 'patterns' tem um formato de constante para os valores
+    "duration": {
+        pattern: "##:##",
+        placeholder: "00:00"
+    },
+} as const;
 
 const InputClassName = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
 
-const PatternField = ({ friendlyName, name, disabled, value, setValue, patternName, optional, formatted = false, error }: PatternFieldProps) => {
+const PatternField = ({ friendlyName, name, disabled, value, setValue, patternName, optional, formatted = false, error, ...props }: PatternFieldProps) => {
     const { pattern, placeholder } = patterns[patternName];
 
     return (
@@ -61,6 +65,7 @@ const PatternField = ({ friendlyName, name, disabled, value, setValue, patternNa
             )}
 
             <PatternFormat
+                {...props as any}
                 format={pattern}
                 id={name}
                 name={name}

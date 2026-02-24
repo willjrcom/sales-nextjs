@@ -1,8 +1,6 @@
-'use client';
-
 import React, { useEffect, useMemo, useState } from 'react';
 import { TextField, CheckboxField, SelectField, HiddenField, ImageField } from '../../components/modal/field';
-import Category, { ValidateCategoryForm } from '@/app/entities/category/category';
+import Category, { SchemaCategory } from '@/app/entities/category/category';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -11,7 +9,6 @@ import DeleteCategory from '@/app/api/category/delete/category';
 import NewCategory from '@/app/api/category/new/category';
 import UpdateCategory from '@/app/api/category/update/category';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import AdditionalCategorySelector from './additional-category';
 import ComplementCategorySelector from './complement-category';
@@ -22,21 +19,35 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ListSize from './list-size';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     const modalName = isUpdate ? 'edit-category-' + item?.id : 'new-category'
     const modalHandler = useModal();
-    const [category, setCategory] = useState<Category>(new Category(item));
-    const [selectedType, setSelectedType] = useState<"Normal" | "Adicional" | "Complemento">("Normal");
     const { data } = useSession();
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
     const router = useRouter();
+
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        control,
+        reset,
+        formState: { errors, isSubmitting }
+    } = useForm<Category>({
+        resolver: zodResolver(SchemaCategory) as any,
+        defaultValues: new Category(item)
+    });
+
+    const category = watch();
+    const [selectedType, setSelectedType] = useState<"Normal" | "Adicional" | "Complemento">("Normal");
 
     const { data: printersResponse } = useQuery({
         queryKey: ['printers'],
         queryFn: () => printService.getPrinters(),
-        enabled: !!data?.user?.access_token && category.need_print,
+        enabled: !!(data as any)?.user?.access_token && category.need_print,
         refetchInterval: 30000,
     })
 
@@ -56,14 +67,14 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: (updatedClient: Category) => UpdateCategory(updatedClient, data!),
-        onSuccess: (_, updatedClient) => {
-            queryClient.invalidateQueries({ queryKey: ['clients'] });
-            notifySuccess(`Cliente ${updatedClient.name} atualizado com sucesso`);
+        mutationFn: (updatedCategory: Category) => UpdateCategory(updatedCategory, data!),
+        onSuccess: (_, updatedCategory) => {
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            notifySuccess(`Categoria ${updatedCategory.name} atualizada com sucesso`);
             modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
-            notifyError(error.message || 'Erro ao atualizar cliente');
+            notifyError(error.message || 'Erro ao atualizar categoria');
         }
     });
 
@@ -81,40 +92,41 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
 
     useEffect(() => {
         if (item?.is_additional) setSelectedType("Adicional");
-        if (item?.is_complement) setSelectedType("Complemento");
-        if (!item?.is_additional && !item?.is_complement) setSelectedType("Normal");
+        else if (item?.is_complement) setSelectedType("Complemento");
+        else setSelectedType("Normal");
     }, [item])
 
     useEffect(() => {
-        const setType: Record<"Normal" | "Adicional" | "Complemento", () => void> = {
-            "Normal": () => setCategory(prev => ({ ...prev, is_complement: false, is_additional: false })),
-            "Complemento": () => setCategory(prev => ({ ...prev, is_complement: true, is_additional: false })),
-            "Adicional": () => setCategory(prev => ({ ...prev, is_complement: false, is_additional: true }))
+        if (selectedType === "Normal") {
+            setValue('is_complement', false);
+            setValue('is_additional', false);
+        } else if (selectedType === "Complemento") {
+            setValue('is_complement', true);
+            setValue('is_additional', false);
+        } else if (selectedType === "Adicional") {
+            setValue('is_complement', false);
+            setValue('is_additional', true);
         }
-
-        setType[selectedType]()
 
         if (selectedType === "Adicional" || selectedType === "Complemento") {
-            handleInputChange('use_process_rule', false);
-            handleInputChange('need_print', false);
+            setValue('use_process_rule', false);
+            setValue('need_print', false);
         }
-    }, [selectedType])
+    }, [selectedType, setValue])
 
-    const handleInputChange = (field: keyof Category, value: any) => {
-        setCategory(prev => ({ ...prev, [field]: value }));
-    };
-
-    const submit = async () => {
+    const onSubmit = async (formData: any) => {
         if (!data) return;
-
-        const validationErrors = ValidateCategoryForm(category);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
+        const categoryToSave = new Category(formData);
 
         if (isUpdate) {
-            updateMutation.mutate(category)
+            updateMutation.mutate(categoryToSave)
         } else {
-            createMutation.mutate(category)
+            createMutation.mutate(categoryToSave)
         }
+    }
+
+    const onInvalid = () => {
+        notifyError('Formulário inválido. Verifique os campos.');
     }
 
     const onDelete = async () => {
@@ -133,13 +145,14 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     <TextField
                         friendlyName="Nome"
                         name="name"
-                        setValue={value => handleInputChange('name', value)}
+                        setValue={(value: any) => setValue('name', value)}
                         value={category.name}
+                        error={errors.name?.message}
                     />
                     <ImageField
                         friendlyName="Imagem"
                         name="image_path"
-                        setValue={value => handleInputChange('image_path', value)}
+                        setValue={(value: any) => setValue('image_path', value)}
                         value={category.image_path}
                         optional
                         onUploadError={(error) => notifyError(error)}
@@ -171,7 +184,12 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     )}
                     {isUpdate && (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={category.is_active} />
+                            <CheckboxField
+                                friendlyName='Ativo'
+                                name='is_active'
+                                setValue={(value: any) => setValue('is_active', value)}
+                                value={category.is_active}
+                            />
                         </div>
                     )}
                     {category?.id && <>
@@ -201,7 +219,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                 <CheckboxField
                                     friendlyName="Deseja imprimir ao lançar o pedido?"
                                     name="need_print"
-                                    setValue={value => handleInputChange('need_print', value)}
+                                    setValue={(value: any) => setValue('need_print', value)}
                                     value={category.need_print}
                                     optional
                                 />
@@ -213,7 +231,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                         name="printer_name"
                                         values={printers}
                                         selectedValue={category.printer_name}
-                                        setSelectedValue={(value) => handleInputChange('printer_name', value)}
+                                        setSelectedValue={(value: any) => setValue('printer_name', value)}
                                         optional
                                     />
                                 </div>
@@ -222,7 +240,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                 <CheckboxField
                                     friendlyName="Deseja produzir com processos?"
                                     name="use_process_rule"
-                                    setValue={value => handleInputChange('use_process_rule', value)}
+                                    setValue={(value: any) => setValue('use_process_rule', value)}
                                     value={category.use_process_rule}
                                     optional
                                 />
@@ -232,7 +250,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                 <CheckboxField
                                     friendlyName="Permitir fracionado?"
                                     name="allow_fractional"
-                                    setValue={value => handleInputChange('allow_fractional', value)}
+                                    setValue={(value: any) => setValue('allow_fractional', value)}
                                     value={category.allow_fractional}
                                     optional
                                 />
@@ -243,22 +261,25 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                     {/* Seção: Categorias Adicionais */}
                     <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
                         <AdditionalCategorySelector
-                            selectedCategory={category}
-                            setSelectedCategory={setCategory}
+                            value={category.additional_categories}
+                            onChange={(value) => setValue('additional_categories', value)}
                         />
                     </div>
 
                     {/* Seção: Complementos */}
                     <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                         <ComplementCategorySelector
-                            selectedCategory={category}
-                            setSelectedCategory={setCategory}
+                            value={category.complement_categories}
+                            onChange={(value) => setValue('complement_categories', value)}
                         />
                     </div>
 
                     {/* Seção: Ingredientes Removíveis */}
                     <div className="bg-gradient-to-br from-white to-orange-50 rounded-lg shadow-sm border border-orange-100 p-6 transition-all duration-300 hover:shadow-md">
-                        <RemovableItensComponent item={category} setItem={setCategory} />
+                        <RemovableItensComponent
+                            value={category.removable_ingredients}
+                            onChange={(value) => setValue('removable_ingredients', value)}
+                        />
                     </div>
                 </>
             )}
@@ -266,21 +287,18 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
             {/* Campo Oculto para ID */}
             <HiddenField
                 name="id"
-                setValue={value => handleInputChange('id', value)}
+                setValue={(value: any) => setValue('id', value)}
                 value={category.id}
             />
-
-            {/* Exibição de Erros */}
-            <ErrorForms errors={errors} setErrors={setErrors} />
 
             {/* Botões para Atualizar ou Excluir */}
             {isUpdated ? (
                 <ButtonsModal
                     item={category}
                     name="category"
-                    onSubmit={submit}
+                    onSubmit={handleSubmit(onSubmit, onInvalid)}
                     deleteItem={onDelete}
-                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || isSubmitting}
                 />
             ) : (
                 <ButtonsModal

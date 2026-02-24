@@ -20,27 +20,14 @@ export default class Stock {
     }
 }
 
-const SchemaStock = z.object({
+export const SchemaStock = z.object({
+    id: z.string().optional(),
     product_id: z.string().uuid("Produto inválido"),
-    product_variation_id: z.string().uuid("Variação inválida").optional(),
+    product_variation_id: z.string().uuid("Variação inválida").optional().or(z.literal('')),
     current_stock: z.coerce.number().min(0, 'Estoque atual deve ser maior ou igual a 0'),
-    min_stock: z.coerce.number().min(0, 'Estoque mínimo deve ser maior ou igual a 0'),
+    min_stock: z.coerce.number().gt(0, 'Estoque mínimo deve ser maior que 0'),
     max_stock: z.coerce.number().min(0, 'Estoque máximo deve ser maior ou igual a 0'),
     unit: z.string().min(1, 'Unidade é obrigatória').max(20, 'Unidade deve ter no máximo 20 caracteres'),
 });
 
-export const ValidateStockForm = (stock: Stock) => {
-    const validatedFields = SchemaStock.safeParse({
-        product_id: stock.product_id,
-        product_variation_id: stock.product_variation_id,
-        current_stock: new Decimal(stock.current_stock).toNumber(),
-        min_stock: new Decimal(stock.min_stock).toNumber(),
-        max_stock: new Decimal(stock.max_stock).toNumber(),
-        unit: stock.unit,
-    });
-
-    if (!validatedFields.success) {
-        return validatedFields.error.flatten().fieldErrors;
-    }
-    return {}
-}; 
+export type StockFormData = z.infer<typeof SchemaStock>;

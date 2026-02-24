@@ -16,7 +16,7 @@ export default class Client extends Person {
 export const SchemaClient = z.object({
     id: z.string({ required_error: 'Id é obrigatório' }).uuid("Id inválido").optional().or(z.literal('')),
     name: z.string({ required_error: 'Nome é obrigatório', invalid_type_error: 'Nome inválido' }).min(3, 'Nome precisa ter pelo menos 3 caracteres').max(100, 'Nome precisa ter no máximo 100 caracteres'),
-    contact: z.string({ required_error: 'Celular é obrigatório', invalid_type_error: 'Celular inválido' }).min(9, 'Celular: Número inválido').max(15, 'Celular: Número inválido').or(z.literal('')),
+    contact: z.string({ required_error: 'Celular é obrigatório', invalid_type_error: 'Celular inválido' }).min(9, 'Celular: Número inválido').max(15, 'Celular: Número inválido'),
 
     image_path: z.string({ required_error: 'Imagem é obrigatória', invalid_type_error: 'Imagem inválida' }).url('Caminho da imagem inválido').optional().or(z.literal('')),
     email: z.string({ required_error: 'Email é obrigatório', invalid_type_error: 'Email inválido' }).email('Email inválido').optional().or(z.literal('')),
@@ -37,27 +37,3 @@ export const SchemaClient = z.object({
 
 export type ClientFormData = z.infer<typeof SchemaClient>
 
-
-export const ValidateClientForm = (client: Client) => {
-    const validatedFields = SchemaClient.safeParse({
-        name: client.name,
-        contact: client.contact.number,
-
-        // Address
-        street: client.address.street,
-        number: client.address.number,
-        neighborhood: client.address.neighborhood,
-        delivery_tax: client.address.delivery_tax.toNumber(),
-        complement: client.address.complement,
-        reference: client.address.reference,
-        city: client.address.city,
-        uf: client.address.uf,
-        cep: client.address.cep,
-    });
-
-    if (!validatedFields.success) {
-        return validatedFields.error.flatten().fieldErrors;
-    }
-
-    return {}
-};

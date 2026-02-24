@@ -2,9 +2,13 @@ import StockMovement from "@/app/entities/stock/stock-movement";
 import RequestApi, { AddAccessToken } from "../request";
 import { Session } from "next-auth";
 
-const GetMovementsByStockID = async (session: Session, stockID: string,): Promise<StockMovement[]> => {
+const GetMovementsByStockID = async (session: Session, stockID: string, date?: string): Promise<StockMovement[]> => {
+    let path = `/stock/${stockID}/movement`;
+    if (date) {
+        path += `?date=${date}`;
+    }
     const response = await RequestApi<null, StockMovement[]>({
-        path: `/stock/movements/${stockID}`,
+        path,
         method: "GET",
         headers: AddAccessToken(session),
     });

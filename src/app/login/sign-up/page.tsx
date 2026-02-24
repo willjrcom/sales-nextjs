@@ -1,51 +1,61 @@
 'use client';
 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import RequestError from '@/app/utils/error';
 import NewUser from '@/app/api/user/new/user';
-import ErrorForms from '@/app/components/modal/error-forms';
 import PasswordField from '@/app/components/modal/fields/password';
-import User, { ValidateUserFormCreate } from '@/app/entities/user/user';
+import User, { SchemaSignUp, SignUpFormData } from '@/app/entities/user/user';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { notifyError, notifySuccess } from '@/app/utils/notifications';
 import { TextField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
 
 const RegisterForm = () => {
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [user, setUser] = useState<User>(new User());
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const router = useRouter();
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleInputChange = useCallback((field: keyof User, value: any) => {
-        setUser(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    }, [setUser]);
-
-    const submit = async () => {
-        if (password !== confirmPassword && password.length > 0) {
-            notifyError('As senhas não conferem');
-            return
-        } else if (password.length < 8) {
-            notifyError('A senha deve ter pelo menos 8 caracteres');
-            return
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors }
+    } = useForm<SignUpFormData>({
+        resolver: zodResolver(SchemaSignUp),
+        defaultValues: {
+            name: '',
+            email: '',
+            cpf: '',
+            password: '',
+            confirmPassword: '',
         }
+    });
 
-        const validationErrors = ValidateUserFormCreate({ ...user } as User);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
+    const formData = watch();
 
+    const onInvalid = () => {
+        notifyError('Verifique os campos obrigatórios');
+    };
+
+    const submit = async (data: SignUpFormData) => {
+        setIsSaving(true);
         try {
-            await NewUser(user, password);
+            const userToCreate = new User({
+                name: data.name,
+                email: data.email,
+                cpf: data.cpf,
+            });
+            await NewUser(userToCreate, data.password);
             notifySuccess('Usuário cadastrado com sucesso!');
             router.push('/login');
-
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao cadastrar usuário");
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -67,46 +77,77 @@ const RegisterForm = () => {
                 </div>
             </div>
             <div className="w-full sm:w-1/2 h-screen flex flex-col items-center bg-white pt-10">
-                <h2 className="text-2xl mb-6">Cadastro</h2>
+                <h2 className="text-2xl mb-6 font-bold text-gray-800">Cadastro</h2>
                 <div className="w-full max-w-md px-8 py-10 overflow-y-auto flex-1">
                     <div className="flex flex-col">
-                        <ErrorForms errors={errors} setErrors={setErrors} />
                         <div className="text-black space-y-6">
                             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
-                                <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={user.name} />
 
-                                <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={user.email} />
+                                <TextField
+                                    name="name"
+                                    friendlyName="Nome"
+                                    placeholder="Digite seu nome"
+                                    setValue={value => setValue('name', value)}
+                                    value={formData.name}
+                                    error={errors.name?.message}
+                                />
 
-                                <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={user.cpf || ''} formatted={true} />
+                                <TextField
+                                    name="email"
+                                    friendlyName="Email"
+                                    placeholder="Digite seu e-mail"
+                                    setValue={value => setValue('email', value)}
+                                    value={formData.email}
+                                    error={errors.email?.message}
+                                />
+
+                                <PatternField
+                                    patternName="cpf"
+                                    name="cpf"
+                                    friendlyName="CPF"
+                                    placeholder="Digite seu cpf"
+                                    setValue={value => setValue('cpf', value)}
+                                    value={formData.cpf}
+                                    formatted={true}
+                                    error={errors.cpf?.message}
+                                />
 
                                 <PasswordField
                                     friendlyName='Senha'
                                     name='password'
                                     placeholder='Digite sua senha'
-                                    setValue={setPassword}
-                                    value={password}
+                                    setValue={value => setValue('password', value)}
+                                    value={formData.password}
                                     showStrengthIndicator={true}
-                                    confirmPassword={confirmPassword}
+                                    confirmPassword={formData.confirmPassword}
                                     showConfirmValidation={true}
+                                    error={errors.password?.message}
                                 />
                                 <PasswordField
                                     friendlyName='Confirmar Senha'
                                     name='confirmPassword'
                                     placeholder='Confirme sua senha'
-                                    setValue={setConfirmPassword}
-                                    value={confirmPassword}
-                                    confirmPassword={password}
+                                    setValue={value => setValue('confirmPassword', value)}
+                                    value={formData.confirmPassword}
+                                    confirmPassword={formData.password}
                                     showConfirmValidation={false}
+                                    error={errors.confirmPassword?.message}
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="w-full max-w-md px-8 py-4 bg-white">
-                    <button onClick={submit} className="w-full py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600">Cadastrar</button>
-                    <div className="flex justify-between mt-4 text-yellow-500">
-                        <Link href="/login" className="hover:underline">Já tem conta? Faça login</Link>
+                <div className="w-full max-w-md px-8 py-4 bg-white border-t border-gray-100">
+                    <button
+                        onClick={handleSubmit(submit, onInvalid)}
+                        disabled={isSaving}
+                        className={`w-full py-3 bg-yellow-500 text-white rounded font-bold transition-colors ${isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-600'}`}
+                    >
+                        {isSaving ? 'Cadastrando...' : 'Cadastrar'}
+                    </button>
+                    <div className="flex justify-center mt-4 text-yellow-500">
+                        <Link href="/login" className="hover:underline font-medium">Já tem conta? Faça login</Link>
                     </div>
                 </div>
             </div>

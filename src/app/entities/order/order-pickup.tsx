@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 type StatusOrderPickup = "Staging" | "Pending" | "Ready" | "Delivered" | "Cancelled";
 
 export default class OrderPickup {
@@ -16,3 +18,9 @@ export default class OrderPickup {
         Object.assign(this, data);
     }
 }
+
+export const SchemaUpdatePickupName = z.object({
+    name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
+});
+
+export type UpdatePickupNameFormData = z.infer<typeof SchemaUpdatePickupName>;

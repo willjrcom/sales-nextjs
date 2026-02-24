@@ -6,11 +6,12 @@ interface RadioFieldProps {
     disabled?: boolean;
     values: { id: string, name: string }[];
     selectedValue: string;
-    setSelectedValue: Dispatch<SetStateAction<string>>;
+    setSelectedValue: ((value: string) => void) | Dispatch<SetStateAction<string>>;
     optional?: boolean;
+    error?: string;
 }
 
-const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue, optional }: RadioFieldProps) => (
+const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSelectedValue, optional, error }: RadioFieldProps) => (
     <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
             {friendlyName} {!optional && <span className="text-red-500">*</span>}
@@ -36,6 +37,7 @@ const RadioField = ({ friendlyName, name, disabled, values, selectedValue, setSe
                 </label>
             </div>
         ))}
+        {error && <p className="text-red-500 text-xs italic mt-1">{error}</p>}
     </div>
 );
 

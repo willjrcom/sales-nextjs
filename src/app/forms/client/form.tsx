@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
-import Client, { ValidateClientForm } from '@/app/entities/client/client';
+import Client, { ClientFormData, SchemaClient } from '@/app/entities/client/client';
+import { z } from 'zod';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { ToIsoDate, ToUtcDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
@@ -9,47 +10,76 @@ import DeleteClient from '@/app/api/client/delete/client';
 import NewClient from '@/app/api/client/new/client';
 import UpdateClient from '@/app/api/client/update/client';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { HiddenField, ImageField, TextField, CheckboxField } from '@/app/components/modal/field';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { HiddenField, ImageField, TextField, CheckboxField, SelectField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
-import Contact from '@/app/entities/contact/contact';
 import Address from '@/app/entities/address/address';
-import ContactForm from '../contact/form';
-import AddressClientForm from '../address/client-form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Decimal from 'decimal.js';
+import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
+import { FaSearch } from 'react-icons/fa';
+import GetCompany from '@/app/api/company/company';
+import { addressUFsWithId } from '@/app/entities/address/utils';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
     const modalHandler = useModal();
-    const [client, setClient] = useState<Client>(() => {
+    const { data: session } = useSession();
+    const queryClient = useQueryClient();
+    const [loadingCep, setLoadingCep] = useState(false);
+
+    const initialData = useMemo(() => {
         const c = new Client(item);
         if (c.birthday) c.birthday = ToUtcDate(c.birthday);
         return c;
+    }, [item]);
+
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors, isSubmitting }
+    } = useForm<ClientFormData & { is_active: boolean }>({
+        resolver: zodResolver(SchemaClient.extend({ is_active: z.boolean() })),
+        defaultValues: {
+            id: initialData.id,
+            name: initialData.name,
+            contact: initialData.contact.number,
+            image_path: initialData.image_path,
+            email: initialData.email,
+            cpf: initialData.cpf,
+            birthday: initialData.birthday || '',
+            street: initialData.address.street,
+            number: initialData.address.number,
+            neighborhood: initialData.address.neighborhood,
+            city: initialData.address.city,
+            uf: initialData.address.uf,
+            cep: initialData.address.cep,
+            complement: initialData.address.complement,
+            reference: initialData.address.reference,
+            delivery_tax: new Decimal(initialData.address.delivery_tax || 0).toNumber(),
+            is_active: initialData.is_active,
+        }
     });
-    const [contact, setContact] = useState<Contact>(new Contact(client.contact))
-    const [address, setAddress] = useState<Address>(new Address(client.address))
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
-    const { data } = useSession();
-    const queryClient = useQueryClient();
 
-    const handleInputChange = useCallback((field: keyof Client, value: any) => {
-        setClient(prev => ({
-            ...prev,
-            [field]: value
-        } as Client));
-    }, [setClient]);
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(session!),
+        enabled: !!session?.user?.access_token,
+    });
+
+    const currentUf = watch('uf');
 
     useEffect(() => {
-        handleInputChange('address', address);
-    }, [address]);
-
-    useEffect(() => {
-        handleInputChange('contact', contact);
-    }, [contact]);
+        if (!isUpdate && company?.address?.uf && !currentUf) {
+            setValue('uf', company.address.uf);
+        }
+    }, [company, isUpdate, setValue, currentUf]);
 
     const createMutation = useMutation({
-        mutationFn: (newClient: Client) => NewClient(newClient, data!),
+        mutationFn: (newClient: Client) => NewClient(newClient, session!),
         onSuccess: (response, newClient) => {
             newClient.id = response;
             queryClient.invalidateQueries({ queryKey: ['clients'] });
@@ -62,7 +92,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: (updatedClient: Client) => UpdateClient(updatedClient, data!),
+        mutationFn: (updatedClient: Client) => UpdateClient(updatedClient, session!),
         onSuccess: (_, updatedClient) => {
             queryClient.invalidateQueries({ queryKey: ['clients'] });
             notifySuccess(`Cliente ${updatedClient.name} atualizado com sucesso`);
@@ -74,42 +104,78 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (clientId: string) => DeleteClient(clientId, data!),
+        mutationFn: (clientId: string) => DeleteClient(clientId, session!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['clients'] });
-            notifySuccess(`Cliente ${client?.name} removido com sucesso`);
+            notifySuccess(`Cliente ${initialData.name} removido com sucesso`);
             modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
-            notifyError(error.message || `Erro ao remover cliente ${client?.name}`);
+            notifyError(error.message || `Erro ao remover cliente ${initialData.name}`);
         }
     });
 
-    const submit = async () => {
-        if (!data) return;
+    const onSubmit = async (formData: ClientFormData & { is_active: boolean }) => {
+        if (!session) return;
 
-        const newClient = { ...client };
+        const clientToSave = new Client(initialData);
+        Object.assign(clientToSave, {
+            ...formData,
+            contact: { ...initialData.contact, number: formData.contact },
+            address: {
+                ...initialData.address,
+                street: formData.street,
+                number: formData.number,
+                neighborhood: formData.neighborhood,
+                city: formData.city,
+                uf: formData.uf,
+                cep: formData.cep,
+                complement: formData.complement,
+                reference: formData.reference,
+                delivery_tax: new Decimal(formData.delivery_tax || 0)
+            }
+        });
 
-        if (newClient.birthday) {
-            newClient.birthday = ToIsoDate(newClient.birthday)
+        if (clientToSave.birthday) {
+            clientToSave.birthday = ToIsoDate(clientToSave.birthday)
         } else {
-            // Remove o campo birthday se estiver vazio, pois o backend usa ponteiro
-            delete newClient.birthday;
+            delete clientToSave.birthday;
         }
 
-        const validationErrors = ValidateClientForm(newClient);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
-
         if (!isUpdate) {
-            createMutation.mutate(newClient);
+            createMutation.mutate(clientToSave);
         } else {
-            updateMutation.mutate(newClient);
+            updateMutation.mutate(clientToSave);
         }
     }
 
+    const onInvalid = () => {
+        notifyError('Formulário inválido. Verifique os campos obrigatórios.');
+    }
+
     const onDelete = async () => {
-        if (!data || !client?.id) return;
-        deleteMutation.mutate(client.id);
+        if (!session || !initialData.id) return;
+        deleteMutation.mutate(initialData.id);
+    }
+
+    const getAddress = async () => {
+        const cep = watch('cep');
+        if (!cep) return;
+
+        setLoadingCep(true);
+        try {
+            const addressFound = await GetAddressByCEP(cep);
+            if (addressFound && addressFound.logradouro) {
+                setValue('street', addressFound.logradouro);
+                setValue('neighborhood', addressFound.bairro);
+                setValue('city', addressFound.localidade);
+                setValue('uf', addressFound.uf);
+            }
+        } catch (error) {
+            notifyError('Erro ao buscar CEP');
+        } finally {
+            setLoadingCep(false);
+        }
     }
 
     return (
@@ -117,54 +183,209 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             {/* Seção: Informações Básicas */}
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
-                <TextField name="name" friendlyName="Nome" placeholder="Digite seu nome" setValue={value => handleInputChange('name', value)} value={client.name} />
+                <TextField
+                    name="name"
+                    friendlyName="Nome"
+                    placeholder="Digite seu nome"
+                    setValue={value => setValue('name', value)}
+                    value={watch('name')}
+                    error={errors.name?.message}
+                />
             </div>
 
             {/* Seção: Contato */}
             <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Contato</h3>
-                <ContactForm contactParent={contact} setContactParent={setContact} />
+                <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                    <PatternField
+                        patternName='full-phone'
+                        name="contact"
+                        friendlyName="Celular"
+                        placeholder="xx xxxx-xxxx"
+                        setValue={value => setValue('contact', value)}
+                        value={watch('contact')}
+                        error={errors.contact?.message}
+                    />
+                </div>
             </div>
 
             {/* Seção: Endereço */}
             <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Endereço</h3>
-                <AddressClientForm addressParent={address} setAddressParent={setAddress} />
+
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4 items-end">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <PatternField
+                                patternName='cep'
+                                name="cep"
+                                friendlyName="Cep"
+                                placeholder="00000-000"
+                                setValue={value => setValue('cep', value)}
+                                value={watch('cep') || ''}
+                                optional
+                                formatted={true}
+                                error={errors.cep?.message}
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md disabled:bg-gray-400'
+                            onClick={getAddress}
+                            disabled={loadingCep}
+                        >
+                            <FaSearch />&nbsp;<span>{loadingCep ? 'Buscando...' : 'Buscar'}</span>
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                name="street"
+                                friendlyName="Rua"
+                                placeholder="Digite sua rua"
+                                setValue={value => setValue('street', value)}
+                                value={watch('street')}
+                                error={errors.street?.message}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                name="number"
+                                friendlyName="Numero"
+                                placeholder="Digite o numero"
+                                setValue={value => setValue('number', value)}
+                                value={watch('number')}
+                                error={errors.number?.message}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                name="neighborhood"
+                                friendlyName="Bairro"
+                                placeholder="Digite o bairro"
+                                setValue={value => setValue('neighborhood', value)}
+                                value={watch('neighborhood')}
+                                error={errors.neighborhood?.message}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                name="complement"
+                                friendlyName="Complemento"
+                                placeholder="Digite o complemento"
+                                setValue={value => setValue('complement', value)}
+                                value={watch('complement') || ''}
+                                optional
+                                error={errors.complement?.message}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <TextField
+                            name="reference"
+                            friendlyName="Referência"
+                            placeholder="Digite a referência"
+                            setValue={value => setValue('reference', value)}
+                            value={watch('reference') || ''}
+                            optional
+                            error={errors.reference?.message}
+                        />
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                            <TextField
+                                name="city"
+                                friendlyName="Cidade"
+                                placeholder="Digite a cidade"
+                                setValue={value => setValue('city', value)}
+                                value={watch('city')}
+                                error={errors.city?.message}
+                            />
+                        </div>
+                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            <SelectField
+                                name="uf"
+                                friendlyName="Estado"
+                                setSelectedValue={value => setValue('uf', value)}
+                                selectedValue={watch('uf')}
+                                values={addressUFsWithId}
+                            />
+                            {errors.uf && <p className="text-red-500 text-xs italic mt-1">{errors.uf.message}</p>}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Seção: Dados Adicionais */}
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Dados Adicionais</h3>
                 <div className="space-y-4">
-
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField name="email" friendlyName="Email" placeholder="Digite seu e-mail" setValue={value => handleInputChange('email', value)} value={client.email} optional={true} />
-
+                            <TextField
+                                name="email"
+                                friendlyName="Email"
+                                placeholder="Digite seu e-mail"
+                                setValue={value => setValue('email', value)}
+                                value={watch('email') || ''}
+                                optional={true}
+                                error={errors.email?.message}
+                            />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <ImageField
                                 friendlyName='Imagem'
                                 name='image_path'
-                                setValue={value => handleInputChange('image_path', value)}
-                                value={client.image_path}
+                                setValue={value => setValue('image_path', value)}
+                                value={watch('image_path') || ''}
                                 optional
                                 onUploadError={(error) => notifyError(error)}
+                                error={errors.image_path?.message}
                             />
                         </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField patternName="cpf" name="cpf" friendlyName="CPF" placeholder="Digite seu cpf" setValue={value => handleInputChange('cpf', value)} value={client.cpf || ''} optional={true} formatted={true} />
+                            <PatternField
+                                patternName="cpf"
+                                name="cpf"
+                                friendlyName="CPF"
+                                placeholder="Digite seu cpf"
+                                setValue={value => setValue('cpf', value)}
+                                value={watch('cpf') || ''}
+                                optional={true}
+                                formatted={true}
+                                error={errors.cpf?.message}
+                            />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField patternName="date" name="birthday" friendlyName="Nascimento" setValue={value => handleInputChange('birthday', value)} value={client.birthday || ''} optional={true} formatted={true} />
+                            <PatternField
+                                patternName="date"
+                                name="birthday"
+                                friendlyName="Nascimento"
+                                setValue={value => setValue('birthday', value)}
+                                value={watch('birthday') || ''}
+                                optional={true}
+                                formatted={true}
+                                error={errors.birthday?.message}
+                            />
                         </div>
                     </div>
                     {isUpdate && (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={client.is_active} />
+                            <CheckboxField
+                                friendlyName='Ativo'
+                                name='is_active'
+                                setValue={(value: boolean) => setValue('is_active', value)}
+                                value={watch('is_active')}
+                            />
                         </div>
                     )}
                 </div>
@@ -172,19 +393,18 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
             <HiddenField
                 name="id"
-                setValue={(value) => handleInputChange("id", value)}
-                value={client.id}
+                setValue={(value: any) => setValue("id", value)}
+                value={watch('id') || ''}
             />
-            <ErrorForms errors={errors} setErrors={setErrors} />
 
             {/* Botões de Ação */}
             <div className="mt-6">
                 <ButtonsModal
-                    item={client}
+                    item={initialData}
                     name="Cliente"
-                    onSubmit={submit}
+                    onSubmit={handleSubmit(onSubmit, onInvalid)}
                     deleteItem={onDelete}
-                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                    isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || isSubmitting}
                 />
             </div>
         </div>

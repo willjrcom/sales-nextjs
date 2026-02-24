@@ -11,6 +11,10 @@ import CheckboxField from "@/app/components/modal/fields/checkbox";
 import UpdateEmployee from "@/app/api/employee/update/employee";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ButtonsModal from "@/app/components/modal/buttons-modal";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { SchemaEmployee } from "@/app/entities/employee/employee";
+import { z } from "zod";
 
 interface EmployeeInfoTabProps {
     item: Employee;
@@ -25,25 +29,43 @@ function formatDate(dateString?: string) {
 
 export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
     const modalName = "view-employee-" + item.id;
-    const [employee, setEmployee] = useState<Employee>(new Employee(item));
-    const contact = new Contact(item.contact);
-    const address = new Address(item.address);
     const queryClient = useQueryClient();
-    const { data } = useSession();
+    const { data: session } = useSession();
     const modalHandler = useModal();
+    const contact = new Contact(item.contact || {});
+    const address = new Address(item.address || {});
 
-    const handleInputChange = useCallback((field: keyof Employee, value: any) => {
-        setEmployee(prev => ({
-            ...prev,
-            [field]: value
-        } as Employee));
-    }, [setEmployee]);
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { isSubmitting }
+    } = useForm({
+        resolver: zodResolver(SchemaEmployee),
+        defaultValues: {
+            ...item,
+            contact: item.contact?.number || '',
+            cep: item.address?.cep || '',
+            street: item.address?.street || '',
+            number: item.address?.number || '',
+            neighborhood: item.address?.neighborhood || '',
+            city: item.address?.city || '',
+            uf: item.address?.uf || '',
+            is_active: item.is_active,
+        }
+    });
+
+    const is_active = watch('is_active');
 
     const updateMutation = useMutation({
-        mutationFn: (updatedEmployee: Employee) => UpdateEmployee(updatedEmployee, data!),
-        onSuccess: (_, updatedEmployee) => {
+        mutationFn: (formData: any) => {
+            const employeeToSave = new Employee(item);
+            Object.assign(employeeToSave, formData);
+            return UpdateEmployee(employeeToSave, session!);
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employees'] });
-            notifySuccess(`Funcionário ${updatedEmployee.name} atualizado com sucesso`);
+            notifySuccess(`Funcionário ${item.name} atualizado com sucesso`);
             modalHandler.hideModal(modalName);
         },
         onError: (error: RequestError) => {
@@ -51,10 +73,14 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
         }
     });
 
-    const onUpdate = async () => {
-        if (!data) return;
-        updateMutation.mutate(employee);
+    const onUpdate = async (formData: any) => {
+        if (!session) return;
+        updateMutation.mutate(formData);
     }
+
+    const onInvalid = () => {
+        notifyError('Formulário incompleto. Verifique os campos obrigatórios.');
+    };
 
     return (
         <>
@@ -83,7 +109,9 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
                     <span className="text-gray-400 uppercase text-xs font-semibold tracking-wider">Contato</span>
                     <div className="flex items-center gap-2 text-gray-700">
                         <HiOutlinePhone size={20} className="text-blue-500" />
-                        <span>{contact ? contact.number : '-'}</span>
+                        <span className={!item.contact?.number ? 'text-gray-400 italic text-sm' : ''}>
+                            {item.contact?.number || 'Campo não cadastrado'}
+                        </span>
                     </div>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -91,12 +119,14 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
                     <div className="flex items-start gap-2 text-gray-700">
                         <HiOutlineHome size={20} className="text-blue-500 mt-0.5" />
                         <div className="flex flex-col text-sm">
-                            <span>{address ? `${address.street}, ${address.number}` : '-'}</span>
-                            {address && (
+                            {item.address?.street ? (
                                 <>
-                                    <span>{address.neighborhood}</span>
-                                    <span>{address.city} - CEP: {address.cep}</span>
+                                    <span>{`${item.address.street}, ${item.address.number}`}</span>
+                                    <div>{item.address.neighborhood}</div>
+                                    <div>{item.address.city} - CEP: {item.address.cep}</div>
                                 </>
+                            ) : (
+                                <span className="text-gray-400 italic">Campo não cadastrado</span>
                             )}
                         </div>
                     </div>
@@ -107,12 +137,17 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
                     <CheckboxField
                         friendlyName="Ativo"
                         name="is_active"
-                        value={employee.is_active}
-                        setValue={value => handleInputChange('is_active', value)}
+                        value={is_active}
+                        setValue={(value: any) => setValue('is_active', value as boolean)}
                     />
                 </div>
             </div>
-            <ButtonsModal item={employee} name="Funcionário" onSubmit={onUpdate} isPending={updateMutation.isPending} />
+            <ButtonsModal
+                item={{ id: item.id, name: item.name }}
+                name="Funcionário"
+                onSubmit={handleSubmit(onUpdate, onInvalid)}
+                isPending={updateMutation.isPending || isSubmitting}
+            />
         </>
     );
 }

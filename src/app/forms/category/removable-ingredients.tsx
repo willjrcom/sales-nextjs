@@ -3,40 +3,30 @@ import Category from "@/app/entities/category/category";
 import { Dispatch, SetStateAction } from "react";
 
 export interface CategoryFormProps {
-    item: Category;
-    setItem: Dispatch<SetStateAction<Category>>;
+    value: string[];
+    onChange: (ingredients: string[]) => void;
 }
 
-const RemovableItensComponent = ({ item, setItem }: CategoryFormProps) => {
+const RemovableItensComponent = ({ value, onChange }: CategoryFormProps) => {
     const handleAddRemovableIngredients = () => {
-        setItem(prev => ({
-            ...prev,
-            removable_ingredients: Array.isArray(prev.removable_ingredients) ? [...prev.removable_ingredients, ''] : ['']
-        }));
+        onChange([...(value || []), '']);
     };
 
     const handleRemoveRemovableIngredients = (index: number) => {
-        setItem(prev => ({
-            ...prev,
-            removable_ingredients: Array.isArray(prev.removable_ingredients)
-                ? prev.removable_ingredients.filter((_, i) => i !== index)
-                : []
-        }));
+        onChange((value || []).filter((_, i) => i !== index));
     };
 
-    const handleRemovableIngredientsChange = (index: number, value: string) => {
-        setItem(prev => {
-            const updatedRemovableIngredients = [...prev.removable_ingredients];
-            updatedRemovableIngredients[index] = value;
-            return { ...prev, removable_ingredients: updatedRemovableIngredients };
-        });
+    const handleRemovableIngredientsChange = (index: number, newValue: string) => {
+        const updated = [...(value || [])];
+        updated[index] = newValue;
+        onChange(updated);
     };
 
     return (
         <FormArray
             title="Ingredientes removíveis"
             singleItemName="Ingrediente"
-            items={item.removable_ingredients}
+            items={value || []}
             onAdd={handleAddRemovableIngredients}
             onRemove={handleRemoveRemovableIngredients}
             onChange={handleRemovableIngredientsChange}

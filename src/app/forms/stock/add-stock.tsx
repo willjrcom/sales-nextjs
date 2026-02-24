@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { TextField } from '../../components/modal/field';
-import StockMovement from '@/app/entities/stock/stock-movement';
+import StockMovement, { SchemaAddStockMovement, AddStockMovementFormData } from '@/app/entities/stock/stock-movement';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import Stock from '@/app/entities/stock/stock';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import AddStock, { AddStockRequest } from '@/app/api/stock/movement/add';
@@ -22,27 +23,33 @@ interface AddStockFormProps {
 const AddStockForm = ({ stock }: AddStockFormProps) => {
     const modalName = 'add-stock-' + stock?.id;
     const modalHandler = useModal();
-    const [movement, setMovement] = useState<AddStockRequest>({} as AddStockRequest);
-    const { data } = useSession();
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const { data: session } = useSession();
     const queryClient = useQueryClient();
+    const [isSaving, setIsSaving] = useState(false);
 
-    useEffect(() => {
-        if (stock) {
-            setMovement(prev => ({
-                ...prev,
-                stock_id: stock.id,
-                product_id: stock.product_id
-            }));
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors }
+    } = useForm<AddStockMovementFormData>({
+        resolver: zodResolver(SchemaAddStockMovement),
+        defaultValues: {
+            quantity: 0,
+            reason: '',
+            price: 0,
+            total_price: 0,
         }
-    }, [stock]);
+    });
 
-    const handleInputChange = (field: keyof StockMovement, value: any) => {
-        setMovement(prev => ({ ...prev, [field]: value }));
+    const formData = watch();
+
+    const onInvalid = () => {
+        notifyError('Verifique os campos obrigatórios');
     };
 
     const createMutation = useMutation({
-        mutationFn: (movement: AddStockRequest) => AddStock(stock?.id!, movement, data!),
+        mutationFn: (request: AddStockRequest) => AddStock(stock?.id!, request, session!),
         onSuccess: () => {
             notifySuccess(`Estoque adicionado com sucesso`);
             queryClient.invalidateQueries({ queryKey: ['stocks'] });
@@ -50,54 +57,69 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao adicionar estoque');
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
-    const submit = async () => {
-        if (!data || !stock?.id) return;
-        createMutation.mutate(movement);
+    const submit = async (data: AddStockMovementFormData) => {
+        if (!session || !stock?.id) return;
+        setIsSaving(true);
+
+        const request: AddStockRequest = {
+            id: stock.id,
+            quantity: new Decimal(data.quantity),
+            reason: data.reason,
+            price: new Decimal(data.price),
+            total_price: new Decimal(data.total_price),
+            new_stock: 0,
+        } as AddStockRequest;
+
+        createMutation.mutate(request);
     }
 
     return (
-        <>
+        <div className="space-y-4">
             <TextField
                 friendlyName="Quantidade"
                 name="quantity"
-                setValue={(value) => handleInputChange('quantity', new Decimal(value || 0))}
-                value={new Decimal(movement.quantity || 0).toString()}
+                setValue={(value: any) => setValue('quantity', value)}
+                value={formData.quantity.toString()}
+                error={errors.quantity?.message}
             />
 
             <TextField
                 friendlyName="Motivo"
                 name="reason"
-                setValue={(value) => handleInputChange('reason', value)}
-                value={movement.reason || ""}
+                setValue={(value: any) => setValue('reason', value)}
+                value={formData.reason}
                 placeholder="ex: Compra, Ajuste de inventário"
+                error={errors.reason?.message}
             />
 
             <PriceField
                 friendlyName="Custo Unitário"
                 name="price"
-                setValue={(value) => handleInputChange('price', new Decimal(value || 0))}
-                value={new Decimal(movement.price || 0).toString()}
+                setValue={(value: any) => setValue('price', value)}
+                value={formData.price.toString()}
+                error={errors.price?.message}
             />
 
             <PriceField
                 friendlyName="Custo Total"
                 name="total_price"
-                setValue={(value) => handleInputChange('total_price', new Decimal(value || 0))}
-                value={new Decimal(movement.total_price || 0).toString()}
+                setValue={(value: any) => setValue('total_price', value)}
+                value={formData.total_price.toString()}
+                error={errors.total_price?.message}
             />
-
-            <ErrorForms errors={errors} setErrors={setErrors} />
 
             <ButtonsModal
-                item={movement}
+                item={{ ...formData, id: stock?.id || '' }}
                 name="stock-movement"
-                onSubmit={submit}
+                onSubmit={handleSubmit(submit, onInvalid)}
+                isPending={isSaving}
             />
-        </>
+        </div>
     )
 }
 
-export default AddStockForm 
+export default AddStockForm;

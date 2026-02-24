@@ -2,11 +2,13 @@
 
 import GetCompany from "@/app/api/company/company";
 
-import React, { useState, useRef } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import QRCode from 'react-qr-code';
-import { TextField, HiddenField, CheckboxField } from '../../components/modal/field';
+import { TextField, CheckboxField } from '../../components/modal/field';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
-import Table, { ValidateTableForm } from '@/app/entities/table/table';
+import Table, { SchemaTable } from '@/app/entities/table/table';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
@@ -14,25 +16,44 @@ import DeleteTable from '@/app/api/table/delete/table';
 import NewTable from '@/app/api/table/new/table';
 import UpdateTable from '@/app/api/table/update/table';
 import { useModal } from '@/app/context/modal/context';
-import ErrorForms from '../../components/modal/error-forms';
 import RequestError from '@/app/utils/error';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const modalName = isUpdate ? 'edit-table-' + item?.id : 'new-table'
     const modalHandler = useModal();
-    const [table, setTable] = useState<Table>(new Table(item));
-    const { data } = useSession();
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
+    const { data: session } = useSession();
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleInputChange = (field: keyof Table, value: any) => {
-        setTable(prev => ({ ...prev, [field]: value }));
+    const initialValues = useMemo(() => {
+        const t = new Table(item);
+        return {
+            id: t.id,
+            name: t.name,
+            is_active: t.is_active,
+            is_available: t.is_available,
+        }
+    }, [item]);
+
+    const {
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors }
+    } = useForm<any>({
+        resolver: zodResolver(SchemaTable),
+        defaultValues: initialValues
+    });
+
+    const table = watch();
+
+    const onInvalid = () => {
+        notifyError('Verifique os campos obrigatórios');
     };
 
     const createMutation = useMutation({
-        mutationFn: (newTable: Table) => NewTable(newTable, data!),
-
+        mutationFn: (newTable: Table) => NewTable(newTable, session!),
         onSuccess: (_, newTable) => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
             queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
@@ -41,11 +62,12 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao criar mesa');
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
     const updateMutation = useMutation({
-        mutationFn: (updatedTable: Table) => UpdateTable(updatedTable, data!),
+        mutationFn: (updatedTable: Table) => UpdateTable(updatedTable, session!),
         onSuccess: (_, updatedTable) => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
             queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
@@ -54,11 +76,12 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar mesa');
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (tableId: string) => DeleteTable(tableId, data!),
+        mutationFn: (tableId: string) => DeleteTable(tableId, session!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tables'] });
             queryClient.invalidateQueries({ queryKey: ['unused-tables'] });
@@ -67,44 +90,40 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         },
         onError: (error: RequestError) => {
             notifyError(error.message || `Erro ao remover mesa ${table.name}`);
-        }
+        },
+        onSettled: () => setIsSaving(false)
     });
 
-    const submit = async () => {
-        if (!data) return;
-
-        const validationErrors = ValidateTableForm(table);
-        if (Object.values(validationErrors).length > 0) return setErrors(validationErrors);
-
+    const submit = async (formData: any) => {
+        if (!session) return;
+        setIsSaving(true);
+        const tableToSave = new Table(formData);
         if (isUpdate) {
-            updateMutation.mutate(table);
+            updateMutation.mutate(tableToSave);
         } else {
-            createMutation.mutate(table);
+            createMutation.mutate(tableToSave);
         }
     }
 
     const onDelete = async () => {
-        if (!data || !table.id) return;
+        if (!session || !table.id) return;
+        setIsSaving(true);
         deleteMutation.mutate(table.id);
     }
 
     const { data: company } = useQuery({
         queryKey: ["company"],
-        queryFn: () => GetCompany(data!),
-        enabled: !!data?.user?.access_token,
+        queryFn: () => GetCompany(session!),
+        enabled: !!(session as any)?.user?.access_token,
     })
 
     const qrCodeRef = useRef<HTMLDivElement>(null);
 
-    if (!company) return <div>Carregando...</div>;
-
     // Generate table URL for QR code
-    const encodedSchemaName = btoa(company.schema_name)
+    const encodedSchemaName = company ? btoa(company.schema_name) : '';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL
-    if (!appUrl) return <div>Url do app não configurada</div>
-
-    const tableUrl = table.id && company
+    const tableUrl = table.id && company && appUrl
         ? `${appUrl}/pages/table?id=${table.id}&q=${encodedSchemaName}`
         : '';
 
@@ -120,7 +139,6 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         const ctx = canvas.getContext('2d');
         const img = new Image();
 
-        // Set canvas size (adding padding and space for text)
         const padding = 40;
         const qrSize = 200;
         const textHeight = 40;
@@ -129,15 +147,9 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
 
         img.onload = () => {
             if (!ctx) return;
-
-            // Fill white background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw QR code with padding
             ctx.drawImage(img, padding, padding, qrSize, qrSize);
-
-            // Draw table name
             ctx.font = 'bold 20px Inter, sans-serif';
             ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
@@ -147,7 +159,6 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 ctx.fillText(`Mesa: ${table.name}`, canvas.width / 2, qrSize + padding + 30);
             }
 
-            // Convert to PNG and download
             canvas.toBlob((blob) => {
                 if (!blob) return;
                 const url = URL.createObjectURL(blob);
@@ -162,28 +173,29 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
         img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
     };
 
+    if (!company) return <div>Carregando...</div>;
+    if (!appUrl) return <div>Url do app não configurada</div>
+
     return (
         <div className="text-black space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column - Form */}
                 <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações da Mesa</h3>
                     <div className="space-y-4">
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField friendlyName='Nome' name='name' setValue={value => handleInputChange('name', value)} value={table.name} />
+                            <TextField friendlyName='Nome' name='name' setValue={(value: any) => setValue('name', value)} value={table.name} error={errors.name?.message as string} />
                         </div>
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <CheckboxField friendlyName='Disponível' name='is_available' setValue={value => handleInputChange('is_available', value)} value={table.is_available} />
+                            <CheckboxField friendlyName='Disponível' name='is_available' setValue={(value: any) => setValue('is_available', value)} value={table.is_available} error={errors.is_available?.message as string} />
                         </div>
                         {isUpdate && (
                             <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                                <CheckboxField friendlyName='Ativo' name='is_active' setValue={value => handleInputChange('is_active', value)} value={table.is_active} />
+                                <CheckboxField friendlyName='Ativo' name='is_active' setValue={(value: any) => setValue('is_active', value)} value={table.is_active} error={errors.is_active?.message as string} />
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Right Column - QR Code */}
                 {isUpdate && table.id && (
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-orange-100 p-6 transition-all duration-300 hover:shadow-md">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-orange-200">QR Code da Mesa</h3>
@@ -221,15 +233,12 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
                 )}
             </div>
 
-            <HiddenField name='id' setValue={value => handleInputChange('id', value)} value={table.id} />
-
-            <ErrorForms errors={errors} setErrors={setErrors} />
             <ButtonsModal
                 item={table}
                 name="Table"
-                onSubmit={submit}
+                onSubmit={handleSubmit(submit, onInvalid)}
                 deleteItem={onDelete}
-                isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                isPending={isSaving}
             />
         </div>
     );

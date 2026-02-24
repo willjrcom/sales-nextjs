@@ -12,7 +12,7 @@ import { useModal } from "@/app/context/modal/context";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetPlaces from '@/app/api/place/place';
 
-const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
+export const ChangeTableModal = ({ orderTableId }: { orderTableId: string }) => {
     const [placeID, setPlaceID] = useState<string>('');
     const [tableID, setTableID] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import Decimal from "decimal.js";
 import Table from "../table/table";
 
@@ -23,3 +24,9 @@ export default class OrderTable {
     Object.assign(this, data);
   }
 }
+
+export const SchemaUpdateTableName = z.object({
+  name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
+});
+
+export type UpdateTableNameFormData = z.infer<typeof SchemaUpdateTableName>;

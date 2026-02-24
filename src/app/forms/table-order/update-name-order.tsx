@@ -4,20 +4,20 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
-import UpdatePickupOrderName from '@/app/api/order-pickup/update/name/[id]/order-pickup';
+import UpdateTableOrderName from '@/app/api/order-table/update/name/[id]/order-table';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { TextField } from '@/app/components/modal/field';
-import OrderPickup, { SchemaUpdatePickupName, UpdatePickupNameFormData } from '@/app/entities/order/order-pickup';
+import OrderTable, { SchemaUpdateTableName, UpdateTableNameFormData } from '@/app/entities/order/order-table';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-interface PickupNameFormProps extends CreateFormsProps<OrderPickup> {
-    pickupOrderId?: string;
+interface TableNameFormProps extends CreateFormsProps<OrderTable> {
+    tableOrderId?: string;
 }
 
-const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
-    const modalName = 'edit-pickup-order-name-' + item?.id;
+const TableNameForm = ({ item, tableOrderId }: TableNameFormProps) => {
+    const modalName = 'edit-table-order-name-' + item?.id;
     const modalHandler = useModal();
     const queryClient = useQueryClient();
     const { data: session } = useSession();
@@ -27,17 +27,18 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
         setValue,
         watch,
         formState: { errors, isSubmitting }
-    } = useForm<UpdatePickupNameFormData>({
-        resolver: zodResolver(SchemaUpdatePickupName),
+    } = useForm<UpdateTableNameFormData>({
+        resolver: zodResolver(SchemaUpdateTableName),
         defaultValues: {
             name: item?.name || '',
         }
     });
 
     const updateNameMutation = useMutation({
-        mutationFn: (newName: string) => UpdatePickupOrderName(pickupOrderId!, newName, session!),
+        mutationFn: (newName: string) => UpdateTableOrderName(tableOrderId!, newName, session!),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['order'] });
+            queryClient.invalidateQueries({ queryKey: ['table-orders'] });
             notifySuccess('Nome atualizado com sucesso');
             modalHandler.hideModal(modalName);
         },
@@ -46,8 +47,8 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
         }
     });
 
-    const onSubmit = (formData: UpdatePickupNameFormData) => {
-        if (!session || !pickupOrderId) return;
+    const onSubmit = (formData: UpdateTableNameFormData) => {
+        if (!session || !tableOrderId) return;
         updateNameMutation.mutate(formData.name);
     }
 
@@ -55,7 +56,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
         <>
             <TextField
                 name='name'
-                friendlyName='Nome'
+                friendlyName='Nome do cliente'
                 placeholder='Digite o nome'
                 setValue={(value: any) => setValue('name', value)}
                 value={watch('name')}
@@ -72,4 +73,4 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
 
 };
 
-export default PickupNameForm;
+export default TableNameForm;

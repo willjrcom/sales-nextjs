@@ -186,6 +186,15 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                     </Card>
                 ) : (
                     <>
+                        <Button
+                            className='mt-3 w-full'
+                            variant='outline'
+                            disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
+                            onClick={handleAddNewGroup}
+                        >
+                            Adicionar mais itens
+                        </Button>
+
                         {/* Group Items */}
                         <div className='space-y-4'>
                             {order?.group_items
