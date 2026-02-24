@@ -1,5 +1,6 @@
 import React from 'react';
 import PatternField, { patterns } from './fields/pattern';
+import { Trash2, Plus } from 'lucide-react';
 
 interface FormArrayProps {
     title: string;
@@ -14,7 +15,7 @@ interface FormArrayProps {
 const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, onRemove, onChange }: FormArrayProps) => {
     // Garantir que items seja sempre um array
     const safeItems = Array.isArray(items) ? items : [];
-    
+
     return (
         <div className="space-y-4">
             <h3 className="text-md font-semibold">{title}</h3>
@@ -30,35 +31,41 @@ const FormArrayPattern = ({ title, singleItemName, items, patternName, onAdd, on
                 </div>
             ) : (
                 <>
-                    <div className="space-y-2 grid grid-cols-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {safeItems.map((item, index) => (
-                            <div key={index} className="flex items-center space-x-4">
-                                <PatternField
-                                    patternName={patternName}
-                                    friendlyName={`${singleItemName} ${index + 1}`}
-                                    name={`${singleItemName}-${index}`}
-                                    value={item}
-                                    setValue={(value) => onChange(index, value)}
-                                    formatted={true}
-                                />
-                                <button
-                                    type="button"
-                                    className="text-red-500"
-                                    onClick={() => onRemove(index)}
-                                >
-                                    Remover
-                                </button>
+                            <div key={index} className="flex items-end space-x-2 bg-gray-50/50 p-3 rounded-lg border border-gray-100 relative group">
+                                <div className="flex-1">
+                                    <PatternField
+                                        patternName={patternName}
+                                        friendlyName={`${singleItemName} ${index + 1}`}
+                                        name={`${singleItemName}-${index}`}
+                                        value={item}
+                                        setValue={(value) => onChange(index, value)}
+                                        formatted={true}
+                                    />
+                                </div>
+                                {safeItems.length > 1 && (
+                                    <button
+                                        type="button"
+                                        className="mb-4 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                        onClick={() => onRemove(index)}
+                                        title={`Remover ${singleItemName}`}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
 
-                    <div className='flex justify-end'>
+                    <div className='flex justify-end mt-2'>
                         <button
                             type="button"
-                            className="mt-4 text-blue-500"
+                            className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-2 rounded-md transition-colors"
                             onClick={onAdd}
                         >
-                            Adicionar
+                            <Plus className="w-4 h-4" />
+                            Adicionar {singleItemName}
                         </button>
                     </div>
                 </>
