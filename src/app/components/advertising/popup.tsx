@@ -36,12 +36,12 @@ export default function AdvertisingPopup({ ads, onClose }: AdvertisingPopupProps
     if (!ads || ads.length === 0) return null;
 
     return (
-        <div className="relative w-full h-full bg-[#171d25] flex flex-col">
+        <div className="relative w-full h-full bg-[#171d25] flex flex-col overflow-hidden">
             <Carousel setApi={setApi} className="w-full h-full flex flex-col">
                 <CarouselContent className="flex-1 h-full ml-0">
                     {ads.map((ad, index) => (
                         <CarouselItem key={ad.id || index} className="h-full pl-0">
-                            <div className="relative h-[480px] w-full overflow-hidden">
+                            <div className="relative h-[380px] w-full overflow-hidden">
                                 {ad.cover_image_path ? (
                                     <div
                                         className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
@@ -56,8 +56,8 @@ export default function AdvertisingPopup({ ads, onClose }: AdvertisingPopupProps
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#171d25] via-[#171d25]/40 to-transparent"></div>
 
                                 {ad.type && ad.type !== 'standard' && (
-                                    <div className="absolute top-8 right-8 z-10">
-                                        <div className="relative flex items-center justify-center w-20 h-20 bg-orange-600 rounded-full shadow-2xl border-4 border-orange-400 rotate-12 transform hover:scale-110 transition-transform duration-300">
+                                    <div className="absolute top-4 right-4 z-10">
+                                        <div className="relative flex items-center justify-center w-14 h-14 bg-orange-600 rounded-full shadow-2xl border-4 border-orange-400 rotate-12 transform hover:scale-110 transition-transform duration-300">
                                             <div className="flex flex-col items-center leading-none text-white font-display">
                                                 <span className="text-sm font-bold uppercase tracking-tighter">
                                                     {ad.type === 'promotion' ? 'Promo' : 'OFF'}
@@ -67,8 +67,8 @@ export default function AdvertisingPopup({ ads, onClose }: AdvertisingPopupProps
                                     </div>
                                 )}
 
-                                <div className="absolute bottom-0 left-0 p-10 w-full mb-4">
-                                    <div className="flex flex-col gap-3 max-w-2xl">
+                                <div className="absolute bottom-0 left-0 p-6 w-full mb-2">
+                                    <div className="flex flex-col gap-2 max-w-2xl">
                                         <div className="flex items-center gap-2">
                                             <span className="bg-blue-600 px-2 py-0.5 rounded-sm text-[11px] font-bold uppercase tracking-wider text-white">
                                                 {ad.type || 'Anúncio'}
@@ -77,10 +77,10 @@ export default function AdvertisingPopup({ ads, onClose }: AdvertisingPopupProps
                                                 {ad.sponsor?.name || 'Patrocinado'}
                                             </span>
                                         </div>
-                                        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight uppercase font-display">
+                                        <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight uppercase font-display">
                                             {ad.title}
                                         </h1>
-                                        <p className="text-slate-300 text-lg leading-relaxed max-w-xl line-clamp-2">
+                                        <p className="text-slate-300 text-base leading-relaxed max-w-xl line-clamp-2">
                                             {ad.description}
                                         </p>
                                     </div>
@@ -103,8 +103,8 @@ export default function AdvertisingPopup({ ads, onClose }: AdvertisingPopupProps
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-between px-10 py-8 bg-[#171d25] border-t border-slate-800/50 mt-auto">
-                                <div className="flex items-center gap-8">
+                            <div className="flex items-center justify-between px-6 py-5 bg-[#171d25] border-t border-slate-800/50 mt-auto">
+                                <div className="flex items-center gap-6">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] text-orange-500 uppercase font-bold tracking-widest mb-1">
                                             Contato
@@ -147,11 +147,11 @@ export default function AdvertisingPopup({ ads, onClose }: AdvertisingPopupProps
 
                 {count > 1 && (
                     <>
-                        <CarouselPrevious className="absolute -left-16 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors bg-transparent border-none hover:bg-transparent h-auto w-auto hidden md:flex">
-                            <ChevronLeft className="size-20 stroke-[1px]" />
+                        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-white transition-all bg-[#3d4450]/80 hover:bg-blue-600 border-none h-12 w-12 hidden md:flex z-30 shadow-xl backdrop-blur-sm">
+                            <ChevronLeft className="size-8 stroke-[2.5px]" />
                         </CarouselPrevious>
-                        <CarouselNext className="absolute -right-16 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors bg-transparent border-none hover:bg-transparent h-auto w-auto hidden md:flex">
-                            <ChevronRight className="size-20 stroke-[1px]" />
+                        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-white transition-all bg-[#3d4450]/80 hover:bg-blue-600 border-none h-12 w-12 hidden md:flex z-30 shadow-xl backdrop-blur-sm">
+                            <ChevronRight className="size-8 stroke-[2.5px]" />
                         </CarouselNext>
                     </>
                 )}

@@ -9,11 +9,13 @@ import CreateAdvertising from '@/app/api/advertising/create';
 import UpdateAdvertising from '@/app/api/advertising/update';
 import DeleteAdvertising from '@/app/api/advertising/delete';
 import GetAllSponsors from '@/app/api/sponsor/list';
+import GetAllCompanyCategories from '@/app/api/company-category/list';
 import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DateField, ImageField, TextField } from '@/app/components/modal/field';
 import SelectField from '@/app/components/modal/fields/select';
+import CheckboxField from '@/app/components/modal/fields/checkbox';
 import { Advertising, AdvertisingFormData, SchemaAdvertising } from '@/app/entities/advertising/advertising';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,6 +44,7 @@ const AdvertisingForm = ({ item, isUpdate }: CreateFormsProps<Advertising>) => {
             ended_at: item?.ended_at || null,
             cover_image_path: item?.cover_image_path || '',
             sponsor_id: item?.sponsor_id || '',
+            category_ids: item?.categories?.map(c => c.id) || [],
         }
     });
 
@@ -51,7 +54,14 @@ const AdvertisingForm = ({ item, isUpdate }: CreateFormsProps<Advertising>) => {
         enabled: !!data?.user?.access_token,
     });
 
+    const { data: categoriesResponse } = useQuery({
+        queryKey: ['company-categories'],
+        queryFn: () => GetAllCompanyCategories(data!),
+        enabled: !!data?.user?.access_token,
+    });
+
     const sponsors = sponsorsResponse || [];
+    const categories = categoriesResponse || [];
 
     const createMutation = useMutation({
         mutationFn: (newAd: AdvertisingFormData) => CreateAdvertising(newAd, data!),
@@ -182,6 +192,31 @@ const AdvertisingForm = ({ item, isUpdate }: CreateFormsProps<Advertising>) => {
                         value={watch('description') || ''}
                         error={errors.description?.message}
                     />
+
+                    <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                            Categorias de Empresas <span className="text-red-500">*</span>
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                            {categories.map((category) => (
+                                <CheckboxField
+                                    key={category.id}
+                                    friendlyName={category.name}
+                                    name={`category-${category.id}`}
+                                    value={watch('category_ids')?.includes(category.id) || false}
+                                    setValue={(checked: boolean) => {
+                                        const currentIds = watch('category_ids') || [];
+                                        if (checked) {
+                                            setValue('category_ids', [...currentIds, category.id]);
+                                        } else {
+                                            setValue('category_ids', currentIds.filter(id => id !== category.id));
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        {errors.category_ids && <p className="text-red-500 text-xs italic mt-1">{errors.category_ids.message}</p>}
+                    </div>
 
                     <ImageField
                         friendlyName='Imagem de Capa'

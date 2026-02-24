@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Sponsor } from "../sponsor/sponsor";
+import { CompanyCategory } from "../company/company-category";
 
 export interface Advertising {
     id: string
@@ -14,6 +15,8 @@ export interface Advertising {
     images?: string[]
     sponsor_id: string
     sponsor?: Sponsor
+    category_ids?: string[]
+    categories?: CompanyCategory[]
 }
 
 export const SchemaAdvertising = z.object({
@@ -27,6 +30,7 @@ export const SchemaAdvertising = z.object({
     cover_image_path: z.string().optional().or(z.literal('')),
     images: z.array(z.string()).optional(),
     sponsor_id: z.string().uuid('ID do patrocinador inválido').min(1, 'Sponsor é obrigatório'),
+    category_ids: z.array(z.string()).optional(),
 });
 
 export type AdvertisingFormData = z.infer<typeof SchemaAdvertising>;

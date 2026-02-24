@@ -140,7 +140,7 @@ function CompanySelection() {
                 "advertising-popup",
                 "", // No title for premium design
                 <AdvertisingPopup ads={ads} onClose={() => modalHandler.hideModal("advertising-popup")} />,
-                "xl"
+                "lg"
             );
         }
     }, [adsSuccess, ads, hasOpenedAds, modalHandler]);
