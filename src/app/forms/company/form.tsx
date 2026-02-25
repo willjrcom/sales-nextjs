@@ -50,6 +50,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         enable_print_order_on_ship_delivery: 'false',
         printer_delivery_on_ship_delivery: '',
         enable_print_items_on_finish_process: 'false',
+        printer_shift_report: '',
     }
     const initialValues = useMemo(() => {
         const c = new Company(item || { preferences: defaultPreferences, contacts: [''] });
@@ -524,7 +525,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                 />
                             </div>
                         </div>
-
                         {/* Impressora para finalizar processo */}
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                             <CheckboxField
@@ -537,24 +537,42 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                 * A impressora utilizada será a configurada em cada categoria
                             </p>
                         </div>
+
+                        {/* Impressora para turno */}
+                        <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <SelectField
+                                    friendlyName="Impressora de resumo de turno"
+                                    name="printer_shift_report" optional
+                                    values={printers}
+                                    selectedValue={company.preferences.printer_shift_report || ''}
+                                    setSelectedValue={(value: string) => handlePreferenceChange('printer_shift_report', value)}
+                                />
+                            </div>
+                            <div className="flex-1"></div>
+                        </div>
                     </div>
                 </CollapsibleContent>
             </Collapsible>
 
             <HiddenField name="id" value={company.id} setValue={value => setValue('id', value as any)} />
-            {!isUpdate && <ButtonsModal
-                item={company}
-                name="Empresa"
-                onSubmit={handleSubmit(onSave, onInvalid)}
-                isPending={isSaving}
-            />}
-            {isUpdate && <ButtonsModal
-                item={company}
-                name="Empresa"
-                onSubmit={handleSubmit(onUpdate, onInvalid)}
-                isPending={isSaving}
-            />}
-        </div>
+            {
+                !isUpdate && <ButtonsModal
+                    item={company}
+                    name="Empresa"
+                    onSubmit={handleSubmit(onSave, onInvalid)}
+                    isPending={isSaving}
+                />
+            }
+            {
+                isUpdate && <ButtonsModal
+                    item={company}
+                    name="Empresa"
+                    onSubmit={handleSubmit(onUpdate, onInvalid)}
+                    isPending={isSaving}
+                />
+            }
+        </div >
     );
 };
 

@@ -9,9 +9,10 @@ import ShiftColumns from "@/app/entities/shift/table-columns";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import GetAllShifts from "@/app/api/shift/all/shift";
 import { notifyError } from "@/app/utils/notifications";
+import GetCompany from "@/app/api/company/company";
 
 const ListShift = () => {
-    const { data } = useSession();
+    const { data: session } = useSession();
     const [lastUpdate, setLastUpdate] = useState(FormatRefreshTime(new Date()));
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
@@ -19,10 +20,16 @@ const ListShift = () => {
         queryKey: ['shifts', pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetAllShifts(data!, pagination.pageIndex, pagination.pageSize);
+            return GetAllShifts(session!, pagination.pageIndex, pagination.pageSize);
         },
-        enabled: !!data?.user?.access_token,
+        enabled: !!session?.user?.access_token,
         placeholderData: keepPreviousData,
+    });
+
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(session!),
+        enabled: !!session?.user?.access_token,
     });
 
     useEffect(() => {
@@ -44,7 +51,7 @@ const ListShift = () => {
                 }
                 tableChildren={
                     <CrudTable
-                        columns={ShiftColumns()}
+                        columns={ShiftColumns(session!, company)}
                         data={shifts}
                         totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {

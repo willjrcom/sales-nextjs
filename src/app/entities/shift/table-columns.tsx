@@ -2,9 +2,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import Shift from "./shift";
 import ButtonIcon from "@/app/components/button/button-icon";
 import ShiftDashboard from "@/app/pages/(user)/shift/shift-dashboard";
+import { Printer } from "lucide-react";
+import printShift from "@/app/components/print/print-shift";
+import { Session } from "next-auth";
+import Company from "../company/company";
 
 
-const ShiftColumns = (): ColumnDef<Shift>[] => [
+const ShiftColumns = (session: Session, company: Company): ColumnDef<Shift>[] => [
   {
     id: 'Aberto as',
     accessorKey: 'opened_at',
@@ -34,12 +38,23 @@ const ShiftColumns = (): ColumnDef<Shift>[] => [
         <ButtonIcon modalName={"show-shift-" + row.original.id} size="xl"
           title={"Ver dia: " + new Date(row.original.opened_at).toLocaleDateString('pt-BR')}>
           <ShiftDashboard
-            shift={shiftInstance} 
+            shift={shiftInstance}
             isUpdate={true}
-            />
+          />
         </ButtonIcon>
       )
     },
+  },
+  {
+    id: 'Imprimir',
+    header: 'Imprimir',
+    cell: ({ row }) => (
+      <ButtonIcon
+        icon={<Printer className="w-4 h-4" />}
+        onClick={() => printShift({ shiftID: row.original.id, session, company })}
+        title="Imprimir Resumo do Turno"
+      />
+    ),
   },
 ];
 
