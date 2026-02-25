@@ -19,18 +19,25 @@ interface Suggestion {
 
 interface AddressAutocompleteProps {
     onAddressSelected: (address: ParsedAddress) => void;
+    onCepChange?: (cep: string) => void;
+    onManualEntry?: () => void;
     placeholder?: string;
     defaultValue?: string;
+    defaultCep?: string;
 }
 
 const GCP_KEY = process.env.NEXT_PUBLIC_GCP_KEY || '';
 
 export default function AddressAutocomplete({
     onAddressSelected,
+    onCepChange,
+    onManualEntry,
     placeholder = 'Buscar endereço...',
     defaultValue = '',
+    defaultCep = '',
 }: AddressAutocompleteProps) {
     const [inputValue, setInputValue] = useState(defaultValue);
+    const [displayCep, setDisplayCep] = useState(defaultCep);
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +133,8 @@ export default function AddressAutocomplete({
                 uf: get('administrative_area_level_1', true),
                 cep: get('postal_code').replace(/\D/g, ''),
             });
+            const parsedCep = get('postal_code').replace(/\D/g, '');
+            setDisplayCep(parsedCep);
         } catch (err) {
             console.error('Place details error:', err);
         }
@@ -190,6 +199,36 @@ export default function AddressAutocomplete({
                 <p className="text-xs text-gray-400 mt-1">
                     Digite o endereço e selecione uma sugestão para preencher automaticamente
                 </p>
+
+                {onManualEntry && (
+                    <button
+                        type="button"
+                        onClick={onManualEntry}
+                        className="mt-1 text-xs text-blue-500 hover:text-blue-700 underline"
+                    >
+                        Não encontrei meu endereço
+                    </button>
+                )}
+
+                {(displayCep || defaultCep) && (
+                    <div className="mt-3">
+                        <label className="block text-xs font-medium text-gray-500 mb-1">CEP</label>
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={9}
+                            value={displayCep || defaultCep}
+                            onChange={e => {
+                                setDisplayCep(e.target.value);
+                                onCepChange?.(e.target.value.replace(/\D/g, ''));
+                            }}
+                            placeholder="00000-000"
+                            className="w-40 px-3 py-1.5 border border-gray-300 rounded-md text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                       bg-white transition-all"
+                        />
+                    </div>
+                )}
             </div>
         </>
     );

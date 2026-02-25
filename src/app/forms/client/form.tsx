@@ -31,10 +31,10 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const [showManualTax, setShowManualTax] = useState(() => {
         return item?.address?.delivery_tax && new Decimal(item.address.delivery_tax).greaterThan(0);
     });
-    // Show extra fields if: editing existing client with address, or user just selected from autocomplete
     const [addressSelected, setAddressSelected] = useState(() => {
         return !!(item?.address?.street);
     });
+    const [showDadosAdicionais, setShowDadosAdicionais] = useState(false);
 
     const initialData = useMemo(() => {
         const c = new Client(item);
@@ -177,10 +177,25 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
 
         if (parsed.cep && session) {
             try {
-                const fee = await GetShippingFeeByCEP(parsed.cep, session);
-                setValue('delivery_tax', fee);
+                const distance = await GetShippingFeeByCEP(parsed.cep, session);
+                setValue('distance', Number(distance));
+                // Reset manual tax — will use km-based calculation
+                if (!showManualTax) setValue('delivery_tax', 0);
             } catch (feeError) {
-                console.warn('Failed to calculate shipping fee:', feeError);
+                console.warn('Failed to calculate distance:', feeError);
+            }
+        }
+    }
+
+    const handleCepChange = async (cep: string) => {
+        setValue('cep', cep);
+        if (cep.length === 8 && session) {
+            try {
+                const distance = await GetShippingFeeByCEP(cep, session);
+                setValue('distance', Number(distance));
+                if (!showManualTax) setValue('delivery_tax', 0);
+            } catch (feeError) {
+                console.warn('Failed to recalculate distance for CEP:', feeError);
             }
         }
     }
@@ -224,8 +239,11 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <AddressAutocomplete
                             onAddressSelected={handleAddressSelected}
+                            onCepChange={handleCepChange}
+                            onManualEntry={() => setAddressSelected(true)}
                             placeholder="Ex: Rua das Flores, 123, São Paulo"
                             defaultValue={item?.address ? `${item.address.street} ${item.address.number}, ${item.address.city}` : ''}
+                            defaultCep={item?.address?.cep || ''}
                         />
                     </div>
 
@@ -258,11 +276,22 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                                 </div>
                             ) : (
                                 <div className="mt-1 flex flex-col items-start gap-1">
-                                    {Number(watch('delivery_tax') || 0) > 0 && (
-                                        <p className="text-sm text-green-600 font-medium">
-                                            Valor estimado (km): R$ {Number(watch('delivery_tax') || 0).toFixed(2)}
-                                        </p>
-                                    )}
+                                    {Number(watch('distance') || 0) > 0 && (() => {
+                                        const distKm = Number(watch('distance') || 0);
+                                        const feePerKm = new Decimal(company?.preferences?.delivery_fee_per_km || '0');
+                                        const minTax = new Decimal(company?.preferences?.min_delivery_tax || '0');
+                                        const estimated = Decimal.max(feePerKm.mul(distKm), minTax);
+                                        return (
+                                            <div className="text-sm text-green-600 font-medium space-y-0.5">
+                                                <p>Distância: ~{distKm.toFixed(2)} km <span className="text-xs font-normal text-gray-400">(estimativa por CEP)</span></p>
+                                                {estimated.greaterThan(0) && (
+                                                    estimated.equals(minTax) && minTax.greaterThan(feePerKm.mul(distKm))
+                                                        ? <p>Taxa mínima de entrega: R$ {estimated.toFixed(2)}</p>
+                                                        : <p>Taxa estimada: ~R$ {estimated.toFixed(2)}</p>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
                                     <button
                                         type="button"
                                         onClick={() => setShowManualTax(true)}
@@ -360,72 +389,88 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             </div>
 
             {/* Seção: Dados Adicionais */}
-            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Dados Adicionais</h3>
-                <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField
-                                name="email"
-                                friendlyName="Email"
-                                placeholder="Digite seu e-mail"
-                                setValue={value => setValue('email', value)}
-                                value={watch('email') || ''}
-                                optional={true}
-                                error={errors.email?.message}
-                            />
-                        </div>
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <ImageField
-                                friendlyName='Imagem'
-                                name='image_path'
-                                setValue={value => setValue('image_path', value)}
-                                value={watch('image_path') || ''}
-                                optional
-                                onUploadError={(error) => notifyError(error)}
-                                error={errors.image_path?.message}
-                            />
-                        </div>
-                    </div>
+            <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 transition-all duration-300 hover:shadow-md overflow-hidden">
+                <button
+                    type="button"
+                    onClick={() => setShowDadosAdicionais(v => !v)}
+                    className="w-full flex items-center justify-between p-6 text-left"
+                >
+                    <h3 className="text-lg font-semibold text-gray-800">Dados Adicionais</h3>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-5 w-5 text-purple-400 transition-transform duration-200 ${showDadosAdicionais ? 'rotate-180' : ''}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
 
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField
-                                patternName="cpf"
-                                name="cpf"
-                                friendlyName="CPF"
-                                placeholder="Digite seu cpf"
-                                setValue={value => setValue('cpf', value)}
-                                value={watch('cpf') || ''}
-                                optional={true}
-                                formatted={true}
-                                error={errors.cpf?.message}
-                            />
+                {showDadosAdicionais && (
+                    <div className="px-6 pb-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="email"
+                                    friendlyName="Email"
+                                    placeholder="Digite seu e-mail"
+                                    setValue={value => setValue('email', value)}
+                                    value={watch('email') || ''}
+                                    optional={true}
+                                    error={errors.email?.message}
+                                />
+                            </div>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <ImageField
+                                    friendlyName='Imagem'
+                                    name='image_path'
+                                    setValue={value => setValue('image_path', value)}
+                                    value={watch('image_path') || ''}
+                                    optional
+                                    onUploadError={(error) => notifyError(error)}
+                                    error={errors.image_path?.message}
+                                />
+                            </div>
                         </div>
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField
-                                patternName="date"
-                                name="birthday"
-                                friendlyName="Nascimento"
-                                setValue={value => setValue('birthday', value)}
-                                value={watch('birthday') || ''}
-                                optional={true}
-                                formatted={true}
-                                error={errors.birthday?.message}
-                            />
+
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <PatternField
+                                    patternName="cpf"
+                                    name="cpf"
+                                    friendlyName="CPF"
+                                    placeholder="Digite seu cpf"
+                                    setValue={value => setValue('cpf', value)}
+                                    value={watch('cpf') || ''}
+                                    optional={true}
+                                    formatted={true}
+                                    error={errors.cpf?.message}
+                                />
+                            </div>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <PatternField
+                                    patternName="date"
+                                    name="birthday"
+                                    friendlyName="Nascimento"
+                                    setValue={value => setValue('birthday', value)}
+                                    value={watch('birthday') || ''}
+                                    optional={true}
+                                    formatted={true}
+                                    error={errors.birthday?.message}
+                                />
+                            </div>
                         </div>
+                        {isUpdate && (
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <CheckboxField
+                                    friendlyName='Ativo'
+                                    name='is_active'
+                                    setValue={(value: boolean) => setValue('is_active', value)}
+                                    value={watch('is_active')}
+                                />
+                            </div>
+                        )}
                     </div>
-                    {isUpdate && (
-                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                            <CheckboxField
-                                friendlyName='Ativo'
-                                name='is_active'
-                                setValue={(value: boolean) => setValue('is_active', value)}
-                                value={watch('is_active')}
-                            />
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
 
             <HiddenField

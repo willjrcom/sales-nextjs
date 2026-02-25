@@ -41,7 +41,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const defaultPreferences = {
         enable_delivery: 'true',
         enable_table: 'true',
-        enable_min_order_value_for_free_delivery: 'false',
         min_order_value_for_free_delivery: '0',
         table_tax_rate: '10',
         min_delivery_tax: '5',
@@ -431,26 +430,6 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             </div>
                         </div>
 
-                        <div className='flex flex-col sm:flex-row gap-4 justify-between'>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <CheckboxField
-                                    friendlyName="Habilitar valor mínimo para entrega gratuita"
-                                    name="enable_min_order_value_for_free_delivery" optional
-                                    value={company.preferences.enable_min_order_value_for_free_delivery === 'true'}
-                                    setValue={(value: boolean) => handlePreferenceChange('enable_min_order_value_for_free_delivery', value)}
-                                />
-                            </div>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                                <PriceField
-                                    friendlyName="Valor mínimo para entrega gratuita"
-                                    name="min_order_value_for_free_delivery" optional
-                                    value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
-                                    setValue={(value: Decimal) => handlePreferenceChange('min_order_value_for_free_delivery', value)}
-                                    disabled={company.preferences.enable_min_order_value_for_free_delivery !== 'true'}
-                                />
-                            </div>
-                        </div>
-
                         {/* Taxas */}
                         <div className='flex flex-col sm:flex-row gap-4 justify-between'>
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
@@ -462,6 +441,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                     disabled={company.preferences.enable_table !== 'true'}
                                 />
                             </div>
+
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <PriceField
                                     friendlyName="Taxa mínima de entrega"
@@ -471,15 +451,32 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                 />
                             </div>
                         </div>
+
                         <div className='flex flex-col sm:flex-row gap-4 justify-between'>
-                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                            {/* <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <PriceField
                                     friendlyName="Valor mínimo de pedido"
                                     name="min_order_value" optional
                                     value={new Decimal(company.preferences.min_order_value || '0')}
                                     setValue={(value: Decimal) => handlePreferenceChange('min_order_value', value)}
                                 />
+                            </div> */}
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <div className={new Decimal(company.preferences.min_order_value_for_free_delivery || '0').isZero() ? 'opacity-50' : ''}>
+                                    <PriceField
+                                        friendlyName="Mínimo para entrega gratuita"
+                                        name="min_order_value_for_free_delivery" optional
+                                        value={new Decimal(company.preferences.min_order_value_for_free_delivery || '0')}
+                                        setValue={(value: Decimal) => handlePreferenceChange('min_order_value_for_free_delivery', value)}
+                                    />
+                                </div>
+                                <p className="text-xs mt-1 text-muted-foreground">
+                                    {new Decimal(company.preferences.min_order_value_for_free_delivery || '0').isZero()
+                                        ? '⚠️ Zero = desativado'
+                                        : '✓ Pedidos acima deste valor terão entrega gratuita'}
+                                </p>
                             </div>
+
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <PriceField
                                     friendlyName="Taxa de entrega por KM"
