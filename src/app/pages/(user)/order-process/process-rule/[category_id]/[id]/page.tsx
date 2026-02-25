@@ -87,7 +87,7 @@ const PageProcessRule = () => {
                     .sort((a, b) => {
                         if (a.status === "Started" && b.status !== "Started") return -1;
                         if (a.status !== "Started" && b.status === "Started") return 1;
-                        return a.created_at.localeCompare(b.created_at);
+                        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
                     })
                     .map((process) => <OrderProcessCard key={process.id} orderProcess={process} onRefetch={refetch} />)
             )}

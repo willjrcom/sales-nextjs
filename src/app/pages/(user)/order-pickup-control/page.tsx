@@ -57,8 +57,8 @@ const PickupOrderPage = () => {
         if (errorDelivered) notifyError('Erro ao carregar últimos pedidos entregues: ' + errorDelivered.message);
     }, [errorDelivered]);
 
-    const readyOrders = useMemo(() => readyOrdersResponse?.items || [], [readyOrdersResponse?.items]);
-    const deliveredOrders = useMemo(() => (deliveredOrdersResponse?.items || []).sort((a, b) => new Date(b.pickup?.delivered_at || 0).getTime() - new Date(a.pickup?.delivered_at || 0).getTime()), [deliveredOrdersResponse?.items]);
+    const readyOrders = useMemo(() => (readyOrdersResponse?.items || []).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()), [readyOrdersResponse?.items]);
+    const deliveredOrders = useMemo(() => (deliveredOrdersResponse?.items || []).sort((a, b) => new Date(a.pickup?.delivered_at || 0).getTime() - new Date(b.pickup?.delivered_at || 0).getTime()), [deliveredOrdersResponse?.items]);
 
     return (
         <div className="w-full px-3 py-2">

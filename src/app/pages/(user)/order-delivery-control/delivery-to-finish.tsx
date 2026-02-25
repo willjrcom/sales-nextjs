@@ -72,11 +72,11 @@ const DeliveryOrderToFinish = () => {
     const deliveryOrders = useMemo(() => {
         const shippedOrders = allOrders.filter((order) => order.delivery?.status === 'Shipped');
 
-        if (!selectedDriverId) {
-            return shippedOrders;
-        }
+        const filteredOrders = !selectedDriverId
+            ? shippedOrders
+            : shippedOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId);
 
-        return shippedOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId);
+        return filteredOrders.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
     }, [allOrders, selectedDriverId]);
 
     useEffect(() => {

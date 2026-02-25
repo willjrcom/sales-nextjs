@@ -58,16 +58,17 @@ const DeliveryOrderFinished = () => {
         const deliveredOrders = allOrders.filter((order) => order.status === 'Finished' && order.delivery?.status === 'Delivered');
         const notFinished = allOrders.filter((order) => order.status === 'Ready' && order.delivery?.status === 'Delivered');
 
-        if (!selectedDriverId) {
-            return {
-                deliveryOrders: deliveredOrders,
-                ordersNotFinished: notFinished
-            };
-        }
+        const filteredDelivered = !selectedDriverId
+            ? deliveredOrders
+            : deliveredOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId);
+
+        const filteredNotFinished = !selectedDriverId
+            ? notFinished
+            : notFinished.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId);
 
         return {
-            deliveryOrders: deliveredOrders.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId),
-            ordersNotFinished: notFinished.filter((order) => order.delivery?.driver?.employee_id === selectedDriverId)
+            deliveryOrders: filteredDelivered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+            ordersNotFinished: filteredNotFinished.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
         };
     }, [allOrders, selectedDriverId]);
 
