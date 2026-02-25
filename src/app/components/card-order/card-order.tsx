@@ -69,21 +69,21 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!data?.user?.access_token,
+        enabled: !!(data?.user as any)?.access_token,
     })
 
 
     const { data: fiscalSettings } = useQuery({
         queryKey: ['fiscal-settings'],
         queryFn: () => getFiscalSettings(data!),
-        enabled: !!data?.user?.access_token,
+        enabled: !!(data?.user as any)?.access_token,
     });
 
     // Usar React Query diretamente
     const { data: order, refetch } = useQuery({
         queryKey: ['order', orderId],
         queryFn: async () => {
-            if (!orderId || !data?.user?.access_token) return null;
+            if (!orderId || !(data?.user as any)?.access_token) return null;
             try {
                 return await GetOrderByID(orderId, data);
             } catch (error) {
@@ -92,7 +92,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 return null;
             }
         },
-        enabled: !!orderId && !!data?.user?.access_token,
+        enabled: !!orderId && !!(data?.user as any)?.access_token,
         refetchInterval: 10000,
     });
 
@@ -376,14 +376,14 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
 
             {/* Layout Responsivo */}
-            <div className="flex flex-col md:flex-row md:justify-between items-start gap-6 mb-6">
+            <div className="flex flex-col md:flex-row md:justify-between items-start gap-4 md:gap-6 mb-6">
                 {/* Informações Básicas */}
-                <div className="flex-1">
+                <div className="flex-1 w-full">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-2xl font-bold mb-2 text-gray-800"><strong>Pedido N°:</strong> {order.order_number}</h3>
+                        <h3 className="text-xl md:text-2xl font-bold mb-2 text-gray-800"><strong>Pedido N°:</strong> {order.order_number}</h3>
                         <StatusComponent status={order?.status} />
                         {!editBlocked && <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
                             <FaEdit />
@@ -397,17 +397,17 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 </div>
 
                 {/* Itens do Pedido */}
-                <div className="mb-6 flex-1 min-w-[300px]">
+                <div className="mb-6 flex-1 w-full min-w-0 md:min-w-[300px]">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold mb-2 text-gray-800">Itens do Pedido</h3>
+                        <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-800">Itens do Pedido</h3>
                         <Refresh onRefresh={refetch} />
                     </div>
-                    <ScrollArea className="max-h-[400px] w-full pr-4">
+                    <ScrollArea className="max-h-[300px] md:max-h-[400px] w-full pr-4">
                         {order.group_items?.length > 0 ? (
                             <ul className="space-y-4">
                                 {order.group_items
-                                    .sort((a, b) => a.category_id.localeCompare(b.category_id))
-                                    .map((group) => (
+                                    .sort((a: any, b: any) => a.category_id.localeCompare(b.category_id))
+                                    .map((group: any) => (
                                         <GroupItemCard key={group.id} group={group} session={data!} />
                                     ))}
                             </ul>
@@ -422,9 +422,9 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             {/* Resumo Financeiro */}
             <hr className="my-4" />
             <div className="mb-6">
-                <h3 className="text-xl font-bold mb-4 text-gray-800">Resumo Financeiro</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
+                <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800">Resumo Financeiro</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                    <div className="flex items-center p-3 md:p-4 bg-white rounded-lg shadow">
                         <FaMoneyBillWave className="text-2xl text-red-500 mr-3" />
                         <div>
                             <p className="text-sm text-gray-500">Total a Pagar</p>
@@ -485,7 +485,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {order.payments.map((payment) => (
+                                    {order.payments.map((payment: any) => (
                                         <tr key={payment.id} className="border-t">
                                             <td className="px-4 py-2 text-gray-700">{payment.method}</td>
                                             <td className="px-4 py-2 text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
@@ -497,7 +497,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     ) : (
                         <div className="overflow-x-auto">
                             <Carousel items={order.payments}>
-                                {(payment) => {
+                                {(payment: any) => {
                                     const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
                                     return (
                                         <div
@@ -518,45 +518,49 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
 
             <hr className="my-4" />
             {/* Botões de Ação */}
-            <div className="flex justify-between items-center gap-4">
-                {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" >
-                    <PaymentForm orderId={order.id} />
-                </ButtonIconText>}
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
+                    <div className="w-full sm:w-auto">
+                        <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" className="w-full">
+                            <PaymentForm orderId={order.id} />
+                        </ButtonIconText>
+                    </div>
+                )}
 
-                {isOrderStatusFinished && <div>&nbsp;</div>}
+                {isOrderStatusFinished && <div className="hidden sm:block">&nbsp;</div>}
 
-                <div className="flex justify-end items-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 sm:gap-4">
                     {!editBlocked && isOrderStatusPending &&
-                        <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck}>
+                        <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck} className="w-full sm:w-auto">
                             <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
                             <button
                                 onClick={handleReady}
                                 disabled={isProcessing}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full"
                             >
                                 {isProcessing ? 'Processando...' : 'Confirmar'}
                             </button>
                         </ButtonIconText>}
 
                     {!editBlocked && isOrderStatusReady &&
-                        <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck}>
+                        <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck} className="w-full sm:w-auto">
                             <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
                             <button
                                 onClick={handleFinished}
                                 disabled={isProcessing}
-                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full"
                             >
                                 {isProcessing ? 'Processando...' : 'Confirmar'}
                             </button>
                         </ButtonIconText>}
 
                     {!editBlocked && !isOrderStatusCancelled &&
-                        <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes}>
+                        <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes} className="w-full sm:w-auto">
                             <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
                             <button
                                 onClick={handleCancel}
                                 disabled={isProcessing}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full"
                             >
                                 {isProcessing ? 'Processando...' : 'Confirmar'}
                             </button>
@@ -565,7 +569,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     {!isOrderStatusCancelled && company &&
                         <button
                             onClick={() => data && printOrder({ orderID: order.id, session: data })}
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 w-full sm:w-auto"
                         >
                             <FaPrint />
                             <span>Imprimir</span>
@@ -581,6 +585,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             color="purple"
                             icon={FaFileInvoiceDollar}
                             isDisabled={!isOrderStatusFinished || isOrderStatusCancelled}
+                            className="w-full sm:w-auto"
                         >
                             <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
                         </ButtonIconText>
