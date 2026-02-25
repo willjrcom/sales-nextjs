@@ -3,7 +3,7 @@ import { Session } from "next-auth";
 
 const GetOrderPrintByID = async (id: string, session: Session, format?: string): Promise<string> => {
     const response = await RequestApi<never, string>({
-        path: "/print-manager/" + id + (format ? `?format=${format}` : ""),
+        path: "/print-manager/order/" + id + (format ? `?format=${format}` : ""),
         method: "GET",
         headers: AddAccessToken(session),
     });

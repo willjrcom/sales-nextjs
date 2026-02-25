@@ -12,6 +12,7 @@ import {
     FaBox,
     FaClock,
     FaChartBar,
+    FaCircle,
 } from "react-icons/fa"
 import { TiFlowMerge } from "react-icons/ti"
 import {
@@ -27,6 +28,7 @@ import GetCompany from "@/app/api/company/company"
 import { useModal } from "@/app/context/modal/context"
 import { useUser } from "@/app/context/user-context"
 import CompanyForm from "@/app/forms/company/form"
+import { usePrintAgent } from "@/app/pages/(user)/print/print"
 
 import {
     Sidebar,
@@ -54,6 +56,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
     const modalHandler = useModal()
     const { data: session } = useSession()
     const { hasPermission, isLoading } = useUser()
+    const { connected: printerConnected } = usePrintAgent()
 
     const { data: company } = useQuery({
         queryKey: ["company"],
@@ -90,8 +93,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
         { label: "Funcionários", icon: FaUserTie, href: "/pages/employee", permission: 'employee' },
         { label: "Mesas", icon: FaTh, href: "/pages/place", permission: 'place' },
         { label: "Estoque", icon: FaBox, href: "/pages/stock", permission: 'manage-stock' },
-        { label: "Impressão", icon: FaPrint, href: "/pages/print", permission: 'print' },
-        { label: "Planos", icon: MdOutlineAttachMoney, href: "/pages/billing", permission: 'billing' },
+        { label: "Gestão de Custos", icon: MdOutlineAttachMoney, href: "/pages/billing", permission: 'billing' },
     ].filter(item => {
         if (!item.permission) return true;
         if (Array.isArray(item.permission)) {
@@ -161,6 +163,18 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
 
             <SidebarFooter>
                 <SidebarMenu>
+                    {hasPermission('print') && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip={printerConnected ? 'Conectado' : 'Desconectado'}>
+                                <Link href="/pages/print">
+                                    <FaCircle className={`w-3 h-3 ${printerConnected ? 'text-green-500 animate-pulse' : 'text-red-500'}`} />
+                                    <span className={printerConnected ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                                        {printerConnected ? 'Conectado' : 'Desconectado'}
+                                    </span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             onClick={async () => {
