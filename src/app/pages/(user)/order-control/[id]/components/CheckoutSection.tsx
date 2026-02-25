@@ -250,7 +250,8 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                             </Button>
                         </div>
                         <div className='space-y-1 text-sm'>
-                            <p className='text-gray-600'>Cliente: <span className='font-bold text-gray-900'>{order.pickup.name}</span></p>
+                            {order.pickup.name && <p className='text-gray-600'>Cliente: <span className='font-bold text-gray-900'>{order.pickup.name}</span></p>}
+                            {order.pickup.contact && <p className='text-gray-600'>Contato: <span className='font-bold text-gray-900'>{order.pickup.contact}</span></p>}
                         </div>
                     </Card>
                 )}

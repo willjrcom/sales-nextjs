@@ -29,9 +29,11 @@ import { getFiscalSettings } from "@/app/api/fiscal-settings/fiscal-settings";
 import {
     FaCheck, FaClipboardCheck, FaEdit, FaTimes, FaMoneyBillWave, FaCreditCard, FaTicketAlt, FaDollarSign, FaPrint,
     FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
-    FaHourglassHalf, FaFileInvoiceDollar
+    FaHourglassHalf, FaFileInvoiceDollar, FaChevronDown, FaChevronUp
 } from "react-icons/fa";
 import GetCompany from '@/app/api/company/company';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Ícones para métodos de pagamento
 const paymentIcons: Record<string, IconType> = {
@@ -58,6 +60,7 @@ interface CardOrderProps {
 
 export default function CardOrder({ orderId, editBlocked = false }: CardOrderProps) {
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
+    const [isDetailsOpen, setIsDetailsOpen] = useState(true);
     const queryClient = useQueryClient();
     const { data } = useSession();
     const [isProcessing, setIsProcessing] = useState(false);
@@ -184,7 +187,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 <div className="text-gray-700">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Entrega</h3>
-                        <StatusComponent status={order.delivery.status} />
+                        {/* <StatusComponent status={order.delivery.status} /> */}
                     </div>
                     <p>
                         <strong>Taxa de Entrega:</strong>{" "}
@@ -204,8 +207,10 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         <p><strong>Prazos:</strong></p>
                         <ul className="list-disc ml-4">
                             <li>Pendente em: {ToUtcDatetime(order.delivery.pending_at)}</li>
-                            <li>Enviado em: {ToUtcDatetime(order.delivery.shipped_at)}</li>
-                            <li>Entregue em: {ToUtcDatetime(order.delivery.delivered_at)}</li>
+                            {order.delivery.ready_at && <li>Pronto em: {ToUtcDatetime(order.delivery.ready_at)}</li>}
+                            {order.delivery.shipped_at && <li>Enviado em: {ToUtcDatetime(order.delivery.shipped_at)}</li>}
+                            {order.delivery.delivered_at && <li>Entregue em: {ToUtcDatetime(order.delivery.delivered_at)}</li>}
+                            {order.delivery.cancelled_at && <li>Cancelado em: {ToUtcDatetime(order.delivery.cancelled_at)}</li>}
                         </ul>
 
                         {!editBlocked && order.status === "Ready" && order.delivery.status === "Ready" && <button onClick={shipDelivery}
@@ -240,16 +245,19 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 <div className="mb-4">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Mesa</h3>
-                        <StatusComponent status={order.table.status} />
+                        {/* <StatusComponent status={order.table.status} /> */}
                     </div>
                     <p><strong>Mesa:</strong> {order.table.table?.name}</p>
                     {order.table.name && <p><strong>Nome:</strong> {order.table.name}</p>}
                     {order.table.contact && <p><strong>Contato:</strong> {order.table.contact}</p>}
+
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>
                         <ul className="list-disc ml-4">
-                            <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>
-                            <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>
+                            {order.table.pending_at && <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>}
+                            {order.ready_at && <li>Pronto em: {ToUtcDatetime(order.ready_at)}</li>}
+                            {order.table.closed_at && <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>}
+                            {order.table.cancelled_at && <li>Cancelado em: {ToUtcDatetime(order.table.cancelled_at)}</li>}
                         </ul>
                         {!editBlocked && order.table.status === "Pending" && <button onClick={() => {
                             const onConfirm = async () => {
@@ -311,14 +319,18 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 <div className="mb-4">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Retirada</h3>
-                        <StatusComponent status={order.pickup.status} />
+                        {/* <StatusComponent status={order.pickup.status} /> */}
                     </div>
-                    <p><strong>Nome:</strong> {order.pickup.name}</p>
+                    {order.pickup.name && <p><strong>Nome:</strong> {order.pickup.name}</p>}
+                    {order.pickup.contact && <p><strong>Contato:</strong> {order.pickup.contact}</p>}
+
                     <div className="mt-2">
                         <p><strong>Prazos:</strong></p>
                         <ul className="list-disc ml-4">
-                            <li>Pendente em: {ToUtcDatetime(order.pickup.pending_at)}</li>
-                            <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>
+                            {order.pickup.pending_at && <li>Pendente em: {ToUtcDatetime(order.pickup.pending_at)}</li>}
+                            {order.pickup.ready_at && <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>}
+                            {order.pickup.delivered_at && <li>Entregue em: {ToUtcDatetime(order.pickup.delivered_at)}</li>}
+                            {order.pickup.cancelled_at && <li>Cancelado em: {ToUtcDatetime(order.pickup.cancelled_at)}</li>}
                         </ul>
 
                         {!editBlocked && order.pickup.status === "Ready" && <button onClick={() => {
@@ -371,49 +383,41 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 {/* Informações Básicas */}
                 <div className="flex-1">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-2xl font-bold mb-2 text-gray-800">Informações do Pedido</h3>
+                        <h3 className="text-2xl font-bold mb-2 text-gray-800"><strong>Pedido N°:</strong> {order.order_number}</h3>
                         <StatusComponent status={order?.status} />
                         {!editBlocked && <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
                             <FaEdit />
                         </Link>}
+                    </div>
+
+                    {/* Detalhes Específicos por Tipo de Pedido */}
+                    <div className="flex-1 border-t md:border-t-0 md:border-l md:pl-4 pt-4 md:pt-0">
+                        {renderOrderTypeDetails()}
+                    </div>
+                </div>
+
+                {/* Itens do Pedido */}
+                <div className="mb-6 flex-1 min-w-[300px]">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">Itens do Pedido</h3>
                         <Refresh onRefresh={refetch} />
                     </div>
-                    <p className="text-gray-700">
-                        <strong>Comanda N°:</strong> {order.order_number}
-                    </p>
-                    <p className="text-gray-700">
-                        <strong>Tipo:</strong>{" "}
-                        {order.delivery
-                            ? "Delivery"
-                            : order.table
-                                ? "Mesa"
-                                : order.pickup
-                                    ? "Retirada"
-                                    : "Desconhecido"}
-                    </p>
-                </div>
-
-                {/* Detalhes Específicos por Tipo de Pedido */}
-                <div className="flex-1 border-t md:border-t-0 md:border-l md:pl-4 pt-4 md:pt-0">
-                    {renderOrderTypeDetails()}
+                    <ScrollArea className="max-h-[400px] w-full pr-4">
+                        {order.group_items?.length > 0 ? (
+                            <ul className="space-y-4">
+                                {order.group_items
+                                    .sort((a, b) => a.category_id.localeCompare(b.category_id))
+                                    .map((group) => (
+                                        <GroupItemCard key={group.id} group={group} session={data!} />
+                                    ))}
+                            </ul>
+                        ) : (
+                            <p className="text-gray-700">Nenhum item encontrado.</p>
+                        )}
+                    </ScrollArea>
                 </div>
             </div>
 
-            {/* Itens do Pedido */}
-            <div className="mb-6">
-                <h3 className="text-xl font-bold mb-2 text-gray-800">Itens do Pedido</h3>
-                {order.group_items?.length > 0 ? (
-                    <ul className="space-y-4">
-                        {order.group_items
-                            .sort((a, b) => a.category_id.localeCompare(b.category_id))
-                            .map((group) => (
-                                <GroupItemCard key={group.id} group={group} session={data!} />
-                            ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-700">Nenhum item encontrado.</p>
-                )}
-            </div>
 
             {/* Resumo Financeiro */}
             <hr className="my-4" />
@@ -472,10 +476,10 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         </button>
                     </div>
                     {paymentView === 'table' ? (
-                        <div className="overflow-x-auto">
+                        <ScrollArea className="max-h-[200px] w-full pr-4">
                             <table className="w-full text-left bg-white rounded-lg shadow">
                                 <thead>
-                                    <tr>
+                                    <tr className="sticky top-0 bg-white shadow-sm z-10">
                                         <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Método</th>
                                         <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Valor Pago (R$)</th>
                                     </tr>
@@ -489,7 +493,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        </ScrollArea>
                     ) : (
                         <div className="overflow-x-auto">
                             <Carousel items={order.payments}>

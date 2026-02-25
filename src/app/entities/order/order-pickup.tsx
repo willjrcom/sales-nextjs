@@ -5,6 +5,7 @@ type StatusOrderPickup = "Staging" | "Pending" | "Ready" | "Delivered" | "Cancel
 export default class OrderPickup {
     id: string = '';
     name: string = '';
+    contact: string = '';
     status: StatusOrderPickup = "Staging";
     orderId: string = '';
     order_number: number = 0;
