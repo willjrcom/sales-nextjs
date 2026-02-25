@@ -32,7 +32,7 @@ export const SchemaClient = z.object({
     reference: z.string({ required_error: 'Referência é obrigatória', invalid_type_error: 'Referência inválida' }).max(100, 'Referência precisa ter no máximo 100 caracteres').optional(),
     city: z.string({ required_error: 'Cidade é obrigatória', invalid_type_error: 'Cidade inválida' }).min(3, 'Cidade precisa ter pelo menos 3 caracteres').max(100, 'Cidade precisa ter no máximo 100 caracteres'),
     uf: z.string({ required_error: 'Estado é obrigatório', invalid_type_error: 'Estado inválido' }).min(2, 'Estado precisa ter pelo menos 2 caracteres').max(2, 'Estado precisa ter no máximo 2 caracteres'),
-    cep: z.string({ required_error: 'Cep é obrigatório', invalid_type_error: 'Cep inválido' }).min(8, 'Cep inválido').max(9, 'Cep inválido').optional().or(z.literal('')),
+    cep: z.string({ required_error: 'Cep é obrigatório', invalid_type_error: 'Cep inválido' }).min(8, 'Cep inválido').max(9, 'Cep inválido'),
 });
 
 export type ClientFormData = z.infer<typeof SchemaClient>

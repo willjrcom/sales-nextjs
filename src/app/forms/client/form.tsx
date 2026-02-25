@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Decimal from 'decimal.js';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
+import GetShippingFeeByCEP from '@/app/api/client/shipping-fee/cep/[cep]';
 import { FaSearch } from 'react-icons/fa';
 import GetCompany from '@/app/api/company/company';
 import { addressUFsWithId } from '@/app/entities/address/utils';
@@ -170,6 +171,14 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                 setValue('neighborhood', addressFound.bairro);
                 setValue('city', addressFound.localidade);
                 setValue('uf', addressFound.uf);
+
+                // Get shipping fee
+                try {
+                    const fee = await GetShippingFeeByCEP(cep, session!);
+                    setValue('delivery_tax', fee);
+                } catch (feeError) {
+                    console.warn("Failed to calculate shipping fee:", feeError);
+                }
             }
         } catch (error) {
             notifyError('Erro ao buscar CEP');
@@ -223,10 +232,14 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                                 placeholder="00000-000"
                                 setValue={value => setValue('cep', value)}
                                 value={watch('cep') || ''}
-                                optional
                                 formatted={true}
                                 error={errors.cep?.message}
                             />
+                            {(watch('delivery_tax') || 0) > 0 && (
+                                <p className="text-sm text-green-600 font-medium mt-1">
+                                    Valor da entrega: R$ {(watch('delivery_tax') || 0).toFixed(2)}
+                                </p>
+                            )}
                         </div>
                         <button
                             type="button"

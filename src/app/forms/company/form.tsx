@@ -480,6 +480,14 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                     setValue={(value: Decimal) => handlePreferenceChange('min_order_value', value)}
                                 />
                             </div>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <PriceField
+                                    friendlyName="Taxa de entrega por KM"
+                                    name="delivery_fee_per_km" optional
+                                    value={new Decimal(company.preferences.delivery_fee_per_km || '0')}
+                                    setValue={(value: Decimal) => handlePreferenceChange('delivery_fee_per_km', value)}
+                                />
+                            </div>
                         </div>
 
                         {/* Impressora para pedido */}
