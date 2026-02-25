@@ -22,6 +22,7 @@ import GetShippingFeeByCEP from '@/app/api/client/shipping-fee/cep/[cep]';
 import GetCompany from '@/app/api/company/company';
 import { addressUFsWithId } from '@/app/entities/address/utils';
 import AddressAutocomplete, { ParsedAddress } from '@/app/components/modal/fields/address-autocomplete';
+import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
 
 const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const modalName = isUpdate ? 'edit-client-' + item?.id : 'new-client'
@@ -191,11 +192,22 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
         setValue('cep', cep);
         if (cep.length === 8 && session) {
             try {
+                // Fetch address by CEP
+                const addressData = await GetAddressByCEP(cep);
+                if (addressData) {
+                    setValue('street', addressData.logradouro);
+                    setValue('neighborhood', addressData.bairro);
+                    setValue('city', addressData.localidade);
+                    setValue('uf', addressData.uf);
+                    setAddressSelected(true);
+                }
+
+                // Recalculate distance
                 const distance = await GetShippingFeeByCEP(cep, session);
                 setValue('distance', Number(distance));
                 if (!showManualTax) setValue('delivery_tax', 0);
             } catch (feeError) {
-                console.warn('Failed to recalculate distance for CEP:', feeError);
+                console.warn('Failed to recalculate address or distance for CEP:', feeError);
             }
         }
     }
@@ -303,13 +315,24 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                             )}
 
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                                <div className="flex-1 sm:flex-[1.5] transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <PatternField
+                                        patternName="cep"
+                                        name="cep"
+                                        friendlyName="CEP"
+                                        setValue={handleCepChange}
+                                        value={watch('cep')}
+                                        error={errors.cep?.message}
+                                    />
+                                </div>
+                                <div className="flex-1 sm:flex-[2.5] transform transition-transform duration-200 hover:scale-[1.01]">
                                     <TextField
                                         name="street"
-                                        friendlyName="Rua"
-                                        placeholder="Digite sua rua"
+                                        friendlyName="Rua (bloqueado)"
+                                        placeholder="Selecione no autocomplete ou preencha o CEP"
                                         setValue={value => setValue('street', value)}
                                         value={watch('street')}
+                                        disabled={true}
                                         error={errors.street?.message}
                                     />
                                 </div>
