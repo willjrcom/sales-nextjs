@@ -260,9 +260,9 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
                 </div>
             </div>
 
-            {/* Seção: Dados Adicionais */}
+            {/* Seção: Dados Obrigatórios */}
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Dados Adicionais</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Dados Obrigatórios</h3>
                 <div className="space-y-4">
 
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-4">
