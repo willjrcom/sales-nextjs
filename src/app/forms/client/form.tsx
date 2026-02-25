@@ -279,9 +279,9 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                         </div>
                     ) : (
                         <div className="mt-1 flex flex-col items-start gap-1">
-                            {(watch('delivery_tax') || 0) > 0 && (
+                            {Number(watch('delivery_tax') || 0) > 0 && (
                                 <p className="text-sm text-green-600 font-medium">
-                                    Valor estimado (km): R$ {(watch('delivery_tax') || 0).toFixed(2)}
+                                    Valor estimado (km): R$ {Number(watch('delivery_tax') || 0).toFixed(2)}
                                 </p>
                             )}
                             <button
