@@ -39,26 +39,6 @@ export default function OrderPaymentsResume() {
         try {
             await PendingOrder(order.id, data)
 
-            if (company?.preferences.enable_print_order_on_pend_order) {
-                await printOrder({
-                    orderID: order.id,
-                    session: data,
-                    company: company
-                })
-            }
-
-            for (let i = 0; i < order.group_items.length; i++) {
-                const groupItem = order.group_items[i];
-
-                if (groupItem.need_print && groupItem.status == "Staging") {
-                    await printGroupItem({
-                        groupItemID: groupItem.id,
-                        printerName: groupItem.printer_name,
-                        session: data
-                    })
-                }
-            }
-
             // Invalidar query de pedidos em staging para atualizar o topbar
             queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
         } catch (error: RequestError | any) {

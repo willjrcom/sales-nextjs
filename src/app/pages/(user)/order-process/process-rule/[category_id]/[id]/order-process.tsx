@@ -65,7 +65,7 @@ const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) =>
             const nextProcessID = await FinishOrderProcess(id, data)
 
             if (!nextProcessID && company?.preferences?.["enable_print_items_on_finish_process"]) {
-                await printGroupItem({ groupItemID: groupItem.id, printerName: groupItem.printer_name, session: data })
+                await printGroupItem({ groupItemID: groupItem.id, session: data })
             }
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao finalizar o pedido');

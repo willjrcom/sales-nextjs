@@ -195,17 +195,6 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
                 notifySuccess("Entrega enviada com sucesso");
             }
 
-            if (company?.preferences.enable_print_order_on_ship_delivery) {
-                for (let i = 0; i < orderIDs.length; i++) {
-                    await printOrder({
-                        orderID: orderIDs[i],
-                        session: data,
-                        company: company,
-                        printerKey: "printer_delivery_on_ship_delivery"
-                    });
-                }
-            }
-
             modalHandler.hideModal("ship-delivery");
         } catch (error) {
             const err = error as RequestError;

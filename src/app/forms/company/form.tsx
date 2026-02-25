@@ -46,9 +46,9 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
         table_tax_rate: '10',
         min_delivery_tax: '5',
         enable_print_order_on_pend_order: 'false',
-        printer_order_on_pend_order: '',
+        printer_order: '',
         enable_print_order_on_ship_delivery: 'false',
-        printer_delivery_on_ship_delivery: '',
+        printer_delivery: '',
         enable_print_items_on_finish_process: 'false',
         printer_shift_report: '',
     }
@@ -503,11 +503,10 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <SelectField
                                     friendlyName="Impressora de pedido"
-                                    name="printer_order_on_pend_order" optional
+                                    name="printer_order"
                                     values={printers}
-                                    selectedValue={company.preferences.printer_order_on_pend_order || ''}
-                                    setSelectedValue={(value: string) => handlePreferenceChange('printer_order_on_pend_order', value)}
-                                    disabled={company.preferences.enable_print_order_on_pend_order === 'false'}
+                                    selectedValue={company.preferences.printer_order || ''}
+                                    setSelectedValue={(value: string) => handlePreferenceChange('printer_order', value)}
                                 />
                             </div>
                         </div>
@@ -525,10 +524,10 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                             <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                 <SelectField
                                     friendlyName="Impressora de entrega"
-                                    name="printer_delivery_on_ship_delivery" optional
+                                    name="printer_delivery" optional
                                     values={printers}
-                                    selectedValue={company.preferences.printer_delivery_on_ship_delivery || ''}
-                                    setSelectedValue={(value: string) => handlePreferenceChange('printer_delivery_on_ship_delivery', value)}
+                                    selectedValue={company.preferences.printer_delivery || ''}
+                                    setSelectedValue={(value: string) => handlePreferenceChange('printer_delivery', value)}
                                     disabled={company.preferences.enable_print_order_on_ship_delivery === 'false'}
                                 />
                             </div>

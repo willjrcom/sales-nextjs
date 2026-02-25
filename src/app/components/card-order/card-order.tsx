@@ -560,7 +560,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     {/* Botão de impressão */}
                     {!isOrderStatusCancelled && company &&
                         <button
-                            onClick={() => data && printOrder({ orderID: order.id, session: data, company: company })}
+                            onClick={() => data && printOrder({ orderID: order.id, session: data })}
                             className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
                         >
                             <FaPrint />

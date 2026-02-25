@@ -53,7 +53,7 @@ const ShiftColumns = (session: Session, company?: Company): ColumnDef<Shift>[] =
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => printShift({ shiftID: row.original.id, session, company })}
+        onClick={() => printShift({ shiftID: row.original.id, session })}
         title="Imprimir Resumo do Turno"
       >
         <Printer className="w-4 h-4" />
