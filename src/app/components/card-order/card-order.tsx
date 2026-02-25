@@ -83,7 +83,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     const { data: order, refetch } = useQuery({
         queryKey: ['order', orderId],
         queryFn: async () => {
-            if (!orderId || !(data?.user as any)?.access_token) return null;
+            if (!orderId || !data) return null;
             try {
                 return await GetOrderByID(orderId, data);
             } catch (error) {

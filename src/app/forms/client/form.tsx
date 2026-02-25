@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ClientFormData, SchemaClient } from '@/app/entities/client/client';
 import { z } from 'zod';
+import PriceField from "@/app/components/modal/fields/price";
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { ToIsoDate, ToUtcDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
@@ -14,7 +15,6 @@ import RequestError from '@/app/utils/error';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiddenField, ImageField, TextField, CheckboxField, SelectField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
-import Address from '@/app/entities/address/address';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Decimal from 'decimal.js';
@@ -30,6 +30,9 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
     const [loadingCep, setLoadingCep] = useState(false);
+    const [showManualTax, setShowManualTax] = useState(() => {
+        return item?.address?.delivery_tax && new Decimal(item.address.delivery_tax).greaterThan(0);
+    });
 
     const initialData = useMemo(() => {
         const c = new Client(item);
@@ -61,6 +64,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
             complement: initialData.address.complement,
             reference: initialData.address.reference,
             delivery_tax: new Decimal(initialData.address.delivery_tax || 0).toNumber(),
+            distance: new Decimal(initialData.address.distance || 0).toNumber(),
             is_active: initialData.is_active,
         }
     });
@@ -133,7 +137,8 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                 cep: formData.cep,
                 complement: formData.complement,
                 reference: formData.reference,
-                delivery_tax: new Decimal(formData.delivery_tax || 0)
+                delivery_tax: new Decimal(formData.delivery_tax || 0),
+                distance: new Decimal(formData.distance || 0).toNumber()
             }
         });
 
@@ -223,7 +228,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Endereço</h3>
 
                 <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4 items-end">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center">
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <PatternField
                                 patternName='cep'
@@ -235,11 +240,6 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                                 formatted={true}
                                 error={errors.cep?.message}
                             />
-                            {(watch('delivery_tax') || 0) > 0 && (
-                                <p className="text-sm text-green-600 font-medium mt-1">
-                                    Valor da entrega: R$ {(watch('delivery_tax') || 0).toFixed(2)}
-                                </p>
-                            )}
                         </div>
                         <button
                             type="button"
@@ -250,6 +250,49 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                             <FaSearch />&nbsp;<span>{loadingCep ? 'Buscando...' : 'Buscar'}</span>
                         </button>
                     </div>
+
+                    {showManualTax ? (
+                        <div className="mt-2">
+                            <div className="flex justify-end mb-1">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowManualTax(false);
+                                        setValue('delivery_tax', 0);
+                                        if (watch('cep')) getAddress();
+                                    }}
+                                    className="text-xs text-red-500 hover:text-red-700 underline"
+                                >
+                                    Desativar e usar cálculo km
+                                </button>
+                            </div>
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <PriceField
+                                    name="delivery_tax"
+                                    friendlyName="Taxa de Entrega Fixa"
+                                    placeholder="Ex: 8.50"
+                                    setValue={(val: Decimal) => setValue('delivery_tax', val.toNumber())}
+                                    value={watch('delivery_tax') || 0}
+                                    optional
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="mt-1 flex flex-col items-start gap-1">
+                            {(watch('delivery_tax') || 0) > 0 && (
+                                <p className="text-sm text-green-600 font-medium">
+                                    Valor estimado (km): R$ {(watch('delivery_tax') || 0).toFixed(2)}
+                                </p>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setShowManualTax(true)}
+                                className="text-xs text-blue-500 hover:text-blue-700 underline"
+                            >
+                                Inserir taxa fixa manualmente
+                            </button>
+                        </div>
+                    )}
 
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
