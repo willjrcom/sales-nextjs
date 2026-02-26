@@ -23,7 +23,7 @@ interface ProcessRuleFormProps extends CreateFormsProps<ProcessRule> {
     category: Category;
 }
 
-const ProcessRuleForm = ({ item, isUpdate, category }: ProcessRuleFormProps) => {
+const ProcessRuleForm = ({ item, isUpdate, category, onSuccess }: ProcessRuleFormProps) => {
     const modalName = isUpdate ? 'edit-process-rule-' + item?.id : 'new-process-rule'
     const modalHandler = useModal();
     const queryClient = useQueryClient();
@@ -96,6 +96,7 @@ const ProcessRuleForm = ({ item, isUpdate, category }: ProcessRuleFormProps) => 
 
             queryClient.invalidateQueries({ queryKey: ['process-rules'] });
             modalHandler.hideModal(modalName);
+            if (onSuccess) onSuccess();
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao salvar regra de processo');
@@ -112,6 +113,7 @@ const ProcessRuleForm = ({ item, isUpdate, category }: ProcessRuleFormProps) => 
             notifySuccess(`Regra de processo ${processRule.name} removida com sucesso`);
             queryClient.invalidateQueries({ queryKey: ['process-rules'] });
             modalHandler.hideModal(modalName);
+            if (onSuccess) onSuccess();
         } catch (error: RequestError | any) {
             notifyError(error.message || `Erro ao remover regra de processo ${processRule.name}`);
         } finally {
@@ -130,7 +132,7 @@ const ProcessRuleForm = ({ item, isUpdate, category }: ProcessRuleFormProps) => 
                             <TextField friendlyName='Nome' name='name' setValue={(value: any) => setValue('name', value)} value={processRule.name} error={errors.name?.message as string} />
                         </div>
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={(value: any) => setValue('order', value)} value={processRule.order} error={errors.order?.message as string} />
+                            <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={(value: any) => setValue('order', value)} value={processRule.order} error={errors.order?.message as string} disabled={isUpdate} />
                             {isOrderDuplicate && <span className="text-xs text-red-500 font-medium mt-1 block">Esta ordem já está em uso nesta categoria.</span>}
                         </div>
                     </div>
