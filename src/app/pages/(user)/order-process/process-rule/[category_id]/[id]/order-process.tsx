@@ -4,7 +4,7 @@ import StartOrderProcess from '../../../../../../api/order-process/start/order-p
 import { useModal } from '../../../../../../context/modal/context';
 import OrderProcess from '../../../../../../entities/order-process/order-process';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     Eye,
     Play,
@@ -39,18 +39,38 @@ const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) =>
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!data?.user?.access_token,
+        enabled: !!(data?.user as any)?.access_token,
     })
 
     const [now, setNow] = useState(new Date());
     const [isProcessing, setIsProcessing] = useState(false);
-    useEffect(() => {
-        if (orderProcess.status === "Started") {
-            setNow(new Date());
+
+    const groupItem = useMemo(() => {
+        if (orderProcess.group_item && orderProcess.group_item.items && orderProcess.group_item.items.length > 0) {
+            return orderProcess.group_item;
         }
+
+        if (orderProcess.snapshot?.data) {
+            const data = typeof orderProcess.snapshot.data === 'string'
+                ? JSON.parse(orderProcess.snapshot.data)
+                : orderProcess.snapshot.data;
+
+            return new GroupItem(data);
+        }
+
+        return orderProcess.group_item;
+    }, [orderProcess.group_item, orderProcess.snapshot]);
+
+    useEffect(() => {
+        if (orderProcess.status !== "Started") return;
+
+        const interval = setInterval(() => {
+            setNow(new Date());
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, [orderProcess.status]);
 
-    const groupItem = orderProcess.group_item;
     if (!groupItem) {
         return <p className="text-gray-500 mt-4 text-center italic text-sm">Nenhum item no pedido</p>
     };
@@ -173,9 +193,11 @@ const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) =>
                                             const startAt = orderProcess.started_at
                                                 ? new Date(orderProcess.started_at)
                                                 : new Date();
-                                            const diffMs = now.getTime() - startAt.getTime();
-                                            const durationDate = new Date(diffMs);
-                                            return ToUtcMinutesSeconds(durationDate.toISOString());
+                                            const diffMs = Math.max(0, now.getTime() - startAt.getTime());
+                                            const totalSeconds = Math.floor(diffMs / 1000);
+                                            const minutes = Math.floor(totalSeconds / 60);
+                                            const seconds = totalSeconds % 60;
+                                            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                                         })()}
                                     </p>
                                 </div>

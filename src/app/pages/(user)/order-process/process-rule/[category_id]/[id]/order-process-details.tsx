@@ -8,13 +8,31 @@ import { Button } from "../../../../../../../components/ui/button";
 import { Badge } from "../../../../../../../components/ui/badge";
 import printGroupItem from "../../../../../../components/print/print-group-item";
 import { useSession } from "next-auth/react";
+import { useMemo } from "react";
+import GroupItem from "../../../../../../entities/order/group-item";
 
 interface OrderProcessDetailsProps {
     orderProcess: OrderProcess;
 }
 
 const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
-    const groupItem = orderProcess.group_item;
+    const groupItem = useMemo(() => {
+        if (orderProcess.group_item && orderProcess.group_item.items && orderProcess.group_item.items.length > 0) {
+            return orderProcess.group_item;
+        }
+
+        if (orderProcess.snapshot?.data) {
+            const data = typeof orderProcess.snapshot.data === 'string'
+                ? JSON.parse(orderProcess.snapshot.data)
+                : orderProcess.snapshot.data;
+
+            return new GroupItem(data);
+        }
+
+        return orderProcess.group_item;
+    }, [orderProcess.group_item, orderProcess.snapshot]);
+
+
     const modalHandler = useModal();
     const { data } = useSession();
 

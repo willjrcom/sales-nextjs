@@ -2,6 +2,7 @@ import OrderQueue from "../order-queue/order-queue";
 import GroupItem from "../order/group-item";
 import ProcessRule from "../process-rule/process-rule";
 import Product from "../product/product";
+import OrderGroupItemSnapshot from "../order/group-item-snapshot";
 
 type StatusProcess = "Pending" | "Started" | "Finished" | "Paused" | "Continued" | "Cancelled";
 type orderType = "Delivery" | "Pickup" | "Table";
@@ -15,6 +16,7 @@ export default class OrderProcess {
     order_id?: string = '';
     group_item_id: string = '';
     group_item?: GroupItem;
+    snapshot?: OrderGroupItemSnapshot;
     process_rule_id: string = '';
     process_rule?: ProcessRule = new ProcessRule();
     queue?: OrderQueue = new OrderQueue();
