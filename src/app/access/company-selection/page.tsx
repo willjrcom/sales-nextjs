@@ -47,7 +47,7 @@ function CompanySelection() {
     const companies = useMemo(() => companiesResponse?.items.sort((a, b) => a.trade_name.localeCompare(b.trade_name)) || [], [companiesResponse?.items]);
 
     useEffect(() => {
-        if (error) notifyError('Erro ao carregar empresas');
+        if (error) notifyError(`Erro ao carregar empresas: ${error.message}`);
     }, [error]);
 
     const { data: meUser } = useQuery({
@@ -59,10 +59,7 @@ function CompanySelection() {
         refetchInterval: 30000,
     });
 
-    const searchParams = useSearchParams();
-    const autoSchema = searchParams.get('schema');
-
-    const { isPending: loadingAds, data: adsResponse, isSuccess: adsSuccess } = useQuery({
+    const { data: adsResponse, isSuccess: adsSuccess } = useQuery({
         queryKey: ['advertisements-active'],
         queryFn: async () => {
             return GetActiveAdvertisements(data!);
@@ -103,32 +100,6 @@ function CompanySelection() {
             setSelecting(false);
         }
     }
-
-    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-        const schemaName = event.currentTarget.getAttribute('data-schema-name');
-
-        if (!schemaName) {
-            notifyError('Schema inválido!');
-            return;
-        }
-
-        try {
-            await accessCompany(schemaName);
-        } catch (error) {
-            const err = error as RequestError;
-            notifyError(err.message || 'Ocorreu um erro ao selecionar a empresa');
-        }
-    }
-
-    // Auto-select effect
-    useEffect(() => {
-        if (autoSchema && companies.length > 0 && !selecting) {
-            const company = companies.find(c => c.schema_name === autoSchema);
-            if (company) {
-                accessCompany(autoSchema);
-            }
-        }
-    }, [autoSchema, companies, selecting]);
 
     const [hasOpenedAds, setHasOpenedAds] = useState(false);
 
@@ -201,9 +172,8 @@ function CompanySelection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {companies.map(company => (
                         <button
-                            key={company.schema_name}
-                            data-schema-name={company.schema_name}
-                            onClick={handleSubmit}
+                            key={company.id}
+                            onClick={() => accessCompany(company.schema_name)}
                             className="block p-6 bg-white rounded-lg shadow-lg hover:bg-yellow-500 hover:text-white transition"
                         >
                             <h2 className="text-2xl font-bold">{company.trade_name}</h2>
