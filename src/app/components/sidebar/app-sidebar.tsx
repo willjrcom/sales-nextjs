@@ -46,11 +46,9 @@ import {
 import Link from "next/link"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    adminMode: boolean
-    toggleAdminMode: () => void
 }
 
-export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarProps) {
+export function AppSidebar({ ...props }: AppSidebarProps) {
     const router = useRouter()
     const queryClient = useQueryClient()
     const modalHandler = useModal()
@@ -61,7 +59,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
     const { data: company } = useQuery({
         queryKey: ["company"],
         queryFn: () => GetCompany(session!),
-        enabled: !!session?.user?.access_token,
+        enabled: !!(session?.user as any)?.access_token,
     })
 
     const handleCompanyModal = () => {
@@ -84,7 +82,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
         await signOut({ callbackUrl: "/login", redirect: true })
     }
 
-    const userItems = [
+    const items = [
         { label: "Novo Pedido", icon: FaPlus, href: "/pages/new-order", permission: 'new-order' },
         { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process", permission: 'order-process' },
         // Produto é um caso especial, pode ter product, category ou process-rule
@@ -101,29 +99,8 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
         }
         return hasPermission(item.permission);
     });
-
-    const adminItems = [
-        { label: "Processos", icon: TiFlowMerge, href: "/pages/admin-order-process", permission: 'statistics' },
-        { label: "Cardápio", icon: MdFastfood, href: "/pages/admin-product", permission: 'statistics' },
-        { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/admin-client", permission: 'statistics' },
-        { label: "Funcionários", icon: FaUserTie, href: "/pages/admin-employee", permission: 'statistics' },
-        { label: "Mesas", icon: FaTh, href: "/pages/admin-place", permission: 'statistics' },
-        { label: "Pedidos", icon: FaPlus, href: "/pages/admin-order", permission: 'statistics' },
-        { label: "Turnos", icon: FaClock, href: "/pages/admin-shift", permission: 'statistics' },
-        { label: "Relatórios", icon: FaChartBar, href: "/pages/admin-report", permission: 'statistics' },
-    ].filter(item => {
-        if (!item.permission) return true;
-        if (Array.isArray(item.permission)) {
-            return item.permission.some(p => hasPermission(p));
-        }
-        return hasPermission(item.permission);
-    });
-
-    // Se estiver carregando, mostra vazio ou esqueleto? Por enquanto vazio para nao piscar itens proibidos
-    const items = adminMode ? adminItems : isLoading ? [] : userItems
-
     return (
-        <Sidebar collapsible="icon" {...props} className={adminMode ? "border-r-2 border-rose-500" : ""}>
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -134,7 +111,6 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                             <div className="flex flex-col gap-0.5 leading-none">
                                 <span className="font-semibold">{company?.trade_name || "Empresa"}</span>
                                 {hasPermission('manage-company') && <span className="text-xs text-muted-foreground">Editar</span>}
-                                {adminMode && <span className="text-[10px] font-bold text-rose-600 bg-rose-100 px-1 rounded w-fit">ADMIN</span>}
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -143,7 +119,7 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
 
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Menu {adminMode ? "Admin" : "Usuário"}</SidebarGroupLabel>
+                    <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
@@ -175,6 +151,22 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     )}
+
+                    {hasPermission('statistics') && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton tooltip="Painel Admin" onClick={
+                                () => {
+                                    router.push("/pages/admin-report")
+                                }
+                            }>
+                                <FaTools />
+                                <span>
+                                    Painel Admin
+                                </span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
+
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             onClick={async () => {
@@ -188,19 +180,6 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                         </SidebarMenuButton>
                     </SidebarMenuItem>
 
-                    {hasPermission('statistics') && (
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                onClick={toggleAdminMode}
-                                tooltip={adminMode ? "Sair do Modo Admin" : "Entrar no Modo Admin"}
-                                className={adminMode ? "bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-900" : ""}
-                            >
-                                <FaTools />
-                                <span>{adminMode ? "Sair do Modo Admin" : "Entrar no Modo Admin"}</span>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    )}
-
                     <SidebarMenuItem>
                         <SidebarMenuButton onClick={signOutToLogin} tooltip="Sair">
                             <FaSignOutAlt />
@@ -210,6 +189,6 @@ export function AppSidebar({ adminMode, toggleAdminMode, ...props }: AppSidebarP
                 </SidebarMenu>
             </SidebarFooter>
             <SidebarRail />
-        </Sidebar>
+        </Sidebar >
     )
 }

@@ -6,12 +6,10 @@ import Topbar from '../topbar/topbar';
 import { ModalProvider } from '@/app/context/modal/context';
 
 const Menu = ({ children }: Readonly<{ children: React.ReactNode }>) => {
-  const [adminMode, setAdminMode] = useState(false);
-
   return (
     <ModalProvider>
       <SidebarProvider defaultOpen={false}>
-        <AppSidebar adminMode={adminMode} toggleAdminMode={() => setAdminMode(!adminMode)} />
+        <AppSidebar />
         <SidebarInset>
           <Topbar />
           <main className="p-4 h-[calc(100vh-3.5rem)] flex justify-center bg-gray-100">

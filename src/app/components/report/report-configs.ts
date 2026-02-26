@@ -1,6 +1,7 @@
 export interface ReportConfig {
   id: string;
   name: string;
+  category: string;
   endpoint: string;
   method: 'POST' | 'POST';
   chartType: 'line' | 'bar' | 'pie';
@@ -13,6 +14,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-total-by-day',
     name: 'Vendas Totais por Dia',
+    category: 'Vendas',
     endpoint: '/report/sales-total-by-day',
     method: 'POST',
     chartType: 'line',
@@ -23,6 +25,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'revenue-cumulative-by-month',
     name: 'Receita Cumulativa por Mês',
+    category: 'Vendas',
     endpoint: '/report/revenue-cumulative-by-month',
     method: 'POST',
     chartType: 'line',
@@ -33,6 +36,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-by-hour',
     name: 'Vendas por Hora',
+    category: 'Vendas',
     endpoint: '/report/sales-by-hour',
     method: 'POST',
     chartType: 'bar',
@@ -43,6 +47,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-by-channel',
     name: 'Vendas por Canal',
+    category: 'Vendas',
     endpoint: '/report/sales-by-channel',
     method: 'POST',
     chartType: 'bar',
@@ -53,6 +58,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-ticket-by-day',
     name: 'Ticket Médio por Dia',
+    category: 'Vendas',
     endpoint: '/report/avg-ticket-by-day',
     method: 'POST',
     chartType: 'line',
@@ -63,6 +69,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-ticket-by-channel',
     name: 'Ticket Médio por Canal',
+    category: 'Vendas',
     endpoint: '/report/avg-ticket-by-channel',
     method: 'POST',
     chartType: 'bar',
@@ -73,6 +80,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'products-sold-by-day',
     name: 'Produtos Vendidos por Dia',
+    category: 'Produtos',
     endpoint: '/report/products-sold-by-day',
     method: 'POST',
     chartType: 'line',
@@ -83,6 +91,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'top-products',
     name: 'Top Produtos',
+    category: 'Produtos',
     endpoint: '/report/top-products',
     method: 'POST',
     chartType: 'bar',
@@ -93,6 +102,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-by-category',
     name: 'Vendas por Categoria',
+    category: 'Produtos',
     endpoint: '/report/sales-by-category',
     method: 'POST',
     chartType: 'bar',
@@ -103,6 +113,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'clients-registered-by-day',
     name: 'Clientes Registrados por Dia',
+    category: 'Clientes',
     endpoint: '/report/clients-registered-by-day',
     method: 'POST',
     chartType: 'line',
@@ -113,6 +124,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'new-vs-recurring-clients',
     name: 'Novos vs Clientes Recorrentes',
+    category: 'Clientes',
     endpoint: '/report/new-vs-recurring-clients',
     method: 'POST',
     chartType: 'pie',
@@ -123,6 +135,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'orders-by-status',
     name: 'Pedidos por Status',
+    category: 'Pedidos',
     endpoint: '/report/orders-by-status',
     method: 'POST',
     chartType: 'bar',
@@ -133,6 +146,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-process-step-duration',
     name: 'Duração Média de Etapa',
+    category: 'Produção',
     endpoint: '/report/avg-process-step-duration',
     method: 'POST',
     chartType: 'bar',
@@ -143,6 +157,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'cancellation-rate',
     name: 'Taxa de Cancelamento',
+    category: 'Pedidos',
     endpoint: '/report/cancellation-rate',
     method: 'POST',
     chartType: 'pie',
@@ -153,6 +168,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'current-queue-length',
     name: 'Tamanho Atual da Fila',
+    category: 'Produção',
     endpoint: '/report/current-queue-length',
     method: 'POST',
     chartType: 'bar',
@@ -163,6 +179,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-delivery-time-by-driver',
     name: 'Tempo Médio de Entrega por Entregador',
+    category: 'Logística',
     endpoint: '/report/avg-delivery-time-by-driver',
     method: 'POST',
     chartType: 'bar',
@@ -173,6 +190,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'deliveries-per-driver',
     name: 'Entregas por Entregador',
+    category: 'Logística',
     endpoint: '/report/deliveries-per-driver',
     method: 'POST',
     chartType: 'bar',
@@ -183,6 +201,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'orders-per-table',
     name: 'Pedidos por Mesa',
+    category: 'Atendimento',
     endpoint: '/report/orders-per-table',
     method: 'POST',
     chartType: 'bar',
@@ -193,6 +212,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-by-shift',
     name: 'Vendas por Turno',
+    category: 'Vendas',
     endpoint: '/report/sales-by-shift',
     method: 'POST',
     chartType: 'bar',
@@ -203,6 +223,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'payments-by-method',
     name: 'Pagamentos por Método',
+    category: 'Financeiro',
     endpoint: '/report/payments-by-method',
     method: 'POST',
     chartType: 'bar',
@@ -213,6 +234,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-by-place',
     name: 'Vendas por Local',
+    category: 'Atendimento',
     endpoint: '/report/sales-by-place',
     method: 'POST',
     chartType: 'bar',
@@ -223,6 +245,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'sales-by-size',
     name: 'Vendas por Tamanho',
+    category: 'Produtos',
     endpoint: '/report/sales-by-size',
     method: 'POST',
     chartType: 'bar',
@@ -233,6 +256,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'additional-items-sold',
     name: 'Itens Adicionais Vendidos',
+    category: 'Produtos',
     endpoint: '/report/additional-items-sold',
     method: 'POST',
     chartType: 'bar',
@@ -243,6 +267,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-pickup-time',
     name: 'Tempo Médio de Coleta',
+    category: 'Atendimento',
     endpoint: '/report/avg-pickup-time',
     method: 'POST',
     chartType: 'bar',
@@ -253,6 +278,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'group-items-status',
     name: 'Status de Itens de Grupo',
+    category: 'Produção',
     endpoint: '/report/group-items-status',
     method: 'POST',
     chartType: 'bar',
@@ -263,6 +289,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'deliveries-by-cep',
     name: 'Entregas por CEP',
+    category: 'Logística',
     endpoint: '/report/deliveries-by-cep',
     method: 'POST',
     chartType: 'bar',
@@ -273,6 +300,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'processed-count-by-rule',
     name: 'Processados por Regra',
+    category: 'Produção',
     endpoint: '/report/processed-count-by-rule',
     method: 'POST',
     chartType: 'bar',
@@ -283,6 +311,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'employee-payments-report',
     name: 'Pagamentos de Funcionários',
+    category: 'Financeiro',
     endpoint: '/report/employee-payments-report',
     method: 'POST',
     chartType: 'bar',
@@ -294,6 +323,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'top-tables',
     name: 'Top 10 Mesas',
+    category: 'Atendimento',
     endpoint: '/report/top-tables',
     method: 'POST',
     chartType: 'bar',
@@ -305,6 +335,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-queue-duration',
     name: 'Duração Média da Fila',
+    category: 'Produção',
     endpoint: '/report/avg-queue-duration',
     method: 'POST',
     chartType: 'bar',
@@ -315,6 +346,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'avg-process-duration-by-product',
     name: 'Duração Média por Produto',
+    category: 'Produção',
     endpoint: '/report/avg-process-duration-by-product',
     method: 'POST',
     chartType: 'bar',
@@ -325,6 +357,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'total-queue-time-by-group-item',
     name: 'Tempo Médio na Fila',
+    category: 'Produção',
     endpoint: '/report/total-queue-time-by-group-item',
     method: 'POST',
     chartType: 'bar',
@@ -336,6 +369,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'product-profitability',
     name: 'Rentabilidade por Produto',
+    category: 'Financeiro',
     endpoint: '/report/product-profitability',
     method: 'POST',
     chartType: 'bar',
@@ -346,6 +380,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'category-profitability',
     name: 'Rentabilidade por Categoria',
+    category: 'Financeiro',
     endpoint: '/report/category-profitability',
     method: 'POST',
     chartType: 'bar',
@@ -356,6 +391,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'low-profit-products',
     name: 'Produtos com Baixa Margem',
+    category: 'Financeiro',
     endpoint: '/report/low-profit-products',
     method: 'POST',
     chartType: 'bar',
@@ -366,6 +402,7 @@ export const reportConfigs: ReportConfig[] = [
   {
     id: 'overall-profitability',
     name: 'Rentabilidade Geral',
+    category: 'Financeiro',
     endpoint: '/report/overall-profitability',
     method: 'POST',
     chartType: 'bar',
