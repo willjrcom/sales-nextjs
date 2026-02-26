@@ -40,7 +40,7 @@ const PageProcessRule = () => {
         queryKey: ['order-processes', currentProcessRuleID],
         queryFn: () => GetProcessesByProcessRuleID(currentProcessRuleID, data!),
         enabled: !!data?.user?.access_token && !!currentProcessRuleID,
-        refetchInterval: 5000,
+        refetchInterval: 10000,
         refetchIntervalInBackground: true,
     });
 
@@ -83,13 +83,7 @@ const PageProcessRule = () => {
             {(!orderProcesses || orderProcesses.length === 0) ? (
                 <p className="text-gray-500 mt-4">Nenhum processo na fila</p>
             ) : (
-                ([...orderProcesses])
-                    .sort((a, b) => {
-                        if (a.status === "Started" && b.status !== "Started") return -1;
-                        if (a.status !== "Started" && b.status === "Started") return 1;
-                        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-                    })
-                    .map((process) => <OrderProcessCard key={process.id} orderProcess={process} onRefetch={refetch} />)
+                orderProcesses.map((process) => <OrderProcessCard key={process.id} orderProcess={process} onRefetch={refetch} />)
             )}
         </>
     )

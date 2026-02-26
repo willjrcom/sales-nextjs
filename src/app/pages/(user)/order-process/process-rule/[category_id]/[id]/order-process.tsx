@@ -46,8 +46,7 @@ const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) =>
     const [isProcessing, setIsProcessing] = useState(false);
     useEffect(() => {
         if (orderProcess.status === "Started") {
-            const timer = setInterval(() => setNow(new Date()), 1000);
-            return () => clearInterval(timer);
+            setNow(new Date());
         }
     }, [orderProcess.status]);
 
