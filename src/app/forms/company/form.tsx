@@ -21,7 +21,6 @@ import { useModal } from '@/app/context/modal/context';
 import UpdateCompany from '@/app/api/company/update/company';
 import FormArrayPattern from '@/app/components/modal/form-array-pattern';
 import printService from '@/app/utils/print-service';
-import Address from "@/app/entities/address/address";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import GetAllCompanyCategories from '@/app/api/company-category/list';
 import { CompanyCategory } from '@/app/entities/company/company-category';

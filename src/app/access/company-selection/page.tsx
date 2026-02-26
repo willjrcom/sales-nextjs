@@ -19,6 +19,7 @@ import GetUserCompanies from '@/app/api/user/companies/user';
 import { getWhitelist } from '@/app/utils/whitelist';
 import GetActiveAdvertisements from '@/app/api/advertising/active';
 import AdvertisingPopup from '@/app/components/advertising/popup';
+import ButtonIconTextFloat from "@/app/components/button/button-float";
 
 export default function Page() {
     return (
@@ -182,14 +183,15 @@ function CompanySelection() {
                 </div>
             ))}
 
-            <button onClick={newCompany}>
-                <div className="fixed bottom-5 right-5 flex items-center justify-center space-x-2 p-4 bg-yellow-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-yellow-600 w-max"
-                    style={{ zIndex: 1000 }}
-                >
-                    <FaPlus className="text-sm" />
-                    <span>Nova empresa</span>
-                </div>
-            </button>
+            <ButtonIconTextFloat
+                title="Nova Empresa"
+                modalName="new-company"
+                icon={FaPlus}
+                color="yellow"
+                position="bottom-right"
+            >
+                <CompanyForm />
+            </ButtonIconTextFloat>
 
             <button
                 onClick={() => signOut({ callbackUrl: '/login', redirect: true })}

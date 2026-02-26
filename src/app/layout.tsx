@@ -26,7 +26,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
-        <Toaster position="top-right" />
+        <Toaster position="top-right" containerStyle={{ zIndex: 20000 }} />
         <div id="modal-root"></div>
       </body>
     </html>
