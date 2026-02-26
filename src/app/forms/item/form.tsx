@@ -172,12 +172,13 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
 
   const currentFilledQty = useMemo(() => {
     if (!currentGroupItem?.items) return new Decimal(0);
-    return currentGroupItem.items.reduce((acc, item) => acc.plus(new Decimal(item.quantity || 0)), new Decimal(0));
+    return currentGroupItem.items.reduce((acc: Decimal, item: any) => acc.plus(new Decimal(item.quantity || 0)), new Decimal(0));
   }, [currentGroupItem?.items]);
 
   const isQuantityExceeded = useMemo(() => {
+    if (!currentGroupItem || !currentGroupItem.id) return false;
     return currentFilledQty.plus(new Decimal(quantity)).greaterThan(1);
-  }, [currentFilledQty, quantity]);
+  }, [currentGroupItem, currentFilledQty, quantity]);
 
   const isFractional = useMemo(() => {
     return !new Decimal(quantity || 0).isInteger();
