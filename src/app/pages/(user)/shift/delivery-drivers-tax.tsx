@@ -12,14 +12,16 @@ const ListDeliveryDriversTax = ({ shift }: DeliveryDriversTaxProps) => {
   const orders = shift.orders || [];
   // Filtrar apenas pedidos com delivery e motorista atribuído
   const deliveries = orders
-    .filter(o => o.delivery && o.delivery.driver_id)
-    // assumir delivery não nulo
-    .map(o => ({ orderNumber: o.order_number, delivery: o.delivery as OrderDelivery }));
+    .filter(o => o.delivery?.driver_id)
+    .map(o => ({ orderNumber: o.order_number, delivery: o.delivery }));
 
   // Agrupar por motorista
   const groups: Record<string, { driverName: string; totalTax: Decimal; deliveries: { orderNumber: number; deliveryTax: Decimal }[] }> = {};
   deliveries.forEach(({ orderNumber, delivery }) => {
-    const driver = delivery.driver!;
+    if (!delivery?.id || !delivery.driver) {
+      return;
+    }
+    const driver = delivery.driver;
     const driverId = driver.id;
     const driverName = driver.employee?.name || "";
     const tax = new Decimal(delivery.delivery_tax || "0");

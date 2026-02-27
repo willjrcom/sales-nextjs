@@ -29,22 +29,61 @@ const PageEditOrderControl = () => {
         }
     }, [id, queryClient]);
 
-    useQuery({
+    const { data: order, error, isLoading } = useQuery({
         queryKey: ['order', 'current'],
-        queryFn: async () => {
-            if (!id || !data?.user?.access_token) return null;
-            try {
-                return await GetOrderByID(id as string, data);
-            } catch (error) {
-                const err = error as RequestError;
-                notifyError(err.message || 'Erro ao buscar pedido');
-                return null;
-            }
-        },
+        queryFn: () => GetOrderByID(id as string, data!),
         enabled: !!data?.user?.access_token && !!id,
     });
 
-    if (!id) return null;
+    if (!id) return (
+        <div className="w-full h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full">
+                <div className="text-gray-500 text-sm">
+                    <p>Selecione um pedido para editar</p>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (isLoading) return (
+        <div className="w-full h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full">
+                <div className="text-gray-500 text-sm">
+                    <p>Carregando...</p>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (error) return (
+        <div className="w-full h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full">
+                <div className="text-gray-500 text-sm">
+                    <p>Erro ao carregar pedido: {error.message}</p>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (order?.status === "Finished") return (
+        <div className="w-full h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full">
+                <div className="text-gray-500 text-sm">
+                    <p>Pedido finalizado, não é possível editar</p>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (order?.status === "Cancelled") return (
+        <div className="w-full h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full">
+                <div className="text-gray-500 text-sm">
+                    <p>Pedido cancelado, não é possível editar</p>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <div className="w-full h-full bg-gray-50">
