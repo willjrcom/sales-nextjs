@@ -26,9 +26,9 @@ export function BottomCartBar({ orderID, setView }: BottomCartBarProps) {
     const count = order?.quantity_items || 0;
 
     const subtotalCents = useMemo(() => {
-        if (!order?.subtotal) return 0;
-        return new Decimal(order.subtotal).toNumber();
-    }, [order?.subtotal]);
+        if (!order?.sub_total) return 0;
+        return new Decimal(order.sub_total).toNumber();
+    }, [order?.sub_total]);
 
     if (count === 0) return null;
 

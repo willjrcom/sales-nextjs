@@ -207,7 +207,7 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
 
     const paymentMethod = order.delivery?.payment_method || 'N/A';
     const change = order.delivery?.change ? new Decimal(order.delivery.change).toFixed(2) : '0.00';
-    const subtotal = new Decimal(order.subtotal).toFixed(2);
+    const subtotal = new Decimal(order.sub_total).toFixed(2);
     const total = new Decimal(order.total).toFixed(2);
     return (
         <div>
