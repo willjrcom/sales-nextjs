@@ -18,6 +18,9 @@ import ClientAddressForm from '@/app/forms/client/update-address-order';
 import PickupNameForm from '@/app/forms/pickup-order/update-name-order';
 import TableNameForm from '@/app/forms/table-order/update-name-order';
 import { ChangeTableModal } from '../type/table-card';
+import AddTableTax from "@/app/api/order-table/update/add-tax/order-table";
+import RemoveTableTax from "@/app/api/order-table/update/remove-tax/order-table";
+import { UtensilsCrossed } from "lucide-react";
 
 // Simple Input component if not available in shared
 const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
@@ -103,6 +106,28 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
         submitOrderMutation.mutate();
     };
 
+    const handleAddTax = async () => {
+        if (!order || !order.table || !session) return;
+        try {
+            await AddTableTax(order.table.id, session);
+            notifySuccess("Taxa adicionada com sucesso");
+            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
+        } catch (error: any) {
+            notifyError(error.message || "Erro ao adicionar taxa");
+        }
+    };
+
+    const handleRemoveTax = async () => {
+        if (!order || !order.table || !session) return;
+        try {
+            await RemoveTableTax(order.table.id, session);
+            notifySuccess("Taxa removida com sucesso");
+            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
+        } catch (error: any) {
+            notifyError(error.message || "Erro ao remover taxa");
+        }
+    };
+
     if (isLoading || !order) {
         return (
             <div className='min-h-screen pt-10 text-center'>
@@ -152,6 +177,30 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                             <span className='font-bold text-blue-600 text-xl'>R$ {total.toFixed(2)}</span>
                         </div>
                     </div>
+
+                    {order.table && (
+                        <div className="mt-4 pt-4 border-t">
+                            {order.fees?.some(f => f.name === 'table_tax') ? (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 gap-2 border-red-100"
+                                    onClick={handleRemoveTax}
+                                >
+                                    <UtensilsCrossed size={14} /> Remover Taxa de Serviço (10%)
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full text-green-600 hover:text-green-700 hover:bg-green-50 gap-2 border-green-100"
+                                    onClick={handleAddTax}
+                                >
+                                    <UtensilsCrossed size={14} /> Adicionar Taxa de Serviço (10%)
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </Card>
 
                 {/* Delivery Information */}
