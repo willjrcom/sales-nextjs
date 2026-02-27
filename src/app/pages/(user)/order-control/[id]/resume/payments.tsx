@@ -84,9 +84,9 @@ export default function OrderPaymentsResume() {
     const haveGroups = order && order?.group_items?.length > 0
     const isAnyGroupsStaging = haveGroups && order?.group_items?.some((group) => group.status == "Staging")
     const isThrowButton = isStatusStagingOrPendingOrReady && isAnyGroupsStaging;
-    const totalPayableDecimal = new Decimal(order?.total_payable || "0");
-    const deliveryTaxDecimal = new Decimal((order?.delivery?.delivery_tax || "0"))
-    const tableTaxDecimal = new Decimal((order?.table?.tax_rate || "0"))
+    const totalDecimal = new Decimal(order?.total || "0");
+    const tableTaxFee = order?.fees?.find(f => f.name === 'table_tax');
+    const tableTaxValue = new Decimal(tableTaxFee?.value || 0);
 
     return (
         <div className="space-y-4">
@@ -136,10 +136,10 @@ export default function OrderPaymentsResume() {
                                 Taxa de Serviço
                             </h4>
                             <p className="text-2xl font-bold text-gray-900 mt-1">
-                                {tableTaxDecimal.toFixed(0)}%
+                                R$ {tableTaxValue.toFixed(2)}
                             </p>
                         </div>
-                        {tableTaxDecimal.gt(0) ? (
+                        {tableTaxValue.gt(0) ? (
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -165,27 +165,32 @@ export default function OrderPaymentsResume() {
             {/* Total Section */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl shadow-lg p-4 text-white">
                 <div className="space-y-2">
-                    {order?.delivery?.delivery_tax && (
-                        <div className="flex justify-between text-sm text-gray-300">
-                            <span>Taxa de entrega</span>
-                            {order.delivery.is_delivery_free ? (
+                    <div className="flex justify-between text-sm text-gray-300">
+                        <span>Subtotal</span>
+                        <span>R$ {new Decimal(order?.sub_total || 0).toFixed(2)}</span>
+                    </div>
+
+                    {order?.fees && order.fees.length > 0 && order.fees.map((fee, idx) => (
+                        <div key={idx} className="flex justify-between text-sm text-gray-300">
+                            <span>{fee.name === 'delivery_fee' ? 'Taxa de entrega' : fee.name === 'table_tax' ? 'Taxa de serviço' : fee.name}</span>
+                            {fee.name === 'delivery_fee' && order.delivery?.is_delivery_free ? (
                                 <div className="flex items-center gap-2">
                                     <span className="line-through text-gray-500">
-                                        R$ {deliveryTaxDecimal.toFixed(2)}
+                                        R$ {new Decimal(fee.value).toFixed(2)}
                                     </span>
                                     <span className="text-green-400 font-medium">Grátis!</span>
                                 </div>
                             ) : (
-                                <span>R$ {deliveryTaxDecimal.toFixed(2)}</span>
+                                <span>R$ {new Decimal(fee.value).toFixed(2)}</span>
                             )}
                         </div>
-                    )}
+                    ))}
 
                     <div className="border-t border-gray-700 pt-3 mt-3">
                         <div className="flex justify-between items-center">
                             <span className="text-gray-400">Total a pagar</span>
                             <span className="text-3xl font-bold">
-                                R$ {totalPayableDecimal.toFixed(2)}
+                                R$ {totalDecimal.toFixed(2)}
                             </span>
                         </div>
                     </div>

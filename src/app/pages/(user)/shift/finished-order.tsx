@@ -45,7 +45,7 @@ const ListOrderCard = ({ shift, status, title }: ListOrderProps) => {
                         {finishedOrders?.map((order, index) => (
                             <tr key={index} className="border-t">
                                 <td className="py-2">{order.order_number}</td>
-                                <td className="py-2">R$ {new Decimal(order.total_payable).toFixed(2)}</td>
+                                <td className="py-2">R$ {new Decimal(order.total).toFixed(2)}</td>
                                 <td className="py-2 text-center">
                                     <button
                                         onClick={() => handleShowOrder(order.id, order.order_number || 0)}

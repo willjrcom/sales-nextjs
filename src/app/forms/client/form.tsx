@@ -315,26 +315,17 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
                             )}
 
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex-1 sm:flex-[1.5] transform transition-transform duration-200 hover:scale-[1.01]">
-                                    <PatternField
-                                        patternName="cep"
-                                        name="cep"
-                                        friendlyName="CEP"
-                                        setValue={handleCepChange}
-                                        value={watch('cep')}
-                                        error={errors.cep?.message}
-                                    />
-                                </div>
                                 <div className="flex-1 sm:flex-[2.5] transform transition-transform duration-200 hover:scale-[1.01]">
                                     <TextField
                                         name="street"
-                                        friendlyName="Rua (bloqueado)"
+                                        friendlyName="Rua"
                                         placeholder="Selecione no autocomplete ou preencha o CEP"
                                         setValue={value => setValue('street', value)}
                                         value={watch('street')}
                                         disabled={true}
                                         error={errors.street?.message}
                                     />
+                                    <p className="text-xs text-muted-foreground">Carregado através do cep</p>
                                 </div>
                                 <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                                     <TextField

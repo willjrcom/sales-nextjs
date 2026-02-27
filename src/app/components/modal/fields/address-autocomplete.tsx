@@ -48,6 +48,11 @@ export default function AddressAutocomplete({
 
     // Close dropdown when clicking outside
     useEffect(() => {
+        // Check if maps is already ready on mount
+        if (typeof window !== 'undefined' && window.google?.maps) {
+            setMapsReady(true);
+        }
+
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setIsOpen(false);
@@ -210,25 +215,23 @@ export default function AddressAutocomplete({
                     </button>
                 )}
 
-                {(displayCep || defaultCep) && (
-                    <div className="mt-3">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">CEP</label>
-                        <input
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={9}
-                            value={displayCep || defaultCep}
-                            onChange={e => {
-                                setDisplayCep(e.target.value);
-                                onCepChange?.(e.target.value.replace(/\D/g, ''));
-                            }}
-                            placeholder="00000-000"
-                            className="w-40 px-3 py-1.5 border border-gray-300 rounded-md text-sm
+                <div className="mt-3">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">CEP</label>
+                    <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={9}
+                        value={displayCep || defaultCep}
+                        onChange={e => {
+                            setDisplayCep(e.target.value);
+                            onCepChange?.(e.target.value.replace(/\D/g, ''));
+                        }}
+                        placeholder="00000-000"
+                        className="w-40 px-3 py-1.5 border border-gray-300 rounded-md text-sm
                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                        bg-white transition-all"
-                        />
-                    </div>
-                )}
+                    />
+                </div>
             </div>
         </>
     );

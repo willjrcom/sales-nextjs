@@ -150,9 +150,9 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
 
     // Converter valores plain para Decimal
     const totalChangeDecimal = new Decimal(order.total_change);
-    const totalPayableDecimal = new Decimal(order.total_payable);
+    const totalDecimal = new Decimal(order.total);
     const totalPaidDecimal = new Decimal(order.total_paid);
-    const totalRestDecimal = totalPayableDecimal.minus(totalPaidDecimal);
+    const totalRestDecimal = totalDecimal.minus(totalPaidDecimal);
 
     const renderOrderTypeDetails = () => {
         if (order.delivery) {
@@ -423,12 +423,19 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             <hr className="my-4" />
             <div className="mb-6">
                 <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800">Resumo Financeiro</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
+                    <div className="flex items-center p-3 md:p-4 bg-white rounded-lg shadow">
+                        <FaDollarSign className="text-2xl text-gray-400 mr-3" />
+                        <div>
+                            <p className="text-sm text-gray-500">Subtotal</p>
+                            <p className="text-lg font-semibold text-gray-700">R$ {new Decimal(order.sub_total || 0).toFixed(2)}</p>
+                        </div>
+                    </div>
                     <div className="flex items-center p-3 md:p-4 bg-white rounded-lg shadow">
                         <FaMoneyBillWave className="text-2xl text-red-500 mr-3" />
                         <div>
-                            <p className="text-sm text-gray-500">Total a Pagar</p>
-                            <p className="text-lg font-semibold text-red-600">R$ {totalPayableDecimal.toFixed(2)}</p>
+                            <p className="text-sm text-gray-500">Total</p>
+                            <p className="text-lg font-semibold text-red-600">R$ {totalDecimal.toFixed(2)}</p>
                         </div>
                     </div>
                     <div className="flex items-center p-4 bg-white rounded-lg shadow">
@@ -453,6 +460,20 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         </div>
                     </div>
                 </div>
+
+                {order.fees && order.fees.length > 0 && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <p className="text-sm font-semibold text-gray-600 mb-2">Taxas Adicionais</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {order.fees.map((fee, idx) => (
+                                <div key={idx} className="flex justify-between items-center bg-white p-2 rounded border border-gray-100 shadow-sm">
+                                    <span className="text-sm text-gray-500">{fee.name === 'delivery_fee' ? 'Taxa de entrega' : fee.name === 'table_tax' ? 'Taxa de serviço' : fee.name}</span>
+                                    <span className="font-medium">R$ {new Decimal(fee.value).toFixed(2)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Pagamentos: escolha de layout */}

@@ -111,9 +111,9 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
         );
     }
 
-    const subtotal = new Decimal(order.total_payable || 0);
-    const deliveryFee = new Decimal(order.delivery?.delivery_tax || 0);
-    const total = subtotal.plus(deliveryFee);
+    const subtotal = new Decimal(order.sub_total || 0);
+    const total = new Decimal(order.total || 0);
+    const fees = order.fees || [];
     const client = order.delivery?.client;
     const address = client?.address;
 
@@ -136,12 +136,17 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                             <span className='text-gray-600'>Subtotal</span>
                             <span className='font-medium'>R$ {subtotal.toFixed(2)}</span>
                         </div>
-                        {order.delivery && (
-                            <div className='flex justify-between'>
-                                <span className='text-gray-600'>Taxa de entrega</span>
-                                <span className='font-medium'>R$ {deliveryFee.toFixed(2)}</span>
+                        {fees.map((fee, idx) => (
+                            <div key={idx} className='flex justify-between'>
+                                <span className='text-gray-600'>{fee.name === 'delivery_fee' ? 'Taxa de entrega' : fee.name === 'table_tax' ? 'Taxa de serviço' : fee.name}</span>
+                                <span className='font-medium'>R$ {new Decimal(fee.value).toFixed(2)}</span>
                             </div>
-                        )}
+                        ))}
+                        {/* total pago */}
+                        <div className='flex justify-between'>
+                            <span className='text-gray-600'>Total Pago</span>
+                            <span className='font-medium'>R$ {new Decimal(order.total_paid || 0).toFixed(2)}</span>
+                        </div>
                         <div className='border-t pt-2 flex justify-between text-base'>
                             <span className='font-semibold'>Total</span>
                             <span className='font-bold text-blue-600 text-xl'>R$ {total.toFixed(2)}</span>
@@ -162,8 +167,8 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                 size="sm"
                                 className="text-blue-600 hover:text-blue-700 h-8 gap-1 p-0 px-2"
                                 onClick={() => {
-                                    if (client) {
-                                        modalHandler.showModal('edit-address-order-' + client.id, 'Atualizar Endereço', <ClientAddressForm item={client} />)
+                                    if (client && order.delivery) {
+                                        modalHandler.showModal('edit-address-order-' + client.id, 'Atualizar Endereço', <ClientAddressForm item={client} deliveryId={order.delivery.id} />)
                                     }
                                 }}
                             >
@@ -316,15 +321,18 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                     </Card>
                 )}
 
+
                 {/* Submit Button */}
-                <Button
-                    size='lg'
-                    className='w-full h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold text-lg shadow-lg'
-                    onClick={handleSubmitOrder}
-                    disabled={submitOrderMutation.isPending}
-                >
-                    {submitOrderMutation.isPending ? 'Enviando...' : (order.table ? '👨‍🍳 Enviar para Cozinha' : '🚀 Enviar Pedido')}
-                </Button>
+                {(order.status === 'Staging' || (order.table && order.table.status === 'Pending')) && (
+                    <Button
+                        size='lg'
+                        className='w-full h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold text-lg shadow-lg'
+                        onClick={handleSubmitOrder}
+                        disabled={submitOrderMutation.isPending}
+                    >
+                        {submitOrderMutation.isPending ? 'Enviando...' : (order.table ? '👨‍🍳 Enviar para Cozinha' : '🚀 Enviar Pedido')}
+                    </Button>
+                )}
             </div>
         </div >
     );

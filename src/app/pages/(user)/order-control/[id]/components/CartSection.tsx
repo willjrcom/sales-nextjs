@@ -87,16 +87,9 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
         [order?.group_items]
     );
 
-    const subtotal = useMemo(() => {
-        if (!order) return new Decimal(0);
-        // return new Decimal(order.total_payable || 0); // sales-nextjs logic might rely on manual calculation if backend field isn't updated instantly?
-        // Let's stick to order.total_payable if available, assuming websocket/refetch updates it.
-        // Actually in gfood-app we use order.total_payable.
-        return new Decimal(order.total_payable || 0);
-    }, [order]);
-
-    const deliveryFee = new Decimal(order?.delivery?.delivery_tax || 0);
-    const total = subtotal.plus(deliveryFee);
+    const subtotal = useMemo(() => new Decimal(order?.sub_total || 0), [order]);
+    const total = useMemo(() => new Decimal(order?.total || 0), [order]);
+    const fees = useMemo(() => order?.fees || [], [order]);
 
     const deleteItemMutation = useMutation({
         mutationFn: async (itemId: string) => {
@@ -160,19 +153,10 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
 
     return (
         <div className='min-h-screen bg-gray-50 pb-24 pt-4'>
-
-            {/* Header-like navigation */}
-            <div className="px-4 mb-4">
-                <Button variant="ghost" onClick={() => GoToMenu()} className="-ml-3 text-gray-600 gap-2">
-                    ← Voltar ao menu
-                </Button>
-                <h1 className="text-2xl font-bold text-gray-900 mt-2">Carrinho</h1>
-            </div>
-
             <div className='mx-auto max-w-md px-4 space-y-4'>
                 {/* Order Number Header */}
                 <div className="flex justify-between items-center mb-4 px-2">
-                    <h2 className="text-xl font-bold text-gray-800">Pedido #{order?.order_number}</h2>
+                    <h2 className="text-xl font-bold text-gray-800">Pedido #{order?.order_number}</h2> <span className={`ml-2 px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor[order?.status || '']}`}>{showStatus[order?.status || '']}</span>
                 </div>
 
                 {!hasItems ? (
@@ -181,19 +165,21 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                         <p className='font-semibold text-lg'>Seu carrinho está vazio</p>
                         <p className='mt-2 text-sm text-gray-500'>Escolha itens no menu para continuar.</p>
                         <Button className='mt-6 w-full' onClick={() => GoToMenu()}>
-                            Voltar ao menu
+                            Adicionar itens
                         </Button>
                     </Card>
                 ) : (
                     <>
-                        <Button
-                            className='mt-3 w-full'
-                            variant='outline'
-                            disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
-                            onClick={handleAddNewGroup}
-                        >
-                            Adicionar mais itens
-                        </Button>
+                        {(order?.status === 'Staging' || (order?.table && order?.table.status === 'Pending')) && (
+                            <Button
+                                className='mt-3 w-full'
+                                variant='outline'
+                                disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
+                                onClick={handleAddNewGroup}
+                            >
+                                Adicionar mais itens
+                            </Button>
+                        )}
 
                         {/* Group Items */}
                         <div className='space-y-4'>
@@ -324,40 +310,47 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
 
                         {/* Order Summary */}
                         <Card className='mt-6 p-4 shadow-md bg-white border-t-4 border-t-blue-500'>
-                            <Row label='Subtotal' value={`R$ ${new Decimal(subtotal.toNumber()).toFixed(2)}`} />
-                            {deliveryFee.greaterThan(0) && (
-                                <Row label='Taxa de entrega' value={`R$ ${new Decimal(deliveryFee.toNumber()).toFixed(2)}`} />
-                            )}
+                            <Row label='Subtotal' value={`R$ ${subtotal.toFixed(2)}`} />
+                            {fees.map((fee, idx) => (
+                                <Row key={idx} label={fee.name === 'delivery_fee' ? 'Taxa de entrega' : fee.name === 'table_tax' ? 'Taxa de serviço' : fee.name} value={`R$ ${new Decimal(fee.value).toFixed(2)}`} />
+                            ))}
                             <div className='my-3 h-px bg-gray-100' />
                             <div className='flex items-center justify-between'>
                                 <p className='text-base font-medium text-gray-600'>Total</p>
-                                <p className='text-2xl font-extrabold text-blue-600'>R$ {new Decimal(total.toNumber()).toFixed(2)}</p>
+                                <p className='text-2xl font-extrabold text-blue-600'>R$ {total.toFixed(2)}</p>
                             </div>
 
                             {
                                 <>
-                                    {order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0) && (
-                                        <div className="space-y-3 mt-6">
-                                            {order.group_items.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1) ? (
+                                    <div className="space-y-3 mt-6">
+                                        {(order?.status === 'Staging' || (order?.table && order?.table.status === 'Pending')) && order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0) ? (
+                                            order.group_items.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1) ? (
                                                 <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-800 text-sm font-medium flex items-center gap-2">
                                                     <span className="material-symbols-outlined text-orange-500 text-lg">warning</span>
                                                     Finalize os itens fracionados incompletos para enviar o pedido.
                                                 </div>
                                             ) : (
                                                 <Button className='w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
-                                                    Enviar pedido
+                                                    {order.table ? '👨‍🍳 Enviar para Cozinha' : '🚀 Enviar pedido'}
                                                 </Button>
-                                            )}
-                                        </div>
+                                            )
+                                        ) : (
+                                            <Button className='w-full h-12 text-lg bg-blue-500 hover:bg-blue-600' onClick={() => setView('checkout')}>
+                                                🔍 Ver pedido
+                                            </Button>
+                                        )}
+                                    </div>
+
+                                    {(order?.status === 'Staging' || (order?.table && order?.table.status === 'Pending')) && (
+                                        <Button
+                                            className='mt-3 w-full'
+                                            variant='outline'
+                                            disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
+                                            onClick={handleAddNewGroup}
+                                        >
+                                            Adicionar mais itens
+                                        </Button>
                                     )}
-                                    <Button
-                                        className='mt-3 w-full'
-                                        variant='outline'
-                                        disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
-                                        onClick={handleAddNewGroup}
-                                    >
-                                        Adicionar mais itens
-                                    </Button>
                                 </>}
                         </Card>
                     </>

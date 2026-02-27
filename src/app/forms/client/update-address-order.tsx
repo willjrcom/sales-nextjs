@@ -1,32 +1,42 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import Client, { ClientFormData, SchemaClient } from '@/app/entities/client/client';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { ToIsoDate } from '@/app/utils/date';
 import { useSession } from 'next-auth/react';
 import UpdateClient from '@/app/api/client/update/client';
+import UpdateAddressOrderDelivery from '@/app/api/order-delivery/update/address/order-delivery';
 import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TextField, SelectField } from '@/app/components/modal/field';
 import PatternField from '@/app/components/modal/fields/pattern';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Decimal from 'decimal.js';
 import GetAddressByCEP from '@/app/api/busca-cep/busca-cep';
-import { FaSearch } from 'react-icons/fa';
 import { addressUFsWithId } from '@/app/entities/address/utils';
+import AddressAutocomplete, { ParsedAddress } from '@/app/components/modal/fields/address-autocomplete';
+import GetShippingFeeByCEP from '@/app/api/client/shipping-fee/cep/[cep]';
+import GetCompany from '@/app/api/company/company';
+import PriceField from "@/app/components/modal/fields/price";
 
 export interface UpdateAddressOrderProps {
     item: Client;
+    deliveryId?: string;
 }
 
-const ClientAddressForm = ({ item }: UpdateAddressOrderProps) => {
+const ClientAddressForm = ({ item, deliveryId }: UpdateAddressOrderProps) => {
     const modalName = 'edit-address-order-' + item?.id;
     const modalHandler = useModal();
     const { data: session } = useSession();
     const queryClient = useQueryClient();
-    const [loadingCep, setLoadingCep] = useState(false);
+    const [showManualTax, setShowManualTax] = useState(() => {
+        return item?.address?.delivery_tax && new Decimal(item.address.delivery_tax).greaterThan(0);
+    });
+    const [addressSelected, setAddressSelected] = useState(() => {
+        return !!(item?.address?.street);
+    });
 
     const initialData = useMemo(() => new Client(item), [item]);
 
@@ -54,17 +64,33 @@ const ClientAddressForm = ({ item }: UpdateAddressOrderProps) => {
             complement: initialData.address.complement,
             reference: initialData.address.reference,
             delivery_tax: new Decimal(initialData.address.delivery_tax || 0).toNumber(),
+            distance: new Decimal(initialData.address.distance || 0).toNumber(),
         }
+    });
+
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(session!),
+        enabled: !!session?.user?.access_token,
     });
 
     const updateMutation = useMutation({
         mutationFn: (updatedClient: Client) => UpdateClient(updatedClient, session!),
-        onSuccess: (_, updatedClient) => {
-            queryClient.invalidateQueries({ queryKey: ['clients'] });
-            queryClient.invalidateQueries({ queryKey: ['orders'] });
-            queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
-            notifySuccess(`Endereço de ${updatedClient.name} atualizado com sucesso`);
-            modalHandler.hideModal(modalName);
+        onSuccess: async (_, updatedClient) => {
+            if (deliveryId && session) {
+                try {
+                    await UpdateAddressOrderDelivery(deliveryId, session);
+                    queryClient.invalidateQueries({ queryKey: ['clients'] });
+                    queryClient.invalidateQueries({ queryKey: ['orders'] });
+                    queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
+                    notifySuccess(`Endereço de ${updatedClient.name} atualizado com sucesso`);
+                    modalHandler.hideModal(modalName);
+                } catch (deliveryError) {
+                    const err = deliveryError as RequestError;
+                    notifyError(err.message || 'Erro ao atualizar endereço de entrega');
+                    return
+                }
+            }
         },
         onError: (error: RequestError) => {
             notifyError(error.message || 'Erro ao atualizar endereço');
@@ -88,7 +114,8 @@ const ClientAddressForm = ({ item }: UpdateAddressOrderProps) => {
                 cep: formData.cep,
                 complement: formData.complement,
                 reference: formData.reference,
-                delivery_tax: new Decimal(formData.delivery_tax || 0)
+                delivery_tax: new Decimal(formData.delivery_tax || 0),
+                distance: new Decimal(formData.distance || 0).toNumber()
             }
         });
 
@@ -105,131 +132,205 @@ const ClientAddressForm = ({ item }: UpdateAddressOrderProps) => {
         notifyError('Formulário inválido. Verifique os campos obrigatórios.');
     }
 
-    const getAddress = async () => {
-        const cep = watch('cep');
-        if (!cep) return;
+    const handleAddressSelected = async (parsed: ParsedAddress) => {
+        setValue('street', parsed.street);
+        setValue('number', parsed.number);
+        setValue('neighborhood', parsed.neighborhood);
+        setValue('city', parsed.city);
+        setValue('uf', parsed.uf);
+        if (parsed.cep) setValue('cep', parsed.cep);
+        setAddressSelected(true);
 
-        setLoadingCep(true);
-        try {
-            const addressFound = await GetAddressByCEP(cep);
-            if (addressFound && addressFound.logradouro) {
-                setValue('street', addressFound.logradouro);
-                setValue('neighborhood', addressFound.bairro);
-                setValue('city', addressFound.localidade);
-                setValue('uf', addressFound.uf);
+        if (parsed.cep && session) {
+            try {
+                const distance = await GetShippingFeeByCEP(parsed.cep, session);
+                setValue('distance', Number(distance));
+                if (!showManualTax) setValue('delivery_tax', 0);
+            } catch (feeError) {
+                console.warn('Failed to calculate distance:', feeError);
             }
-        } catch (error) {
-            notifyError('Erro ao buscar CEP');
-        } finally {
-            setLoadingCep(false);
+        }
+    }
+
+    const handleCepChange = async (cep: string) => {
+        setValue('cep', cep);
+        if (cep.length === 8 && session) {
+            try {
+                const addressData = await GetAddressByCEP(cep);
+                if (addressData) {
+                    setValue('street', addressData.logradouro);
+                    setValue('neighborhood', addressData.bairro);
+                    setValue('city', addressData.localidade);
+                    setValue('uf', addressData.uf);
+                    setAddressSelected(true);
+                }
+
+                const distance = await GetShippingFeeByCEP(cep, session);
+                setValue('distance', Number(distance));
+                if (!showManualTax) setValue('delivery_tax', 0);
+            } catch (feeError) {
+                console.warn('Failed to recalculate address or distance for CEP:', feeError);
+            }
         }
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-end">
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <PatternField
-                        patternName='cep'
-                        name="cep"
-                        friendlyName="Cep"
-                        placeholder="00000-000"
-                        setValue={value => setValue('cep', value)}
-                        value={watch('cep') || ''}
-                        optional
-                        formatted={true}
-                        error={errors.cep?.message}
-                    />
-                </div>
-                <button
-                    type="button"
-                    className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md disabled:bg-gray-400'
-                    onClick={getAddress}
-                    disabled={loadingCep}
-                >
-                    <FaSearch />&nbsp;<span>{loadingCep ? 'Buscando...' : 'Buscar'}</span>
-                </button>
-            </div>
+        <div className="text-black space-y-6">
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-green-200">Endereço de Entrega</h3>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
-                    <TextField
-                        name="street"
-                        friendlyName="Rua"
-                        placeholder="Digite sua rua"
-                        setValue={value => setValue('street', value)}
-                        value={watch('street')}
-                        error={errors.street?.message}
-                    />
-                </div>
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <TextField
-                        name="number"
-                        friendlyName="Numero"
-                        placeholder="Digite o numero"
-                        setValue={value => setValue('number', value)}
-                        value={watch('number')}
-                        error={errors.number?.message}
-                    />
-                </div>
-            </div>
+                <div className="space-y-4">
+                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                        <AddressAutocomplete
+                            onAddressSelected={handleAddressSelected}
+                            onCepChange={handleCepChange}
+                            onManualEntry={() => setAddressSelected(true)}
+                            placeholder="Ex: Rua das Flores, 123, São Paulo"
+                            defaultValue={item?.address ? `${item.address.street} ${item.address.number}, ${item.address.city}` : ''}
+                            defaultCep={item?.address?.cep || ''}
+                        />
+                    </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <TextField
-                        name="neighborhood"
-                        friendlyName="Bairro"
-                        placeholder="Digite o bairro"
-                        setValue={value => setValue('neighborhood', value)}
-                        value={watch('neighborhood')}
-                        error={errors.neighborhood?.message}
-                    />
-                </div>
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <TextField
-                        name="complement"
-                        friendlyName="Complemento"
-                        placeholder="Digite o complemento"
-                        setValue={value => setValue('complement', value)}
-                        value={watch('complement') || ''}
-                        optional
-                        error={errors.complement?.message}
-                    />
-                </div>
-            </div>
+                    {addressSelected && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                            {showManualTax ? (
+                                <div className="mt-2">
+                                    <div className="flex justify-end mb-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowManualTax(false);
+                                                setValue('delivery_tax', 0);
+                                            }}
+                                            className="text-xs text-red-500 hover:text-red-700 underline"
+                                        >
+                                            Desativar e usar cálculo km
+                                        </button>
+                                    </div>
+                                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                        <PriceField
+                                            name="delivery_tax"
+                                            friendlyName="Taxa de Entrega Fixa"
+                                            placeholder="Ex: 8.50"
+                                            setValue={(val: Decimal) => setValue('delivery_tax', val.toNumber())}
+                                            value={watch('delivery_tax') || 0}
+                                            optional
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-1 flex flex-col items-start gap-1">
+                                    {Number(watch('distance') || 0) > 0 && (() => {
+                                        const distKm = Number(watch('distance') || 0);
+                                        const feePerKm = new Decimal(company?.preferences?.delivery_fee_per_km || '0');
+                                        const minTax = new Decimal(company?.preferences?.min_delivery_tax || '0');
+                                        const estimated = Decimal.max(feePerKm.mul(distKm), minTax);
+                                        return (
+                                            <div className="text-sm text-green-600 font-medium space-y-0.5">
+                                                <p>Distância: ~{distKm.toFixed(2)} km <span className="text-xs font-normal text-gray-400">(estimativa por CEP)</span></p>
+                                                {estimated.greaterThan(0) && (
+                                                    estimated.equals(minTax) && minTax.greaterThan(feePerKm.mul(distKm))
+                                                        ? <p>Taxa mínima de entrega: R$ {estimated.toFixed(2)}</p>
+                                                        : <p>Taxa estimada: ~R$ {estimated.toFixed(2)}</p>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowManualTax(true)}
+                                        className="text-xs text-blue-500 hover:text-blue-700 underline"
+                                    >
+                                        Inserir taxa fixa manualmente
+                                    </button>
+                                </div>
+                            )}
 
-            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                <TextField
-                    name="reference"
-                    friendlyName="Referência"
-                    placeholder="Digite a referência"
-                    setValue={value => setValue('reference', value)}
-                    value={watch('reference') || ''}
-                    optional
-                    error={errors.reference?.message}
-                />
-            </div>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 sm:flex-[2.5] transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <TextField
+                                        name="street"
+                                        friendlyName="Rua"
+                                        placeholder="Selecione no autocomplete ou preencha o CEP"
+                                        setValue={value => setValue('street', value)}
+                                        value={watch('street')}
+                                        disabled={true}
+                                        error={errors.street?.message}
+                                    />
+                                    <p className="text-xs text-muted-foreground">Carregado através do cep</p>
+                                </div>
+                                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <TextField
+                                        name="number"
+                                        friendlyName="Numero"
+                                        placeholder="Digite o numero"
+                                        setValue={value => setValue('number', value)}
+                                        value={watch('number')}
+                                        error={errors.number?.message}
+                                    />
+                                </div>
+                            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
-                    <TextField
-                        name="city"
-                        friendlyName="Cidade"
-                        placeholder="Digite a cidade"
-                        setValue={value => setValue('city', value)}
-                        value={watch('city')}
-                        error={errors.city?.message}
-                    />
-                </div>
-                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                    <SelectField
-                        name="uf"
-                        friendlyName="Estado"
-                        setSelectedValue={value => setValue('uf', value)}
-                        selectedValue={watch('uf')}
-                        values={addressUFsWithId}
-                    />
-                    {errors.uf && <p className="text-red-500 text-xs italic mt-1">{errors.uf.message}</p>}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <TextField
+                                        name="neighborhood"
+                                        friendlyName="Bairro"
+                                        placeholder="Digite o bairro"
+                                        setValue={value => setValue('neighborhood', value)}
+                                        value={watch('neighborhood')}
+                                        error={errors.neighborhood?.message}
+                                    />
+                                </div>
+                                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <TextField
+                                        name="complement"
+                                        friendlyName="Complemento"
+                                        placeholder="Digite o complemento"
+                                        setValue={value => setValue('complement', value)}
+                                        value={watch('complement') || ''}
+                                        optional
+                                        error={errors.complement?.message}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="reference"
+                                    friendlyName="Referência"
+                                    placeholder="Digite a referência"
+                                    setValue={value => setValue('reference', value)}
+                                    value={watch('reference') || ''}
+                                    optional
+                                    error={errors.reference?.message}
+                                />
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <TextField
+                                        name="city"
+                                        friendlyName="Cidade"
+                                        placeholder="Digite a cidade"
+                                        setValue={value => setValue('city', value)}
+                                        value={watch('city')}
+                                        error={errors.city?.message}
+                                    />
+                                </div>
+                                <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                    <SelectField
+                                        name="uf"
+                                        friendlyName="Estado"
+                                        setSelectedValue={value => setValue('uf', value)}
+                                        selectedValue={watch('uf')}
+                                        values={addressUFsWithId}
+                                    />
+                                    {errors.uf && <p className="text-red-500 text-xs italic mt-1">{errors.uf.message}</p>}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

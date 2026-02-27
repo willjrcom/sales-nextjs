@@ -211,7 +211,7 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
     const { icon, bg } = getTypeIcon(order);
     const info = getSecondaryInfo(order);
 
-    const total = formatCurrencyBR(order.total_payable);
+    const total = formatCurrencyBR(order.total);
     const items = order.quantity_items ?? 0;
 
     // badge tempo (limitado)

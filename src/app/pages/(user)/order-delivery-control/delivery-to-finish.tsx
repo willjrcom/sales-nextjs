@@ -207,14 +207,16 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
 
     const paymentMethod = order.delivery?.payment_method || 'N/A';
     const change = order.delivery?.change ? new Decimal(order.delivery.change).toFixed(2) : '0.00';
-    const total = new Decimal(order.total_payable).toFixed(2);
+    const subtotal = new Decimal(order.subtotal).toFixed(2);
+    const total = new Decimal(order.total).toFixed(2);
     return (
         <div>
             <div className="space-y-2 mb-4">
                 <p className="text-sm text-gray-700">Confirma finalização da entrega?</p>
                 <p className="text-sm"><strong>Método de pagamento:</strong> {paymentMethod}</p>
                 <p className="text-sm"><strong>Troco (R$):</strong> {change}</p>
-                <p className="text-sm"><strong>Valor total (R$):</strong> {total}</p>
+                <p className="text-sm"><strong>Subtotal (R$):</strong> {subtotal}</p>
+                <p className="text-sm"><strong>Total a pagar (R$):</strong> {total}</p>
             </div>
             <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50 disabled:cursor-not-allowed"

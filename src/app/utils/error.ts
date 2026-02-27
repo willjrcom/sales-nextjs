@@ -80,6 +80,8 @@ const errorTranslations: Record<string, string> = {
     "group item size invalid": "O tamanho do item é diferente do grupo, adicione um novo grupo de itens.",
     "opened queue not found": "Nenhuma fila aberta encontrada",
     "end change is required": "O valor final do caixa é obrigatório",
+    "order already shipped": "O pedido já foi enviado",
+    "order already delivered": "O pedido já foi entregue",
 
     // Erros de Grupo de Itens (Group Item)
     "group item not staging": "Esse item já foi enviado para produção, por favor, adicione um novo grupo de itens.",

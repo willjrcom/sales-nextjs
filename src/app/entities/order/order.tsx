@@ -8,13 +8,20 @@ import OrderTable from "./order-table";
 
 export type StatusOrder = "Staging" | "Pending" | "Ready" | "Finished" | "Cancelled" | "Archived";
 
+export interface AdditionalFee {
+    name: string;
+    value: Decimal;
+}
+
 export default class Order {
     id: string = '';
     order_number: number = 0;
     status: StatusOrder = "Staging";
     group_items: GroupItem[] = [];
     payments?: PaymentOrder[] = [];
-    total_payable: Decimal = new Decimal(0);
+    fees: AdditionalFee[] = [];
+    sub_total: Decimal = new Decimal(0);
+    total: Decimal = new Decimal(0);
     total_paid: Decimal = new Decimal(0);
     total_change: Decimal = new Decimal(0);
     quantity_items: number = 0;

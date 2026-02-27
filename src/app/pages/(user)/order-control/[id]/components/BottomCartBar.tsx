@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import Decimal from 'decimal.js';
 import { OrderControlView } from '../page';
 import { useSession } from 'next-auth/react';
-import Order from '@/app/entities/order/order';
 
 interface BottomCartBarProps {
     orderID: string;
@@ -26,10 +25,10 @@ export function BottomCartBar({ orderID, setView }: BottomCartBarProps) {
 
     const count = order?.quantity_items || 0;
 
-    const totalCents = useMemo(() => {
-        if (!order?.total_payable) return 0;
-        return new Decimal(order.total_payable).toNumber();
-    }, [order?.total_payable]);
+    const subtotalCents = useMemo(() => {
+        if (!order?.subtotal) return 0;
+        return new Decimal(order.subtotal).toNumber();
+    }, [order?.subtotal]);
 
     if (count === 0) return null;
 
@@ -44,7 +43,7 @@ export function BottomCartBar({ orderID, setView }: BottomCartBarProps) {
                 </div>
                 <div className='flex-1 text-left'>
                     <p className='text-xs text-white/70'>Total</p>
-                    <p className='font-semibold'>R$ {new Decimal(totalCents || 0).toFixed(2)}</p>
+                    <p className='font-semibold'>R$ {new Decimal(subtotalCents || 0).toFixed(2)}</p>
                 </div>
                 <div className='inline-flex items-center gap-2 bg-white text-black rounded-2xl h-11 px-4 font-medium'>
                     Ver carrinho <FaArrowRight size={14} />

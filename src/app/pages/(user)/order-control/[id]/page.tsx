@@ -17,7 +17,7 @@ export type OrderControlView = 'menu' | 'cart' | 'checkout';
 const PageEditOrderControl = () => {
     const { data } = useSession();
     const { id } = useParams();
-    const [view, setView] = useState<OrderControlView>('menu');
+    const [view, setView] = useState<OrderControlView>('cart');
     const queryClient = useQueryClient();
 
     useEffect(() => {
