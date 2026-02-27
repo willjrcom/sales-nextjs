@@ -230,7 +230,6 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 setIsProcessing(true);
                 try {
                     await CloseTable(order.table?.id, data);
-                    queryClient.invalidateQueries({ queryKey: ['orders'] });
                     queryClient.invalidateQueries({ queryKey: ['table-orders'] });
                     refetch();
                 } catch (error) {
@@ -304,7 +303,6 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 setIsProcessing(true);
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
-                    queryClient.invalidateQueries({ queryKey: ['orders'] });
                     queryClient.invalidateQueries({ queryKey: ['pickup-orders-ready'] });
                     queryClient.invalidateQueries({ queryKey: ['pickup-orders-delivered'] });
                     refetch();

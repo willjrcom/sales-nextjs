@@ -80,8 +80,6 @@ const ClientAddressForm = ({ item, deliveryId }: UpdateAddressOrderProps) => {
             if (deliveryId && session) {
                 try {
                     await UpdateAddressOrderDelivery(deliveryId, session);
-                    queryClient.invalidateQueries({ queryKey: ['clients'] });
-                    queryClient.invalidateQueries({ queryKey: ['orders'] });
                     queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
                     notifySuccess(`Endereço de ${updatedClient.name} atualizado com sucesso`);
                     modalHandler.hideModal(modalName);

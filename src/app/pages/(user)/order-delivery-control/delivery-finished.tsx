@@ -9,11 +9,11 @@ import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { FaBoxOpen } from "react-icons/fa";
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useUser } from "@/app/context/user-context";
 import AccessDenied from "@/app/components/access-denied";
+import { GetOrdersWithFinishedDelivery } from "../../../api/order/all/delivery/order";
 
 const DeliveryOrderFinished = () => {
     const queryClient = useQueryClient();
@@ -24,10 +24,10 @@ const DeliveryOrderFinished = () => {
     const { hasPermission, user } = useUser();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['delivery-orders'],
+        queryKey: ['finished-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetOrdersWithDelivery(data!);
+            return GetOrdersWithFinishedDelivery(data!);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 60000,
@@ -97,7 +97,7 @@ const DeliveryOrderFinished = () => {
                 <h3 className="text-lg font-semibold mb-1">Pedidos finalizados</h3>
                 <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             </div>
-            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => queryClient.invalidateQueries({ queryKey: ['delivery-orders'] })}>
+            {orderID && <ButtonIconTextFloat modalName={"show-order-" + orderID} icon={FaBoxOpen} title="Ver entrega" position="bottom-right" size="xl" onCloseModal={() => queryClient.invalidateQueries({ queryKey: ['finished-delivery-orders'] })}>
                 <CardOrder orderId={orderID} />
             </ButtonIconTextFloat>}
         </>

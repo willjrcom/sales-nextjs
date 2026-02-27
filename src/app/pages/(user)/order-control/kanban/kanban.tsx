@@ -57,7 +57,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
             try {
                 setIsProcessing(true);
                 await ReadyOrder(orderId, data);
-                queryClient.invalidateQueries({ queryKey: ['orders'] });
+                queryClient.invalidateQueries({ queryKey: ['opened-orders'] });
             } catch (error: RequestError | any) {
                 notifyError(error.message || 'erro ao deixar pedido pronto')
             } finally {
@@ -69,7 +69,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
             try {
                 setIsProcessing(true);
                 await FinishOrder(orderId, data);
-                queryClient.invalidateQueries({ queryKey: ['orders'] });
+                queryClient.invalidateQueries({ queryKey: ['opened-orders'] });
             } catch (error: RequestError | any) {
                 notifyError(error.message || 'erro ao finalizar pedido')
             } finally {

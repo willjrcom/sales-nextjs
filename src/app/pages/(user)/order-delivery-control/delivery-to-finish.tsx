@@ -20,11 +20,11 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import { useUser } from "@/app/context/user-context";
 import AccessDenied from "@/app/components/access-denied";
+import { GetOrdersWithShippedDelivery } from "../../../api/order/all/delivery/order";
 
 const DeliveryOrderToFinish = () => {
     // const [centerPoint, setCenterPoint] = useState<Point | null>(null);
@@ -38,10 +38,10 @@ const DeliveryOrderToFinish = () => {
     const { hasPermission, user } = useUser();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['delivery-orders'],
+        queryKey: ['shipped-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetOrdersWithDelivery(data!);
+            return GetOrdersWithShippedDelivery(data!);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
@@ -192,7 +192,7 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
             await DeliveryOrderDelivery(deliveryID, data);
 
             notifySuccess("Entrega recebida com sucesso");
-            queryClient.invalidateQueries({ queryKey: ['delivery-orders'] });
+            queryClient.invalidateQueries({ queryKey: ['shipped-delivery-orders'] });
 
             modalHandler.hideModal("finish-delivery");
             showOrder(order.id);

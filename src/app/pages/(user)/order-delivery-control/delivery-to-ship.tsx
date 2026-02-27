@@ -18,13 +18,12 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { FaMotorcycle } from "react-icons/fa";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-import printOrder from "@/app/components/print/print-order";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import GetOrdersWithDelivery from '@/app/api/order/all/delivery/order';
 import GetAllDeliveryDrivers from '@/app/api/delivery-driver/delivery-driver';
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import AccessDenied from "@/app/components/access-denied";
 import { useUser } from "@/app/context/user-context";
+import { GetOrdersWithReadyDelivery } from "../../../api/order/all/delivery/order";
 
 const DeliveryOrderToShip = () => {
     // const [centerPoint, setCenterPoint] = useState<Point | null>(null);
@@ -38,10 +37,10 @@ const DeliveryOrderToShip = () => {
     const { hasPermission, user } = useUser();
 
     const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
-        queryKey: ['delivery-orders'],
+        queryKey: ['ready-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetOrdersWithDelivery(data!);
+            return GetOrdersWithReadyDelivery(data!);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
@@ -187,7 +186,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
         setIsProcessing(true);
         try {
             await ShipOrderDelivery(deliveryOrderIds, selectedDriver.id, data);
-            queryClient.invalidateQueries({ queryKey: ['delivery-orders'] });
+            queryClient.invalidateQueries({ queryKey: ['ready-delivery-orders'] });
 
             if (orderIDs.length > 1) {
                 notifySuccess("Entregas enviadas com sucesso");

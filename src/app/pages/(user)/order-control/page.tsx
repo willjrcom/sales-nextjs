@@ -8,11 +8,12 @@ import { useModal } from "@/app/context/modal/context";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import GetOrders from "@/app/api/order/order";
+import { GetOpenedOrders } from "@/app/api/order/order";
 import { notifyError } from "@/app/utils/notifications";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
 import { FaList } from "react-icons/fa";
 import ThreeColumnHeader from '@/components/header/three-column-header';
+import ListFinishedOrdersCard from './kanban/list-finished-orders-card';
 
 const PageOrder = () => {
     const { data } = useSession();
@@ -20,10 +21,10 @@ const PageOrder = () => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     const { isPending, error, data: ordersResponse, refetch } = useQuery({
-        queryKey: ['orders'],
+        queryKey: ['opened-orders'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
-            return GetOrders(data!);
+            return GetOpenedOrders(data!);
         },
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
@@ -35,7 +36,6 @@ const PageOrder = () => {
 
     const orders = useMemo(() => ordersResponse?.items || [], [ordersResponse?.items]);
     const stagingOrders = useMemo(() => orders.filter((order) => order.status === "Staging"), [orders]);
-    const finishedOrders = useMemo(() => orders.filter((order) => order.status === "Finished"), [orders]);
 
     const openStagingOrders = () => {
         const onClose = () => {
@@ -49,7 +49,7 @@ const PageOrder = () => {
     return (
         <>
             <ButtonIconTextFloat modalName="show-finished-orders" icon={FaList} position="bottom-right" title="Pedidos finalizados">
-                <ListItemsCard orders={finishedOrders} />
+                <ListFinishedOrdersCard />
             </ButtonIconTextFloat>
 
             <div className="w-full h-full px-3 py-2">
