@@ -37,10 +37,12 @@ const RegisterForm = () => {
                     const res = await ValidatePasswordResetToken(tokenFromUrl);
                     setJwtResult(res);
                     if (res.valid) {
+                        if (res.email) setEmail(res.email);
                         setShowPasswordModal(true);
                     }
                 } catch (err: any) {
-                    setJwtResult({ valid: false, error: err?.message || 'Erro ao validar token' });
+                    console.error('Validation error:', err);
+                    setJwtResult({ valid: false, error: err?.message || err?.error?.message || 'Erro ao validar token' });
                 }
             };
             validate();
@@ -84,51 +86,27 @@ const RegisterForm = () => {
                         <p className="text-gray-600 mb-6">
                             Enviamos um email para <strong>{email}</strong> com instruções para redefinir sua senha.
                         </p>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
                             <div className="flex items-center gap-3">
-                                <HiOutlineMail className="text-blue-600" size={20} />
-                                <p className="text-blue-800 text-sm">
-                                    Verifique sua caixa de entrada e também a pasta de spam
+                                <HiOutlineMail className="text-blue-600" size={24} />
+                                <p className="text-blue-800 text-sm leading-relaxed text-left">
+                                    {jwtResult?.valid
+                                        ? `Token validado para ${jwtResult.email}. Clique abaixo para definir sua nova senha.`
+                                        : 'Clique no link de redefinição que enviamos para o seu e-mail para continuar com a alteração da senha.'}
                                 </p>
                             </div>
-                        </div>
-                        <div className="mb-4">
-                            <TextField
-                                friendlyName="Código de redefinição (JWT)"
-                                name="jwt"
-                                placeholder="Cole aqui o código enviado por e-mail"
-                                setValue={setJwtToken}
-                                value={jwtToken}
-                            />
-                            <button
-                                className="w-full py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                                onClick={async () => {
-                                    setJwtResult(null);
-                                    try {
-                                        const res = await ValidatePasswordResetToken(jwtToken);
-                                        setJwtResult(res);
-                                    } catch (err: any) {
-                                        setJwtResult({ valid: false, error: err?.message || 'Erro ao validar token' });
-                                    }
-                                }}
-                                disabled={!jwtToken}
-                            >
-                                Validar
-                            </button>
-                            {jwtResult && (
-                                <div className={`mt-2 text-sm ${jwtResult.valid ? 'text-green-600' : 'text-red-600'}`}>
-                                    {jwtResult.valid
-                                        ? <>
-                                            Token válido! E-mail: {jwtResult.email}
-                                            <button
-                                                className="block mt-2 w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                                                onClick={() => setShowPasswordModal(true)}
-                                            >
-                                                Redefinir Senha
-                                            </button>
-                                        </>
-                                        : `Token inválido: ${jwtResult.error}`}
-                                </div>
+                            {jwtResult?.valid && (
+                                <button
+                                    className="w-full py-2 mt-4 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold"
+                                    onClick={() => setShowPasswordModal(true)}
+                                >
+                                    Alterar Minha Senha
+                                </button>
+                            )}
+                            {jwtResult && !jwtResult.valid && (
+                                <p className="mt-2 text-xs text-red-600 font-bold">
+                                    Falha na validação: {jwtResult.error || 'Token inválido'}
+                                </p>
                             )}
                         </div>
                         {showPasswordModal && (

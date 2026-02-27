@@ -60,7 +60,7 @@ const LoginForm = () => {
           priority
         />
         <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 p-5 rounded text-white z-10 hidden sm:block">
-          <h2 className="text-2xl mb-2">GazalTech</h2>
+          <h2 className="text-2xl mb-2">GFood</h2>
           <p>Conecte-se a sua conta.</p>
         </div>
       </div>
