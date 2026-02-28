@@ -41,7 +41,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
     const [changeFor, setChangeFor] = useState<string>('');
 
 
-    const { data: order, isFetching } = useQuery({
+    const { data: order, isLoading } = useQuery({
         queryKey: ['order', 'current'],
         queryFn: () => GetOrderByID(orderID, session!),
         enabled: !!orderID && !!session,
@@ -128,7 +128,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
         }
     };
 
-    if (isFetching || !order) {
+    if (isLoading || !order) {
         return (
             <div className='min-h-screen pt-10 text-center'>
                 <p className='text-gray-500'>Carregando...</p>
