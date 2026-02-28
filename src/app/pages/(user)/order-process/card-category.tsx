@@ -1,56 +1,55 @@
 import Carousel from "@/components/carousel/carousel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CategoryMap } from "@/app/entities/category/category";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import Category from "@/app/entities/category/category";
 import CardProcessRule from "./card-process-rule";
-import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
-import { useQuery } from "@tanstack/react-query";
-import { GetProcessRulesByCategoryID } from "@/app/api/process-rule/process-rule";
+import React from "react";
+import { LayoutGrid, AlertCircle } from "lucide-react";
 
 interface CardCategoryProps {
-    category: CategoryMap;
+    category: Category;
 }
 
 const CardCategory = ({ category }: CardCategoryProps) => {
-    const { data } = useSession();
-    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const { isFetching, isLoading, data: processRulesResponse = [], refetch } = useQuery({
-        queryKey: ['process-rules-with-processes', category.id],
-        queryFn: async () => {
-            setLastUpdate(FormatRefreshTime(new Date()));
-            return GetProcessRulesByCategoryID(data!, category.id, true);
-        },
-        enabled: !!data?.user?.access_token,
-        refetchInterval: 30000,
-    });
-
-    const processRules = useMemo(() => processRulesResponse || [], [processRulesResponse]);
+    // Agora os process_rules já vêm preenchidos da página principal
+    const processRules = category.process_rules || [];
 
     return (
-        <Card className="mb-6">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <CardTitle className="text-2xl font-bold">{category.name}</CardTitle>
-                <Refresh
-                    onRefresh={refetch}
-                    isFetching={isFetching}
-                    lastUpdate={lastUpdate}
-                    optionalText="Processo"
-                />
+        <Card className="border-none shadow-md bg-white overflow-hidden transition-all duration-300 hover:shadow-lg group">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3 px-5 bg-gray-50/50 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-white rounded-md shadow-sm border border-gray-100 group-hover:scale-105 transition-transform duration-300">
+                        <LayoutGrid className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <div>
+                        <CardTitle className="text-lg font-black tracking-tight text-gray-800 leading-none">
+                            {category.name}
+                        </CardTitle>
+                        <CardDescription className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                            {processRules.length} {processRules.length === 1 ? 'Fluxo' : 'Fluxos'}
+                        </CardDescription>
+                    </div>
+                </div>
             </CardHeader>
-            <CardContent>
-                {isLoading ? (
-                    <p className="text-gray-500">Carregando processos...</p>
-                ) : processRules.length === 0 ? (
-                    <p className="text-gray-500">Nenhum processo encontrado</p>
+            <CardContent className="pt-4 pb-4 px-4">
+                {processRules.length === 0 ? (
+                    <div className="flex items-center gap-2 p-3 rounded-xl border border-dashed border-gray-200 bg-gray-50/30 text-gray-500 italic text-xs">
+                        <AlertCircle className="w-4 h-4 text-gray-400" />
+                        Nenhuma regra de processo configurada.
+                    </div>
                 ) : (
-                    <Carousel items={processRules}>
-                        {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
-                    </Carousel>
+                    <div className="animate-in fade-in zoom-in-95 duration-500">
+                        <Carousel items={processRules}>
+                            {(processRule) => (
+                                <div className="px-1 py-0.5">
+                                    <CardProcessRule key={processRule.id} processRule={processRule} />
+                                </div>
+                            )}
+                        </Carousel>
+                    </div>
                 )}
             </CardContent>
         </Card>
     )
 }
 
-export default CardCategory
+export default CardCategory;

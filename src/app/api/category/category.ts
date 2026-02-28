@@ -42,4 +42,13 @@ export const GetCategoriesComplement = async (session: Session, isActive: boolea
     return response.data
 };
 
-export default GetCategories
+export const GetCategoriesWithOrderProcess = async (session: Session): Promise<Category[]> => {
+    const response = await RequestApi<null, Category[]>({
+        path: `/product-category/all-with-order-process`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+    return response.data;
+};
+
+export default GetCategories;
