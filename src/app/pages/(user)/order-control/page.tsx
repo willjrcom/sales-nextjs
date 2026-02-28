@@ -11,9 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 import { GetOpenedOrders } from "@/app/api/order/order";
 import { notifyError } from "@/app/utils/notifications";
 import ButtonIconTextFloat from "@/app/components/button/button-float";
-import { FaList } from "react-icons/fa";
-import ThreeColumnHeader from '@/components/header/three-column-header';
 import ListFinishedOrdersCard from './kanban/list-finished-orders-card';
+import { ClipboardList, AlertCircle, LayoutGrid, RotateCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const PageOrder = () => {
     const { data } = useSession();
@@ -26,6 +28,7 @@ const PageOrder = () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetOpenedOrders(data!);
         },
+        // @ts-ignore
         enabled: !!data?.user?.access_token,
         refetchInterval: 30000,
     });
@@ -44,42 +47,65 @@ const PageOrder = () => {
         modalHandler.showModal("show-staging-orders", "Pedidos Não Enviados", <ListItemsCard orders={stagingOrders} />, "sm", onClose);
     }
 
-    const classOrderStaging = stagingOrders.length > 0 ? "text-white bg-red-400 hover:bg-red-500" : "bg-gray-200 hover:bg-gray-300";
-
     return (
-        <>
-            <ButtonIconTextFloat modalName="show-finished-orders" icon={FaList} position="bottom-right" title="Pedidos finalizados">
+        <div className="flex flex-col h-screen bg-gray-50/30 overflow-hidden">
+            <ButtonIconTextFloat modalName="show-finished-orders" icon={ClipboardList} position="bottom-right" title="Pedidos finalizados">
                 <ListFinishedOrdersCard />
             </ButtonIconTextFloat>
 
-            <div className="w-full h-full px-3 py-2">
-                {/* Header compacto inline */}
-                <div className="flex items-center justify-between gap-4 mb-2">
-                    <button
-                        className={`px-3 py-1.5 text-sm rounded whitespace-nowrap ${classOrderStaging}`}
-                        onClick={openStagingOrders}
-                    >
-                        {stagingOrders.length} Pedidos Não Enviados
-                    </button>
+            <div className="flex-1 flex flex-col min-h-0">
+                {/* Header Premium */}
+                <div className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between shadow-sm z-10">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                                <LayoutGrid className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none">
+                                    Monitor de Pedidos
+                                </h1>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                                    Gestão em tempo real
+                                </p>
+                            </div>
+                        </div>
 
-                    <ThreeColumnHeader center={<div className="flex items-center gap-2">
-                        <PageTitle title="Pedidos" tooltip="Kanban para gerenciamento de pedidos, mostrando o fluxo de cada pedido." />
-                        <span className="text-xs text-gray-500">Arraste para alterar status</span>
-                    </div>} />
+                        {stagingOrders.length > 0 && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="h-9 rounded-full px-4 gap-2 font-bold shadow-lg shadow-red-200 animate-pulse"
+                                onClick={openStagingOrders}
+                            >
+                                <AlertCircle className="w-4 h-4" />
+                                {stagingOrders.length} Pendentes de Envio
+                            </Button>
+                        )}
+                    </div>
 
-                    <Refresh
-                        onRefresh={refetch}
-                        isFetching={isFetching}
-                        lastUpdate={lastUpdate}
-                    />
+                    <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-end mr-2">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sincronizado</span>
+                            <span className="text-xs font-black text-gray-600 tracking-tight">{lastUpdate}</span>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className={cn("rounded-xl border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md", isFetching && "animate-spin")}
+                            onClick={() => refetch()}
+                        >
+                            <RotateCw className="w-4 h-4 text-gray-500" />
+                        </Button>
+                    </div>
                 </div>
 
-                {/* Kanban ocupa todo o espaço restante */}
-                <div className="w-full">
+                {/* Área do Kanban com Scroll Customizado */}
+                <div className="flex-1 overflow-auto bg-gray-50/50 p-4">
                     <OrderKanban orders={orders} />
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

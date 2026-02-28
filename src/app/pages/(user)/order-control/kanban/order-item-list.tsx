@@ -1,37 +1,10 @@
 import Order from "@/app/entities/order/order";
-import { FaLuggageCart, FaMotorcycle, FaUtensils } from "react-icons/fa";
+import { Bike, Utensils, Package, Clock, ShoppingBag, ChevronRight, User } from "lucide-react";
 import CardOrder from "../../../../components/card-order/card-order";
 import { useModal } from "@/app/context/modal/context";
-
-type BadgeVariant = "gray" | "blue" | "green" | "yellow" | "red" | "purple";
-
-const Badge = ({
-    label,
-    variant = "gray",
-    className = "",
-}: {
-    label: string;
-    variant?: BadgeVariant;
-    className?: string;
-}) => {
-    const map: Record<BadgeVariant, string> = {
-        gray: "bg-gray-100 text-gray-700 border-gray-200",
-        blue: "bg-blue-50 text-blue-700 border-blue-200",
-        green: "bg-green-50 text-green-700 border-green-200",
-        yellow: "bg-yellow-50 text-yellow-700 border-yellow-200",
-        red: "bg-red-50 text-red-700 border-red-200",
-        purple: "bg-purple-50 text-purple-700 border-purple-200",
-    };
-
-    return (
-        <span
-            className={`text-xs font-semibold px-2 py-1 rounded-full border ${map[variant]} ${className}`}
-            title={label}
-        >
-            {label}
-        </span>
-    );
-};
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 function safeDate(d?: any): Date | null {
     if (!d) return null;
@@ -46,16 +19,15 @@ function formatTimeAgo(date?: any) {
     const diff = Date.now() - dt.getTime();
     if (diff < 60_000) return "agora";
     const mins = Math.floor(diff / 60_000);
-    if (mins < 60) return `${mins}min`;
+    if (mins < 60) return `${mins}m`;
     const hours = Math.floor(mins / 60);
     const rest = mins % 60;
-    return `${hours}h${rest > 0 ? ` ${rest}min` : ""}`;
+    return `${hours}h${rest > 0 ? `${rest}m` : ""}`;
 }
 
 function formatCurrencyBR(value: any) {
     try {
-        const num =
-            typeof value?.toNumber === "function" ? value.toNumber() : Number(value);
+        const num = typeof value?.toNumber === "function" ? value.toNumber() : Number(value);
         if (Number.isNaN(num)) return "—";
         return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     } catch {
@@ -70,120 +42,40 @@ function getOrderType(order: Order) {
     return "unknown";
 }
 
-function getTypeIcon(order: Order) {
+function getTypeConfig(order: Order) {
     const type = getOrderType(order);
     if (type === "delivery")
-        return { icon: <FaMotorcycle className="w-4 h-4" />, bg: "bg-blue-500" };
+        return { icon: Bike, color: "text-blue-600", bg: "bg-blue-50", label: "Delivery" };
     if (type === "table")
-        return { icon: <FaUtensils className="w-4 h-4" />, bg: "bg-green-500" };
+        return { icon: Utensils, color: "text-emerald-600", bg: "bg-emerald-50", label: "Mesa" };
     if (type === "pickup")
-        return { icon: <FaLuggageCart className="w-4 h-4" />, bg: "bg-yellow-500" };
-    return { icon: <FaLuggageCart className="w-4 h-4" />, bg: "bg-gray-400" };
+        return { icon: ShoppingBag, color: "text-amber-600", bg: "bg-amber-50", label: "Balcão" };
+    return { icon: Package, color: "text-gray-600", bg: "bg-gray-50", label: "Outro" };
 }
 
-function getSecondaryInfo(order: Order) {
+function getOrderInfo(order: Order) {
     if (order.delivery) {
-        const deliveryStatus = order.delivery.status;
-        const clientName = order.delivery?.client?.name || "";
-        const flags: { label: string; variant: BadgeVariant }[] = [];
-
-        if (deliveryStatus === "Pending") flags.push({ label: "Entrega Pendente", variant: "yellow" });
-        if (deliveryStatus === "Ready") flags.push({ label: "Entrega Pronta", variant: "purple" });
-        if (deliveryStatus === "Shipped") flags.push({ label: "Entrega Enviada", variant: "blue" });
-        if (deliveryStatus === "Delivered") flags.push({ label: "Entrega Recebida", variant: "green" });
-        if (deliveryStatus === "Cancelled") flags.push({ label: "Entrega Cancelada", variant: "red" });
-
-        const timeRef =
-            formatTimeAgo(order.delivery.cancelled_at) ||
-            formatTimeAgo(order.delivery.delivered_at) ||
-            formatTimeAgo(order.delivery.shipped_at) ||
-            formatTimeAgo(order.delivery.ready_at) ||
-            formatTimeAgo(order.delivery.pending_at) ||
-            formatTimeAgo(order.created_at);
-
-        const timeLabel =
-            order.delivery.cancelled_at
-                ? "cancelado"
-                : order.delivery.delivered_at
-                    ? "entregue"
-                    : order.delivery.shipped_at
-                        ? "enviado"
-                        : order.delivery.ready_at
-                            ? "pronto"
-                            : order.delivery.pending_at
-                                ? "pendente"
-                                : order.created_at
-                                    ? "criado" : "";
-
-        return { title: clientName, flags, timeRef, timeLabel };
-    }
-
-    if (order.table) {
-        const tableName = order.table.table?.name || "";
-        const clientName = order.table.name || "";
-        const flags: { label: string; variant: BadgeVariant }[] = [];
-
-        if (order.table.status === "Pending") flags.push({ label: "Mesa Pendente", variant: "yellow" });
-        if (order.table.status === "Closed") flags.push({ label: "Mesa Fechada", variant: "green" });
-        if (order.table.status === "Cancelled") flags.push({ label: "Mesa Cancelada", variant: "red" });
-
-        const timeRef =
-            formatTimeAgo(order.table.cancelled_at) ||
-            formatTimeAgo(order.table.closed_at) ||
-            formatTimeAgo(order.table.pending_at) ||
-            formatTimeAgo(order.created_at);
-
-        const timeLabel =
-            order.table.cancelled_at
-                ? "cancelada"
-                : order.table.closed_at
-                    ? "fechada"
-                    : order.table.pending_at
-                        ? "pendente"
-                        : order.created_at
-                            ? "criado" : "";
-
         return {
-            title: tableName + ' ' + clientName,
-            flags,
-            timeRef,
-            timeLabel,
+            title: order.delivery?.client?.name || "Cliente S/ Nome",
+            subtitle: order.delivery.status === "Pending" ? "Entrega Pendente" : "Entrega em Fluxo",
+            time: formatTimeAgo(order.created_at)
         };
     }
-
-    if (order.pickup) {
-        const pickupName = order.pickup.name || "";
-        const flags: { label: string; variant: BadgeVariant }[] = [];
-        const pickupStatus = order.pickup.status;
-
-        if (pickupStatus === "Pending") flags.push({ label: "Balcão Pendente", variant: "yellow" });
-        if (pickupStatus === "Ready") flags.push({ label: "Balcão Pronto", variant: "green" });
-        if (pickupStatus === "Delivered") flags.push({ label: "Balcão Retirado", variant: "blue" });
-        if (pickupStatus === "Cancelled") flags.push({ label: "Balcão Cancelado", variant: "red" });
-
-        const timeRef =
-            formatTimeAgo(order.pickup.cancelled_at) ||
-            formatTimeAgo(order.pickup.delivered_at) ||
-            formatTimeAgo(order.pickup.ready_at) ||
-            formatTimeAgo(order.pickup.pending_at) ||
-            formatTimeAgo(order.created_at);
-
-        const timeLabel =
-            order.pickup.cancelled_at
-                ? "cancelado"
-                : order.pickup.delivered_at
-                    ? "retirado"
-                    : order.pickup.ready_at
-                        ? "pronto"
-                        : order.pickup.pending_at
-                            ? "pendente"
-                            : order.created_at
-                                ? "criado" : "";
-
-        return { title: pickupName, flags, timeRef, timeLabel };
+    if (order.table) {
+        return {
+            title: `Mesa ${order.table.table?.name || "?"}`,
+            subtitle: order.table.name || "Cliente S/ Nome",
+            time: formatTimeAgo(order.created_at)
+        };
     }
-
-    return { title: "", flags: [], timeRef: null, timeLabel: null };
+    if (order.pickup) {
+        return {
+            title: order.pickup.name || "Cliente S/ Nome",
+            subtitle: "Retirada no Balcão",
+            time: formatTimeAgo(order.created_at)
+        };
+    }
+    return { title: "Pedido #" + order.order_number, subtitle: "", time: formatTimeAgo(order.created_at) };
 }
 
 interface OrderItemListProps {
@@ -208,60 +100,74 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
         );
     };
 
-    const { icon, bg } = getTypeIcon(order);
-    const info = getSecondaryInfo(order);
-
+    const { icon: TypeIcon, color, bg, label } = getTypeConfig(order);
+    const info = getOrderInfo(order);
     const total = formatCurrencyBR(order.total);
-    const items = order.quantity_items ?? 0;
-
-    // badge tempo (limitado)
-    const timeBadge =
-        info.timeRef && info.timeLabel
-            ? `${info.timeLabel} há ${info.timeRef}`
-            : null;
+    const itemsCount = order.quantity_items ?? 0;
 
     return (
-        <div
-            className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm"
+        <Card
+            className="group cursor-pointer border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white overflow-hidden rounded-2xl active:scale-[0.98]"
             onClick={OpenOrder}
         >
-            <div className="flex items-start justify-between gap-3">
-                {/* LEFT */}
-                <div className="flex flex-col gap-2 min-w-0 flex-1">
-                    {/* Linha 1 */}
-                    <div className="flex items-center gap-2 flex-wrap min-w-0">
-                        <div className="text-lg font-bold">
-                            Pedido {order.order_number}
+            <CardContent className="p-0">
+                <div className="p-4 flex flex-col gap-3">
+                    {/* Header: Tipo e Tempo */}
+                    <div className="flex items-center justify-between">
+                        <div className={cn("flex items-center gap-2 px-2 py-1 rounded-lg", bg)}>
+                            <TypeIcon className={cn("w-3.5 h-3.5", color)} />
+                            <span className={cn("text-[10px] font-black uppercase tracking-wider", color)}>
+                                {label}
+                            </span>
                         </div>
-
-                        <div className="text-sm text-gray-600 flex items-center gap-1 flex-wrap">
-                            {info.flags?.slice(0, 2).map((f, idx) => (
-                                <Badge key={idx} label={f.label} variant={f.variant} />
-                            ))}
+                        <div className="flex items-center gap-1.5 text-gray-400">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-tight">
+                                {info.time}
+                            </span>
                         </div>
                     </div>
 
-                    {/* Linha 3 */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <Badge label={`${items} itens`} variant="gray" />
-                        <Badge label={total} variant="gray" />
-
-                        {timeBadge && (
-                            <Badge
-                                label={timeBadge}
-                                variant="gray"
-                                className="max-w-[180px] truncate"
-                            />
+                    {/* Main Info */}
+                    <div className="space-y-1">
+                        <div className="flex items-center justify-between group-hover:translate-x-1 transition-transform">
+                            <h3 className="text-base font-black text-gray-800 tracking-tight leading-tight truncate pr-2">
+                                {info.title}
+                            </h3>
+                            <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-400 shrink-0" />
+                        </div>
+                        {info.subtitle && (
+                            <p className="text-xs font-bold text-gray-400 tracking-tight leading-none italic truncate">
+                                {info.subtitle}
+                            </p>
                         )}
                     </div>
+
+                    {/* Footer: Itens e Total */}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                        <div className="flex items-center gap-1.5 font-bold text-gray-500">
+                            <div className="flex -space-x-2 mr-1">
+                                <div className="w-5 h-5 rounded-full bg-gray-100 border border-white flex items-center justify-center">
+                                    <ShoppingBag className="w-3 h-3 text-gray-400" />
+                                </div>
+                            </div>
+                            <span className="text-[10px] uppercase tracking-tighter">
+                                {itemsCount} {itemsCount === 1 ? 'item' : 'itens'}
+                            </span>
+                        </div>
+                        <Badge variant="secondary" className="bg-gray-50 text-gray-600 font-black tracking-tight rounded-lg px-2 h-6 border-none">
+                            {total}
+                        </Badge>
+                    </div>
                 </div>
 
-                {/* RIGHT ICON */}
-                <div className={`shrink-0 p-2 rounded-full text-white ${bg}`}>
-                    {icon}
-                </div>
-            </div>
-        </div>
+                {/* Status Bar */}
+                <div className={cn(
+                    "h-1.5 w-full",
+                    order.status === "Pending" ? "bg-amber-400" : "bg-emerald-400"
+                )} />
+            </CardContent>
+        </Card>
     );
 };
 
