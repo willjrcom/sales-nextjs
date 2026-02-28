@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from "react";
 import Employee from "@/app/entities/employee/employee";
-import Contact from "@/app/entities/contact/contact";
-import Address from "@/app/entities/address/address";
 import { HiOutlineUser, HiOutlinePhone, HiOutlineHome, HiOutlineIdentification, HiOutlineMail, HiOutlineCalendar } from "react-icons/hi";
 import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
@@ -12,8 +10,6 @@ import UpdateEmployee from "@/app/api/employee/update/employee";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ButtonsModal from "@/app/components/modal/buttons-modal";
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { SchemaEmployee } from "@/app/entities/employee/employee";
 import { z } from "zod";
 
 interface EmployeeInfoTabProps {
@@ -32,8 +28,6 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
     const queryClient = useQueryClient();
     const { data: session } = useSession();
     const modalHandler = useModal();
-    const contact = new Contact(item.contact || {});
-    const address = new Address(item.address || {});
 
     const {
         handleSubmit,
@@ -41,7 +35,6 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
         watch,
         formState: { isSubmitting }
     } = useForm({
-        resolver: zodResolver(SchemaEmployee),
         defaultValues: {
             ...item,
             contact: item.contact?.number || '',

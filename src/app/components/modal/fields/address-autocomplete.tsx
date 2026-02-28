@@ -202,7 +202,7 @@ export default function AddressAutocomplete({
                 )}
 
                 <p className="text-xs text-gray-400 mt-1">
-                    Digite o endereço e selecione uma sugestão para preencher automaticamente
+                    Digite o endereço e selecione uma sugestão para preencher automaticamente <span className="text-red-500">*</span>
                 </p>
 
                 {onManualEntry && (
@@ -216,7 +216,7 @@ export default function AddressAutocomplete({
                 )}
 
                 <div className="mt-3">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">CEP</label>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">CEP <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         inputMode="numeric"
