@@ -27,32 +27,24 @@ const PageProcessRule = () => {
     const { data } = useSession();
     const [currentProcessRuleID, setCurrentProcessRuleID] = useState<string>(id as string);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const [isRefreshing, setIsRefreshing] = useState(false);
     const router = useRouter();
 
     const { data: processRulesResponse } = useQuery({
         queryKey: ['process-rules', category_id],
         queryFn: () => GetProcessRulesByCategoryID(data!, category_id as string),
         enabled: !!data?.user?.access_token,
+        refetchInterval: 60000,
     });
 
-    const { data: orderProcessesResponse, refetch } = useQuery({
+    const { isFetching, data: orderProcessesResponse, refetch } = useQuery({
         queryKey: ['order-processes', currentProcessRuleID],
-        queryFn: () => GetProcessesByProcessRuleID(currentProcessRuleID, data!),
+        queryFn: () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetProcessesByProcessRuleID(currentProcessRuleID, data!);
+        },
         enabled: !!data?.user?.access_token && !!currentProcessRuleID,
         refetchInterval: 10000,
-        refetchIntervalInBackground: true,
     });
-
-    const handleRefresh = async () => {
-        setIsRefreshing(true);
-        try {
-            await refetch();
-            setLastUpdate(FormatRefreshTime(new Date()));
-        } finally {
-            setIsRefreshing(false);
-        }
-    };
 
     const orderProcesses = useMemo(() => orderProcessesResponse?.items || [], [orderProcessesResponse?.items]);
 
@@ -69,14 +61,10 @@ const PageProcessRule = () => {
         setCurrentProcessRuleID(id as string);
     }, [id]);
 
-    if (!processRule) {
-        return <><Loading /></>;
-    };
-
     const body = (
         <>
             <div className="flex justify-between">
-                <p>Tempo ideal de produção: {processRule.ideal_time}</p>
+                <p>Tempo ideal de produção: {processRule?.ideal_time}</p>
                 <p>Total de processos: {orderProcesses.length}</p>
             </div>
 
@@ -105,16 +93,15 @@ const PageProcessRule = () => {
                     </BreadcrumbList>
                 </Breadcrumb>
             </div>
-            <CrudLayout title={
-                processRule.name ?
-                    <PageTitle title={processRule.name} tooltip="Exibe e gerencia os pedidos em execução nesta etapa do processo." /> :
-                    "Carregando..."
+            <CrudLayout title={processRule?.name ?
+                <PageTitle title={processRule.name} tooltip="Exibe e gerencia os pedidos em execução nesta etapa do processo." /> :
+                <Loading />
             }
                 searchButtonChildren={
                     <SelectField friendlyName="Processo Atual" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional removeDefaultOption />
                 }
                 refreshButton={
-                    <Refresh onRefresh={handleRefresh} isFetching={isRefreshing} lastUpdate={lastUpdate} />
+                    <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
                 }
                 tableChildren={body}
             />

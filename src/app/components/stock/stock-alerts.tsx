@@ -14,7 +14,7 @@ const StockAlerts = () => {
     const queryClient = useQueryClient();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isFetching, data: stockAlertsResponse, refetch } = useQuery({
+    const { isFetching, isLoading, data: stockAlertsResponse, refetch } = useQuery({
         queryKey: ['stock-alerts'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -80,26 +80,6 @@ const StockAlerts = () => {
     const activeAlerts = useMemo(() => alerts.filter(alert => !alert.is_resolved), [alerts]);
     const resolvedAlerts = useMemo(() => alerts.filter(alert => alert.is_resolved), [alerts]);
 
-    if (isFetching) {
-        return (
-            <div className="p-6">
-                <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
-                <p>Carregando...</p>
-            </div>
-        );
-    }
-
-    if (activeAlerts.length === 0 && resolvedAlerts.length === 0) {
-        return (
-            <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
-                    <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
-                </div>
-                <p>Nenhum alerta encontrado</p>
-            </div>
-        );
-    }
     return (
         <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -107,8 +87,20 @@ const StockAlerts = () => {
                 <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
             </div>
 
+            {isLoading && (
+                <div className="mb-6">
+                    <p>Carregando...</p>
+                </div>
+            )}
+
+            {!isLoading && activeAlerts.length === 0 && resolvedAlerts.length === 0 && (
+                <div className="mb-6">
+                    <p>Nenhum alerta encontrado</p>
+                </div>
+            )}
+
             {/* Alertas Ativos */}
-            {activeAlerts.length > 0 && (
+            {!isLoading && activeAlerts.length > 0 && (
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-3">Alertas Ativos ({activeAlerts.length})</h3>
 
@@ -155,7 +147,7 @@ const StockAlerts = () => {
             )}
 
             {/* Alertas Resolvidos */}
-            {resolvedAlerts.length > 0 && (
+            {!isLoading && resolvedAlerts.length > 0 && (
                 <div>
                     <h3 className="text-lg font-semibold mb-3">Alertas Resolvidos ({resolvedAlerts.length})</h3>
                     <div className="space-y-3">

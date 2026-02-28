@@ -24,7 +24,7 @@ const PageCategories = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const { hasPermission, user } = useUser();
 
-    const { isPending, error, data: categoriesResponse, refetch } = useQuery({
+    const { isFetching, error, data: categoriesResponse, refetch } = useQuery({
         queryKey: ['categories', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -66,7 +66,7 @@ const PageCategories = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isFetching={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

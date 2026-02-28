@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,7 +39,7 @@ export function SubscriptionStatusCard() {
     const [cancelling, setCancelling] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-    const { data: status, isFetching } = useQuery({
+    const { isFetching, isLoading, data: status } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
         enabled: !!(session as any)?.user?.access_token,
@@ -61,25 +62,10 @@ export function SubscriptionStatusCard() {
         }
     };
 
-    if (isFetching) {
-        return (
-            <Card>
-                <CardContent className="pt-6">
-                    <div className="animate-pulse space-y-3">
-                        <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                        <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    if (!status) return null;
-
-    const normalizedPlan = status.current_plan?.toLowerCase() || 'free';
-    const plan = PLAN_LABELS[normalizedPlan as keyof typeof PLAN_LABELS] || PLAN_LABELS.free;
-    const expiresAt = status.expires_at ? parseISO(status.expires_at) : null;
-    const daysRemaining = status.days_remaining ?? null;
+    const normalizedPlan = status?.current_plan?.toLowerCase() || 'free';
+    const plan = PLAN_LABELS[normalizedPlan as keyof typeof PLAN_LABELS] || PLAN_LABELS[PlanType.FREE];
+    const expiresAt = status?.expires_at ? parseISO(status.expires_at) : null;
+    const daysRemaining = status?.days_remaining ?? null;
     const isExpiringSoon = daysRemaining !== null && daysRemaining <= 7 && daysRemaining > 0;
     const isExpired = daysRemaining !== null && daysRemaining <= 0;
 
@@ -95,14 +81,15 @@ export function SubscriptionStatusCard() {
                         </div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
+                        {isLoading && <Skeleton className="w-20 h-6" />}
                         <Badge className={`${plan.color} px-3 py-1 text-sm`}>{plan.name}</Badge>
-                        {status.frequency && status.frequency !== "MONTHLY" && (
+                        {status?.frequency && status.frequency !== "MONTHLY" && (
                             <Badge variant="outline" className="text-xs font-medium gap-1.5 py-0.5 px-2 text-muted-foreground border-muted-foreground/30">
                                 <Calendar className="w-3 h-3" />
                                 {status.frequency === "SEMIANNUALLY" ? "Semestral" : "Anual"}
                             </Badge>
                         )}
-                        {status.frequency === "MONTHLY" && (
+                        {status?.frequency === "MONTHLY" && (
                             <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded-sm">
                                 Mensal
                             </span>
@@ -144,7 +131,7 @@ export function SubscriptionStatusCard() {
                 )}
 
                 {/* Upcoming Plan */}
-                {status.upcoming_plan && status.upcoming_start_at && (
+                {status?.upcoming_plan && status.upcoming_start_at && (
                     <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-md text-sm">
                         <p className="font-medium">Próximo plano agendado</p>
                         <p className="text-xs mt-1">
@@ -171,7 +158,7 @@ export function SubscriptionStatusCard() {
                         )}
 
                         {/* Cancel Button: Show for ANY active paid plan (not Free) */}
-                        {normalizedPlan !== 'free' && !status.is_cancelled && (
+                        {normalizedPlan !== 'free' && !status?.is_cancelled && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -184,7 +171,7 @@ export function SubscriptionStatusCard() {
                             </Button>
                         )}
                         {/* show message "A recorrência do seu plano foi cancelada!"*/}
-                        {status.current_plan !== 'free' && status.is_cancelled && (
+                        {status?.current_plan !== 'free' && status?.is_cancelled && (
                             <Badge
                                 variant="destructive"
                                 className="text-red-600 hover:text-red-700 hover:bg-red-700"

@@ -72,7 +72,6 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
         enabled: !!(data?.user as any)?.access_token,
     })
 
-
     const { data: fiscalSettings } = useQuery({
         queryKey: ['fiscal-settings'],
         queryFn: () => getFiscalSettings(data!),

@@ -37,7 +37,7 @@ const DeliveryOrderToFinish = () => {
     const { data } = useSession();
     const { hasPermission, user } = useUser();
 
-    const { data: deliveryOrdersResponse, refetch, isFetching } = useQuery({
+    const { isFetching, data: deliveryOrdersResponse, refetch } = useQuery({
         queryKey: ['shipped-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));

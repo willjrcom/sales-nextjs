@@ -30,7 +30,7 @@ const PageProducts = () => {
         refetchInterval: 60000,
     });
 
-    const { isPending, error, data: productsResponse, refetch } = useQuery({
+    const { isFetching, error, data: productsResponse, refetch } = useQuery({
         queryKey: ['products', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -83,7 +83,7 @@ const PageProducts = () => {
                 refreshButton={
                     < Refresh
                         onRefresh={refetch}
-                        isFetching={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

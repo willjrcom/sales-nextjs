@@ -7,9 +7,14 @@ import Client from "@/app/entities/client/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaCheck, FaSearch } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
+import { Loader2, User, MapPin, Phone, CreditCard, Search } from "lucide-react";
 import PatternField from "@/app/components/modal/fields/pattern";
 import { notifyError } from "@/app/utils/notifications";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const PageNewOrderDelivery = () => {
     const [contact, setContact] = useState('');
@@ -36,43 +41,65 @@ const PageNewOrderDelivery = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-full p-6">
-            <div className="w-full max-w-md space-y-6">
-                <h1 className="text-2xl font-bold text-gray-800 text-center">
-                    Novo Pedido - Delivery
-                </h1>
+        <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 bg-gray-50/50">
+            <div className="w-full max-w-xl space-y-8">
+                <div className="text-center space-y-2">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        Novo Pedido
+                    </h1>
+                    <p className="text-lg text-muted-foreground">
+                        Identifique o cliente para iniciar a entrega.
+                    </p>
+                </div>
 
-                <div className="bg-white rounded-lg shadow p-6 space-y-6">
-                    <div className="flex flex-col space-y-4">
-                        <div>
-                            <label
-                                htmlFor="contato"
-                                className="block text-sm font-semibold mb-1 text-gray-700"
-                            >
-                                Contato do Cliente
-                            </label>
+                <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Search className="w-5 h-5 text-blue-500" />
+                            Buscar Cliente
+                        </CardTitle>
+                        <CardDescription>
+                            Digite o número de telefone ou celular cadastrado.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
                             <PatternField
                                 patternName="full-phone"
                                 name="contato"
-                                placeholder="Digite o contato do cliente"
+                                placeholder="Ex: (11) 99999-9999"
                                 setValue={setContact}
                                 value={contact}
                                 optional
                             />
                         </div>
 
-                        <button
+                        <Button
                             onClick={search}
-                            disabled={isSearching}
-                            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isSearching || !contact}
+                            className="w-full h-12 text-lg font-medium transition-all duration-200"
                         >
-                            <FaSearch />
-                            <span>{isSearching ? 'Buscando...' : 'Buscar'}</span>
-                        </button>
-                    </div>
+                            {isSearching ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Buscando...
+                                </>
+                            ) : (
+                                <>
+                                    <Search className="mr-2 h-5 w-5" />
+                                    Localizar Cliente
+                                </>
+                            )}
+                        </Button>
+                    </CardContent>
 
-                    {client && <CardClient client={client} isCreating={isCreating} setIsCreating={setIsCreating} />}
-                </div>
+                    {client && (
+                        <div className="px-6 pb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <Separator className="mb-6" />
+                            <CardClient client={client} isCreating={isCreating} setIsCreating={setIsCreating} />
+                        </div>
+                    )}
+                </Card>
             </div>
         </div>
     );
@@ -97,33 +124,84 @@ const CardClient = ({ client, isCreating, setIsCreating }: { client: Client | nu
     if (!client) return <p className="text-red-500">Cliente não encontrado</p>;
 
     return (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800">Cliente Encontrado</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Client Info */}
-                <div className="space-y-2">
-                    <p className="text-gray-700">Nome: <span className="font-semibold">{client.name}</span></p>
-                    <p className="text-gray-700">Contato: <span className="font-semibold">{client.contact.number}</span></p>
-                    <p className="text-gray-700">CPF: <span className="font-semibold">{client.cpf}</span></p>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <Badge variant="secondary" className="px-3 py-1 text-sm font-medium bg-green-50 text-green-700 border-green-100 hover:bg-green-50 uppercase tracking-wider">
+                    Cliente Localizado
+                </Badge>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Informações Pessoais */}
+                <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-tight flex items-center gap-2">
+                        <User className="w-4 h-4" /> Dados Pessoais
+                    </h3>
+                    <div className="space-y-3 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+                        <div className="flex flex-col">
+                            <span className="text-xs text-muted-foreground uppercase font-semibold">Nome Completo</span>
+                            <span className="text-gray-900 font-medium">{client.name}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-muted-foreground uppercase font-semibold">Telefone</span>
+                            <div className="flex items-center gap-2 text-gray-900 font-medium mt-1">
+                                <Phone className="w-3.5 h-3.5 text-blue-500" />
+                                {client.contact.number}
+                            </div>
+                        </div>
+                        {client.cpf && (
+                            <div className="flex flex-col">
+                                <span className="text-xs text-muted-foreground uppercase font-semibold">CPF</span>
+                                <div className="flex items-center gap-2 text-gray-900 font-medium mt-1">
+                                    <CreditCard className="w-3.5 h-3.5 text-blue-500" />
+                                    {client.cpf}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-                {/* Address Info */}
-                <div className="space-y-2">
-                    <p className="text-gray-700">Endereço:</p>
-                    <p className="ml-4 text-gray-600">{client.address.street}, {client.address.number}</p>
-                    <p className="ml-4 text-gray-600">{client.address.neighborhood}</p>
-                    <p className="ml-4 text-gray-600">{client.address.city} - {client.address.uf}</p>
-                    <p className="ml-4 text-gray-600">CEP: {client.address.cep}</p>
+
+                {/* Informações de Endereço */}
+                <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-tight flex items-center gap-2">
+                        <MapPin className="w-4 h-4" /> Endereço de Entrega
+                    </h3>
+                    <div className="space-y-3 bg-gray-50/50 p-4 rounded-xl border border-gray-100 h-full">
+                        <p className="text-gray-900 font-medium leading-relaxed">
+                            {client.address.street}, {client.address.number}<br />
+                            {client.address.complement && (
+                                <span className="text-sm text-muted-foreground block italic mb-1">
+                                    {client.address.complement}
+                                </span>
+                            )}
+                            <span className="text-sm text-gray-600 block">
+                                {client.address.neighborhood} - {client.address.city}/{client.address.uf}
+                            </span>
+                            <span className="text-sm font-mono text-gray-500 block mt-1">
+                                CEP: {client.address.cep}
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <button
+            <Button
                 onClick={() => newOrder(client)}
                 disabled={isCreating}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-14 text-lg font-bold shadow-lg shadow-blue-200/50 hover:shadow-blue-300/50 transform transition-all active:scale-[0.98] duration-200 bg-blue-600 hover:bg-blue-700"
             >
-                <FaCheck />
-                <span>{isCreating ? 'Iniciando...' : 'Confirmar Cliente'}</span>
-            </button>
+                {isCreating ? (
+                    <>
+                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                        Criando Pedido...
+                    </>
+                ) : (
+                    <>
+                        <FaCheck className="mr-2 h-5 w-5" />
+                        Iniciar Novo Pedido
+                    </>
+                )}
+            </Button>
         </div>
     );
 };

@@ -26,7 +26,7 @@ const PageMenuDigital = () => {
         enabled: !!session?.user?.access_token,
     })
 
-    const { data: subscriptionStatus, isFetching: isLoadingStatus } = useQuery({
+    const { isLoading, data: subscriptionStatus } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
         enabled: !!session?.user?.access_token,
@@ -42,7 +42,7 @@ const PageMenuDigital = () => {
         return <AccessDenied />
     }
 
-    if (isLoadingStatus) {
+    if (isLoading) {
         return (
             <div className="flex justify-center p-8">
                 <span className="loading loading-spinner loading-md"></span>

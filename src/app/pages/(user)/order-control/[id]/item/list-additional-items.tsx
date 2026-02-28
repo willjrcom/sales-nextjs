@@ -31,7 +31,7 @@ const ListAdditionalItems = ({ item }: ListAdditionalItemsProps) => {
     const [quantities, setQuantities] = useState<Record<string, QuantityMapItem>>({});
 
     // Fetch additional products
-    const { data: additionalProductsResponse, refetch, isFetching, error } = useQuery({
+    const { isFetching, isLoading, data: additionalProductsResponse, refetch, error } = useQuery({
         queryKey: ['additional-products', item.category_id],
         queryFn: async () => {
             const result = await GetAdditionalProducts(data!, item.category_id);
@@ -182,10 +182,10 @@ const ListAdditionalItems = ({ item }: ListAdditionalItemsProps) => {
             </div>
             <hr className='my-4' />
 
-            {isFetching && <p className="text-gray-500">Carregando itens adicionais...</p>}
+            {isLoading && <p className="text-gray-500">Carregando itens adicionais...</p>}
             {error && <p className="text-red-600">Erro ao carregar itens adicionais.</p>}
 
-            {!isFetching && !error && (
+            {!isLoading && !error && (
                 <div className="space-y-4">
                     {additionalProducts.map(product => (
                         <AdditionalItemCard key={product.id} product={product} />

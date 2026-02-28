@@ -36,7 +36,7 @@ function CompanySelection() {
     const [selecting, setSelecting] = useState<boolean>(false);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isFetching: loadingCompanies, error, data: companiesResponse, refetch } = useQuery({
+    const { isFetching, isLoading, error, data: companiesResponse, refetch } = useQuery({
         queryKey: ['user-companies'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -146,7 +146,7 @@ function CompanySelection() {
                 </div>
                 <EmployeeUserProfile />
             </div>
-            {loadingCompanies && (
+            {isLoading && (
                 <div className="flex justify-center items-center h-64 mb-10">
                     <Loading />
                 </div>
@@ -157,19 +157,27 @@ function CompanySelection() {
                 </div>
             )}
 
-            {!loadingCompanies && <div className='flex justify-center items-center gap-4 mb-10'>
+            {<div className='flex justify-center items-center gap-4 mb-10'>
                 <h2 className="text-2xl">Selecione uma Empresa</h2>
-                <Refresh onRefresh={refetch} isFetching={loadingCompanies} lastUpdate={lastUpdate} removeText={true} />
+                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} removeText={true} />
             </div>}
 
-            {!loadingCompanies && (companies.length === 0 ? (
+            {isLoading && (
+                <div className="flex justify-center items-center h-64 mb-10">
+                    <Loading />
+                </div>
+            )}
+
+            {!isLoading && (companies.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-64">
                     <h2 className="text-2xl font-bold text-center">Não existem empresas disponíveis.</h2>
                     <p className="text-lg text-center">Por favor, cadastre a sua nova empresa</p>
                     <p className="text-lg text-center">ou</p>
                     <p className="text-lg text-center">entre em contato com a empresa responsável pela sua conta.</p>
                 </div>
-            ) : (
+            ))}
+
+            {!isLoading && companies.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {companies.map(company => (
                         <button
@@ -181,7 +189,7 @@ function CompanySelection() {
                         </button>
                     ))}
                 </div>
-            ))}
+            )}
 
             <ButtonIconTextFloat
                 title="Nova Empresa"

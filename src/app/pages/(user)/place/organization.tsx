@@ -45,7 +45,7 @@ const PageDragAndDropGrid = () => {
     const queryClient = useQueryClient();
     const lastLoadedPlaceID = useRef<string>("");  // Rastreia o último ambiente carregado
 
-    const { data: placesResponse, refetch: refetchPlaces, isPending: isPendingPlaces } = useQuery({
+    const { data: placesResponse, refetch: refetchPlaces, isFetching } = useQuery({
         queryKey: ['places'],
         queryFn: () => GetPlaces(data!),
         enabled: !!data?.user?.access_token,
@@ -348,7 +348,7 @@ const PageDragAndDropGrid = () => {
                     <div>
                         <div className="flex items-center justify-between">
                             <h4 className="text-lg font-semibold mb-2">Não alocadas</h4>
-                            <Refresh onRefresh={handleRefresh} isFetching={isPendingPlaces} lastUpdate={lastUpdate} />
+                            <Refresh onRefresh={handleRefresh} isFetching={isFetching} lastUpdate={lastUpdate} />
                         </div>
                         <DroppableColumn key="unused-tables" id="unused-tables">
                             {unusedTables.map((item) => (

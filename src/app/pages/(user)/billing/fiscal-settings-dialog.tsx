@@ -34,7 +34,7 @@ export function FiscalSettingsDialog({ currentPlan }: FiscalSettingsDialogProps)
         },
     });
 
-    const { data: settings, isFetching } = useQuery({
+    const { data: settings, isLoading, isFetching } = useQuery({
         queryKey: ['fiscal-settings'],
         queryFn: () => getFiscalSettings(session!),
         enabled: !!session?.user?.access_token && open,
@@ -332,7 +332,7 @@ export function FiscalSettingsDialog({ currentPlan }: FiscalSettingsDialogProps)
 
                 <DialogFooter className="mr-6 mb-6">
                     <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-                    <Button onClick={handleSubmit(onSubmit)} disabled={updateMutation.isPending || isFetching}>
+                    <Button onClick={handleSubmit(onSubmit)} disabled={updateMutation.isPending || isLoading}>
                         {updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
                     </Button>
                 </DialogFooter>

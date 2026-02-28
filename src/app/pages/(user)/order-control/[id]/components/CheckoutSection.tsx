@@ -21,6 +21,7 @@ import { ChangeTableModal } from '../type/table-card';
 import AddTableTax from "@/app/api/order-table/update/add-tax/order-table";
 import RemoveTableTax from "@/app/api/order-table/update/remove-tax/order-table";
 import { UtensilsCrossed } from "lucide-react";
+import GetCompany from '@/app/api/company/company';
 
 // Simple Input component if not available in shared
 const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
@@ -34,12 +35,18 @@ interface CheckoutSectionProps {
 
 export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
     const { data: session } = useSession();
-    const router = useRouter();
     const queryClient = useQueryClient();
     const modalHandler = useModal();
     const [paymentMethod, setPaymentMethod] = useState<string>('Dinheiro');
     const [changeFor, setChangeFor] = useState<string>('');
 
+    const { data: company } = useQuery({
+        queryKey: ['company'],
+        queryFn: () => GetCompany(session!),
+        enabled: !!session?.user?.access_token,
+    })
+
+    const serviceTax = company?.preferences.table_tax_rate || 10;
 
     const { data: order, isLoading } = useQuery({
         queryKey: ['order', 'current'],
@@ -187,7 +194,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                     className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 gap-2 border-red-100"
                                     onClick={handleRemoveTax}
                                 >
-                                    <UtensilsCrossed size={14} /> Remover Taxa de Serviço (10%)
+                                    <UtensilsCrossed size={14} /> Remover Taxa de Serviço ({serviceTax}%)
                                 </Button>
                             ) : (
                                 <Button
@@ -196,7 +203,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                     className="w-full text-green-600 hover:text-green-700 hover:bg-green-50 gap-2 border-green-100"
                                     onClick={handleAddTax}
                                 >
-                                    <UtensilsCrossed size={14} /> Adicionar Taxa de Serviço (10%)
+                                    <UtensilsCrossed size={14} /> Adicionar Taxa de Serviço ({serviceTax}%)
                                 </Button>
                             )}
                         </div>

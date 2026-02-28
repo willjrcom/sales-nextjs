@@ -90,7 +90,7 @@ export default function BillingPage() {
     const [paymentsMonth, setPaymentsMonth] = useState(currentDate.getMonth() + 1);
     const [paymentsYear, setPaymentsYear] = useState(currentDate.getFullYear());
 
-    const { data: paymentsResponse, refetch: refetchPayments, isRefetching: isRefetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
+    const { data: paymentsResponse, refetch: refetchPayments, isFetching: isFetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
         queryKey: ['company-payments', paymentsPage, paymentsMonth, paymentsYear],
         queryFn: () => listPayments(session!, paymentsPage, 10, paymentsMonth, paymentsYear),
         enabled: !!(session as any)?.user?.access_token,
@@ -101,7 +101,7 @@ export default function BillingPage() {
     const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
     const [costsPage, setCostsPage] = useState(0);
 
-    const { data: costsResponse, refetch: refetchCosts, isRefetching: isRefetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
+    const { data: costsResponse, refetch: refetchCosts, isFetching: isFetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
         queryKey: ['company-costs', selectedMonth, selectedYear, costsPage],
         queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear, costsPage),
         enabled: !!(session as any)?.user?.access_token,
@@ -349,7 +349,7 @@ export default function BillingPage() {
                                     </select>
                                     <Refresh
                                         onRefresh={refetchPayments}
-                                        isFetching={isRefetchingPayments}
+                                        isFetching={isFetchingPayments}
                                         lastUpdate={paymentsUpdatedAt ? FormatRefreshTime(new Date(paymentsUpdatedAt)) : undefined}
                                     />
                                 </div>
@@ -400,7 +400,7 @@ export default function BillingPage() {
                         <RegisterCostDialog onSuccess={refetchCosts} />
                         <Refresh
                             onRefresh={refetchCosts}
-                            isFetching={isRefetchingCosts}
+                            isFetching={isFetchingCosts}
                             lastUpdate={costsUpdatedAt ? FormatRefreshTime(new Date(costsUpdatedAt)) : undefined}
                             optionalText="Custos"
                         />

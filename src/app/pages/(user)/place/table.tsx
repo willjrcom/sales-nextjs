@@ -20,7 +20,7 @@ const PageTable = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: tablesResponse, refetch } = useQuery({
+    const { isFetching, error, data: tablesResponse, refetch } = useQuery({
         queryKey: ['tables', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -58,7 +58,7 @@ const PageTable = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isFetching={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

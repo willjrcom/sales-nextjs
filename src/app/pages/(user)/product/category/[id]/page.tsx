@@ -1,13 +1,10 @@
 'use client';
 
 import GetCategoryByID from "@/app/api/category/[id]/category";
-import PageTitle from '@/app/components/ui/page-title';
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import ListSize from "../../../../../forms/category/list-size";
 import CategoryForm from "@/app/forms/category/form";
-import ButtonIconTextFloat from "@/app/components/button/button-float";
-import { FaEdit } from "react-icons/fa";
+
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -17,24 +14,18 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
-import ThreeColumnHeader from "@/components/header/three-column-header";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PageCategoryEdit = () => {
     const { id } = useParams();
     const { data: session } = useSession();
 
-    const { data: category } = useQuery({
+    const { isLoading, data: category } = useQuery({
         queryKey: ['category', id],
         queryFn: () => GetCategoryByID(session!, id as string),
         enabled: !!id && !!session,
     });
 
-    if (!id || !category) {
-        return (
-            <ThreeColumnHeader center={<PageTitle title="Categoria não encontrada" tooltip="Verifique o ID da categoria e tente novamente." />} />
-        )
-    }
 
     return (
         <div>
@@ -45,12 +36,12 @@ const PageCategoryEdit = () => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>{category.name}</BreadcrumbPage>
+                        {isLoading ? <Skeleton className="h-6 w-24" /> : <BreadcrumbPage>{category?.name}</BreadcrumbPage>}
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <CategoryForm isUpdate={true} item={category} />
+            {isLoading ? <Skeleton className="h-6 w-24" /> : <CategoryForm isUpdate={true} item={category} />}
         </div>
     );
 }

@@ -15,7 +15,7 @@ interface CardCategoryProps {
 const CardCategory = ({ category }: CardCategoryProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const { isFetching, data: processRulesResponse = [], refetch } = useQuery({
+    const { isFetching, isLoading, data: processRulesResponse = [], refetch } = useQuery({
         queryKey: ['process-rules-with-processes', category.id],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -26,10 +26,6 @@ const CardCategory = ({ category }: CardCategoryProps) => {
     });
 
     const processRules = useMemo(() => processRulesResponse || [], [processRulesResponse]);
-
-    if (processRules.length === 0 || isFetching) {
-        return null;
-    };
 
     return (
         <Card className="mb-6">
@@ -43,13 +39,18 @@ const CardCategory = ({ category }: CardCategoryProps) => {
                 />
             </CardHeader>
             <CardContent>
-                <Carousel items={processRules}>
-                    {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
-                </Carousel>
+                {isLoading ? (
+                    <p className="text-gray-500">Carregando processos...</p>
+                ) : processRules.length === 0 ? (
+                    <p className="text-gray-500">Nenhum processo encontrado</p>
+                ) : (
+                    <Carousel items={processRules}>
+                        {(processRule) => <CardProcessRule key={processRule.id} processRule={processRule} />}
+                    </Carousel>
+                )}
             </CardContent>
         </Card>
     )
-
 }
 
 export default CardCategory

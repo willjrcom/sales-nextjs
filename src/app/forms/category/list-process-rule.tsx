@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
 import Image from 'next/image';
 import {
     DndContext,
@@ -144,10 +145,14 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
     const [items, setItems] = useState<ProcessRule[]>([]);
+    const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { data: processRules, isFetching } = useQuery({
+    const { isFetching, isLoading, data: processRules, refetch } = useQuery({
         queryKey: ['process-rules', 'by-category', category.id],
-        queryFn: () => GetProcessRulesByCategoryID(session!, category.id),
+        queryFn: () => () => {
+            setLastUpdate(FormatRefreshTime(new Date()));
+            return GetProcessRulesByCategoryID(session!, category.id);
+        },
         enabled: !!session?.user?.access_token && !!category.id,
     });
 
@@ -199,29 +204,28 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
         }
     };
 
-    if (isFetching) {
-        return (
-            <div className="flex flex-col items-center justify-center p-12 space-y-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-                <p className="text-sm text-gray-500">Carregando etapas...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="relative min-h-[400px]">
+            <ButtonIconTextFloat modalName="new-process-rule" title="Nova Etapa" position="bottom-right-1">
+                <ProcessRuleForm category={category} />
+            </ButtonIconTextFloat>
+
             <div className="mb-6 flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900 mb-1">Fluxo de Preparo</h2>
                     <p className="text-sm text-gray-500">Arraste para redefinir a sequência dos processos.</p>
                 </div>
 
-                <ButtonIconTextFloat modalName="new-process-rule" title="Nova Etapa" position="bottom-right-1">
-                    <ProcessRuleForm category={category} />
-                </ButtonIconTextFloat>
+                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
             </div>
 
-            {items.length === 0 ? (
+            {isLoading && (
+                <div className="flex flex-col items-center justify-center p-12 space-y-4">
+                    <p className="text-sm text-gray-500">Carregando etapas...</p>
+                </div>
+            )}
+
+            {!isLoading && items.length === 0 && (
                 <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
                     <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 mb-4">
                         <AlertCircle size={32} />
@@ -229,7 +233,9 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
                     <p className="text-gray-700 font-medium">Nenhuma etapa definida</p>
                     <p className="text-gray-400 text-sm">Comece adicionando o primeiro processo do fluxo.</p>
                 </div>
-            ) : (
+            )}
+
+            {!isLoading && items.length > 0 && (
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
@@ -256,7 +262,7 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
             <div className="mt-8 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
                 <AlertCircle className="text-blue-600 mt-0.5" size={18} />
                 <p className="text-xs text-blue-700 leading-relaxed">
-                    <strong>Dica Premium:</strong> A ordem definida aqui impacta diretamente na visualização dos operadores de cozinha e no cálculo de tempo ideal de cada categoria.
+                    <strong>Dica:</strong> A ordem definida aqui impacta diretamente na visualização dos operadores de cozinha e no cálculo de tempo ideal de cada categoria.
                 </p>
             </div>
         </div>

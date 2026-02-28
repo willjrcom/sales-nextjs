@@ -16,13 +16,9 @@ export default function ReportPage() {
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
 
-  if (!config) {
-    return <div className="p-4 ml-52">Relatório não encontrado.</div>;
-  }
-
-  const body = config.inputType === 'dateRange'
+  const body = config?.inputType === 'dateRange'
     ? { start: new Date(startDate).toISOString(), end: new Date(endDate).toISOString() }
-    : config.inputType === 'date'
+    : config?.inputType === 'date'
       ? { day: new Date(startDate).toISOString() }
       : undefined;
 
@@ -35,8 +31,8 @@ export default function ReportPage() {
         &larr; Voltar
       </button>
 
-      <ThreeColumnHeader center={<PageTitle title={config.name} tooltip={`Relatório: ${config.name}`} />} />
-      {config.inputType !== 'none' && (
+      <ThreeColumnHeader center={<PageTitle title={config?.name || 'Relatório não encontrado'} tooltip={`Relatório: ${config?.name}`} />} />
+      {config?.inputType !== 'none' && (
         <div className="mb-4 flex gap-4">
           <input
             type="date"
@@ -44,7 +40,7 @@ export default function ReportPage() {
             onChange={(e) => setStartDate(e.target.value)}
             className="border p-2 rounded"
           />
-          {config.inputType === 'dateRange' && (
+          {config?.inputType === 'dateRange' && (
             <input
               type="date"
               value={endDate}
@@ -54,17 +50,25 @@ export default function ReportPage() {
           )}
         </div>
       )}
-      <div className="bg-white p-4 rounded shadow">
-        <ReportChart
-          endpoint={config.endpoint}
-          method={config.method}
-          body={body}
-          chartType={config.chartType}
-          labelKey={config.labelKey}
-          dataKey={config.dataKey}
-          title={config.name}
-        />
-      </div>
+      {!config && (
+        <div className="bg-white p-4 rounded shadow">
+          <p>Relatório não encontrado.</p>
+        </div>
+      )}
+
+      {config && (
+        <div className="bg-white p-4 rounded shadow">
+          <ReportChart
+            endpoint={config.endpoint}
+            method={config.method}
+            body={body}
+            chartType={config.chartType}
+            labelKey={config.labelKey}
+            dataKey={config.dataKey}
+            title={config.name}
+          />
+        </div>
+      )}
     </div>
   );
 }

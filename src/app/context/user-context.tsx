@@ -22,7 +22,7 @@ const UserContext = createContext<UserContextType>({
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: session } = useSession();
 
-    const { data: employee, isFetching } = useQuery({
+    const { data: employee, isLoading } = useQuery({
         queryKey: ['me-employee'],
         queryFn: () => GetMeEmployee(session!),
         enabled: !!session?.user?.access_token,
@@ -57,7 +57,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, [session, company]);
 
     return (
-        <UserContext.Provider value={{ user: employee, isLoading: isFetching, hasPermission }}>
+        <UserContext.Provider value={{ user: employee, isLoading: isLoading, hasPermission }}>
             {children}
         </UserContext.Provider>
     );

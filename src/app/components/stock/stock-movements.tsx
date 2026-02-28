@@ -15,7 +15,7 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
-    const { isFetching, data: stockMovementsResponse, refetch } = useQuery({
+    const { isFetching, isLoading, data: stockMovementsResponse, refetch } = useQuery({
         queryKey: ['stock-movements', stockID, selectedDate],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -57,15 +57,6 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
         }
     };
 
-    if (isFetching) {
-        return (
-            <div className="p-6">
-                <h2 className="text-xl font-bold mb-4">Histórico de Movimentos</h2>
-                <p>Carregando...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -80,9 +71,20 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
                     <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
                 </div>
             </div>
-            {movements.length === 0 ? (
-                <p className="text-gray-500">Nenhum movimento encontrado</p>
-            ) : (
+
+            {isLoading && (
+                <div className="mb-6">
+                    <p>Carregando...</p>
+                </div>
+            )}
+
+            {!isLoading && movements.length === 0 && (
+                <div className="mb-6">
+                    <p>Nenhum movimento encontrado</p>
+                </div>
+            )}
+
+            {!isLoading && movements.length > 0 && (
                 <div className="space-y-4">
                     {movements.map((movement) => (
                         <div key={movement.id} className="bg-white border rounded-lg p-4">

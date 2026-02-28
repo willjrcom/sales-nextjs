@@ -64,7 +64,7 @@ export default function AdminAccessPage() {
   const companyColumns = useMemo(() => getCompanyColumns(session, update, router), [session, update, router]);
 
   const [lastUpdateCompanies, setLastUpdateCompanies] = useState<string>(FormatRefreshTime(new Date()));
-  const { data: companiesResponse, isFetching: companiesLoading, error: companiesError, refetch: refetchCompanies } = useQuery<Company[]>({
+  const { data: companiesResponse, isLoading: isLoadingCompaniesInitial, isFetching: isFetchingCompanies, error: companiesError, refetch: refetchCompanies } = useQuery<Company[]>({
     queryKey: ['public-companies'],
     queryFn: () => {
       setLastUpdateCompanies(FormatRefreshTime(new Date()));
@@ -76,7 +76,7 @@ export default function AdminAccessPage() {
   const companies = useMemo(() => companiesResponse || [], [companiesResponse])
 
   const [lastUpdateCompanyCategories, setLastUpdateCompanyCategories] = useState<string>(FormatRefreshTime(new Date()));
-  const { data: companyCategoriesResponse, isFetching: companyCategoriesLoading, error: companyCategoriesError, refetch: refetchCompanyCategories } = useQuery({
+  const { data: companyCategoriesResponse, isLoading: isLoadingCompanyCategoriesInitial, isFetching: isFetchingCompanyCategories, error: companyCategoriesError, refetch: refetchCompanyCategories } = useQuery({
     queryKey: ['public-company-categories'],
     queryFn: () => {
       setLastUpdateCompanyCategories(FormatRefreshTime(new Date()));
@@ -89,7 +89,7 @@ export default function AdminAccessPage() {
 
 
   const [lastUpdateUsers, setLastUpdateUsers] = useState<string>(FormatRefreshTime(new Date()));
-  const { data: usersResponse, isFetching: usersLoading, error: usersError, refetch: refetchUsers } = useQuery({
+  const { data: usersResponse, isLoading: isLoadingUsersInitial, isFetching: isFetchingUsers, error: usersError, refetch: refetchUsers } = useQuery({
     queryKey: ['public-users'],
     queryFn: () => {
       setLastUpdateUsers(FormatRefreshTime(new Date()));
@@ -101,7 +101,7 @@ export default function AdminAccessPage() {
   const users = useMemo(() => usersResponse || [], [usersResponse])
 
   const [lastUpdateSponsors, setLastUpdateSponsors] = useState<string>(FormatRefreshTime(new Date()));
-  const { data: sponsorsResponse, isFetching: sponsorsLoading, error: sponsorsError, refetch: refetchSponsors } = useQuery({
+  const { data: sponsorsResponse, isLoading: sponsorsInitialLoading, isFetching: isFetchingSponsors, error: sponsorsError, refetch: refetchSponsors } = useQuery({
     queryKey: ['public-sponsors'],
     queryFn: () => {
       setLastUpdateSponsors(FormatRefreshTime(new Date()));
@@ -113,7 +113,7 @@ export default function AdminAccessPage() {
   const sponsors = useMemo(() => sponsorsResponse || [], [sponsorsResponse])
 
   const [lastUpdateAdvertisements, setLastUpdateAdvertisements] = useState<string>(FormatRefreshTime(new Date()));
-  const { data: adsResponse, isFetching: adsLoading, error: adsError, refetch: refetchAds } = useQuery({
+  const { data: adsResponse, isLoading: adsInitialLoading, isFetching: isFetchingAds, error: adsError, refetch: refetchAds } = useQuery({
     queryKey: ['public-advertisements'],
     queryFn: () => {
       setLastUpdateAdvertisements(FormatRefreshTime(new Date()));
@@ -200,12 +200,12 @@ export default function AdminAccessPage() {
           action={
             <Refresh
               onRefresh={refetchCompanies}
-              isFetching={companiesLoading}
+              isFetching={isFetchingCompanies}
               lastUpdate={lastUpdateCompanies}
             />
           }
         >
-          {companiesLoading ? (
+          {isLoadingCompaniesInitial ? (
             <div className="flex justify-center py-6">
               <Loading />
             </div>
@@ -226,13 +226,13 @@ export default function AdminAccessPage() {
             <div className="flex gap-2">
               <Refresh
                 onRefresh={refetchCompanyCategories}
-                isFetching={companyCategoriesLoading}
+                isFetching={isFetchingCompanyCategories}
                 lastUpdate={lastUpdateCompanyCategories}
               />
             </div>
           }
         >
-          {companyCategoriesLoading ? (
+          {isLoadingCompanyCategoriesInitial ? (
             <div className="flex justify-center py-6">
               <Loading />
             </div>
@@ -263,13 +263,13 @@ export default function AdminAccessPage() {
             <div className="flex gap-2">
               <Refresh
                 onRefresh={refetchSponsors}
-                isFetching={sponsorsLoading}
+                isFetching={isFetchingSponsors}
                 lastUpdate={lastUpdateSponsors}
               />
             </div>
           }
         >
-          {sponsorsLoading ? (
+          {sponsorsInitialLoading ? (
             <div className="flex justify-center py-6">
               <Loading />
             </div>
@@ -300,13 +300,13 @@ export default function AdminAccessPage() {
             <div className="flex gap-2">
               <Refresh
                 onRefresh={refetchAds}
-                isFetching={adsLoading}
+                isFetching={isFetchingAds}
                 lastUpdate={lastUpdateAdvertisements}
               />
             </div>
           }
         >
-          {adsLoading ? (
+          {adsInitialLoading ? (
             <div className="flex justify-center py-6">
               <Loading />
             </div>
@@ -336,12 +336,12 @@ export default function AdminAccessPage() {
           action={
             <Refresh
               onRefresh={refetchUsers}
-              isFetching={usersLoading}
+              isFetching={isFetchingUsers}
               lastUpdate={lastUpdateUsers}
             />
           }
         >
-          {usersLoading ? (
+          {isLoadingUsersInitial ? (
             <div className="flex justify-center py-6">
               <Loading />
             </div>
