@@ -114,7 +114,7 @@ const PageProcessRule = () => {
                     <SelectField friendlyName="Processo Atual" name="process" disabled={false} values={processRules} selectedValue={currentProcessRuleID} setSelectedValue={setCurrentProcessRuleID} optional removeDefaultOption />
                 }
                 refreshButton={
-                    <Refresh onRefresh={handleRefresh} isPending={isRefreshing} lastUpdate={lastUpdate} />
+                    <Refresh onRefresh={handleRefresh} isFetching={isRefreshing} lastUpdate={lastUpdate} />
                 }
                 tableChildren={body}
             />

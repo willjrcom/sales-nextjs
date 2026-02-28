@@ -16,7 +16,7 @@ const ListShift = () => {
     const [lastUpdate, setLastUpdate] = useState(FormatRefreshTime(new Date()));
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
-    const { isPending, error, data: shiftsResponse, refetch } = useQuery({
+    const { isFetching, error, data: shiftsResponse, refetch } = useQuery({
         queryKey: ['shifts', pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -45,7 +45,7 @@ const ListShift = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

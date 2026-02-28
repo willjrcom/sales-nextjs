@@ -8,19 +8,19 @@ interface RefreshProps {
     /** Last update time formatted */
     lastUpdate?: string;
     /** Loading state */
-    isPending?: boolean;
+    isFetching?: boolean;
     optionalText?: string;
 }
 
-const Refresh = ({ onRefresh, removeText, lastUpdate, isPending, optionalText }: RefreshProps) => {
+const Refresh = ({ onRefresh, removeText, lastUpdate, isFetching, optionalText }: RefreshProps) => {
     return (
         <div className="flex items-center gap-3">
             <button
-                onClick={!isPending ? onRefresh : undefined}
-                disabled={isPending}
+                onClick={!isFetching ? onRefresh : undefined}
+                disabled={isFetching}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:cursor-not-allowed"
             >
-                {isPending ? (
+                {isFetching ? (
                     <HiOutlineRefresh className="h-5 w-5 text-blue-500 animate-spin" />
                 ) : (
                     <HiOutlineRefresh className="h-5 w-5 text-gray-800" />

@@ -14,7 +14,7 @@ interface CategorySelectorProps {
 const ComplementCategorySelector = ({ value, onChange }: CategorySelectorProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const { isPending, data: complementCategoriesResponse, refetch } = useQuery({
+    const { isFetching, data: complementCategoriesResponse, refetch } = useQuery({
         queryKey: ['complement-categories'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -32,7 +32,7 @@ const ComplementCategorySelector = ({ value, onChange }: CategorySelectorProps) 
                 <h4 className="text-md font-medium">Categorias complemento</h4>
                 <Refresh removeText
                     onRefresh={refetch}
-                    isPending={isPending}
+                    isFetching={isFetching}
                     lastUpdate={lastUpdate}
                 />
             </div>

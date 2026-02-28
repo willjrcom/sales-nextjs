@@ -53,7 +53,7 @@ export default function BillingPage() {
         enabled: !!(session as any)?.user?.access_token,
     });
 
-    const { data: subscriptionStatus, isLoading: isLoadingStatus } = useQuery({
+    const { data: subscriptionStatus, isFetching: isLoadingStatus } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
         enabled: !!(session as any)?.user?.access_token,
@@ -349,7 +349,7 @@ export default function BillingPage() {
                                     </select>
                                     <Refresh
                                         onRefresh={refetchPayments}
-                                        isPending={isRefetchingPayments}
+                                        isFetching={isRefetchingPayments}
                                         lastUpdate={paymentsUpdatedAt ? FormatRefreshTime(new Date(paymentsUpdatedAt)) : undefined}
                                     />
                                 </div>
@@ -400,7 +400,7 @@ export default function BillingPage() {
                         <RegisterCostDialog onSuccess={refetchCosts} />
                         <Refresh
                             onRefresh={refetchCosts}
-                            isPending={isRefetchingCosts}
+                            isFetching={isRefetchingCosts}
                             lastUpdate={costsUpdatedAt ? FormatRefreshTime(new Date(costsUpdatedAt)) : undefined}
                             optionalText="Custos"
                         />

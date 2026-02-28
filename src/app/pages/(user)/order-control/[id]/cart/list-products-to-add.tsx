@@ -46,7 +46,7 @@ export const ListProductsToAdd = () => {
     });
 
     // Fetch products based on selected category
-    const { isPending, data: productsResponse, refetch } = useQuery({
+    const { isFetching, data: productsResponse, refetch } = useQuery({
         queryKey: ['products', 'default', selectedCategoryId, pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             if (selectedCategoryId) {
@@ -189,7 +189,7 @@ export const ListProductsToAdd = () => {
 
                             <Refresh
                                 onRefresh={refetch}
-                                isPending={isPending}
+                                isFetching={isFetching}
                             />
                         </div>
                     </div>
@@ -246,7 +246,7 @@ export const ListProductsToAdd = () => {
                                     variant="outline"
                                     size="sm"
                                     onClick={handlePreviousPage}
-                                    disabled={pagination.pageIndex === 0 || isPending}
+                                    disabled={pagination.pageIndex === 0 || isFetching}
                                     className="gap-1"
                                 >
                                     <ChevronLeft className="h-4 w-4" />
@@ -262,7 +262,7 @@ export const ListProductsToAdd = () => {
                                     variant="outline"
                                     size="sm"
                                     onClick={handleNextPage}
-                                    disabled={pagination.pageIndex >= totalPages - 1 || isPending}
+                                    disabled={pagination.pageIndex >= totalPages - 1 || isFetching}
                                     className="gap-1"
                                 >
                                     Próxima

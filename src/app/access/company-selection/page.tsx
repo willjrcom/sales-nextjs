@@ -36,7 +36,7 @@ function CompanySelection() {
     const [selecting, setSelecting] = useState<boolean>(false);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending: loadingCompanies, error, data: companiesResponse, refetch } = useQuery({
+    const { isFetching: loadingCompanies, error, data: companiesResponse, refetch } = useQuery({
         queryKey: ['user-companies'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -159,7 +159,7 @@ function CompanySelection() {
 
             {!loadingCompanies && <div className='flex justify-center items-center gap-4 mb-10'>
                 <h2 className="text-2xl">Selecione uma Empresa</h2>
-                <Refresh onRefresh={refetch} isPending={loadingCompanies} lastUpdate={lastUpdate} removeText={true} />
+                <Refresh onRefresh={refetch} isFetching={loadingCompanies} lastUpdate={lastUpdate} removeText={true} />
             </div>}
 
             {!loadingCompanies && (companies.length === 0 ? (

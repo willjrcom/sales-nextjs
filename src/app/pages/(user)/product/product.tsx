@@ -83,7 +83,7 @@ const PageProducts = () => {
                 refreshButton={
                     < Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isPending}
                         lastUpdate={lastUpdate}
                     />
                 }

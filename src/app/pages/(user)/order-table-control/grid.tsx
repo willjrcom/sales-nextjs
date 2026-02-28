@@ -86,7 +86,7 @@ const DragAndDropGrid = () => {
     });
 
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const { isLoading, data: tableOrdersResponse, refetch } = useQuery({
+    const { isFetching, data: tableOrdersResponse, refetch } = useQuery({
         queryKey: ['table-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -143,7 +143,7 @@ const DragAndDropGrid = () => {
                     center={<PageTitle title="Controle de Mesas" tooltip="Gerencie mesas e pedidos em cada local." />}
                     left={<SelectField friendlyName="" name="place" selectedValue={placeSelectedID} setSelectedValue={setPlaceSelectedID} values={places}
                         optional />}
-                    right={<Refresh onRefresh={refetch} isPending={isLoading} lastUpdate={lastUpdate} />} />
+                    right={<Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />} />
                 <div
                     style={{
                         display: "grid",

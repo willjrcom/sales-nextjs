@@ -21,7 +21,7 @@ const PageDeliveryDriver = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: deliveryDriversResponse, refetch } = useQuery({
+    const { isFetching, error, data: deliveryDriversResponse, refetch } = useQuery({
         queryKey: ['delivery-drivers', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -64,7 +64,7 @@ const PageDeliveryDriver = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

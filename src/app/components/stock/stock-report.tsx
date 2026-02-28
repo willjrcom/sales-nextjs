@@ -12,7 +12,7 @@ const StockReport = () => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = React.useState<string>('');
 
-    const { data: reportStock, isLoading, refetch } = useQuery<StockReportComplete>({
+    const { data: reportStock, isFetching, refetch } = useQuery<StockReportComplete>({
         queryKey: ['stock-report'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -22,7 +22,7 @@ const StockReport = () => {
         refetchInterval: 60000,
     });
 
-    if (isLoading) {
+    if (isFetching) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Relatório de Estoque</h2>
@@ -49,7 +49,7 @@ const StockReport = () => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold">Relatório de Estoque</h2>
-                <Refresh lastUpdate={lastUpdate} onRefresh={refetch} isPending={isLoading} />
+                <Refresh lastUpdate={lastUpdate} onRefresh={refetch} isFetching={isFetching} />
             </div>
 
             {/* Resumo */}

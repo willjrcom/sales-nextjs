@@ -21,7 +21,7 @@ const PageEmployee = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: employeesResponse, refetch } = useQuery({
+    const { isFetching, error, data: employeesResponse, refetch } = useQuery({
         queryKey: ['employees', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -64,7 +64,7 @@ const PageEmployee = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

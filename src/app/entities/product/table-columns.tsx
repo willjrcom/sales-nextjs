@@ -45,9 +45,27 @@ const ProductColumns = (): ColumnDef<Product>[] => [
     header: 'Tamanhos',
     cell: ({ row }) => {
       const variations = row.original.variations || [];
-      if (variations.length === 0) return "Semariações";
-      const sizes = Array.from(new Set(variations.map(v => v.size?.name || "Padrão"))).join(", ");
-      return sizes;
+      if (variations.length === 0) return "Sem variações";
+      const sizeMap = new Map<string, boolean>();
+      variations.forEach(v => {
+        const name = v.size?.name || "Padrão";
+        const isAvailable = v.is_available ?? true;
+        if (!sizeMap.has(name) || isAvailable) {
+          sizeMap.set(name, isAvailable);
+        }
+      });
+
+      const sizeList = Array.from(sizeMap.entries());
+      return (
+        <div className="flex flex-wrap gap-x-1">
+          {sizeList.map(([name, isAvailable], idx) => (
+            <span key={name} className={isAvailable ? "" : "text-gray-400"}>
+              {isAvailable ? name : <s>{name}</s>}
+              {idx < sizeList.length - 1 ? "," : ""}
+            </span>
+          ))}
+        </div>
+      );
     },
   },
   {

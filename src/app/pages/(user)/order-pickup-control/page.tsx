@@ -26,7 +26,7 @@ const PickupOrderPage = () => {
     };
 
     // Query para pedidos prontos (status Ready)
-    const { isPending: isPendingReady, error: errorReady, data: readyOrdersResponse, refetch: refetchReady } = useQuery({
+    const { isFetching: isFetchingReady, error: errorReady, data: readyOrdersResponse, refetch: refetchReady } = useQuery({
         queryKey: ['pickup-orders-ready'],
         queryFn: async () => {
             setLastUpdateReady(FormatRefreshTime(new Date()));
@@ -38,7 +38,7 @@ const PickupOrderPage = () => {
     });
 
     // Query para últimos 10 entregues (status Delivered)
-    const { isPending: isPendingDelivered, error: errorDelivered, data: deliveredOrdersResponse, refetch: refetchDelivered } = useQuery({
+    const { isFetching: isFetchingDelivered, error: errorDelivered, data: deliveredOrdersResponse, refetch: refetchDelivered } = useQuery({
         queryKey: ['pickup-orders-delivered'],
         queryFn: async () => {
             setLastUpdateDelivered(FormatRefreshTime(new Date()));
@@ -70,7 +70,7 @@ const PickupOrderPage = () => {
                 </TabsList>
                 <TabsContent value="ready">
                     <div className="flex justify-end items-center mb-2">
-                        <Refresh onRefresh={refetchReady} isPending={isPendingReady} lastUpdate={lastUpdateReady} />
+                        <Refresh onRefresh={refetchReady} isFetching={isFetchingReady} lastUpdate={lastUpdateReady} />
                     </div>
                     {readyOrders.length === 0
                         ? <p className="text-gray-500">Nenhum pedido pronto para retirada</p>
@@ -79,7 +79,7 @@ const PickupOrderPage = () => {
                 </TabsContent>
                 <TabsContent value="last-10">
                     <div className="flex justify-end items-center mb-2">
-                        <Refresh onRefresh={refetchDelivered} isPending={isPendingDelivered} lastUpdate={lastUpdateDelivered} />
+                        <Refresh onRefresh={refetchDelivered} isFetching={isFetchingDelivered} lastUpdate={lastUpdateDelivered} />
                     </div>
                     {deliveredOrders.length === 0
                         ? <p className="text-gray-500">Nenhum pedido entregue recentemente</p>

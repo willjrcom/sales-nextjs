@@ -37,7 +37,7 @@ const DeliveryOrderToFinish = () => {
     const { data } = useSession();
     const { hasPermission, user } = useUser();
 
-    const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
+    const { data: deliveryOrdersResponse, refetch, isFetching } = useQuery({
         queryKey: ['shipped-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -136,7 +136,7 @@ const DeliveryOrderToFinish = () => {
                     values={deliveryDrivers}
                     optional
                 />
-                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
             </div>
             <CrudTable columns={DeliveryOrderColumns()} data={deliveryOrders} rowSelectionType="radio" selectedRow={orderID} setSelectedRow={setSelectedOrderID} />
             {/* <div className="flex flex-col md:flex-row gap-2 items-start">

@@ -24,7 +24,7 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
     const currentGroupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
     // Fetch categories
-    const { isLoading: categoriesLoading, data: categories = [], refetch: refetchCategories } = useQuery({
+    const { isFetching: categoriesLoading, data: categories = [], refetch: refetchCategories } = useQuery({
         queryKey: ['categories', 'map', 'product'],
         queryFn: () => GetCategoriesMap(session!, true, false, false),
         enabled: !!session
@@ -32,13 +32,13 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
 
     // Fetch all products
     // Using existing fetching strategy from sales-nextjs
-    const { isLoading: productsLoading, data: productsResponse, refetch: refetchProducts } = useQuery({
+    const { isFetching: productsLoading, data: productsResponse, refetch: refetchProducts } = useQuery({
         queryKey: ['products', 'all'],
         queryFn: () => GetDefaultProducts(session!, 0, 100, true),
         enabled: !!session
     });
 
-    const isLoading = categoriesLoading || productsLoading;
+    const isFetching = categoriesLoading || productsLoading;
     const isError = !session; // Simple check for session as well
 
     const products = useMemo(() => productsResponse?.items || [], [productsResponse]);
@@ -134,7 +134,7 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                                     refetchCategories();
                                     refetchProducts();
                                 }}
-                                isPending={isLoading}
+                                isFetching={isFetching}
                             />
                         </div>
                     </div>
@@ -160,7 +160,7 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                 </div>
 
                 {/* Loading state */}
-                {isLoading && (
+                {isFetching && (
                     <div className='mt-10 text-center text-gray-500'>
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
                         <p>Carregando cardápio...</p>
@@ -168,14 +168,14 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                 )}
 
                 {/* Empty state (No products at all) */}
-                {!isLoading && products.length === 0 && (
+                {!isFetching && products.length === 0 && (
                     <div className='mt-10 text-center text-gray-500'>
                         <p>Nenhum produto disponível no momento</p>
                     </div>
                 )}
 
                 {/* Filtered Empty state (Products exist but none match filter) */}
-                {!isLoading && products.length > 0 && filteredProducts.length === 0 && (
+                {!isFetching && products.length > 0 && filteredProducts.length === 0 && (
                     <div className='mt-10 text-center text-gray-500'>
                         <p className="mb-4">Nenhum item compatível com {currentGroupItem?.size || 'os filtros'} foi encontrado.</p>
                         <button

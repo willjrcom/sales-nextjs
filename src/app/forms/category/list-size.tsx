@@ -29,7 +29,7 @@ const ListSize = ({ categoryID, isAdditional }: ListSizeProps) => {
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     // Usa useQuery para manter os dados sincronizados
-    const { data: sizes, refetch, isPending } = useQuery({
+    const { data: sizes, refetch, isFetching } = useQuery({
         queryKey: ['sizes', categoryID],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -56,7 +56,7 @@ const ListSize = ({ categoryID, isAdditional }: ListSizeProps) => {
                 setValue={setShowInactive}
             />}
                 center={<h2 className="text-xl font-bold mb-4">Tamanhos</h2>}
-                right={<Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />}></ThreeColumnHeader>
+                right={<Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />}></ThreeColumnHeader>
 
             <div className="flex flex-wrap gap-4">
                 {sortedSizes.map((size) => (

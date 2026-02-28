@@ -14,7 +14,7 @@ interface CategorySelectorProps {
 const AdditionalCategorySelector = ({ value, onChange }: CategorySelectorProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const { isPending, data: additionalCategoriesResponse, refetch } = useQuery({
+    const { isFetching, data: additionalCategoriesResponse, refetch } = useQuery({
         queryKey: ['additional-categories'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -32,7 +32,7 @@ const AdditionalCategorySelector = ({ value, onChange }: CategorySelectorProps) 
                 <h4 className="text-md font-medium">Categorias adicionais</h4>
                 <Refresh removeText
                     onRefresh={refetch}
-                    isPending={isPending}
+                    isFetching={isFetching}
                     lastUpdate={lastUpdate}
                 />
             </div>

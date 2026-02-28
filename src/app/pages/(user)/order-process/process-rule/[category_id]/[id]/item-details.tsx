@@ -5,6 +5,7 @@ import { useModal } from '../../../../../../context/modal/context';
 import Image from 'next/image';
 import { Card, CardContent } from "../../../../../../../components/ui/card";
 import { Badge } from "../../../../../../../components/ui/badge";
+import GetProductByID from "@/app/api/product/[id]/product";
 import {
     ImageIcon,
     Info,
@@ -14,15 +15,23 @@ import {
     Tag
 } from "lucide-react";
 import { cn } from "../../../../../../../lib/utils";
+import { useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 
 interface ItemDetailsProps {
     item: Item;
-    product?: Product;
     isComplement?: boolean;
 }
 
-const ItemDetails = ({ item, product, isComplement }: ItemDetailsProps) => {
+const ItemDetails = ({ item, isComplement }: ItemDetailsProps) => {
     const modalHandler = useModal();
+    const { data } = useSession();
+
+    const { data: product } = useQuery<Product>({
+        queryKey: ['product', item.product_id],
+        queryFn: () => GetProductByID(item.product_id, data!),
+        enabled: !!data?.user?.access_token,
+    });
 
     const openImage = () => {
         if (!product?.image_path) return;

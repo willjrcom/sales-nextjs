@@ -38,7 +38,7 @@ export function SubscriptionStatusCard() {
     const [cancelling, setCancelling] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-    const { data: status, isLoading } = useQuery({
+    const { data: status, isFetching } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
         enabled: !!(session as any)?.user?.access_token,
@@ -61,7 +61,7 @@ export function SubscriptionStatusCard() {
         }
     };
 
-    if (isLoading) {
+    if (isFetching) {
         return (
             <Card>
                 <CardContent className="pt-6">

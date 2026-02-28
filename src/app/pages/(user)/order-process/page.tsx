@@ -13,7 +13,7 @@ const OrderProcess = () => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, data: categoriesResponse = [], refetch } = useQuery({
+    const { isFetching, data: categoriesResponse = [], refetch } = useQuery({
         queryKey: ['categories', 'map', 'order-process'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -32,7 +32,7 @@ const OrderProcess = () => {
                 right={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                         optionalText='Categoria'
                     />

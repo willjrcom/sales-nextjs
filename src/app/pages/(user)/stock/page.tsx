@@ -24,7 +24,7 @@ const PageStock = () => {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const { data } = useSession();
 
-    const { isPending: stockPending, error: stockError, data: stocksResponse, refetch } = useQuery({
+    const { isFetching: stockPending, error: stockError, data: stocksResponse, refetch } = useQuery({
         queryKey: ['stocks', pagination.pageIndex, pagination.pageSize],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -102,7 +102,7 @@ const PageStock = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={stockPending}
+                        isFetching={stockPending}
                         lastUpdate={lastUpdate}
                     />
                 }

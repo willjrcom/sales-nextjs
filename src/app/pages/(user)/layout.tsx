@@ -1,5 +1,5 @@
 "use client";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useUser } from "@/app/context/user-context";
 import Loading from "../loading";
 import AccessDenied from "@/app/components/access-denied";
@@ -8,7 +8,6 @@ import { ReactNode } from "react";
 export default function UserLayout({ children }: { children: ReactNode }) {
     const { hasPermission, isLoading, user } = useUser();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
 
     if (isLoading) {
         return <Loading />;

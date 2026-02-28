@@ -15,7 +15,7 @@ interface CardCategoryProps {
 const CardCategory = ({ category }: CardCategoryProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
-    const { isPending, data: processRulesResponse = [], refetch } = useQuery({
+    const { isFetching, data: processRulesResponse = [], refetch } = useQuery({
         queryKey: ['process-rules-with-processes', category.id],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -27,7 +27,7 @@ const CardCategory = ({ category }: CardCategoryProps) => {
 
     const processRules = useMemo(() => processRulesResponse || [], [processRulesResponse]);
 
-    if (processRules.length === 0 || isPending) {
+    if (processRules.length === 0 || isFetching) {
         return null;
     };
 
@@ -37,7 +37,7 @@ const CardCategory = ({ category }: CardCategoryProps) => {
                 <CardTitle className="text-2xl font-bold">{category.name}</CardTitle>
                 <Refresh
                     onRefresh={refetch}
-                    isPending={isPending}
+                    isFetching={isFetching}
                     lastUpdate={lastUpdate}
                     optionalText="Processo"
                 />

@@ -66,7 +66,7 @@ const PageCategories = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isPending}
                         lastUpdate={lastUpdate}
                     />
                 }

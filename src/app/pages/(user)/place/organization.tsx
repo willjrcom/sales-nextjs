@@ -348,7 +348,7 @@ const PageDragAndDropGrid = () => {
                     <div>
                         <div className="flex items-center justify-between">
                             <h4 className="text-lg font-semibold mb-2">Não alocadas</h4>
-                            <Refresh onRefresh={handleRefresh} isPending={isPendingPlaces} lastUpdate={lastUpdate} />
+                            <Refresh onRefresh={handleRefresh} isFetching={isPendingPlaces} lastUpdate={lastUpdate} />
                         </div>
                         <DroppableColumn key="unused-tables" id="unused-tables">
                             {unusedTables.map((item) => (

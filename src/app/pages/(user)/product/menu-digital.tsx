@@ -26,7 +26,7 @@ const PageMenuDigital = () => {
         enabled: !!session?.user?.access_token,
     })
 
-    const { data: subscriptionStatus, isLoading: isLoadingStatus } = useQuery({
+    const { data: subscriptionStatus, isFetching: isLoadingStatus } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
         enabled: !!session?.user?.access_token,

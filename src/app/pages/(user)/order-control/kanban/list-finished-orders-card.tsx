@@ -11,7 +11,7 @@ const ListFinishedOrdersCard = () => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: ordersResponse, refetch } = useQuery({
+    const { data: ordersResponse, refetch } = useQuery({
         queryKey: ['opened-orders'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));

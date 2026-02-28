@@ -20,7 +20,7 @@ const PageOrder = () => {
     const modalHandler = useModal();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: ordersResponse, refetch } = useQuery({
+    const { isFetching, error, data: ordersResponse, refetch } = useQuery({
         queryKey: ['opened-orders'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -69,7 +69,7 @@ const PageOrder = () => {
 
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 </div>

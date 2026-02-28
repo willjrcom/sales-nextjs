@@ -15,7 +15,7 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
     const { data } = useSession();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
-    const { isPending, data: stockMovementsResponse, refetch } = useQuery({
+    const { isFetching, data: stockMovementsResponse, refetch } = useQuery({
         queryKey: ['stock-movements', stockID, selectedDate],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -57,7 +57,7 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
         }
     };
 
-    if (isPending) {
+    if (isFetching) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Histórico de Movimentos</h2>
@@ -77,7 +77,7 @@ const StockMovements = ({ stockID }: StockMovementsProps) => {
                         onChange={(e) => setSelectedDate(e.target.value)}
                         className="border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                    <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
                 </div>
             </div>
             {movements.length === 0 ? (

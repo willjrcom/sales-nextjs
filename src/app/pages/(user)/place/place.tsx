@@ -15,13 +15,12 @@ import GetPlaces from "@/app/api/place/place";
 import { notifyError } from "@/app/utils/notifications";
 
 const PagePlace = () => {
-    const [nome, setNome] = useState<string>("");
     const [showInactive, setShowInactive] = useState(false);
     const { data } = useSession();
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isPending, error, data: placesResponse, refetch } = useQuery({
+    const { isFetching, error, data: placesResponse, refetch } = useQuery({
         queryKey: ['places', pagination.pageIndex, pagination.pageSize, !showInactive],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -63,7 +62,7 @@ const PagePlace = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isFetching}
                         lastUpdate={lastUpdate}
                     />
                 }

@@ -29,6 +29,7 @@ import { useModal } from "@/app/context/modal/context"
 import { useUser } from "@/app/context/user-context"
 import CompanyForm from "@/app/forms/company/form"
 import { usePrintAgent } from "@/app/pages/(user)/print/print"
+import Loading from "../../loading";
 
 import {
     Sidebar,
@@ -99,6 +100,11 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
         }
         return hasPermission(item.permission);
     });
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>

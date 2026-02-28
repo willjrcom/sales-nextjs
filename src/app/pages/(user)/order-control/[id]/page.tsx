@@ -29,7 +29,7 @@ const PageEditOrderControl = () => {
         }
     }, [id, queryClient]);
 
-    const { data: order, error, isLoading } = useQuery({
+    const { data: order, error, isFetching } = useQuery({
         queryKey: ['order', 'current'],
         queryFn: () => GetOrderByID(id as string, data!),
         enabled: !!data?.user?.access_token && !!id,
@@ -45,7 +45,7 @@ const PageEditOrderControl = () => {
         </div>
     );
 
-    if (isLoading) return (
+    if (isFetching) return (
         <div className="w-full h-full bg-gray-50">
             <div className="flex items-center justify-center h-full">
                 <div className="text-gray-500 text-sm">

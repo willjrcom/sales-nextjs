@@ -23,7 +23,7 @@ const DeliveryOrderFinished = () => {
     const { data } = useSession();
     const { hasPermission, user } = useUser();
 
-    const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
+    const { data: deliveryOrdersResponse, refetch, isFetching } = useQuery({
         queryKey: ['finished-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -85,7 +85,7 @@ const DeliveryOrderFinished = () => {
                     values={deliveryDrivers}
                     optional
                 />
-                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
             </div>
             {ordersNotFinished.length > 0 &&
                 <div className="mt-2 text-sm">

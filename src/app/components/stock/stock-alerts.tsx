@@ -14,7 +14,7 @@ const StockAlerts = () => {
     const queryClient = useQueryClient();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isLoading, data: stockAlertsResponse, refetch } = useQuery({
+    const { isFetching, data: stockAlertsResponse, refetch } = useQuery({
         queryKey: ['stock-alerts'],
         queryFn: async () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -80,7 +80,7 @@ const StockAlerts = () => {
     const activeAlerts = useMemo(() => alerts.filter(alert => !alert.is_resolved), [alerts]);
     const resolvedAlerts = useMemo(() => alerts.filter(alert => alert.is_resolved), [alerts]);
 
-    if (isLoading) {
+    if (isFetching) {
         return (
             <div className="p-6">
                 <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
@@ -94,7 +94,7 @@ const StockAlerts = () => {
             <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
-                    <Refresh onRefresh={refetch} isPending={isLoading} lastUpdate={lastUpdate} />
+                    <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
                 </div>
                 <p>Nenhum alerta encontrado</p>
             </div>
@@ -104,7 +104,7 @@ const StockAlerts = () => {
         <div className="p-6">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
-                <Refresh onRefresh={refetch} isPending={isLoading} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
             </div>
 
             {/* Alertas Ativos */}

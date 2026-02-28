@@ -58,7 +58,7 @@ const PageTable = () => {
                 refreshButton={
                     <Refresh
                         onRefresh={refetch}
-                        isPending={isPending}
+                        isFetching={isPending}
                         lastUpdate={lastUpdate}
                     />
                 }

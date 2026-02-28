@@ -36,7 +36,7 @@ const DeliveryOrderToShip = () => {
     const { data } = useSession();
     const { hasPermission, user } = useUser();
 
-    const { data: deliveryOrdersResponse, refetch, isPending } = useQuery({
+    const { data: deliveryOrdersResponse, refetch, isFetching } = useQuery({
         queryKey: ['ready-delivery-orders'],
         queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
@@ -113,7 +113,7 @@ const DeliveryOrderToShip = () => {
     return (
         <>
             <div className="flex justify-end items-center">
-                <Refresh onRefresh={refetch} isPending={isPending} lastUpdate={lastUpdate} />
+                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
             </div>
 
             <CrudTable columns={DeliveryOrderColumns()} data={readyOrdersSorted} rowSelectionType="checkbox" selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
@@ -154,7 +154,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
         enabled: !!data?.user?.access_token,
     })
 
-    const { data: deliveryDriversResponse, refetch, isPending } = useQuery({
+    const { data: deliveryDriversResponse, refetch, isFetching } = useQuery({
         queryKey: ['delivery-drivers'],
         queryFn: () => GetAllDeliveryDrivers(data!),
         enabled: !!data?.user?.access_token,
@@ -209,7 +209,7 @@ export const SelectDeliveryDriver = ({ deliveryIDs, orderIDs }: ModalData) => {
             <div className="items-center mb-4">
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Selecione um entregador:</h3>
-                    <Refresh onRefresh={handleRefresh} isPending={isPending} lastUpdate={lastUpdate} />
+                    <Refresh onRefresh={handleRefresh} isFetching={isFetching} lastUpdate={lastUpdate} />
                 </div>
                 {deliveryDrivers.length === 0 && <p className="text-gray-500">Nenhum entregador cadastrado</p>}
 

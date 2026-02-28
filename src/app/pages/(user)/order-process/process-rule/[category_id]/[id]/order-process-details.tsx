@@ -1,6 +1,5 @@
 import { useModal } from "../../../../../../context/modal/context";
 import OrderProcess from "../../../../../../entities/order-process/order-process";
-import { ToUtcTimeWithSeconds } from "../../../../../../utils/date";
 import CancelOrderProcess from "./cancel-process-order";
 import ItemDetails from "./item-details";
 import { Printer, MessageSquare, Package, Layers, Hash, X } from "lucide-react";
@@ -72,8 +71,7 @@ const OrderProcessDetails = ({ orderProcess }: OrderProcessDetailsProps) => {
                     </div>
                     <div className="grid grid-cols-1 gap-2.5">
                         {groupItem.items.map(item => {
-                            const product = orderProcess.products.find(p => p.id === item.product_id);
-                            return <ItemDetails key={item.id} item={item} product={product} />;
+                            return <ItemDetails key={item.id} item={item} />;
                         })}
                     </div>
                 </div>

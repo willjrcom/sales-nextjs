@@ -145,7 +145,7 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
     const queryClient = useQueryClient();
     const [items, setItems] = useState<ProcessRule[]>([]);
 
-    const { data: processRules, isPending } = useQuery({
+    const { data: processRules, isFetching } = useQuery({
         queryKey: ['process-rules', 'by-category', category.id],
         queryFn: () => GetProcessRulesByCategoryID(session!, category.id),
         enabled: !!session?.user?.access_token && !!category.id,
@@ -199,7 +199,7 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
         }
     };
 
-    if (isPending) {
+    if (isFetching) {
         return (
             <div className="flex flex-col items-center justify-center p-12 space-y-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
