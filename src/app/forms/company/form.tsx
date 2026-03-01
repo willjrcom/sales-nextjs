@@ -40,6 +40,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     const defaultPreferences = {
         enable_delivery: 'true',
         enable_table: 'true',
+        enable_pickup: 'true',
         min_order_value_for_free_delivery: '0',
         table_tax_rate: '10',
         min_delivery_tax: '5',
@@ -419,6 +420,11 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                     value={company.preferences.enable_delivery === 'true'}
                                     setValue={(value: boolean) => handlePreferenceChange('enable_delivery', value)}
                                 />
+                                <p className="text-xs mt-1 text-muted-foreground">
+                                    {company.preferences.enable_delivery === 'true'
+                                        ? '✓ Clientes poderão fazer pedidos para entrega pelo menu digital'
+                                        : '⚠️ A opção de entrega não aparecerá para os clientes'}
+                                </p>
                             </div>
 
                             <div className={`space-y-4 transition-all duration-200 ${company.preferences.enable_delivery === 'false' ? 'opacity-50 grayscale-[0.5]' : ''}`}>
@@ -470,6 +476,11 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                     value={company.preferences.enable_table === 'true'}
                                     setValue={(value: boolean) => handlePreferenceChange('enable_table', value)}
                                 />
+                                <p className="text-xs mt-1 text-muted-foreground">
+                                    {company.preferences.enable_table === 'true'
+                                        ? '✓ O auto-atendimento em mesa pelo QR Code estará ativado'
+                                        : '⚠️ O auto-atendimento em mesa estará desativado'}
+                                </p>
                             </div>
 
                             <div className={`transition-all duration-200 ${company.preferences.enable_table === 'false' ? 'opacity-50 grayscale-[0.5]' : ''}`}>
@@ -482,6 +493,23 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                                         disabled={company.preferences.enable_table !== 'true'}
                                     />
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Grupo: Retirada */}
+                        <div className='p-4 border border-green-100 rounded-xl bg-green-50/20 space-y-4'>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <CheckboxField
+                                    friendlyName="Retirada/Balcão disponível"
+                                    name="enable_pickup" optional
+                                    value={company.preferences.enable_pickup === 'true'}
+                                    setValue={(value: boolean) => handlePreferenceChange('enable_pickup', value)}
+                                />
+                                <p className="text-xs mt-1 text-muted-foreground">
+                                    {company.preferences.enable_pickup === 'true'
+                                        ? '✓ Clientes poderão pedir para retirar no balcão'
+                                        : '⚠️ Pedidos para retirada/balcão estarão desativados'}
+                                </p>
                             </div>
                         </div>
 
