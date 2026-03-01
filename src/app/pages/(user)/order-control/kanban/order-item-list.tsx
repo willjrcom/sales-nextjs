@@ -2,6 +2,7 @@ import Order from "@/app/entities/order/order";
 import { Bike, Utensils, Package, Clock, ShoppingBag, ChevronRight, User } from "lucide-react";
 import CardOrder from "../../../../components/card-order/card-order";
 import { useModal } from "@/app/context/modal/context";
+import { formatCurrency } from "@/app/utils/format";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -25,16 +26,6 @@ function formatTimeAgo(date?: any) {
     return `${hours}h${rest > 0 ? `${rest}m` : ""}`;
 }
 
-function formatCurrencyBR(value: any) {
-    try {
-        const num = typeof value?.toNumber === "function" ? value.toNumber() : Number(value);
-        if (Number.isNaN(num)) return "—";
-        return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    } catch {
-        return "—";
-    }
-}
-
 function getOrderType(order: Order) {
     if (order.delivery) return "delivery";
     if (order.table) return "table";
@@ -55,23 +46,53 @@ function getTypeConfig(order: Order) {
 
 function getOrderInfo(order: Order) {
     if (order.delivery) {
+        let statusDelivery = "Entrega Pendente"
+        switch (order.delivery.status) {
+            case "Shipped":
+                statusDelivery = "Entrega em Andamento"
+                break;
+            case "Delivered":
+                statusDelivery = "Entrega Realizada"
+                break;
+            case "Cancelled":
+                statusDelivery = "Entrega Cancelada"
+                break;
+        }
         return {
             title: order.delivery?.client?.name || "Cliente S/ Nome",
-            subtitle: order.delivery.status === "Pending" ? "Entrega Pendente" : "Entrega em Fluxo",
+            subtitle: statusDelivery,
             time: formatTimeAgo(order.created_at)
         };
     }
     if (order.table) {
+        let statusTable = "Mesa Aberta"
+        switch (order.table.status) {
+            case "Closed":
+                statusTable = "Mesa Fechada"
+                break;
+            case "Cancelled":
+                statusTable = "Mesa Cancelada"
+                break;
+        }
         return {
             title: `Mesa ${order.table.table?.name || "?"}`,
-            subtitle: order.table.name || "Cliente S/ Nome",
+            subtitle: statusTable,
             time: formatTimeAgo(order.created_at)
         };
     }
     if (order.pickup) {
+        let statusPickup = ""
+        switch (order.pickup.status) {
+            case "Delivered":
+                statusPickup = "Entregue no Balcão"
+                break;
+            case "Cancelled":
+                statusPickup = "Retirada Cancelada"
+                break;
+        }
         return {
             title: order.pickup.name || "Cliente S/ Nome",
-            subtitle: "Retirada no Balcão",
+            subtitle: statusPickup,
             time: formatTimeAgo(order.created_at)
         };
     }
@@ -102,7 +123,7 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
 
     const { icon: TypeIcon, color, bg, label } = getTypeConfig(order);
     const info = getOrderInfo(order);
-    const total = formatCurrencyBR(order.total);
+    const total = formatCurrency(Number(order.total));
     const itemsCount = order.quantity_items ?? 0;
 
     return (

@@ -17,7 +17,7 @@ function DroppableFinish({ id, children, activeId, canReceive }: OrderProps) {
         <div
             ref={setNodeRef}
             className={cn(
-                "flex-1 min-w-[280px] h-[calc(100vh-140px)] flex flex-col bg-gray-100/40 rounded-[2rem] border-2 border-transparent transition-all duration-300 p-4 relative overflow-hidden",
+                "flex-1 min-w-[100px] h-[calc(100vh-140px)] flex flex-col bg-gray-100/40 rounded-[2rem] border-2 border-transparent transition-all duration-300 p-4 relative overflow-hidden",
                 isOver && isReceivable && "bg-blue-50 border-blue-200 shadow-inner",
                 isOver && !isReceivable && "bg-red-50 border-red-200 shadow-inner"
             )}

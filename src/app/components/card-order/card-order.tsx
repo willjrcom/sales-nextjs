@@ -13,11 +13,9 @@ import { useModal } from "@/app/context/modal/context";
 import Refresh from "@/app/components/crud/refresh";
 import Link from "next/link";
 import Carousel from "../../../components/carousel/carousel";
-import type { IconType } from 'react-icons';
-const DefaultPaymentIcon = FaDollarSign;
 import CloseTable from "@/app/api/order-table/status/close/order-table";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { notifyError } from "@/app/utils/notifications";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
 import { SelectDeliveryDriver } from "@/app/pages/(user)/order-delivery-control/delivery-to-ship";
@@ -27,31 +25,66 @@ import GetOrderByID from "@/app/api/order/[id]/order";
 import GroupItemCard from "./group-item-card";
 import { getFiscalSettings } from "@/app/api/fiscal-settings/fiscal-settings";
 import {
-    FaCheck, FaClipboardCheck, FaEdit, FaTimes, FaMoneyBillWave, FaCreditCard, FaTicketAlt, FaDollarSign, FaPrint,
-    FaCcVisa, FaCcMastercard, FaCcAmex, FaCcPaypal, FaCcDinersClub,
-    FaHourglassHalf, FaFileInvoiceDollar, FaChevronDown, FaChevronUp
-} from "react-icons/fa";
+    Check,
+    ClipboardCheck,
+    Edit,
+    X,
+    DollarSign,
+    CreditCard,
+    Ticket,
+    Printer,
+    FileText,
+    Hourglass,
+    ChevronDown,
+    ChevronUp,
+    Bike,
+    Utensils,
+    Package,
+    Clock,
+    ShoppingBag,
+    User,
+    Calendar,
+    MapPin,
+    Phone,
+    Truck,
+    Wallet,
+    Info,
+    RotateCw,
+    AlertCircle,
+    LayoutGrid,
+    Search,
+    Receipt,
+    History
+} from "lucide-react";
 import GetCompany from '@/app/api/company/company';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { formatCurrency, formatPhone } from "@/app/utils/format";
 
 // Ícones para métodos de pagamento
-const paymentIcons: Record<string, IconType> = {
-    Dinheiro: FaMoneyBillWave,
-    Visa: FaCcVisa,
-    MasterCard: FaCcMastercard,
-    Ticket: FaTicketAlt,
-    VR: FaDollarSign,
-    "American Express": FaCcAmex,
-    Elo: FaCreditCard,
-    "Diners Club": FaCcDinersClub,
-    Hipercard: FaCreditCard,
-    "Visa Electron": FaCcVisa,
-    Maestro: FaCcMastercard,
-    Alelo: FaCreditCard,
-    PayPal: FaCcPaypal,
-    Outros: FaDollarSign,
+const paymentIcons: Record<string, any> = {
+    Dinheiro: DollarSign,
+    Visa: CreditCard,
+    MasterCard: CreditCard,
+    Ticket: Ticket,
+    VR: Wallet,
+    "American Express": CreditCard,
+    Elo: CreditCard,
+    "Diners Club": CreditCard,
+    Hipercard: CreditCard,
+    "Visa Electron": CreditCard,
+    Maestro: CreditCard,
+    Alelo: CreditCard,
+    PayPal: CreditCard,
+    Outros: DollarSign,
 };
+
+const DefaultPaymentIcon = DollarSign;
 
 interface CardOrderProps {
     orderId: string | null;
@@ -60,39 +93,36 @@ interface CardOrderProps {
 
 export default function CardOrder({ orderId, editBlocked = false }: CardOrderProps) {
     const [paymentView, setPaymentView] = useState<'table' | 'carousel'>('table');
-    const [isDetailsOpen, setIsDetailsOpen] = useState(true);
     const queryClient = useQueryClient();
-    const { data } = useSession();
+    const { data, status } = useSession();
+    const isAuthenticating = status === "loading";
     const [isProcessing, setIsProcessing] = useState(false);
     const modalHandler = useModal();
+    const accessToken = data?.user?.access_token || data?.access_token;
 
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!(data?.user as any)?.access_token,
+        enabled: !isAuthenticating && !!accessToken,
     })
 
     const { data: fiscalSettings } = useQuery({
         queryKey: ['fiscal-settings'],
         queryFn: () => getFiscalSettings(data!),
-        enabled: !!(data?.user as any)?.access_token,
+        enabled: !isAuthenticating && !!accessToken,
     });
 
-    // Usar React Query diretamente
-    const { data: order, refetch } = useQuery({
+    const { isLoading, data: order, refetch } = useQuery({
         queryKey: ['order', orderId],
-        queryFn: async () => {
-            if (!orderId || !data) return null;
-            try {
-                return await GetOrderByID(orderId, data);
-            } catch (error) {
-                const err = error as RequestError;
-                notifyError(err.message || 'Erro ao buscar pedido');
-                return null;
-            }
+        queryFn: () => {
+            return GetOrderByID(orderId!, data!);
         },
-        enabled: !!orderId && !!(data?.user as any)?.access_token,
+        enabled: !!orderId && !isAuthenticating && !!accessToken,
         refetchInterval: 10000,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        staleTime: 0,
+
     });
 
     const handleReady = async () => {
@@ -140,6 +170,14 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
         }
     };
 
+    if (isLoading || isAuthenticating) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+            </div>
+        );
+    }
+
     if (!order) return null;
 
     const isOrderStatusPending = order.status === "Pending";
@@ -182,44 +220,122 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 )
             }
 
+
             return (
-                <div className="text-gray-700">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Entrega</h3>
-                        {/* <StatusComponent status={order.delivery.status} /> */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                                <Bike className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Detalhes da Entrega</h3>
+                        </div>
+                        <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 font-black">
+                            {order.delivery.status === "Ready" ? "Pronto para Envio" : order.delivery.status === "Shipped" ? "Em Transporte" : order.delivery.status === "Delivered" ? "Entregue" : "Pendente"}
+                        </Badge>
                     </div>
-                    <p>
-                        <strong>Taxa de Entrega:</strong>{" "}
-                        R$ {deliveryTaxDecimal.toFixed(2) || "0.00"}
-                    </p>
-                    <p>
-                        <strong>Cliente:</strong> {order.delivery.client?.name}
-                    </p>
-                    <p>
-                        <strong>Endereço:</strong> {order.delivery.address?.street}, {order.delivery.address?.number}
-                    </p>
-                    <p>
-                        <strong>Entregador:</strong>{" "}
-                        {order.delivery.driver?.employee?.name || "Não atribuído"}
-                    </p>
-                    <div className="mt-2">
-                        <p><strong>Prazos:</strong></p>
-                        <ul className="list-disc ml-4">
-                            <li>Pendente em: {ToUtcDatetime(order.delivery.pending_at)}</li>
-                            {order.delivery.ready_at && <li>Pronto em: {ToUtcDatetime(order.delivery.ready_at)}</li>}
-                            {order.delivery.shipped_at && <li>Enviado em: {ToUtcDatetime(order.delivery.shipped_at)}</li>}
-                            {order.delivery.delivered_at && <li>Entregue em: {ToUtcDatetime(order.delivery.delivered_at)}</li>}
-                            {order.delivery.cancelled_at && <li>Cancelado em: {ToUtcDatetime(order.delivery.cancelled_at)}</li>}
-                        </ul>
 
-                        {!editBlocked && order.status === "Ready" && order.delivery.status === "Ready" && <button onClick={shipDelivery}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Enviar entrega</button>
-                        }
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                                <User className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Cliente</span>
+                                <p className="text-gray-800 font-black ml-auto">{order.delivery.client?.name}</p>
+                            </div>
+                            {order.delivery.client?.contact?.number && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Phone className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Contato</span>
+                                    <p className="text-gray-800 font-black ml-auto">{formatPhone(order.delivery.client.contact.number)}</p>
+                                </div>
+                            )}
+                            <div className="flex items-center gap-2 text-sm">
+                                <MapPin className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Endereço</span>
+                                <p className="text-gray-800 font-black truncate ml-auto text-right max-w-[150px]">
+                                    {order.delivery.address?.street}, {order.delivery.address?.number}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm">
+                                <Truck className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Entregador</span>
+                                <p className="text-gray-800 font-black ml-auto">
+                                    {order.delivery.driver?.employee?.name || "Não atribuído"}
+                                </p>
+                            </div>
+                        </div>
 
-                        {!editBlocked && order.status === "Ready" && order.delivery.status === "Shipped" && <button onClick={finishDelivery}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Receber entrega</button>
-                        }
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Taxa</span>
+                                <p className="text-emerald-600 font-black ml-auto">{formatCurrency(Number(deliveryTaxDecimal.toFixed(2)))}</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm">
+                                <Clock className="w-4 h-4 text-amber-500" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pendente em</span>
+                                <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.delivery.pending_at)}</p>
+                            </div>
+                            {totalChangeDecimal.gt(0) && (
+                                <div className="flex items-center gap-2 text-sm p-2 bg-amber-100/50 rounded-xl border border-amber-100">
+                                    <Wallet className="w-4 h-4 text-amber-600" />
+                                    <span className="text-amber-700 font-bold uppercase text-[10px] tracking-widest">Levar Troco</span>
+                                    <p className="text-amber-700 font-black ml-auto">{formatCurrency(Number(totalChangeDecimal.toFixed(2)))}</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    <Collapsible>
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="w-full justify-between text-gray-400 font-bold uppercase text-[10px] tracking-widest h-8 hover:bg-gray-100">
+                                <div className="flex items-center gap-2">
+                                    <Info className="w-3.5 h-3.5" />
+                                    Ver Histórico de Prazos
+                                </div>
+                                <ChevronDown className="w-3.5 h-3.5" />
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pt-2">
+                            <div className="bg-white rounded-xl border border-gray-100 p-3 space-y-2">
+                                {order.delivery.ready_at && (
+                                    <div className="flex items-center justify-between text-[10px]">
+                                        <span className="text-gray-400 font-bold uppercase">Pronto:</span>
+                                        <span className="text-gray-600 font-black">{ToUtcDatetime(order.delivery.ready_at)}</span>
+                                    </div>
+                                )}
+                                {order.delivery.shipped_at && (
+                                    <div className="flex items-center justify-between text-[10px]">
+                                        <span className="text-gray-400 font-bold uppercase">Enviado:</span>
+                                        <span className="text-gray-600 font-black">{ToUtcDatetime(order.delivery.shipped_at)}</span>
+                                    </div>
+                                )}
+                                {order.delivery.delivered_at && (
+                                    <div className="flex items-center justify-between text-[10px]">
+                                        <span className="text-gray-400 font-bold uppercase">Entregue:</span>
+                                        <span className="text-gray-600 font-black">{ToUtcDatetime(order.delivery.delivered_at)}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
+
+                    {!editBlocked && order.status === "Ready" && (
+                        <div className="pt-2">
+                            {order.delivery.status === "Ready" && (
+                                <Button onClick={shipDelivery} className="w-full bg-blue-600 hover:bg-blue-700 font-black uppercase tracking-widest gap-2 shadow-lg shadow-blue-100">
+                                    <Truck className="w-4 h-4" />
+                                    Enviar Entrega
+                                </Button>
+                            )}
+                            {order.delivery.status === "Shipped" && (
+                                <Button onClick={finishDelivery} className="w-full bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-100">
+                                    <Check className="w-4 h-4" />
+                                    Receber Entrega
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -240,58 +356,106 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             }
 
             return (
-                <div className="mb-4">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Mesa</h3>
-                        {/* <StatusComponent status={order.table.status} /> */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-amber-100 rounded-xl text-amber-600">
+                                <Utensils className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Detalhes da Mesa</h3>
+                        </div>
+                        <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-100 font-black">
+                            {order.table.status === "Pending" ? "Ocupada" : order.table.status === "Closed" ? "Fechada" : "Cancelada"}
+                        </Badge>
                     </div>
-                    <p><strong>Mesa:</strong> {order.table.table?.name}</p>
-                    {order.table.name && <p><strong>Nome:</strong> {order.table.name}</p>}
-                    {order.table.contact && <p><strong>Contato:</strong> {order.table.contact}</p>}
 
-                    <div className="mt-2">
-                        <p><strong>Prazos:</strong></p>
-                        <ul className="list-disc ml-4">
-                            {order.table.pending_at && <li>Pendente em: {ToUtcDatetime(order.table.pending_at)}</li>}
-                            {order.ready_at && <li>Pronto em: {ToUtcDatetime(order.ready_at)}</li>}
-                            {order.table.closed_at && <li>Fechado em: {ToUtcDatetime(order.table.closed_at)}</li>}
-                            {order.table.cancelled_at && <li>Cancelado em: {ToUtcDatetime(order.table.cancelled_at)}</li>}
-                        </ul>
-                        {!editBlocked && order.table.status === "Pending" && <button onClick={() => {
-                            const onConfirm = async () => {
-                                try {
-                                    await closeTable();
-                                    modalHandler.hideModal('close-table-' + order.id);
-                                } catch (error) {
-                                    const err = error as RequestError;
-                                    notifyError(err.message || "Erro ao fechar mesa");
-                                }
-                            }
-                            modalHandler.showModal(
-                                'close-table-' + order.id,
-                                'Fechar Mesa',
-                                <>
-                                    <div className="text-center mb-4"><h2>Tem certeza que deseja fechar a mesa?</h2></div>
-                                    <button
-                                        disabled={isProcessing}
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={onConfirm}
-                                    >
-                                        {isProcessing ? 'Fechando...' : 'Fechar Mesa'}
-                                    </button>
-                                </>
-                                ,
-                                'md',
-                                () => modalHandler.hideModal('close-table-' + order.id)
-                            )
-                        }}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={isProcessing}
-                        >
-                            Fechar Mesa
-                        </button>
-                        }
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                                <LayoutGrid className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Mesa</span>
+                                <p className="text-gray-800 font-black ml-auto">{order.table.table?.name}</p>
+                            </div>
+                            {order.table.name && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <User className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Responsável</span>
+                                    <p className="text-gray-800 font-black ml-auto">{order.table.name}</p>
+                                </div>
+                            )}
+                            {order.table.contact && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Phone className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Contato</span>
+                                    <p className="text-gray-800 font-black ml-auto">{formatPhone(order.table.contact)}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                                <Clock className="w-4 h-4 text-amber-500" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Aberta em</span>
+                                <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.table.pending_at)}</p>
+                            </div>
+                            {order.ready_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Check className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pronto em</span>
+                                    <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.ready_at)}</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    {!editBlocked && order.table.status === "Pending" && (
+                        <div className="pt-2">
+                            <Button
+                                onClick={() => {
+                                    const onConfirm = async () => {
+                                        try {
+                                            await closeTable();
+                                            modalHandler.hideModal('close-table-' + order.id);
+                                        } catch (error) {
+                                            const err = error as RequestError;
+                                            notifyError(err.message || "Erro ao fechar mesa");
+                                        }
+                                    }
+                                    modalHandler.showModal(
+                                        'close-table-' + order.id,
+                                        'Fechar Mesa',
+                                        <div className="space-y-6 py-4">
+                                            <div className="text-center space-y-2">
+                                                <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <AlertCircle className="w-8 h-8" />
+                                                </div>
+                                                <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Fechar Mesa?</h2>
+                                                <p className="text-gray-500 font-medium">Esta ação marcará a mesa {order.table?.table?.name} como concluída e pronta para pagamento.</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal('close-table-' + order.id)}>
+                                                    Cancelar
+                                                </Button>
+                                                <Button
+                                                    disabled={isProcessing}
+                                                    className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest"
+                                                    onClick={onConfirm}
+                                                >
+                                                    {isProcessing ? 'Fechando...' : 'Confirmar Fechamento'}
+                                                </Button>
+                                            </div>
+                                        </div>,
+                                        'md',
+                                        () => modalHandler.hideModal('close-table-' + order.id)
+                                    )
+                                }}
+                                className="w-full bg-amber-100 hover:bg-amber-200 text-amber-700 font-black uppercase tracking-widest gap-2"
+                            >
+                                <X className="w-4 h-4" />
+                                Fechar Mesa
+                            </Button>
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -312,59 +476,110 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     setIsProcessing(false);
                 }
             }
+
             return (
-                <div className="mb-4">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold mb-2 text-gray-800">Detalhes da Retirada</h3>
-                        {/* <StatusComponent status={order.pickup.status} /> */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-purple-100 rounded-xl text-purple-600">
+                                <Package className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Detalhes da Retirada</h3>
+                        </div>
+                        <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-100 font-black">
+                            {order.pickup.status === "Pending" ? "Pendente" : order.pickup.status === "Ready" ? "Pronto" : order.pickup.status === "Delivered" ? "Entregue" : "Cancelado"}
+                        </Badge>
                     </div>
-                    {order.pickup.name && <p><strong>Nome:</strong> {order.pickup.name}</p>}
-                    {order.pickup.contact && <p><strong>Contato:</strong> {order.pickup.contact}</p>}
 
-                    <div className="mt-2">
-                        <p><strong>Prazos:</strong></p>
-                        <ul className="list-disc ml-4">
-                            {order.pickup.pending_at && <li>Pendente em: {ToUtcDatetime(order.pickup.pending_at)}</li>}
-                            {order.pickup.ready_at && <li>Pronto em: {ToUtcDatetime(order.pickup.ready_at)}</li>}
-                            {order.pickup.delivered_at && <li>Entregue em: {ToUtcDatetime(order.pickup.delivered_at)}</li>}
-                            {order.pickup.cancelled_at && <li>Cancelado em: {ToUtcDatetime(order.pickup.cancelled_at)}</li>}
-                        </ul>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                        <div className="space-y-3">
+                            {order.pickup.name && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <User className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Cliente</span>
+                                    <p className="text-gray-800 font-black ml-auto">{order.pickup.name}</p>
+                                </div>
+                            )}
+                            {order.pickup.contact && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Phone className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Contato</span>
+                                    <p className="text-gray-800 font-black ml-auto">{formatPhone(order.pickup.contact)}</p>
+                                </div>
+                            )}
+                        </div>
 
-                        {!editBlocked && order.pickup.status === "Ready" && <button onClick={() => {
-                            const onConfirm = async () => {
-                                try {
-                                    await deliveryPickup();
-                                    modalHandler.hideModal('delivery-pickup-' + order.id);
-                                } catch (error) {
-                                    const err = error as RequestError;
-                                    notifyError(err.message || "Erro ao entregar retirada");
-                                }
-                            }
-                            modalHandler.showModal(
-                                'delivery-pickup-' + order.id,
-                                'Entregar pedido',
-                                <>
-                                    <div className="text-center mb-4"><h2>Tem certeza que deseja entregar o pedido?</h2></div>
-                                    <button
-                                        disabled={isProcessing}
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={onConfirm}
-                                    >
-                                        {isProcessing ? 'Entregando...' : 'Entregar pedido'}
-                                    </button>
-                                </>
-                                ,
-                                'md',
-                                () => modalHandler.hideModal('delivery-pickup-' + order.id)
-                            )
-                        }}
-                            className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={isProcessing}
-                        >
-                            Entregar pedido
-                        </button>
-                        }
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                                <Clock className="w-4 h-4 text-purple-500" />
+                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pendente em</span>
+                                <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.pickup.pending_at)}</p>
+                            </div>
+                            {order.pickup.ready_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Check className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pronto em</span>
+                                    <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.pickup.ready_at)}</p>
+                                </div>
+                            )}
+                            {order.pickup.delivered_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Check className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Entregue em</span>
+                                    <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.pickup.delivered_at)}</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    {!editBlocked && order.pickup.status === "Ready" && (
+                        <div className="pt-2">
+                            <Button
+                                onClick={() => {
+                                    const onConfirm = async () => {
+                                        try {
+                                            await deliveryPickup();
+                                            modalHandler.hideModal('delivery-pickup-' + order.id);
+                                        } catch (error) {
+                                            const err = error as RequestError;
+                                            notifyError(err.message || "Erro ao entregar retirada");
+                                        }
+                                    }
+                                    modalHandler.showModal(
+                                        'delivery-pickup-' + order.id,
+                                        'Entregar Pedido',
+                                        <div className="space-y-6 py-4">
+                                            <div className="text-center space-y-2">
+                                                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <ShoppingBag className="w-8 h-8" />
+                                                </div>
+                                                <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Entregar Pedido?</h2>
+                                                <p className="text-gray-500 font-medium">Confirma que o pedido foi retirado pelo cliente?</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal('delivery-pickup-' + order.id)}>
+                                                    Cancelar
+                                                </Button>
+                                                <Button
+                                                    disabled={isProcessing}
+                                                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest"
+                                                    onClick={onConfirm}
+                                                >
+                                                    {isProcessing ? 'Entregando...' : 'Confirmar Retirada'}
+                                                </Button>
+                                            </div>
+                                        </div>,
+                                        'md',
+                                        () => modalHandler.hideModal('delivery-pickup-' + order.id)
+                                    )
+                                }}
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-100"
+                            >
+                                <ShoppingBag className="w-4 h-4" />
+                                Confirmar Retirada
+                            </Button>
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -373,243 +588,342 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     };
 
     return (
-        <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-
-            {/* Layout Responsivo */}
-            <div className="flex flex-col md:flex-row md:justify-between items-start gap-4 md:gap-6 mb-6">
-                {/* Informações Básicas */}
-                <div className="flex-1 w-full">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl md:text-2xl font-bold mb-2 text-gray-800"><strong>Pedido N°:</strong> {order.order_number}</h3>
-                        <StatusComponent status={order?.status} />
-                        {!editBlocked && <Link onClick={() => modalHandler.hideModal("show-order-" + order.id)} href={"/pages/order-control/" + order?.id}>
-                            <FaEdit />
-                        </Link>}
-                    </div>
-
-                    {/* Detalhes Específicos por Tipo de Pedido */}
-                    <div className="flex-1 border-t md:border-t-0 md:border-l md:pl-4 pt-4 md:pt-0">
-                        {renderOrderTypeDetails()}
+        <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-sm overflow-hidden rounded-[2.5rem]">
+            <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b pb-8 pt-8 px-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 font-black px-3 py-1 rounded-lg">
+                                #{order.order_number}
+                            </Badge>
+                            <StatusComponent status={order?.status} />
+                        </div>
+                        <CardTitle className="text-3xl font-black text-gray-900 tracking-tight mt-2 flex items-center gap-3">
+                            Pedido de {order.delivery ? 'Entrega' : order.table ? 'Mesa' : 'Retirada'}
+                            {!editBlocked && order.status !== 'Finished' && order.status !== 'Cancelled' && (
+                                <Link
+                                    onClick={() => modalHandler.hideModal("show-order-" + order.id)}
+                                    href={"/pages/order-control/" + order?.id}
+                                    className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-blue-600"
+                                >
+                                    <Edit className="w-5 h-5" />
+                                </Link>
+                            )}
+                        </CardTitle>
                     </div>
                 </div>
+            </CardHeader>
 
-                {/* Itens do Pedido */}
-                <div className="mb-6 flex-1 w-full min-w-0 md:min-w-[300px]">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-800">Itens do Pedido</h3>
-                        <Refresh onRefresh={refetch} />
-                    </div>
-                    <ScrollArea className="max-h-[300px] md:max-h-[400px] w-full pr-4">
-                        {order.group_items?.length > 0 ? (
-                            <ul className="space-y-4">
-                                {order.group_items
-                                    .sort((a: any, b: any) => a.category_id.localeCompare(b.category_id))
-                                    .map((group: any) => (
-                                        <GroupItemCard key={group.id} group={group} session={data!} />
-                                    ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-700">Nenhum item encontrado.</p>
-                        )}
-                    </ScrollArea>
-                </div>
-            </div>
+            <CardContent className="p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Coluna Esquerda: Detalhes e Finanças */}
+                    <div className="lg:col-span-12 space-y-12">
+                        {/* Seção Superior: Detalhes do Tipo de Pedido */}
+                        <div className="bg-gray-50/50 rounded-[2rem] p-6 border border-gray-100">
+                            {renderOrderTypeDetails()}
+                        </div>
 
-
-            {/* Resumo Financeiro */}
-            <hr className="my-4" />
-            <div className="mb-6">
-                <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800">Resumo Financeiro</h3>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
-                    <div className="flex items-center p-3 md:p-4 bg-white rounded-lg shadow">
-                        <FaDollarSign className="text-2xl text-gray-400 mr-3" />
-                        <div>
-                            <p className="text-sm text-gray-500">Subtotal</p>
-                            <p className="text-lg font-semibold text-gray-700">R$ {new Decimal(order.sub_total || 0).toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center p-3 md:p-4 bg-white rounded-lg shadow">
-                        <FaMoneyBillWave className="text-2xl text-red-500 mr-3" />
-                        <div>
-                            <p className="text-sm text-gray-500">Total</p>
-                            <p className="text-lg font-semibold text-red-600">R$ {totalDecimal.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
-                        <FaCreditCard className="text-2xl text-green-500 mr-3" />
-                        <div>
-                            <p className="text-sm text-gray-500">Total Pago</p>
-                            <p className="text-lg font-semibold text-green-600">R$ {totalPaidDecimal.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
-                        <FaHourglassHalf className="text-2xl text-yellow-500 mr-3" />
-                        <div>
-                            <p className="text-sm text-gray-500">Total Restante</p>
-                            <p className="text-lg font-semibold text-yellow-600">R$ {totalRestDecimal.gt(0) ? totalRestDecimal.toFixed(2) : '0.00'}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center p-4 bg-white rounded-lg shadow">
-                        <FaDollarSign className="text-2xl text-blue-500 mr-3" />
-                        <div>
-                            <p className="text-sm text-gray-500">Troco</p>
-                            <p className="text-lg font-semibold text-blue-600">R$ {totalChangeDecimal.gt(0) ? totalChangeDecimal.toFixed(2) : '0.00'}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {order.fees && order.fees.length > 0 && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                        <p className="text-sm font-semibold text-gray-600 mb-2">Taxas Adicionais</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {order.fees.map((fee, idx) => (
-                                <div key={idx} className="flex justify-between items-center bg-white p-2 rounded border border-gray-100 shadow-sm">
-                                    <span className="text-sm text-gray-500">{fee.name === 'delivery_fee' ? 'Taxa de entrega' : fee.name === 'table_tax' ? 'Taxa de serviço' : fee.name}</span>
-                                    <span className="font-medium">R$ {new Decimal(fee.value).toFixed(2)}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Itens do Pedido */}
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-emerald-100 rounded-xl text-emerald-600">
+                                            <ShoppingBag className="w-5 h-5" />
+                                        </div>
+                                        <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Itens do Pedido</h3>
+                                    </div>
+                                    <Button variant="ghost" size="icon" onClick={() => refetch()} className="text-gray-400 hover:text-emerald-600 rounded-xl">
+                                        <RotateCw className="w-4 h-4" />
+                                    </Button>
                                 </div>
-                            ))}
+                                <ScrollArea className="h-[400px] w-full pr-4">
+                                    {order.group_items?.length > 0 ? (
+                                        <ul className="space-y-4">
+                                            {order.group_items
+                                                .sort((a: any, b: any) => a.category_id.localeCompare(b.category_id))
+                                                .map((group: any) => (
+                                                    <GroupItemCard key={group.id} group={group} session={data!} />
+                                                ))}
+                                        </ul>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-2 py-12 bg-gray-50/50 rounded-3xl border border-dashed">
+                                            <ShoppingBag className="w-12 h-12 opacity-20" />
+                                            <p className="font-bold uppercase text-xs tracking-widest">Nenhum item</p>
+                                        </div>
+                                    )}
+                                </ScrollArea>
+                            </div>
+
+                            {/* Resumo Financeiro */}
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-2 bg-emerald-100 rounded-xl text-emerald-600">
+                                        <DollarSign className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Resumo Financeiro</h3>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 bg-gray-50/50 rounded-[1.5rem] border border-gray-100 space-y-1">
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Subtotal</p>
+                                        <p className="text-lg font-black text-gray-700">{formatCurrency(Number(order.sub_total || 0))}</p>
+                                    </div>
+                                    <div className="p-4 bg-emerald-50 rounded-[1.5rem] border border-emerald-100 space-y-1">
+                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Total</p>
+                                        <p className="text-lg font-black text-emerald-700">{formatCurrency(Number(totalDecimal.toFixed(2)))}</p>
+                                    </div>
+                                    <div className="p-4 bg-blue-50 rounded-[1.5rem] border border-blue-100 space-y-1">
+                                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Pago</p>
+                                        <p className="text-lg font-black text-blue-700">{formatCurrency(Number(totalPaidDecimal.toFixed(2)))}</p>
+                                    </div>
+                                    <div className={cn(
+                                        "p-4 rounded-[1.5rem] border space-y-1",
+                                        totalRestDecimal.gt(0) ? "bg-amber-50 border-amber-100" : "bg-gray-50/50 border-gray-100"
+                                    )}>
+                                        <p className={cn(
+                                            "text-[10px] font-black uppercase tracking-widest",
+                                            totalRestDecimal.gt(0) ? "text-amber-600" : "text-gray-400"
+                                        )}>Restante</p>
+                                        <p className={cn(
+                                            "text-lg font-black",
+                                            totalRestDecimal.gt(0) ? "text-amber-700" : "text-gray-700"
+                                        )}>{formatCurrency(Number(totalRestDecimal.gt(0) ? totalRestDecimal.toFixed(2) : '0.00'))}</p>
+                                    </div>
+                                    {totalChangeDecimal.gt(0) && (
+                                        <div className="p-4 bg-amber-100 rounded-[1.5rem] border border-amber-200 shadow-sm space-y-1 col-span-2">
+                                            <div className="flex items-center gap-2">
+                                                <Wallet className="w-4 h-4 text-amber-700" />
+                                                <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest">Troco para Levar</p>
+                                            </div>
+                                            <p className="text-2xl font-black text-amber-800">{formatCurrency(Number(totalChangeDecimal.toFixed(2)))}</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {order.fees && order.fees.length > 0 && (
+                                    <div className="bg-gray-50/50 p-4 rounded-[1.5rem] border border-gray-100 space-y-3">
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Taxas Adicionais</p>
+                                        <div className="space-y-2">
+                                            {order.fees.map((fee, idx) => (
+                                                <div key={idx} className="flex justify-between items-center bg-white/50 p-2 px-3 rounded-xl border border-gray-100 shadow-sm">
+                                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">
+                                                        {fee.name === 'delivery_fee' ? 'Taxa de entrega' : fee.name === 'table_tax' ? 'Taxa de serviço' : fee.name}
+                                                    </span>
+                                                    <span className="text-sm font-black text-gray-800">{formatCurrency(Number(fee.value))}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* Pagamentos: escolha de layout */}
+                {order.payments && order.payments.length > 0 && (
+                    <div className="mt-12 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                                    <CreditCard className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Pagamentos Efetuados</h3>
+                            </div>
+                            <div className="flex bg-gray-100 p-1 rounded-xl">
+                                <Button
+                                    variant={paymentView === 'table' ? 'secondary' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setPaymentView('table')}
+                                    className={cn("text-[10px] font-black uppercase tracking-widest rounded-lg h-7 px-3", paymentView === 'table' && "bg-white shadow-sm")}
+                                >
+                                    Tabela
+                                </Button>
+                                <Button
+                                    variant={paymentView === 'carousel' ? 'secondary' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setPaymentView('carousel')}
+                                    className={cn("text-[10px] font-black uppercase tracking-widest rounded-lg h-7 px-3", paymentView === 'carousel' && "bg-white shadow-sm")}
+                                >
+                                    Carrossel
+                                </Button>
+                            </div>
+                        </div>
+
+                        {paymentView === 'table' ? (
+                            <div className="bg-gray-50/50 rounded-2xl border border-gray-100 p-2">
+                                <ScrollArea className="h-auto max-h-[250px] w-full">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="border-b border-gray-100">
+                                                <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Método</th>
+                                                <th className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Valor Pago</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-50">
+                                            {order.payments.map((payment: any) => (
+                                                <tr key={payment.id} className="hover:bg-white/50 transition-colors">
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-center gap-2">
+                                                            {(() => {
+                                                                const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
+                                                                return <Icon className="w-4 h-4 text-gray-400" />;
+                                                            })()}
+                                                            <span className="text-sm font-bold text-gray-700">{payment.method}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <span className="text-sm font-black text-gray-900">{formatCurrency(Number(payment.total_paid))}</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </ScrollArea>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto pb-4">
+                                <Carousel items={order.payments}>
+                                    {(payment: any) => {
+                                        const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
+                                        return (
+                                            <div
+                                                key={payment.id}
+                                                className="flex flex-col items-center p-6 border border-gray-100 rounded-[2rem] bg-white shadow-sm hover:shadow-md transition mx-2 min-w-[150px]"
+                                            >
+                                                <div className="p-3 bg-gray-50 rounded-2xl mb-3 text-gray-400">
+                                                    <Icon className="w-6 h-6" />
+                                                </div>
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{payment.method}</p>
+                                                <p className="text-lg font-black text-gray-900">{formatCurrency(Number(payment.total_paid))}</p>
+                                            </div>
+                                        );
+                                    }}
+                                </Carousel>
+                            </div>
+                        )}
                     </div>
                 )}
-            </div>
 
-            {/* Pagamentos: escolha de layout */}
-            {order.payments && order.payments.length > 0 && (
-                <div className="mt-6">
-                    <h4 className="text-lg font-semibold mb-2 text-gray-800">
-                        {paymentView === 'table' ? 'Detalhes dos Pagamentos' : 'Visualização Rápida'}
-                    </h4>
-                    <div className="flex items-center mb-4 space-x-2">
-                        <button
-                            onClick={() => setPaymentView('table')}
-                            className={`px-3 py-1 rounded ${paymentView === 'table' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                        >
-                            Tabela
-                        </button>
-                        <button
-                            onClick={() => setPaymentView('carousel')}
-                            className={`px-3 py-1 rounded ${paymentView === 'carousel' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                        >
-                            Carrossel
-                        </button>
-                    </div>
-                    {paymentView === 'table' ? (
-                        <ScrollArea className="max-h-[200px] w-full pr-4">
-                            <table className="w-full text-left bg-white rounded-lg shadow">
-                                <thead>
-                                    <tr className="sticky top-0 bg-white shadow-sm z-10">
-                                        <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Método</th>
-                                        <th className="px-4 py-2 text-sm font-medium text-gray-500 uppercase">Valor Pago (R$)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {order.payments.map((payment: any) => (
-                                        <tr key={payment.id} className="border-t">
-                                            <td className="px-4 py-2 text-gray-700">{payment.method}</td>
-                                            <td className="px-4 py-2 text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </ScrollArea>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <Carousel items={order.payments}>
-                                {(payment: any) => {
-                                    const Icon = paymentIcons[payment.method] || DefaultPaymentIcon;
-                                    return (
-                                        <div
-                                            key={payment.id}
-                                            className="flex flex-col items-center p-4 border rounded-lg bg-gray-5 shadow-sm hover:shadow-md transition mx-2"
-                                        >
-                                            <Icon className="text-3xl text-gray-600 mb-2" />
-                                            <p className="font-semibold text-gray-700 mb-1">{payment.method}</p>
-                                            <p className="text-gray-700">R$ {new Decimal(payment.total_paid).toFixed(2)}</p>
-                                        </div>
-                                    );
-                                }}
-                            </Carousel>
-                        </div>
-                    )}
+                <div className="my-12">
+                    <Separator className="bg-gray-100" />
                 </div>
-            )}
 
-            <hr className="my-4" />
-            {/* Botões de Ação */}
-            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
-                {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
-                    <div className="w-full sm:w-auto">
-                        <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" className="w-full">
+                {/* Botões de Ação */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
+                        <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest h-12 px-8 rounded-2xl shadow-lg shadow-blue-100">
                             <PaymentForm orderId={order.id} />
                         </ButtonIconText>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-3 ml-auto w-full md:w-auto">
+                        {!editBlocked && isOrderStatusPending && (
+                            <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar Pronto" size="md" color="yellow" icon={Check} className="flex-1 md:flex-none">
+                                <div className="space-y-6 py-4">
+                                    <div className="text-center space-y-2">
+                                        <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Clock className="w-8 h-8" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Deixar Pronto?</h2>
+                                        <p className="text-gray-500 font-medium">Confirma que o pedido #${order.order_number} está pronto?</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("ready-order-" + order.id)}>
+                                            Voltar
+                                        </Button>
+                                        <Button
+                                            disabled={isProcessing}
+                                            className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest"
+                                            onClick={handleReady}
+                                        >
+                                            {isProcessing ? 'Processando...' : 'Confirmar'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ButtonIconText>
+                        )}
+
+                        {!editBlocked && isOrderStatusReady && (
+                            <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={ClipboardCheck} className="flex-1 md:flex-none">
+                                <div className="space-y-6 py-4">
+                                    <div className="text-center space-y-2">
+                                        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Check className="w-8 h-8" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Finalizar Pedido?</h2>
+                                        <p className="text-gray-500 font-medium">Esta ação concluirá o pedido #${order.order_number}.</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("finish-order-" + order.id)}>
+                                            Voltar
+                                        </Button>
+                                        <Button
+                                            disabled={isProcessing}
+                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest"
+                                            onClick={handleFinished}
+                                        >
+                                            {isProcessing ? 'Processando...' : 'Concluir'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ButtonIconText>
+                        )}
+
+                        {!editBlocked && !isOrderStatusCancelled && (
+                            <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={X} className="flex-1 md:flex-none">
+                                <div className="space-y-6 py-4">
+                                    <div className="text-center space-y-2">
+                                        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <AlertCircle className="w-8 h-8" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight text-red-600">Cancelar Pedido?</h2>
+                                        <p className="text-gray-500 font-medium">Esta ação não pode ser desfeita. Deseja realmente cancelar?</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("cancel-order-" + order.id)}>
+                                            Voltar
+                                        </Button>
+                                        <Button
+                                            disabled={isProcessing}
+                                            className="flex-1 bg-red-600 hover:bg-red-700 font-black uppercase tracking-widest"
+                                            onClick={handleCancel}
+                                        >
+                                            {isProcessing ? 'Cancelando...' : 'Confirmar'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ButtonIconText>
+                        )}
+
+                        {!isOrderStatusCancelled && company && (
+                            <Button
+                                onClick={() => data && printOrder({ orderID: order.id, session: data })}
+                                variant="outline"
+                                className="flex-1 md:flex-none h-12 px-6 rounded-2xl font-black uppercase tracking-widest gap-2 bg-white border-2 border-gray-100 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-95"
+                            >
+                                <Printer className="w-4 h-4 text-gray-400" />
+                                <span>Imprimir</span>
+                            </Button>
+                        )}
+
+                        {fiscalSettings?.fiscal_enabled && (
+                            <ButtonIconText
+                                modalName={"emit-nfce-" + order.id}
+                                title="Gerar NFC-e"
+                                size="md"
+                                color="purple"
+                                icon={Receipt}
+                                isDisabled={!isOrderStatusFinished || isOrderStatusCancelled}
+                                className="flex-1 md:flex-none"
+                            >
+                                <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
+                            </ButtonIconText>
+                        )}
                     </div>
-                )}
-
-                {isOrderStatusFinished && <div className="hidden sm:block">&nbsp;</div>}
-
-                <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 sm:gap-4">
-                    {!editBlocked && isOrderStatusPending &&
-                        <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar pronto" size="md" color="yellow" icon={FaCheck} className="w-full sm:w-auto">
-                            <p className="mb-2">tem certeza que deseja deixar o pedido pronto?</p>
-                            <button
-                                onClick={handleReady}
-                                disabled={isProcessing}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full"
-                            >
-                                {isProcessing ? 'Processando...' : 'Confirmar'}
-                            </button>
-                        </ButtonIconText>}
-
-                    {!editBlocked && isOrderStatusReady &&
-                        <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={FaClipboardCheck} className="w-full sm:w-auto">
-                            <p className="mb-2">tem certeza que deseja finalizar o pedido?</p>
-                            <button
-                                onClick={handleFinished}
-                                disabled={isProcessing}
-                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full"
-                            >
-                                {isProcessing ? 'Processando...' : 'Confirmar'}
-                            </button>
-                        </ButtonIconText>}
-
-                    {!editBlocked && !isOrderStatusCancelled &&
-                        <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={FaTimes} className="w-full sm:w-auto">
-                            <p className="mb-2">tem certeza que deseja cancelar o pedido?</p>
-                            <button
-                                onClick={handleCancel}
-                                disabled={isProcessing}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full"
-                            >
-                                {isProcessing ? 'Processando...' : 'Confirmar'}
-                            </button>
-                        </ButtonIconText>}
-                    {/* Botão de impressão */}
-                    {!isOrderStatusCancelled && company &&
-                        <button
-                            onClick={() => data && printOrder({ orderID: order.id, session: data })}
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 w-full sm:w-auto"
-                        >
-                            <FaPrint />
-                            <span>Imprimir</span>
-                        </button>
-                    }
-
-                    {/* Botão de gerar nota fiscal */}
-                    {fiscalSettings?.fiscal_enabled &&
-                        <ButtonIconText
-                            modalName={"emit-nfce-" + order.id}
-                            title="Gerar NFC-e"
-                            size="md"
-                            color="purple"
-                            icon={FaFileInvoiceDollar}
-                            isDisabled={!isOrderStatusFinished || isOrderStatusCancelled}
-                            className="w-full sm:w-auto"
-                        >
-                            <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
-                        </ButtonIconText>
-                    }
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };

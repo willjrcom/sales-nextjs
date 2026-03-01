@@ -1,7 +1,6 @@
 "use client"
 
-import PageTitle from '@/app/components/ui/page-title';
-import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
+import { FormatRefreshTime } from "@/app/components/crud/refresh";
 import OrderKanban from "@/app/pages/(user)/order-control/kanban/kanban";
 import ListItemsCard from "@/app/pages/(user)/order-control/kanban/list-items-card";
 import { useModal } from "@/app/context/modal/context";
@@ -14,7 +13,6 @@ import ButtonIconTextFloat from "@/app/components/button/button-float";
 import ListFinishedOrdersCard from './kanban/list-finished-orders-card';
 import { ClipboardList, AlertCircle, LayoutGrid, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const PageOrder = () => {
