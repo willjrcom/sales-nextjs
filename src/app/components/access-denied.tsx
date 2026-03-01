@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-export default function AccessDenied({ message = "Você não tem permissão para acessar esta página." }: { message?: string }) {
+export default function AccessDenied({ message = "Você não tem permissão para acessar esta página, acesse a página Funcionários -> Permissões" }: { message?: string }) {
     const router = useRouter();
     return (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] gap-4">
