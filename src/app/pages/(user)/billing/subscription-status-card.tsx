@@ -103,8 +103,8 @@ export function SubscriptionStatusCard() {
                     <div className="flex items-center gap-2 pb-4 border-b">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div className="flex-1">
-                            <p className="text-sm font-medium">Válido até</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm font-medium">{isExpired ? "Expirou em" : "Válido até"}</p>
+                            <p className={`text-sm ${isExpired ? 'text-red-600 font-bold' : 'text-muted-foreground'}`}>
                                 {format(expiresAt, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                             </p>
                         </div>

@@ -138,7 +138,7 @@ function OrderKanban({ orders }: OrderKanbanProps) {
                 >
                     <ColumnHeader
                         icon={PlayCircle}
-                        title="Em Preparo"
+                        title="Prontos"
                         count={readyOrders.length}
                         color="bg-blue-500"
                     />

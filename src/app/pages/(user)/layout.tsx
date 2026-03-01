@@ -3,11 +3,56 @@ import { usePathname } from "next/navigation";
 import { useUser } from "@/app/context/user-context";
 import Loading from "../loading";
 import AccessDenied from "@/app/components/access-denied";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
+import SubscriptionOverlay from "@/app/components/billing/subscription-overlay";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
     const { hasPermission, isLoading, user } = useUser();
+    const { data: session } = useSession();
     const pathname = usePathname();
+
+    const { data: subscriptionStatus } = useQuery({
+        queryKey: ["subscription-status"],
+        queryFn: () => GetSubscriptionStatus(session!),
+        enabled: !!(session as any)?.user?.access_token,
+        staleTime: 0,
+        gcTime: 0, // Added gcTime to ensure immediate update
+        refetchOnWindowFocus: true,
+        refetchOnMount: true, // Added refetchOnMount to ensure immediate update
+    });
+
+    const isRestrictedPath = useMemo(() => {
+        const restrictedPaths = [
+            '/pages/new-order',
+            '/pages/order-table-control',
+            '/pages/order-pickup-control',
+            '/pages/order-delivery-control',
+            '/pages/order-control'
+        ];
+        return restrictedPaths.some(path => pathname?.startsWith(path));
+    }, [pathname]);
+
+    const isSubscriptionExpired = useMemo(() => {
+        if (!subscriptionStatus) return false;
+
+        const currentPlan = subscriptionStatus.current_plan?.toLowerCase();
+        const daysRemaining = subscriptionStatus.days_remaining;
+
+        // Se o plano for 'free' ou os dias restantes forem 0 ou menos, consideramos inativo/expirado
+        const isFree = currentPlan === 'free' || !currentPlan;
+        const hasNoTime = daysRemaining !== null && daysRemaining <= 0;
+
+        const isExpired = isFree || hasNoTime;
+
+        if (isRestrictedPath && isExpired) {
+            console.log("Blocking access: Subscription is inactive/expired.", { currentPlan, daysRemaining });
+        }
+
+        return isExpired;
+    }, [subscriptionStatus, isRestrictedPath]);
 
     if (isLoading) {
         return <Loading />;
@@ -61,5 +106,10 @@ export default function UserLayout({ children }: { children: ReactNode }) {
         }
     }
 
-    return <>{children}</>;
+    return (
+        <>
+            {isRestrictedPath && isSubscriptionExpired && <SubscriptionOverlay />}
+            {children}
+        </>
+    );
 }

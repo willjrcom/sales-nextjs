@@ -21,6 +21,7 @@ import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dia
 import { SubscriptionStatusCard } from "@/app/pages/(user)/billing/subscription-status-card";
 import { UpgradeDialog } from "@/app/pages/(user)/billing/upgrade-dialog";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
+import { AlertCircle } from "lucide-react";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
 import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
 import { Plan } from "@/app/entities/company/subscription";
@@ -195,6 +196,21 @@ export default function BillingPage() {
                 </TabsList>
 
                 <TabsContent value="plans" className="space-y-8">
+                    {subscriptionStatus && (subscriptionStatus.current_plan?.toLowerCase() === 'free' || !subscriptionStatus.current_plan || (subscriptionStatus.days_remaining !== null && subscriptionStatus.days_remaining <= 0)) && (
+                        <Card className="border-amber-200 bg-amber-50 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+                            <CardHeader className="flex flex-row items-center gap-4 py-4 px-6 text-left">
+                                <div className="p-3 bg-amber-100 rounded-xl flex-shrink-0">
+                                    <AlertCircle className="w-6 h-6 text-amber-600" />
+                                </div>
+                                <div className="space-y-1">
+                                    <CardTitle className="text-amber-900 text-lg">Assinatura Inativa ou Expirada</CardTitle>
+                                    <CardDescription className="text-amber-800/80 font-medium leading-relaxed">
+                                        Seu acesso às funcionalidades operacionais (pedidos, mesas, balcão e entregas) está bloqueado. Escolha um plano abaixo para reativar seu acesso.
+                                    </CardDescription>
+                                </div>
+                            </CardHeader>
+                        </Card>
+                    )}
                     <SubscriptionStatusCard />
 
                     {/* Frequency Toggle */}
