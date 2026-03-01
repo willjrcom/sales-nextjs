@@ -67,7 +67,7 @@ export function SubscriptionStatusCard() {
     const expiresAt = status?.expires_at ? parseISO(status.expires_at) : null;
     const daysRemaining = status?.days_remaining ?? null;
     const isExpiringSoon = daysRemaining !== null && daysRemaining <= 7 && daysRemaining > 0;
-    const isExpired = daysRemaining !== null && daysRemaining <= 0;
+    const isExpired = expiresAt ? expiresAt < new Date() : daysRemaining !== null && daysRemaining <= 0;
 
     return (
         <Card className="border-2">

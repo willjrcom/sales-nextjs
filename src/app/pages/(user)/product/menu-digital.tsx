@@ -13,6 +13,7 @@ import { useUser } from "@/app/context/user-context";
 import AccessDenied from "@/app/components/access-denied";
 import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
 import { useRouter } from "next/navigation";
+import { parseISO } from "date-fns";
 
 const PageMenuDigital = () => {
     const { data: session } = useSession();
@@ -42,6 +43,14 @@ const PageMenuDigital = () => {
         return <AccessDenied />
     }
 
+    if (!appUrl) {
+        return (
+            <div className="p-4 text-red-500">
+                Url do app não configurada
+            </div>
+        )
+    }
+
     if (isLoading) {
         return (
             <div className="flex justify-center p-8">
@@ -50,10 +59,12 @@ const PageMenuDigital = () => {
         )
     }
 
-    const currentPlan = subscriptionStatus?.current_plan?.toLowerCase() || 'free';
-    const isPlanInferior = currentPlan === 'basic';
+    const currentPlan = subscriptionStatus?.current_plan?.toLowerCase();
+    const isBasicPlan = currentPlan === 'basic';
+    const expiresAt = subscriptionStatus?.expires_at ? parseISO(subscriptionStatus.expires_at) : null;
+    const isExpired = expiresAt ? expiresAt < new Date() : false;
 
-    if (isPlanInferior) {
+    if (isBasicPlan) {
         return (
             <div className="p-6 max-w-2xl mx-auto space-y-6">
                 <Card className="border-orange-200 bg-orange-50/50">
@@ -91,10 +102,34 @@ const PageMenuDigital = () => {
         )
     }
 
-    if (!appUrl) {
+    // status is expired
+    if (isExpired) {
         return (
-            <div className="p-4 text-red-500">
-                Url do app não configurada
+            <div className="p-6 max-w-2xl mx-auto space-y-6">
+                <Card className="border-red-200 bg-red-50/50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-red-700">
+                            <AlertTriangle className="h-5 w-5" />
+                            Assinatura Expirada
+                        </CardTitle>
+                        <CardDescription className="text-red-600">
+                            O recurso de **Menu Digital** está bloqueado porque sua assinatura expirou.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-sm text-red-700">
+                        <p>Para voltar a utilizar o menu digital e outros recursos, por favor regularize sua assinatura na página de faturamento.</p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button
+                            variant="destructive"
+                            className="bg-red-600 hover:bg-red-700 w-full flex gap-2"
+                            onClick={() => router.push('/pages/billing?tab=plans')}
+                        >
+                            Regularizar Assinatura
+                            <ExternalLink className="h-4 w-4" />
+                        </Button>
+                    </CardFooter>
+                </Card>
             </div>
         )
     }

@@ -4,6 +4,7 @@ import { useUser } from "@/app/context/user-context";
 import Loading from "../loading";
 import AccessDenied from "@/app/components/access-denied";
 import { ReactNode, useMemo } from "react";
+import { parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
@@ -36,22 +37,16 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     }, [pathname]);
 
     const isSubscriptionExpired = useMemo(() => {
-        if (!subscriptionStatus) return false;
+        if (!subscriptionStatus?.expires_at) return false;
 
-        const currentPlan = subscriptionStatus.current_plan?.toLowerCase();
-        const daysRemaining = subscriptionStatus.days_remaining;
+        const expiresAt = parseISO(subscriptionStatus.expires_at);
+        const expired = expiresAt < new Date();
 
-        // Se o plano for 'free' ou os dias restantes forem 0 ou menos, consideramos inativo/expirado
-        const isFree = currentPlan === 'free' || !currentPlan;
-        const hasNoTime = daysRemaining !== null && daysRemaining <= 0;
-
-        const isExpired = isFree || hasNoTime;
-
-        if (isRestrictedPath && isExpired) {
-            console.log("Blocking access: Subscription is inactive/expired.", { currentPlan, daysRemaining });
+        if (isRestrictedPath && expired) {
+            console.log("Blocking access: Subscription is expired.", { expiresAt });
         }
 
-        return isExpired;
+        return expired;
     }, [subscriptionStatus, isRestrictedPath]);
 
     if (isLoading) {
