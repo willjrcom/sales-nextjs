@@ -18,7 +18,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import printOrder from "@/app/components/print/print-order";
 import DeliveryPickup from "@/app/api/order-pickup/status/delivery/order-pickup";
-import SelectDeliveryDriver from "@/app/pages/(user)/order-delivery-control/delivery-to-ship";
 import { FinishDelivery } from "@/app/pages/(user)/order-delivery-control/delivery-to-finish";
 import EmitNFCeModal from "@/app/components/card-order/emit-nfce-modal";
 import GetOrderByID from "@/app/api/order/[id]/order";
@@ -65,6 +64,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatPhone } from "@/app/utils/format";
+import SelectDeliveryDriver from '@/app/pages/(user)/order-delivery-control/select-delivery-driver';
 
 // Ícones para métodos de pagamento
 const paymentIcons: Record<string, any> = {

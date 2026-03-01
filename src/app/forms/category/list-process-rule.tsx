@@ -147,9 +147,9 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
     const [items, setItems] = useState<ProcessRule[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
-    const { isFetching, isLoading, data: processRules, refetch } = useQuery({
+    const { isFetching, isLoading, data: processRules, refetch } = useQuery<ProcessRule[]>({
         queryKey: ['process-rules', 'by-category', category.id],
-        queryFn: () => () => {
+        queryFn: () => {
             setLastUpdate(FormatRefreshTime(new Date()));
             return GetProcessRulesByCategoryID(session!, category.id);
         },
@@ -158,7 +158,7 @@ export default function ListProcessRule({ category }: ListProcessRuleProps) {
 
     useEffect(() => {
         if (processRules) {
-            setItems(processRules.sort((a, b) => a.order - b.order));
+            setItems(processRules?.sort((a, b) => a.order - b.order));
         }
     }, [processRules]);
 
