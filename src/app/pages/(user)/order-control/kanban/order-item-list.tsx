@@ -58,8 +58,10 @@ function getOrderInfo(order: Order) {
                 statusDelivery = "Entrega Cancelada"
                 break;
         }
+
+        const clientName = order.delivery?.client?.name;
         return {
-            title: order.delivery?.client?.name || "Cliente S/ Nome",
+            title: "Pedido " + order.order_number + (clientName ? (" - " + clientName) : ""),
             subtitle: statusDelivery,
             time: formatTimeAgo(order.created_at)
         };
@@ -74,8 +76,10 @@ function getOrderInfo(order: Order) {
                 statusTable = "Mesa Cancelada"
                 break;
         }
+
+        const tableName = order.table?.name;
         return {
-            title: `Mesa ${order.table.table?.name || "?"}`,
+            title: "Pedido " + order.order_number + (tableName ? (" - " + tableName) : ""),
             subtitle: statusTable,
             time: formatTimeAgo(order.created_at)
         };
@@ -90,13 +94,15 @@ function getOrderInfo(order: Order) {
                 statusPickup = "Retirada Cancelada"
                 break;
         }
+
+        const clientName = order.pickup?.name;
         return {
-            title: order.pickup.name || "Cliente S/ Nome",
+            title: "Pedido " + order.order_number + (clientName ? (" - " + clientName) : ""),
             subtitle: statusPickup,
             time: formatTimeAgo(order.created_at)
         };
     }
-    return { title: "Pedido #" + order.order_number, subtitle: "", time: formatTimeAgo(order.created_at) };
+    return { title: "Pedido " + order.order_number, subtitle: "", time: formatTimeAgo(order.created_at) };
 }
 
 interface OrderItemListProps {

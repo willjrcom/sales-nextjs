@@ -131,10 +131,6 @@ const ProcessRuleForm = ({ item, isUpdate, category, onSuccess }: ProcessRuleFor
                         <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
                             <TextField friendlyName='Nome' name='name' setValue={(value: any) => setValue('name', value)} value={processRule.name} error={errors.name?.message as string} />
                         </div>
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <NumberField friendlyName='Ordem (minimo: 1)' name='order' min={1} setValue={(value: any) => setValue('order', value)} value={processRule.order} error={errors.order?.message as string} disabled={isUpdate} />
-                            {isOrderDuplicate && <span className="text-xs text-red-500 font-medium mt-1 block">Esta ordem já está em uso nesta categoria.</span>}
-                        </div>
                     </div>
                     <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                         <TextField friendlyName='Descrição' name='description' setValue={(value: any) => setValue('description', value)} value={processRule.description} optional error={errors.description?.message as string} />

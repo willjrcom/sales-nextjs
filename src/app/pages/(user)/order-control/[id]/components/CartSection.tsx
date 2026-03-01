@@ -156,7 +156,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
             <div className='mx-auto max-w-md px-4 space-y-4'>
                 {/* Order Number Header */}
                 <div className="flex justify-between items-center mb-4 px-2">
-                    <h2 className="text-xl font-bold text-gray-800">Pedido #{order?.order_number}</h2> <span className={`ml-2 px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor[order?.status || '']}`}>{showStatus[order?.status || '']}</span>
+                    <h2 className="text-xl font-bold text-gray-800">Pedido {order?.order_number}</h2> <span className={`ml-2 px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor[order?.status || '']}`}>{showStatus[order?.status || '']}</span>
                 </div>
 
                 {!hasItems ? (

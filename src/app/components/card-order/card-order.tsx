@@ -594,7 +594,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     <div className="space-y-1">
                         <div className="flex items-center gap-3">
                             <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 font-black px-3 py-1 rounded-lg">
-                                #{order.order_number}
+                                Pedido {order.order_number}
                             </Badge>
                             <StatusComponent status={order?.status} />
                         </div>
@@ -827,7 +827,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                             <Clock className="w-8 h-8" />
                                         </div>
                                         <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Deixar Pronto?</h2>
-                                        <p className="text-gray-500 font-medium">Confirma que o pedido #${order.order_number} está pronto?</p>
+                                        <p className="text-gray-500 font-medium">Confirma que o pedido {order.order_number} está pronto?</p>
                                     </div>
                                     <div className="flex gap-3">
                                         <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("ready-order-" + order.id)}>
@@ -853,7 +853,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                             <Check className="w-8 h-8" />
                                         </div>
                                         <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Finalizar Pedido?</h2>
-                                        <p className="text-gray-500 font-medium">Esta ação concluirá o pedido #${order.order_number}.</p>
+                                        <p className="text-gray-500 font-medium">Esta ação concluirá o pedido {order.order_number}.</p>
                                     </div>
                                     <div className="flex gap-3">
                                         <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("finish-order-" + order.id)}>

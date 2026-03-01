@@ -5,6 +5,7 @@ import Contact from "../contact/contact";
 import Address from "../address/address";
 import React from "react";
 import EmployeeCard from "@/app/forms/employee/employee-card";
+import EmployeePermissionsTab from "@/app/forms/employee/tabs/permissions";
 
 
 const EmployeeColumns = (): ColumnDef<Employee>[] => [
@@ -50,6 +51,19 @@ const EmployeeColumns = (): ColumnDef<Employee>[] => [
       )
     },
   },
+  {
+    id: 'Permissões',
+    accessorKey: 'permissions',
+    header: 'Permissões',
+    cell: ({ row }) => {
+      return (
+        <ButtonIcon modalName={"view-employee-" + row.original.id}
+          title={"Visualizar " + row.original.name}>
+          <EmployeePermissionsTab item={row.original} />
+        </ButtonIcon>
+      )
+    },
+  }
 ];
 
 export default EmployeeColumns

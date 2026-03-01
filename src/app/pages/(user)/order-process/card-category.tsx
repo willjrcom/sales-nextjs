@@ -3,13 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import Category from "@/app/entities/category/category";
 import CardProcessRule from "./card-process-rule";
 import React from "react";
-import { LayoutGrid, AlertCircle } from "lucide-react";
+import { LayoutGrid, AlertCircle, Settings2 } from "lucide-react";
+import CardEditProcessRules from "./card-edit-process-rules";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@/app/context/user-context";
 
 interface CardCategoryProps {
     category: Category;
 }
 
 const CardCategory = ({ category }: CardCategoryProps) => {
+    const { hasPermission } = useUser();
     // Agora os process_rules já vêm preenchidos da página principal
     const processRules = category.process_rules || [];
 
@@ -29,6 +33,21 @@ const CardCategory = ({ category }: CardCategoryProps) => {
                         </CardDescription>
                     </div>
                 </div>
+
+                {hasPermission('edit-order-process') && (
+                    <CardEditProcessRules
+                        category={category}
+                        trigger={
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-all duration-200"
+                            >
+                                <Settings2 className="w-4 h-4" />
+                            </Button>
+                        }
+                    />
+                )}
             </CardHeader>
             <CardContent className="pt-4 pb-4 px-4">
                 {processRules.length === 0 ? (

@@ -127,7 +127,7 @@ const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) =>
                             <Hash className="w-4 h-4 text-gray-400" />
                         </div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <span className="text-sm font-bold text-gray-800">Pedido #{orderProcess.order_number}</span>
+                            <span className="text-sm font-bold text-gray-800">Pedido {orderProcess.order_number}</span>
                             <Badge variant="secondary" className="bg-gray-100 text-[10px] text-gray-500 font-bold px-1.5 h-4.5 border-none shadow-none">
                                 {orderProcess.order_type}
                             </Badge>

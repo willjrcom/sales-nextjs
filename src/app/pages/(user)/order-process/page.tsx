@@ -3,18 +3,27 @@
 import { useSession } from 'next-auth/react';
 import ThreeColumnHeader from "@/components/header/three-column-header";
 import Refresh, { FormatRefreshTime } from '@/app/components/crud/refresh';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import PageTitle from '@/app/components/ui/page-title';
 import { useQuery } from '@tanstack/react-query';
 import CardCategory from './card-category';
 import { GetCategoriesWithOrderProcess } from '@/app/api/category/category';
-import { Settings, AlertCircle, ChevronRight, LayoutGrid } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Settings, AlertCircle, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Category from '@/app/entities/category/category';
+import { useUser } from '@/app/context/user-context';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import ListProcessRule from '@/app/forms/category/list-process-rule';
 
 const OrderProcess = () => {
     const { data } = useSession();
+    const { hasPermission } = useUser();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
 
     // Endpoint eficiente que já traz categorias + processos + contagens
@@ -35,12 +44,12 @@ const OrderProcess = () => {
 
     // Categorias marcadas para usar processos mas sem NENHUMA regra cadastrada
     const emptyCategories = useMemo(() =>
-        relevantCategories.filter(c => c.use_process_rule && (!c.process_rules || c.process_rules.length === 0)),
+        relevantCategories.filter(c => !c.process_rules || c.process_rules.length === 0),
         [relevantCategories]);
 
     // Todas as categorias que usam processos (com ou sem regras) para exibir como cards
     const categoriesToDisplay = useMemo(() =>
-        relevantCategories.filter(c => c.use_process_rule),
+        relevantCategories.filter(c => c.process_rules && c.process_rules.length > 0),
         [relevantCategories]);
 
     return (
@@ -68,7 +77,7 @@ const OrderProcess = () => {
             />
 
             {/* Banner de Categorias Sem Configuração */}
-            {emptyCategories.length > 0 && (
+            {hasPermission('edit-order-process') && emptyCategories.length > 0 && (
                 <div className="bg-amber-50 border border-amber-100/50 rounded-2xl p-4 flex flex-col gap-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2 text-amber-900">
@@ -84,9 +93,19 @@ const OrderProcess = () => {
 
                     <div className="flex flex-wrap gap-1.5">
                         {emptyCategories.map(cat => (
-                            <Badge key={cat.id} variant="secondary" className="bg-white border-amber-200 text-amber-700 font-bold py-1 px-3 shadow-sm hover:scale-105 transition-transform duration-200">
-                                {cat.name}
-                            </Badge>
+                            <Dialog key={cat.id}>
+                                <DialogTrigger asChild>
+                                    <Badge className="bg-white cursor-pointer border-amber-200 text-amber-700 font-bold py-1 px-3 shadow-sm hover:scale-105 hover:bg-amber-50 transition-all duration-200">
+                                        {cat.name}
+                                    </Badge>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                                    <DialogHeader>
+                                        <DialogTitle>Configurar Regras: {cat.name}</DialogTitle>
+                                    </DialogHeader>
+                                    <ListProcessRule category={cat} />
+                                </DialogContent>
+                            </Dialog>
                         ))}
                     </div>
 

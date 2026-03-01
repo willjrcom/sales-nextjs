@@ -28,7 +28,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     } else if (pathname?.startsWith('/pages/new-order')) {
         requiredPermission = 'new-order';
     } else if (pathname?.startsWith('/pages/order-process')) {
-        requiredPermission = 'order-process';
+        requiredPermission = ['order-process', 'edit-order-process'];
     } else if (pathname?.startsWith('/pages/place')) {
         requiredPermission = 'place';
     } else if (pathname?.startsWith('/pages/stock')) {

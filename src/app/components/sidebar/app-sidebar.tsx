@@ -85,7 +85,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
 
     const items = [
         { label: "Novo Pedido", icon: FaPlus, href: "/pages/new-order", permission: 'new-order' },
-        { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process", permission: 'order-process' },
+        { label: "Processos", icon: TiFlowMerge, href: "/pages/order-process", permission: ['order-process', 'edit-order-process'] },
         // Produto é um caso especial, pode ter product, category ou process-rule
         { label: "Cardápio", icon: MdFastfood, href: "/pages/product?tab=products", permission: ['product', 'category', 'process-rule', 'menu-digital'] },
         { label: "Clientes", icon: BsFillPeopleFill, href: "/pages/client", permission: 'client' },

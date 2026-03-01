@@ -249,15 +249,6 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                     />
                                 </div>
                             )}
-                            <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                                <CheckboxField
-                                    friendlyName="Deseja produzir com processos?"
-                                    name="use_process_rule"
-                                    setValue={(value: any) => setValue('use_process_rule', value)}
-                                    value={category.use_process_rule}
-                                    optional
-                                />
-                            </div>
 
                             <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                                 <CheckboxField

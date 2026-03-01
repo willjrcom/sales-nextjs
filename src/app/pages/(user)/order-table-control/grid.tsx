@@ -73,7 +73,7 @@ const SidebarActiveTables = ({ orders }: { orders: OrderTable[] }) => {
                                         {order.name}
                                     </span>
                                     <Badge variant="outline" className="text-[10px] font-mono font-bold bg-white text-gray-400 border-gray-100">
-                                        #{order.order_number || order.order_id.slice(0, 4)}
+                                        Pedido {order.order_number}
                                     </Badge>
                                 </div>
                                 <div className="flex items-center justify-between">

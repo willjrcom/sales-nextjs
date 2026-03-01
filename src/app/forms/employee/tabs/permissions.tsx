@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Employee from "@/app/entities/employee/employee";
 import { useSession } from "next-auth/react";
 import { notifyError } from "@/app/utils/notifications";
@@ -45,7 +45,8 @@ export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabP
         {
             key: 'orders', label: 'Pedidos', values: [
                 { key: 'new-order', label: 'Novo Pedido' },
-                { key: 'order-process', label: 'Editar Processos de Pedidos' },
+                { key: 'order-process', label: 'Visualizar Processos de Pedidos' },
+                { key: 'edit-order-process', label: 'Editar Processos de Pedidos' },
                 { key: 'order-control', label: 'Editar Pedidos' },
                 { key: 'order-table-control', label: 'Editar pedidos de Mesas' },
                 { key: 'order-pickup-control', label: 'Editar pedidos de Balcões/Retiradas' },
@@ -80,6 +81,28 @@ export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabP
             ]
         },
     ];
+
+    const allPermissionKeys = useMemo(() =>
+        availablePermissions.flatMap(group => group.values.map(v => v.key)),
+        []);
+
+    const allSelected = useMemo(() =>
+        allPermissionKeys.every(key => permissions[key]),
+        [permissions, allPermissionKeys]);
+
+    const handleToggleAll = () => {
+        const newValue = !allSelected;
+        const newPermissions = { ...permissions };
+
+        allPermissionKeys.forEach(key => {
+            const isDisabled = protectedPermissions.includes(key) && employee?.user_id === item.user_id;
+            if (!isDisabled) {
+                newPermissions[key] = newValue;
+            }
+        });
+
+        setPermissions(newPermissions);
+    };
 
     useEffect(() => {
         if (permissions && Object.keys(permissions).length > 0) {
@@ -125,6 +148,15 @@ export default function EmployeePermissionsTab({ item }: EmployeePermissionsTabP
 
     return (
         <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-2 px-1">
+                <CheckboxField
+                    friendlyName="Selecionar Todas as Permissões"
+                    name="select_all"
+                    value={allSelected}
+                    setValue={handleToggleAll}
+                />
+            </div>
+
             <TooltipProvider>
                 {availablePermissions.map((node) => (
                     <PermissionNode

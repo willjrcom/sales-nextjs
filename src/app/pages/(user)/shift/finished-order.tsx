@@ -18,7 +18,7 @@ const ListOrderCard = ({ shift, status, title }: ListOrderProps) => {
     const handleShowOrder = (orderId: string, orderNumber: number) => {
         modalHandler.showModal(
             `order-details-${orderId}`,
-            `Detalhes do Pedido #${orderNumber}`,
+            `Detalhes do Pedido ${orderNumber}`,
             <CardOrder orderId={orderId} editBlocked={true} />,
             'xl'
         );
