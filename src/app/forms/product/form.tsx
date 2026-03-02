@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextField, CheckboxField, RadioField, ImageField } from '../../components/modal/field';
+import { TextField, CheckboxField, RadioField, ImageField, SelectField } from '../../components/modal/field';
 import Product, { SchemaProduct, ProductFormData } from '@/app/entities/product/product';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -235,9 +235,19 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
                 <div className="space-y-4">
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <RadioField friendlyName='Categorias' name='category_id' setSelectedValue={(value: any) => setValue('category_id', value)} selectedValue={product.category_id} values={categories} error={errors.category_id?.message as string} />
-                    </div>
+                    {isUpdate ? (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria selecionada</label>
+                            <div className="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm p-2 border font-bold text-purple-700">
+                                {categories.find(c => c.id === product.category_id)?.name || 'Categoria não encontrada'}
+                            </div>
+                            <p className="text-xs text-gray-400 mt-2">A categoria não pode ser alterada após a criação do produto.</p>
+                        </div>
+                    ) : (
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
+                            <SelectField friendlyName='Categorias' name='category_id' setSelectedValue={(value: any) => setValue('category_id', value)} selectedValue={product.category_id} values={categories} error={errors.category_id?.message as string} />
+                        </div>
+                    )}
                 </div>
             </div>
 
