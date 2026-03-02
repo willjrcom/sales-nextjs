@@ -54,7 +54,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
         </div>
         <div>
           <dt className="font-medium">Total</dt>
-          <dd className="mt-1 font-semibold">R$ {new Decimal(groupItem.total_price).toFixed(2)}</dd>
+          <dd className="mt-1 font-semibold">R$ {new Decimal(groupItem.total).toFixed(2)}</dd>
         </div>
       </dl>
 
@@ -94,7 +94,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
                     <li key={add.id}>
                       {add.quantity} x {add.name}
                       {add.flavor && <span className="ml-1 text-orange-700">(Sabor: {add.flavor})</span>}
-                      (+R$ {new Decimal(add.price).toFixed(2)})
+                      (+R$ {new Decimal(add.sub_total).toFixed(2)})
                     </li>
                   ))}
                 </ul>
@@ -108,7 +108,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
               )}
             </div>
             <div className="col-span-1 flex items-center justify-end">
-              <p className="font-semibold text-gray-800">R$ {new Decimal(item.total_price).toFixed(2)}</p>
+              <p className="font-semibold text-gray-800">R$ {new Decimal(item.total).toFixed(2)}</p>
             </div>
           </div>
         ))}
@@ -126,7 +126,7 @@ export default function GroupItemCard({ groupItem }: GroupItemCardProps) {
                   <p className="text-xs text-orange-700">Sabor: {groupItem.complement_item.flavor}</p>
                 )}
               </div>
-              <p className="font-semibold">R$ {new Decimal(groupItem.complement_item.price).toFixed(2)}</p>
+              <p className="font-semibold">R$ {new Decimal(groupItem.complement_item.sub_total).toFixed(2)}</p>
             </div>
           </div>
         )

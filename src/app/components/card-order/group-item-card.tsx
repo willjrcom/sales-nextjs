@@ -31,8 +31,13 @@ export default function GroupItemCard({ group, session }: GroupItemCardProps) {
                     </Button>
                     {group.start_at && <RoundComponent>Agendado para: {ToUtcDatetime(group.start_at)}</RoundComponent>}
                     <RoundComponent>Qtd: {group.quantity}</RoundComponent>
+                    {!new Decimal(group.sub_total || 0).equals(group.total) && (
+                        <RoundComponent>
+                            Itens: R$ {new Decimal(group.sub_total || 0).toFixed(2)}
+                        </RoundComponent>
+                    )}
                     <RoundComponent>
-                        Total: R$ {new Decimal(group.total_price).toFixed(2)}
+                        Total: R$ {new Decimal(group.total).toFixed(2)}
                     </RoundComponent>
                 </div>
             </div>

@@ -249,7 +249,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                             <div className="flex justify-between items-start">
                                                                 <p className='font-medium text-sm leading-tight'>{item.name}</p>
                                                                 <p className='text-sm font-semibold text-gray-900 ml-2'>
-                                                                    R$ {new Decimal(item.total_price || 0).toFixed(2)}
+                                                                    R$ {new Decimal(item.total || 0).toFixed(2)}
                                                                 </p>
                                                             </div>
 
@@ -263,7 +263,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                                 <div className="mt-1">
                                                                     {item.additional_items.map(additional => (
                                                                         <p key={additional.id} className="text-xs text-gray-500">
-                                                                            + {additional.quantity}x {additional.name} (R$ {new Decimal(additional.price).times(additional.quantity).toFixed(2)})
+                                                                            + {additional.quantity}x {additional.name} (R$ {new Decimal(additional.sub_total).times(additional.quantity).toFixed(2)})
                                                                         </p>
                                                                     ))}
                                                                 </div>
@@ -299,9 +299,17 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                             {/* Group Details (Complement, Obs, Schedule) */}
                                             <GroupItemDetails groupItem={groupItem} isStaging={groupItem.status === 'Staging'} />
                                             {/* Group Total */}
-                                            <div className='mt-3 pt-2 text-right border-t border-gray-100'>
-                                                <span className='text-xs text-gray-500 mr-2'>Subtotal do grupo</span>
-                                                <span className='font-semibold text-gray-900'>{new Decimal(groupItem.total_price || 0).toFixed(2)}</span>
+                                            <div className='mt-3 pt-2 space-y-1 border-t border-gray-100'>
+                                                {new Decimal(groupItem.sub_total || 0).gt(0) && !new Decimal(groupItem.sub_total || 0).equals(groupItem.total || 0) && (
+                                                    <div className='flex justify-between items-center px-1'>
+                                                        <span className='text-[10px] uppercase tracking-wider font-semibold text-gray-400'>Subtotal itens</span>
+                                                        <span className='text-xs font-medium text-gray-500'>R$ {new Decimal(groupItem.sub_total || 0).toFixed(2)}</span>
+                                                    </div>
+                                                )}
+                                                <div className='flex justify-between items-center px-1'>
+                                                    <span className='text-xs font-bold text-gray-700'>Total do grupo</span>
+                                                    <span className='text-base font-bold text-blue-600'>R$ {new Decimal(groupItem.total || 0).toFixed(2)}</span>
+                                                </div>
                                             </div>
                                         </Card>
                                     );

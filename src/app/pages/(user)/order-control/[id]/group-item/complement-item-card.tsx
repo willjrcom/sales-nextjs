@@ -20,7 +20,7 @@ const ComplementItemCard = () => {
                     <div className="text-sm font-medium">
                         {groupItem?.complement_item?.quantity} x {groupItem?.complement_item?.name}
                     </div>
-                    <div className="text-sm font-bold">R$ {new Decimal(groupItem.complement_item!.price).times(groupItem.complement_item!.quantity).toFixed(2)}</div>
+                    <div className="text-sm font-bold">R$ {new Decimal(groupItem.complement_item!.sub_total).times(groupItem.complement_item!.quantity).toFixed(2)}</div>
                 </div>
 
                 {isGroupItemStaging &&

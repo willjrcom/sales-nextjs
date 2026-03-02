@@ -3,8 +3,8 @@ export default class Item {
     id: string = '';
     name: string = '';
     observation: string = '';
-    price: Decimal = new Decimal(0);
-    total_price: Decimal = new Decimal(0);
+    sub_total: Decimal = new Decimal(0);
+    total: Decimal = new Decimal(0);
     size: string = '';
     quantity: number = 0;
     group_item_id: string = '';

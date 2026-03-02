@@ -20,7 +20,7 @@ const EditItem = ({ item }: EditItemProps) => {
     if (!item) return
 
     const totalAdditionalsDecimal = useMemo(() => item.additional_items?.reduce(
-        (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.price).times(it.quantity)),
+        (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.sub_total).times(it.quantity)),
         new Decimal(0)
     ) || new Decimal(0), [item.additional_items]);
 
@@ -46,7 +46,7 @@ const EditItem = ({ item }: EditItemProps) => {
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-md">Produto</p>
-                <p className="text-lg font-bold">R$ {new Decimal(item.price).toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {new Decimal(item.sub_total).toFixed(2)}</p>
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-md">Adicionais</p>
@@ -54,7 +54,7 @@ const EditItem = ({ item }: EditItemProps) => {
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total</p>
-                <p className="text-lg font-bold">R$ {new Decimal(item.total_price).toFixed(2)}</p>
+                <p className="text-lg font-bold">R$ {new Decimal(item.total).toFixed(2)}</p>
             </div>
         </div>
     );

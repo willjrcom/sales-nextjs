@@ -19,7 +19,7 @@ export default function CartModal() {
     const queryClient = useQueryClient();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
     const itemCount = useMemo(() => groupItem?.items?.length || 0, [groupItem?.items]);
-    const total = useMemo(() => new Decimal(groupItem?.total_price || "0").toFixed(2), [groupItem?.total_price]);
+    const total = useMemo(() => new Decimal(groupItem?.total || "0").toFixed(2), [groupItem?.total]);
 
     return (
         <Drawer direction="right">

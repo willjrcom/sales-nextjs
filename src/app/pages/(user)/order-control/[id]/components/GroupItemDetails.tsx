@@ -92,7 +92,7 @@ export const GroupItemDetails = ({ groupItem, isStaging }: GroupItemDetailsProps
                                 {groupItem.complement_item.quantity}x {groupItem.complement_item.name}
                             </p>
                             <p className="text-xs text-gray-500 font-semibold">
-                                + R$ {new Decimal(groupItem.complement_item.price).times(groupItem.complement_item.quantity).toFixed(2)}
+                                + R$ {new Decimal(groupItem.complement_item.sub_total).times(groupItem.complement_item.quantity).toFixed(2)}
                             </p>
                         </div>
                         {isStaging && (

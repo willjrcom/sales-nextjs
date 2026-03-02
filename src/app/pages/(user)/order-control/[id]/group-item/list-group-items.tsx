@@ -19,7 +19,7 @@ const ListGroupItems = ({ groupItems, category }: ListGroupItemsProps) => {
                 <h2 className="text-lg font-semibold">{category.name}</h2>
                 <p className="text-right mt-2">
                     Subtotal: R$ {groupItems?.reduce(
-                        (total: Decimal, group) => new Decimal(total).plus(new Decimal(group.total_price)),
+                        (total: Decimal, group) => new Decimal(total).plus(new Decimal(group.total)),
                         new Decimal(0)
                     ).toFixed(2)}
                 </p>

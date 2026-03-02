@@ -11,7 +11,8 @@ export default class GroupItem {
   order_id: string = '';
   size: string = '';
   status: StatusGroupItem = "Staging";
-  total_price: Decimal = new Decimal(0);
+  sub_total: Decimal = new Decimal(0);
+  total: Decimal = new Decimal(0);
   quantity: number = 0;
   need_print: boolean = false;
   printer_name: string = '';

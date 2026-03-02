@@ -92,7 +92,7 @@ const EditGroupItem = () => {
             <hr className="my-4" />
             <div className="flex justify-between items-center">
                 <p className="text-lg font-bold">Total:</p>
-                <p className="text-xl font-bold">R$ {new Decimal(groupItem?.total_price || "0").toFixed(2)}</p>
+                <p className="text-xl font-bold">R$ {new Decimal(groupItem?.total || "0").toFixed(2)}</p>
             </div>
 
             <hr className="my-4" />

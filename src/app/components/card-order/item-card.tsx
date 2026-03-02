@@ -14,7 +14,7 @@ export default function ItemCard({ item }: ItemCardProps) {
             <div className="flex space-x-2 items-center justify-between">
                 <p className="font-semibold">{item.quantity} x {item.name}</p>
                 <RoundComponent>
-                    Total: R$ {new Decimal(item.total_price).toFixed(2)}
+                    Total: R$ {new Decimal(item.total).toFixed(2)}
                 </RoundComponent>
             </div>
 

@@ -15,13 +15,8 @@ const ItemCard = ({ item }: CardProps) => {
         modalHandler.hideModal(modalName);
     };
 
-    // Calcular preço total com Decimal
-    let totalPriceDecimal = new Decimal(item.price).times(item.quantity);
-    const totalAdditionalsDecimal = item.additional_items?.reduce(
-        (total: Decimal, it) => new Decimal(total).plus(new Decimal(it.price).times(it.quantity)),
-        new Decimal(0)
-    ) || new Decimal(0);
-    totalPriceDecimal = totalPriceDecimal.plus(totalAdditionalsDecimal);
+    // Preço total já calculado pelo backend
+    const totalPriceDecimal = new Decimal(item.total);
 
     return (
         <div
