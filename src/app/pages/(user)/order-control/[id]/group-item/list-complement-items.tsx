@@ -20,13 +20,18 @@ const ListComplementItems = () => {
     const complementItems = useMemo(() => complementProductsResponse?.items || [], [complementProductsResponse?.items]);
 
     return (
-        <div>
-            <br className="my-4" />
+        <div className="py-4">
             <div className="space-y-4">
-                {complementItems.length === 0 && <p className="text-gray-500">Nenhum produto disponível</p>}
-                <Carousel items={complementItems}>
-                    {(product) => <AddComplementItemModal key={product.id} product={product} />}
-                </Carousel>
+                {complementItems.length === 0 && (
+                    <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-100">
+                        <p className="text-gray-400 text-sm italic">Nenhum produto disponível para esta categoria</p>
+                    </div>
+                )}
+                {complementItems.length > 0 && (
+                    <Carousel items={complementItems}>
+                        {(product) => <AddComplementItemModal key={product.id} product={product} />}
+                    </Carousel>
+                )}
             </div>
         </div>
     );

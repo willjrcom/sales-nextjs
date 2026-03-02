@@ -1,3 +1,4 @@
+import { useState } from "react";
 import RequestError from "@/app/utils/error";
 import NewComplementGroupItem from "@/app/api/group-item/update/complement/group-item";
 import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
@@ -21,6 +22,8 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
     const modalHandler = useModal();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
+    const [showVariations, setShowVariations] = useState(false);
+
     const submit = async (variationId: string) => {
         if (!data) return
         if (!groupItem) return notifyError("Nenhum grupo de itens selecionado")
@@ -36,52 +39,89 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
         }
     }
 
-    return (
-        <div className="border rounded-lg bg-white overflow-hidden w-full max-w-sm mx-auto">
-            {/* Header info with image */}
-            <div className="flex items-center gap-3 p-2 bg-gray-50 border-b relative">
-                {product.image_path ? (
-                    <div className="relative w-12 h-12 bg-gray-100 rounded shrink-0 overflow-hidden">
-                        <Image src={product.image_path} alt={product.name} fill className="object-cover" />
+    if (!showVariations) {
+        return (
+            <div
+                className="group border rounded-xl bg-white overflow-hidden w-full max-w-sm mx-auto transition-all duration-300 hover:shadow-xl hover:border-blue-300 cursor-pointer"
+                onClick={() => setShowVariations(true)}
+            >
+                {/* Header info with image */}
+                <div className="relative h-40 bg-gray-50 overflow-hidden">
+                    {product.image_path ? (
+                        <Image
+                            src={product.image_path}
+                            alt={product.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+                            <FaPlus size={24} className="text-gray-200" />
+                        </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-4">
+                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Complemento</span>
+                        <h2 className="text-white font-bold text-base leading-tight line-clamp-2">{product.name}</h2>
                     </div>
-                ) : (
-                    <div className="relative w-12 h-12 bg-gray-200 rounded shrink-0 flex items-center justify-center">
-                        <span className="text-[10px] text-gray-400 text-center leading-none px-1">Img N/D</span>
-                    </div>
-                )}
-
-                <div className="flex-1 min-w-0">
-                    <h2 className="font-medium text-sm leading-tight text-gray-900 line-clamp-2 pr-12">{product.name}</h2>
                 </div>
 
-                {/* SKU */}
-                <span className="absolute top-2 right-2 bg-gray-100 text-gray-600 border text-[10px] px-1.5 py-0.5 rounded font-mono">
+                <div className="p-3 flex items-center justify-between bg-white group-hover:bg-blue-50 transition-colors">
+                    <span className="text-xs font-bold text-blue-600 uppercase tracking-tight">Ver tamanhos</span>
+                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                        <FaPlus size={10} />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="group border rounded-xl bg-white overflow-hidden w-full max-w-sm mx-auto shadow-md border-blue-100">
+            {/* Small Header for navigation back */}
+            <div className="flex items-center gap-3 p-3 bg-gray-50 border-b relative">
+                <button
+                    onClick={() => setShowVariations(false)}
+                    className="p-1.5 hover:bg-gray-200 rounded-full transition-colors text-gray-500"
+                    title="Voltar"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <div className="flex-1 min-w-0">
+                    <h2 className="font-bold text-xs leading-tight text-gray-900 truncate">{product.name}</h2>
+                    <p className="text-[10px] text-gray-400 font-medium">Selecione o tamanho</p>
+                </div>
+                <span className="bg-white text-gray-500 text-[9px] px-1.5 py-0.5 rounded border font-mono">
                     #{product.sku}
                 </span>
             </div>
 
-            {/* botões de variação */}
-            <div>
+            {/* Variations List */}
+            <div className="max-h-64 overflow-y-auto p-1 divide-y divide-gray-50">
                 {product.variations?.length > 0 ? (
                     product.variations.map((variation) => (
-                        <div key={variation.id} className="flex items-center justify-between p-2 border-b last:border-0 hover:bg-gray-50">
-                            <div>
-                                <p className="text-sm text-gray-600">{typeof variation.size === 'string' ? variation.size : variation.size?.name}</p>
-                                <p className="text-sm font-bold text-primary">
+                        <div key={variation.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 transition-colors group/item">
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">
+                                    {typeof variation.size === 'string' ? variation.size : variation.size?.name}
+                                </span>
+                                <span className="text-sm font-extrabold text-blue-600">
                                     R$ {new Decimal(variation.price).toFixed(2)}
-                                </p>
+                                </span>
                             </div>
                             <button
                                 onClick={() => submit(variation.id)}
-                                className="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs font-medium transition-colors"
+                                className="h-9 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95 text-[10px] font-bold uppercase tracking-tight"
                             >
-                                <FaPlus size={10} />
-                                <span>Adicionar</span>
+                                Selecionar
                             </button>
                         </div>
                     ))
                 ) : (
-                    <p className="text-sm text-gray-500 text-center py-4">Nenhuma variação disponível (Tamanho)</p>
+                    <div className="text-center py-10">
+                        <p className="text-xs text-gray-400 italic">Nenhuma variação disponível</p>
+                    </div>
                 )}
             </div>
         </div>
