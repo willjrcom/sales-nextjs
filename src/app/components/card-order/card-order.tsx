@@ -53,7 +53,8 @@ import {
     LayoutGrid,
     Search,
     Receipt,
-    History
+    History,
+    Plus
 } from "lucide-react";
 import GetCompany from '@/app/api/company/company';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -185,6 +186,14 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     const isOrderStatusCancelled = order.status === "Cancelled";
     const isOrderStatusFinished = order.status === "Finished";
 
+    const isTypeConfirmed = order.delivery
+        ? order.delivery.status === "Delivered"
+        : order.pickup
+            ? order.pickup.status === "Delivered"
+            : order.table
+                ? order.table.status !== "Pending"
+                : true;
+
     // Converter valores plain para Decimal
     const totalChangeDecimal = new Decimal(order.total_change);
     const totalDecimal = new Decimal(order.total);
@@ -271,11 +280,34 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                 <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Taxa</span>
                                 <p className="text-emerald-600 font-black ml-auto">{formatCurrency(Number(deliveryTaxDecimal.toFixed(2)))}</p>
                             </div>
-                            <div className="flex items-center gap-2 text-sm">
-                                <Clock className="w-4 h-4 text-amber-500" />
-                                <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pendente em</span>
-                                <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.delivery.pending_at)}</p>
-                            </div>
+                            {order.delivery.pending_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Clock className="w-4 h-4 text-amber-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pendente em</span>
+                                    <p className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.delivery.pending_at)}</p>
+                                </div>
+                            )}
+                            {order.delivery.ready_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Clock className="w-4 h-4 text-amber-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Pronto em</span>
+                                    <span className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.delivery.ready_at)}</span>
+                                </div>
+                            )}
+                            {order.delivery.shipped_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Clock className="w-4 h-4 text-amber-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Enviado em</span>
+                                    <span className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.delivery.shipped_at)}</span>
+                                </div>
+                            )}
+                            {order.delivery.delivered_at && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Clock className="w-4 h-4 text-amber-500" />
+                                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Entregue em</span>
+                                    <span className="text-gray-800 font-black ml-auto">{ToUtcDatetime(order.delivery.delivered_at)}</span>
+                                </div>
+                            )}
                             {totalChangeDecimal.gt(0) && (
                                 <div className="flex items-center gap-2 text-sm p-2 bg-amber-100/50 rounded-xl border border-amber-100">
                                     <Wallet className="w-4 h-4 text-amber-600" />
@@ -285,40 +317,6 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             )}
                         </div>
                     </div>
-
-                    <Collapsible>
-                        <CollapsibleTrigger asChild>
-                            <Button variant="ghost" size="sm" className="w-full justify-between text-gray-400 font-bold uppercase text-[10px] tracking-widest h-8 hover:bg-gray-100">
-                                <div className="flex items-center gap-2">
-                                    <Info className="w-3.5 h-3.5" />
-                                    Ver Histórico de Prazos
-                                </div>
-                                <ChevronDown className="w-3.5 h-3.5" />
-                            </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="pt-2">
-                            <div className="bg-white rounded-xl border border-gray-100 p-3 space-y-2">
-                                {order.delivery.ready_at && (
-                                    <div className="flex items-center justify-between text-[10px]">
-                                        <span className="text-gray-400 font-bold uppercase">Pronto:</span>
-                                        <span className="text-gray-600 font-black">{ToUtcDatetime(order.delivery.ready_at)}</span>
-                                    </div>
-                                )}
-                                {order.delivery.shipped_at && (
-                                    <div className="flex items-center justify-between text-[10px]">
-                                        <span className="text-gray-400 font-bold uppercase">Enviado:</span>
-                                        <span className="text-gray-600 font-black">{ToUtcDatetime(order.delivery.shipped_at)}</span>
-                                    </div>
-                                )}
-                                {order.delivery.delivered_at && (
-                                    <div className="flex items-center justify-between text-[10px]">
-                                        <span className="text-gray-400 font-bold uppercase">Entregue:</span>
-                                        <span className="text-gray-600 font-black">{ToUtcDatetime(order.delivery.delivered_at)}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
 
                     {!editBlocked && order.status === "Ready" && (
                         <div className="pt-2">
@@ -609,7 +607,113 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                     <Edit className="w-5 h-5" />
                                 </Link>
                             )}
+
+                            <Button variant="ghost" size="icon" onClick={() => refetch()} className="text-gray-400 hover:text-emerald-600 rounded-xl">
+                                <RotateCw className="w-4 h-4" />
+                            </Button>
                         </CardTitle>
+                    </div>
+
+                    {/* Botões de Ação no Header */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        {!editBlocked && isOrderStatusPending && (
+                            <ButtonIconText
+                                modalName={"ready-order-" + order.id}
+                                title="Pronto"
+                                size="md"
+                                color="yellow"
+                                icon={Check}
+                                className="h-10 px-4 rounded-xl shadow-sm"
+                            >
+                                <div className="space-y-6 py-4">
+                                    <div className="text-center space-y-2">
+                                        <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Clock className="w-8 h-8" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Deixar Pronto?</h2>
+                                        <p className="text-gray-500 font-medium">Confirma que o pedido {order.order_number} está pronto?</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest rounded-xl h-11" onClick={() => modalHandler.hideModal("ready-order-" + order.id)}>
+                                            Voltar
+                                        </Button>
+                                        <Button
+                                            disabled={isProcessing}
+                                            className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest rounded-xl h-11"
+                                            onClick={handleReady}
+                                        >
+                                            {isProcessing ? 'Processando...' : 'Confirmar'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ButtonIconText>
+                        )}
+
+                        {!editBlocked && isOrderStatusReady && isTypeConfirmed && (
+                            <ButtonIconText
+                                modalName={"finish-order-" + order.id}
+                                title="Finalizar"
+                                size="md"
+                                color="green"
+                                icon={ClipboardCheck}
+                                className="h-10 px-4 rounded-xl shadow-sm"
+                            >
+                                <div className="space-y-6 py-4">
+                                    <div className="text-center space-y-2">
+                                        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Check className="w-8 h-8" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Finalizar Pedido?</h2>
+                                        <p className="text-gray-500 font-medium">Esta ação concluirá o pedido {order.order_number}.</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest rounded-xl h-11" onClick={() => modalHandler.hideModal("finish-order-" + order.id)}>
+                                            Voltar
+                                        </Button>
+                                        <Button
+                                            disabled={isProcessing}
+                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest rounded-xl h-11"
+                                            onClick={handleFinished}
+                                        >
+                                            {isProcessing ? 'Processando...' : 'Concluir'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ButtonIconText>
+                        )}
+
+                        {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
+                            <ButtonIconText
+                                modalName={"cancel-order-" + order.id}
+                                title="Cancelar"
+                                size="md"
+                                color="red"
+                                icon={X}
+                                className="h-10 px-4 rounded-xl shadow-sm"
+                            >
+                                <div className="space-y-6 py-4">
+                                    <div className="text-center space-y-2">
+                                        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <AlertCircle className="w-8 h-8" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight text-red-600">Cancelar Pedido?</h2>
+                                        <p className="text-gray-500 font-medium">Esta ação não pode ser desfeita. Deseja realmente cancelar?</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest rounded-xl h-11" onClick={() => modalHandler.hideModal("cancel-order-" + order.id)}>
+                                            Voltar
+                                        </Button>
+                                        <Button
+                                            disabled={isProcessing}
+                                            className="flex-1 bg-red-600 hover:bg-red-700 font-black uppercase tracking-widest rounded-xl h-11"
+                                            onClick={handleCancel}
+                                        >
+                                            {isProcessing ? 'Cancelando...' : 'Confirmar'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </ButtonIconText>
+                        )}
                     </div>
                 </div>
             </CardHeader>
@@ -633,9 +737,6 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                         </div>
                                         <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Itens do Pedido</h3>
                                     </div>
-                                    <Button variant="ghost" size="icon" onClick={() => refetch()} className="text-gray-400 hover:text-emerald-600 rounded-xl">
-                                        <RotateCw className="w-4 h-4" />
-                                    </Button>
                                 </div>
                                 <ScrollArea className="h-[400px] w-full pr-4">
                                     {order.group_items?.length > 0 ? (
@@ -813,90 +914,19 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                 {/* Botões de Ação */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
-                        <ButtonIconText modalName="add-payment" title="Adicionar pagamento" size="md" className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest h-12 px-8 rounded-2xl shadow-lg shadow-blue-100">
+                        <ButtonIconText
+                            modalName="add-payment"
+                            title="Adicionar pagamento"
+                            size="md"
+                            color="blue"
+                            icon={Plus}
+                            className="w-full md:w-auto h-12 px-8 rounded-2xl shadow-lg shadow-blue-100"
+                        >
                             <PaymentForm orderId={order.id} />
                         </ButtonIconText>
                     )}
 
                     <div className="flex flex-wrap items-center gap-3 ml-auto w-full md:w-auto">
-                        {!editBlocked && isOrderStatusPending && (
-                            <ButtonIconText modalName={"ready-order-" + order.id} title="Deixar Pronto" size="md" color="yellow" icon={Check} className="flex-1 md:flex-none">
-                                <div className="space-y-6 py-4">
-                                    <div className="text-center space-y-2">
-                                        <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Clock className="w-8 h-8" />
-                                        </div>
-                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Deixar Pronto?</h2>
-                                        <p className="text-gray-500 font-medium">Confirma que o pedido {order.order_number} está pronto?</p>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("ready-order-" + order.id)}>
-                                            Voltar
-                                        </Button>
-                                        <Button
-                                            disabled={isProcessing}
-                                            className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest"
-                                            onClick={handleReady}
-                                        >
-                                            {isProcessing ? 'Processando...' : 'Confirmar'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </ButtonIconText>
-                        )}
-
-                        {!editBlocked && isOrderStatusReady && (
-                            <ButtonIconText modalName={"finish-order-" + order.id} title="Finalizar" size="md" color="green" icon={ClipboardCheck} className="flex-1 md:flex-none">
-                                <div className="space-y-6 py-4">
-                                    <div className="text-center space-y-2">
-                                        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Check className="w-8 h-8" />
-                                        </div>
-                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Finalizar Pedido?</h2>
-                                        <p className="text-gray-500 font-medium">Esta ação concluirá o pedido {order.order_number}.</p>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("finish-order-" + order.id)}>
-                                            Voltar
-                                        </Button>
-                                        <Button
-                                            disabled={isProcessing}
-                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest"
-                                            onClick={handleFinished}
-                                        >
-                                            {isProcessing ? 'Processando...' : 'Concluir'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </ButtonIconText>
-                        )}
-
-                        {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
-                            <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={X} className="flex-1 md:flex-none">
-                                <div className="space-y-6 py-4">
-                                    <div className="text-center space-y-2">
-                                        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <AlertCircle className="w-8 h-8" />
-                                        </div>
-                                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight text-red-600">Cancelar Pedido?</h2>
-                                        <p className="text-gray-500 font-medium">Esta ação não pode ser desfeita. Deseja realmente cancelar?</p>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="outline" className="flex-1 font-bold uppercase tracking-widest" onClick={() => modalHandler.hideModal("cancel-order-" + order.id)}>
-                                            Voltar
-                                        </Button>
-                                        <Button
-                                            disabled={isProcessing}
-                                            className="flex-1 bg-red-600 hover:bg-red-700 font-black uppercase tracking-widest"
-                                            onClick={handleCancel}
-                                        >
-                                            {isProcessing ? 'Cancelando...' : 'Confirmar'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </ButtonIconText>
-                        )}
-
                         {!isOrderStatusCancelled && company && (
                             <Button
                                 onClick={() => data && printOrder({ orderID: order.id, session: data })}
@@ -911,12 +941,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                         {fiscalSettings?.fiscal_enabled && (
                             <ButtonIconText
                                 modalName={"emit-nfce-" + order.id}
-                                title="Gerar NFC-e"
+                                title="NFC-e"
                                 size="md"
                                 color="purple"
                                 icon={Receipt}
                                 isDisabled={!isOrderStatusFinished || isOrderStatusCancelled}
-                                className="flex-1 md:flex-none"
+                                className="flex-1 md:flex-none h-12 px-6 rounded-2xl"
                             >
                                 <EmitNFCeModal orderId={order.id} onSuccess={refetch} />
                             </ButtonIconText>

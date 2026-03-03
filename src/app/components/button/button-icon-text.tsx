@@ -1,40 +1,71 @@
 import React from "react";
-import { FaPlus } from "react-icons/fa";
+import { Plus, LucideIcon } from "lucide-react";
 import { useModal } from "@/app/context/modal/context";
-import { IconType } from "react-icons";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface NewButtonProps {
-    icon?: IconType;
-    size?: 'sm' | 'md' | 'lg' | 'xl'
-    modalName: string
+    icon?: LucideIcon;
+    size?: 'sm' | 'md' | 'lg' | 'xl' | 'default';
+    modalName: string;
     title?: string;
-    color?: string;
+    color?: 'blue' | 'green' | 'red' | 'yellow' | 'purple' | 'gray' | 'emerald' | 'amber' | 'rose' | 'indigo';
     onCloseModal?: () => void;
     children: React.ReactNode;
     isDisabled?: boolean;
     className?: string;
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
 
-const ButtonIconText = ({ icon: Icon = FaPlus, size = 'md', modalName, title = "", color = 'blue', onCloseModal, children, isDisabled, className }: NewButtonProps) => {
+const colorMap = {
+    blue: "bg-blue-600 hover:bg-blue-700 text-white",
+    green: "bg-emerald-600 hover:bg-emerald-700 text-white",
+    emerald: "bg-emerald-600 hover:bg-emerald-700 text-white",
+    red: "bg-rose-600 hover:bg-rose-700 text-white",
+    rose: "bg-rose-600 hover:bg-rose-700 text-white",
+    yellow: "bg-amber-600 hover:bg-amber-700 text-white",
+    amber: "bg-amber-600 hover:bg-amber-700 text-white",
+    purple: "bg-indigo-600 hover:bg-indigo-700 text-white",
+    indigo: "bg-indigo-600 hover:bg-indigo-700 text-white",
+    gray: "bg-gray-600 hover:bg-gray-700 text-white",
+};
+
+const ButtonIconText = ({
+    icon: Icon = Plus,
+    size = 'md',
+    modalName,
+    title = "",
+    color = 'blue',
+    onCloseModal,
+    children,
+    isDisabled,
+    className,
+    variant = "default"
+}: NewButtonProps) => {
     const modalHandler = useModal();
 
     const onClose = () => {
         if (onCloseModal) onCloseModal();
     }
 
-    if (isDisabled) {
-        return (
-            <button disabled className={cn(`flex items-center space-x-2 p-2 bg-gray-500 text-white rounded-md w-max`, className)}>
-                <Icon /> {title && <span>{title}</span>}
-            </button>
-        )
-    }
+    const buttonSize = size === 'md' ? 'default' : (size === 'xl' ? 'lg' : size) as any;
+
     return (
-        <button onClick={() => modalHandler.showModal(modalName, title, children, size, onClose)} className={cn(`flex items-center space-x-2 p-2 bg-${color}-500 text-white rounded-md hover:bg-${color}-600 w-max`, className)}>
-            <Icon /> {title && <span>{title}</span>}
-        </button>
+        <Button
+            disabled={isDisabled}
+            variant={variant}
+            size={buttonSize}
+            onClick={() => modalHandler.showModal(modalName, title, children, size as any, onClose)}
+            className={cn(
+                "font-black uppercase tracking-widest gap-2 transition-all active:scale-95 shadow-sm",
+                variant === "default" && colorMap[color],
+                className
+            )}
+        >
+            <Icon className="w-4 h-4" />
+            {title && <span>{title}</span>}
+        </Button>
     )
 }
 
-export default ButtonIconText
+export default ButtonIconText;
