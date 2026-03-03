@@ -43,7 +43,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             variations: prod.variations.map(v => ({
                 size_id: v.size_id,
                 price: new Decimal(v.price || 0).toNumber(),
-                cost: new Decimal(v.cost || 0).toNumber(),
                 is_available: v.is_available ?? true
             }))
         }
@@ -104,7 +103,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
         );
 
         const newVariations = filteredSizes.map((size: Size) => {
-            // If variation exists for this size, keep it (preserve price, cost, etc.)
+            // If variation exists for this size, keep it (preserve price, availability, etc.)
             if (existingVariationsMap.has(size.id)) {
                 const existing = existingVariationsMap.get(size.id)!;
                 return {
@@ -117,7 +116,6 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             return {
                 size_id: size.id,
                 price: 0,
-                cost: 0,
                 is_available: true
             };
         });
@@ -282,21 +280,13 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <PriceField
                                         friendlyName='Preço'
                                         name={`variations.${index}.price`}
                                         setValue={(value: Decimal) => setValue(`variations.${index}.price`, value.toNumber())}
                                         value={new Decimal(product.variations?.[index]?.price || 0)}
                                         error={(errors.variations as any)?.[index]?.price?.message}
-                                    />
-                                    <PriceField
-                                        friendlyName='Custo'
-                                        name={`variations.${index}.cost`}
-                                        setValue={(value: Decimal) => setValue(`variations.${index}.cost`, value.toNumber())}
-                                        value={new Decimal(product.variations?.[index]?.cost || 0)}
-                                        optional
-                                        error={(errors.variations as any)?.[index]?.cost?.message}
                                     />
                                 </div>
                             </div>

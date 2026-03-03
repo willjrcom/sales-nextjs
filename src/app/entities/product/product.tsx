@@ -35,7 +35,6 @@ export const SchemaProduct = z.object({
     variations: z.array(z.object({
         size_id: z.string().uuid("Tamanho inválido"),
         price: z.coerce.number().min(0, "Preço deve ser maior ou igual a 0"),
-        cost: z.coerce.number().min(0, "Custo deve ser maior ou igual a 0"),
         is_available: z.boolean(),
     })).min(1, "Adicione pelo menos uma variação"),
 });

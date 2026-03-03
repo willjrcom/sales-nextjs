@@ -7,7 +7,6 @@ export default class ProductVariation {
     size_id: string = '';
     size: Size = new Size();
     price: Decimal = new Decimal(0);
-    cost: Decimal = new Decimal(0);
     is_available: boolean = true;
 
     constructor(data: Partial<ProductVariation> = {}) {
