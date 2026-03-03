@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, LucideIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useModal } from "@/app/context/modal/context";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

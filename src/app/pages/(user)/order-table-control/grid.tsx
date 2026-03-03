@@ -219,57 +219,79 @@ const DragAndDropGrid = () => {
     );
 };
 
+interface NewOrderModalContentProps {
+    placeTable: PlaceTable;
+    onClose: () => void;
+    onSubmit: (name: string, contact: string) => Promise<void>;
+    isCreating: boolean;
+}
+
+const NewOrderModalContent = ({ placeTable, onClose, onSubmit, isCreating }: NewOrderModalContentProps) => {
+    const [name, setName] = useState<string>("");
+    const [contact, setContact] = useState<string>("");
+
+    return (
+        <div className="space-y-6 pt-4 text-black">
+            <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl shadow-blue-200">
+                <div className="flex items-center gap-3 font-black text-lg mb-2">
+                    <TableIcon className="w-6 h-6 border-2 border-white/30 p-1 rounded-lg" />
+                    Mesa {placeTable.table.name}
+                </div>
+                <p className="text-sm font-bold text-blue-100 uppercase tracking-widest opacity-80">Iniciar Atendimento</p>
+            </div>
+            <div className="space-y-4">
+                <TextField friendlyName="Nome do Cliente (Opcional)" placeholder="Ex: Lucas Oliveira" name="name" value={name} setValue={setName} />
+                <PatternField friendlyName="Contato / WhatsApp" placeholder="(00) 00000-0000" name="contact" value={contact} setValue={setContact} patternName="full-phone" optional />
+            </div>
+            <div className="flex gap-4">
+                <Button variant="outline" className="flex-1 rounded-2xl h-14 font-black text-gray-400 hover:text-gray-900 transition-all border-gray-100" onClick={onClose}>Cancelar</Button>
+                <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-14 font-black gap-2 shadow-lg shadow-blue-200" onClick={() => onSubmit(name, contact)} disabled={isCreating}>
+                    {isCreating ? 'Iniciando...' : 'Confirmar'}
+                    {!isCreating && <Plus className="w-5 h-5" />}
+                </Button>
+            </div>
+        </div>
+    );
+};
+
 const TableItem = ({ placeTable, ordersForTable }: { placeTable: PlaceTable, ordersForTable: OrderTable[] }) => {
     const { data } = useSession();
     const router = useRouter();
     const modalHandler = useModal();
-    const [name, setName] = useState<string>("");
-    const [contact, setContact] = useState<string>("");
     const [isCreating, setIsCreating] = useState(false);
 
     const openModal = () => {
         if (ordersForTable.length === 0) {
-            const onClose = () => {
+            const handleClose = () => {
                 modalHandler.hideModal("new-table")
                 setIsCreating(false)
-                setName("")
-                setContact("")
             }
-            const newOrder = async (tableID: string) => {
+
+            const handleNewOrder = async (name: string, contact: string) => {
                 if (!data || isCreating) return
                 setIsCreating(true);
                 try {
-                    const response = await NewOrderTable(data, tableID, name, contact)
+                    const response = await NewOrderTable(data, placeTable.table_id, name, contact)
                     router.push('/pages/order-control/' + response.order_id)
-                    onClose()
+                    handleClose()
                 } catch (error: RequestError | any) {
                     notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
                     setIsCreating(false);
                 }
             }
-            const content = () => (
-                <div className="space-y-6 pt-4">
-                    <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl shadow-blue-200">
-                        <div className="flex items-center gap-3 font-black text-lg mb-2">
-                            <TableIcon className="w-6 h-6 border-2 border-white/30 p-1 rounded-lg" />
-                            Mesa {placeTable.table.name}
-                        </div>
-                        <p className="text-sm font-bold text-blue-100 uppercase tracking-widest opacity-80">Iniciar Atendimento</p>
-                    </div>
-                    <div className="space-y-4">
-                        <TextField friendlyName="Nome do Cliente (Opcional)" placeholder="Ex: Lucas Oliveira" name="name" value={name} setValue={setName} />
-                        <PatternField friendlyName="Contato / WhatsApp" placeholder="(00) 00000-0000" name="contact" value={contact} setValue={setContact} patternName="full-phone" optional />
-                    </div>
-                    <div className="flex gap-4">
-                        <Button variant="outline" className="flex-1 rounded-2xl h-14 font-black text-gray-400 hover:text-gray-900 transition-all border-gray-100" onClick={onClose}>Cancelar</Button>
-                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-14 font-black gap-2 shadow-lg shadow-blue-200" onClick={() => newOrder(placeTable.table_id)} disabled={isCreating}>
-                            {isCreating ? 'Iniciando...' : 'Confirmar'}
-                            {!isCreating && <Plus className="w-5 h-5" />}
-                        </Button>
-                    </div>
-                </div>
-            )
-            modalHandler.showModal("new-table", "Novo Pedido", content(), "md", onClose);
+
+            modalHandler.showModal(
+                "new-table",
+                "Novo Pedido",
+                <NewOrderModalContent
+                    placeTable={placeTable}
+                    onClose={handleClose}
+                    onSubmit={handleNewOrder}
+                    isCreating={isCreating}
+                />,
+                "md",
+                handleClose
+            );
             return
         }
         if (ordersForTable.length > 1) {

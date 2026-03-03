@@ -65,7 +65,7 @@ const errorTranslations: Record<string, string> = {
     "order already cancelled": "O pedido já foi cancelado",
     "order already archived": "O pedido já foi arquivado",
     "order paid more than total": "O valor pago excede o total do pedido",
-    "order paid less than total": "O total pago deve ser maior que o total do pedido",
+    "order paid less than total": "O pedido não foi inteiro pago",
     "order delivery must be delivered": "A entrega do pedido deve estar entregue",
     "order table must be closed": "A mesa do pedido deve estar fechada",
     "order pickup must be ready": "O pedido para retirada deve estar pronto",
