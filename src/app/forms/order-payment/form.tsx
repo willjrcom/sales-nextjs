@@ -52,6 +52,11 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
         }
     });
 
+    const onInvalid = () => {
+        console.log(errors);
+        notifyError('Verifique os campos obrigatórios');
+    };
+
     const onSubmit = (formData: PaymentFormData) => {
         if (!session || !orderId) return;
 
@@ -98,7 +103,7 @@ const PaymentForm = ({ item, isUpdate, orderId }: PaymentFormProps) => {
             <ButtonsModal
                 item={item || new PaymentOrder()}
                 name="Pagamento"
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onSubmit, onInvalid)}
                 isAddItem
                 isPending={payMutation.isPending || isSubmitting}
             />

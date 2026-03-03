@@ -5,7 +5,7 @@ import GetCompany from "@/app/api/company/company";
 import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextField, CheckboxField, RadioField } from '../../components/modal/field';
+import { TextField, CheckboxField, SelectField } from '../../components/modal/field';
 import Stock, { SchemaStock } from '@/app/entities/stock/stock';
 import ButtonsModal from '../../components/modal/buttons-modal';
 import { useSession } from 'next-auth/react';
@@ -16,7 +16,7 @@ import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GetDefaultProductsByCategory } from '@/app/api/product/product';
+import GetProducts, { GetProductsByCategoryID, GetProductsMap } from '@/app/api/product/product';
 import { GetCategoriesMap } from '@/app/api/category/category';
 import { GetAllStocksWithProduct, GetStockByProductID } from '@/app/api/stock/stock';
 
@@ -55,6 +55,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const stock = watch();
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 
@@ -67,7 +68,7 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
 
     const { data: productsResponse } = useQuery({
         queryKey: ['products', 'map', categoryID],
-        queryFn: () => GetDefaultProductsByCategory(session!, categoryID, false),
+        queryFn: () => GetProductsByCategoryID(session!, categoryID),
         enabled: !!(session as any)?.user?.access_token && !!categoryID,
     });
 
@@ -94,13 +95,20 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
 
         return products
             .filter(product => {
+                const mapProd = product as any;
+                if (mapProd.variation_id || mapProd.product_id) {
+                    const vID = mapProd.variation_id || mapProd.id;
+                    return !stocks.some(s => s.product_id === mapProd.product_id && s.product_variation_id === vID);
+                }
+
                 const pStocks = stocks.filter(s => s.product_id === product.id);
-                if (product.variations.length === 0) {
+                const variations = product.variations || [];
+                if (variations.length === 0) {
                     return !pStocks.some(s => !s.product_variation_id);
                 }
-                return product.variations.some(v => !pStocks.some(s => s.product_variation_id === v.id));
+                return variations.some(v => !pStocks.some(s => s.product_variation_id === v.id));
             })
-            .map(product => ({ id: product.id, name: product.name }));
+            .map(product => ({ id: (product as any).variation_id || product.id, product_id: (product as any).product_id, name: product.name }));
     }, [products, stocks, isUpdate]);
 
     const variations = useMemo(() => {
@@ -141,7 +149,13 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     const submit = async (formData: any) => {
         if (!session) return;
         setIsSaving(true);
-        const stockToSave = new Stock(formData);
+
+        const data = { ...formData };
+        if (!data.product_variation_id) {
+            delete data.product_variation_id;
+        }
+
+        const stockToSave = new Stock(data);
         if (isUpdate) {
             updateMutation.mutate(stockToSave);
         } else {
@@ -154,28 +168,38 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Produto</h3>
                 <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                    {!isUpdate && <RadioField
+                    {!isUpdate && <SelectField
                         friendlyName="Categoria"
                         name="category_id"
                         selectedValue={categoryID}
-                        setSelectedValue={setCategoryID}
+                        setSelectedValue={(val) => {
+                            setCategoryID(val);
+                            setValue('product_id', '');
+                            setValue('product_variation_id', '');
+                        }}
                         values={categories}
                         error={errors.category_id?.message as string}
                     />}
 
-                    {!isUpdate && <RadioField
+                    {!isUpdate && <SelectField
                         friendlyName="Produto"
                         name="product_id"
-                        selectedValue={stock.product_id}
+                        selectedValue={stock.product_variation_id || stock.product_id}
                         setSelectedValue={(value: any) => {
-                            setValue('product_id', value);
-                            setValue('product_variation_id', '');
+                            const selected = products.find(p => (p as any).variation_id === value || p.id === value);
+                            if (selected && (selected as any).product_id) {
+                                setValue('product_id', (selected as any).product_id);
+                                setValue('product_variation_id', (selected as any).variation_id);
+                            } else {
+                                setValue('product_id', value);
+                                setValue('product_variation_id', '');
+                            }
                         }}
                         values={recordProducts}
                         error={errors.product_id?.message as string}
                     />}
 
-                    {!isUpdate && variations.length > 0 && <RadioField
+                    {!isUpdate && variations.length > 0 && <SelectField
                         friendlyName="Variação / Tamanho"
                         name="product_variation_id"
                         selectedValue={stock.product_variation_id || ""}

@@ -71,6 +71,7 @@ const CreateAndAddUserToCompanyForm = ({ cpf }: CreateAndAddUserToCompanyFormPro
     }
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Formulário incompleto. Verifique os campos obrigatórios.');
     };
 

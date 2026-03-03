@@ -127,6 +127,7 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
     }
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Formulário inválido. Verifique os campos.');
     }
 

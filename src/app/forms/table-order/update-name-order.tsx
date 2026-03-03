@@ -47,6 +47,11 @@ const TableNameForm = ({ item, tableOrderId }: TableNameFormProps) => {
         }
     });
 
+    const onInvalid = () => {
+        console.log(errors);
+        notifyError('Verifique os campos obrigatórios');
+    };
+
     const onSubmit = (formData: UpdateTableNameFormData) => {
         if (!session || !tableOrderId) return;
         updateNameMutation.mutate(formData.name);
@@ -65,7 +70,7 @@ const TableNameForm = ({ item, tableOrderId }: TableNameFormProps) => {
             <ButtonsModal
                 item={item!}
                 name='Atualizar nome'
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onSubmit, onInvalid)}
                 isPending={updateNameMutation.isPending || isSubmitting}
             />
         </>

@@ -22,6 +22,66 @@ import AddRemovedItem from "@/app/api/item/update/removed-item/add/item";
 import Image from "next/image";
 import { OrderControlView } from "@/app/pages/(user)/order-control/[id]/page";
 
+const AdditionalItemRow = ({ additional, qty, updateAdditional, session }: {
+  additional: Product,
+  qty: number,
+  updateAdditional: (id: string, delta: number) => void,
+  session: any
+}) => {
+  const { data: stocks } = useQuery({
+    queryKey: ['stocks', 'product', additional.id],
+    queryFn: () => GetStockByProductID(additional.id, session),
+    enabled: !!session?.user?.access_token,
+  });
+
+  const variationId = additional.variations?.[0]?.id;
+  const stockRecord = stocks?.find(s => s.product_variation_id === variationId) || stocks?.find(s => !s.product_variation_id);
+  const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
+  const remaining = available ? available.minus(new Decimal(qty)) : null;
+
+  let price = new Decimal(0);
+  if (additional.variations && additional.variations.length > 0) {
+    price = new Decimal(additional.variations[0].price);
+  }
+
+
+  return (
+    <div className="flex flex-col p-3 border rounded-lg hover:border-green-200 transition-colors bg-white">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="font-medium text-gray-900">{additional.name}</p>
+          <p className="text-sm text-green-600 font-semibold">+ R$ {price.toFixed(2)}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {qty > 0 && (
+            <button
+              onClick={() => updateAdditional(additional.id, -1)}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors"
+            >
+              -
+            </button>
+          )}
+          {qty > 0 && <span className="font-semibold w-4 text-center">{qty}</span>}
+          <button
+            onClick={() => updateAdditional(additional.id, 1)}
+            disabled={(available !== null && remaining !== null && remaining.lte(0))}
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${qty > 0 ? 'bg-green-50 text-green-600 border border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 hover:text-gray-600'}${(available !== null && remaining !== null && remaining.lte(0)) ? ' opacity-50 cursor-not-allowed' : ''}`}
+          >
+            +
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-col items-center mt-2 space-y-1">
+        {available && qty > 0 && (
+          <p className="text-[10px] text-gray-400 text-center italic">
+            Estoque disponível: {available.toFixed(2)} • Restará após adicionar: {Decimal.max(remaining || 0, 0).toFixed(2)}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
 interface AddProductCardProps {
   product: Product;
   setView?: (view: OrderControlView) => void;
@@ -303,7 +363,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
     } catch (error) {
       const err = error as RequestError;
       notifyError(err.message || 'Erro ao adicionar item');
-      await queryClient.invalidateQueries({ queryKey: ['stocks', 'product', item.id] });
+      await queryClient.invalidateQueries({ queryKey: ['stocks'] });
     } finally {
       setIsSubmitting(false);
     }
@@ -478,40 +538,15 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
                 </div>
 
                 <div className="space-y-3">
-                  {additionalProducts.map((additional: Product) => {
-                    const qty = selectedAdditionals[additional.id] || 0;
-                    // Helper to get price
-                    let price = new Decimal(0);
-                    if (additional.variations && additional.variations.length > 0) {
-                      price = new Decimal(additional.variations[0].price);
-                    }
-
-                    return (
-                      <div key={additional.id} className="flex items-center justify-between p-3 border rounded-lg hover:border-green-200 transition-colors bg-white">
-                        <div>
-                          <p className="font-medium text-gray-900">{additional.name}</p>
-                          <p className="text-sm text-green-600 font-semibold">+ R$ {price.toFixed(2)}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          {qty > 0 && (
-                            <button
-                              onClick={() => updateAdditional(additional.id, -1)}
-                              className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors"
-                            >
-                              -
-                            </button>
-                          )}
-                          {qty > 0 && <span className="font-semibold w-4 text-center">{qty}</span>}
-                          <button
-                            onClick={() => updateAdditional(additional.id, 1)}
-                            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${qty > 0 ? 'bg-green-50 text-green-600 border border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 hover:text-gray-600'}`}
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
+                  {additionalProducts.map((additional: Product) => (
+                    <AdditionalItemRow
+                      key={additional.id}
+                      additional={additional}
+                      qty={selectedAdditionals[additional.id] || 0}
+                      updateAdditional={updateAdditional}
+                      session={data}
+                    />
+                  ))}
                 </div>
               </div>
             )}

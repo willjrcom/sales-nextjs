@@ -1,3 +1,4 @@
+import { useState } from "react";
 import RequestError from "@/app/utils/error";
 import DeleteComplementGroupItem from "@/app/api/group-item/delete/complement/group-item";
 import GetGroupItemByID from "@/app/api/group-item/[id]/group-item";
@@ -13,9 +14,11 @@ const DeleteComplementItemModal = () => {
     const modalHandler = useModal();
     const { data } = useSession();
     const modalName = "delete-complement-" + groupItem?.id;
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onDelete = async () => {
         if (!data || !groupItem?.id) return;
+        setIsSubmitting(true);
         try {
             await DeleteComplementGroupItem(groupItem.id, data)
             const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
@@ -25,13 +28,21 @@ const DeleteComplementItemModal = () => {
             modalHandler.hideModal(modalName)
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao excluir complemento")
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
     return (
         <>
             <div className="text-center mb-4"><h2>Tem certeza que deseja excluir {groupItem?.complement_item?.name}?</h2></div>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onDelete}>Excluir</button>
+            <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+                onClick={onDelete}
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? "Excluindo..." : "Excluir"}
+            </button>
         </>
     )
 };

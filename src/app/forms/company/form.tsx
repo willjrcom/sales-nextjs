@@ -30,7 +30,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { ChevronDown, Settings } from 'lucide-react';
+import { ChevronDown, Settings, Clock, Plus, Trash2 } from 'lucide-react';
 import { FaSearch } from 'react-icons/fa';
 import GetAddressByCEP from '../../api/busca-cep/busca-cep';
 import { addressUFsWithId } from '../../entities/address/utils';
@@ -53,6 +53,16 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
     }
     const initialValues = useMemo(() => {
         const c = new Company(item || { preferences: defaultPreferences, contacts: [''] });
+
+        // Initialize schedules if empty
+        if (!c.schedules || c.schedules.length === 0) {
+            c.schedules = Array.from({ length: 7 }, (_, i) => ({
+                day_of_week: i,
+                is_open: true,
+                hours: [{ opening_time: '08:00', closing_time: '22:00' }]
+            }));
+        }
+
         return {
             ...c,
             contacts: (c.contacts || ['']).map(contact => ({ value: contact }))
@@ -393,6 +403,98 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                     })()}
                 </div>
             )}
+            {/* Seção: Horário de Funcionamento */}
+            <Collapsible className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 transition-all duration-300 hover:shadow-md overflow-hidden group">
+                <CollapsibleTrigger asChild>
+                    <div className="w-full flex items-center justify-between p-6 cursor-pointer hover:bg-green-50/50 transition-colors">
+                        <div className='flex items-center gap-3'>
+                            <div className='p-2 bg-green-100 rounded-lg text-green-600 transition-transform duration-300 group-data-[state=open]:rotate-90'>
+                                <Clock className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800">Horário de Funcionamento</h3>
+                        </div>
+                        <ChevronDown className="w-5 h-5 text-green-500 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                    </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="p-6 pt-0 border-t border-green-100/50 space-y-4">
+                        {['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'].map((dayName, index) => {
+                            const schedule = company.schedules?.find((s: any) => s.day_of_week === index);
+                            if (!schedule) return null;
+
+                            return (
+                                <div key={index} className="p-4 border border-gray-100 rounded-xl bg-white/50 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-semibold text-gray-700 min-w-[80px]">{dayName}</span>
+                                            <CheckboxField
+                                                friendlyName="Aberto"
+                                                name={`schedules.${index}.is_open`}
+                                                value={schedule.is_open}
+                                                setValue={(val: boolean) => setValue(`schedules.${index}.is_open`, val)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {schedule.is_open && (
+                                        <div className="space-y-2 ml-4 border-l-2 border-green-100 pl-4">
+                                            {schedule.hours.map((hour: any, hourIndex: number) => (
+                                                <div key={hourIndex} className="flex items-center gap-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="time"
+                                                            className="p-1 border rounded text-sm"
+                                                            value={hour.opening_time}
+                                                            onChange={(e) => {
+                                                                const newHours = [...schedule.hours];
+                                                                newHours[hourIndex].opening_time = e.target.value;
+                                                                setValue(`schedules.${index}.hours`, newHours);
+                                                            }}
+                                                        />
+                                                        <span className="text-gray-400 text-xs">até</span>
+                                                        <input
+                                                            type="time"
+                                                            className="p-1 border rounded text-sm"
+                                                            value={hour.closing_time}
+                                                            onChange={(e) => {
+                                                                const newHours = [...schedule.hours];
+                                                                newHours[hourIndex].closing_time = e.target.value;
+                                                                setValue(`schedules.${index}.hours`, newHours);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    {schedule.hours.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newHours = schedule.hours.filter((_: any, i: number) => i !== hourIndex);
+                                                                setValue(`schedules.${index}.hours`, newHours);
+                                                            }}
+                                                            className="text-red-400 hover:text-red-600 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newHours = [...schedule.hours, { opening_time: '18:00', closing_time: '23:00' }];
+                                                    setValue(`schedules.${index}.hours`, newHours);
+                                                }}
+                                                className="flex items-center gap-1 text-xs text-green-600 hover:text-green-800 font-medium mt-2"
+                                            >
+                                                <Plus className="w-3 h-3" /> Adicionar intervalo
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
 
             <Collapsible className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 transition-all duration-300 hover:shadow-md overflow-hidden group">
                 <CollapsibleTrigger asChild>

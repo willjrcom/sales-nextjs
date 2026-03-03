@@ -46,6 +46,11 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
         }
     });
 
+    const onInvalid = () => {
+        console.log(errors);
+        notifyError('Verifique os campos obrigatórios');
+    };
+
     const onSubmit = (formData: UpdatePickupNameFormData) => {
         if (!session || !pickupOrderId) return;
         updateNameMutation.mutate(formData.name);
@@ -64,7 +69,7 @@ const PickupNameForm = ({ item, pickupOrderId }: PickupNameFormProps) => {
             <ButtonsModal
                 item={item!}
                 name='Atualizar nome'
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onSubmit, onInvalid)}
                 isPending={updateNameMutation.isPending || isSubmitting}
             />
         </>

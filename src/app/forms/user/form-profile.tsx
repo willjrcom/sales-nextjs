@@ -94,6 +94,7 @@ const UserForm = ({ item }: CreateFormsProps<User>) => {
     }
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Formulário inválido. Verifique os campos obrigatórios.');
     }
 

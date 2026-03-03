@@ -10,7 +10,8 @@ import Image from "next/image";
 import { FaPlus } from "react-icons/fa";
 import Decimal from "decimal.js";
 import { notifyError } from "@/app/utils/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { GetStockByProductID } from "@/app/api/stock/stock";
 
 interface AddComplementItemModalProps {
     product: Product;
@@ -21,13 +22,22 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
     const queryClient = useQueryClient();
     const modalHandler = useModal();
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
+    const { data: session } = useSession();
+
+    const { data: stocks } = useQuery({
+        queryKey: ['stocks', 'product', product.id],
+        queryFn: () => GetStockByProductID(product.id, session!),
+        enabled: !!session?.user,
+    });
 
     const [showVariations, setShowVariations] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const submit = async (variationId: string) => {
         if (!data) return
         if (!groupItem) return notifyError("Nenhum grupo de itens selecionado")
 
+        setIsSubmitting(true);
         try {
             await NewComplementGroupItem(groupItem.id, product.id, variationId, data)
             const updatedGroupItem = await GetGroupItemByID(groupItem.id, data);
@@ -36,6 +46,9 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
             modalHandler.hideModal("add-complement-item-group-item-" + groupItem?.id)
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao adicionar complemento");
+            queryClient.invalidateQueries({ queryKey: ['stocks', 'product', product.id] });
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -109,12 +122,29 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
                                 <span className="text-sm font-extrabold text-blue-600">
                                     R$ {new Decimal(variation.price).toFixed(2)}
                                 </span>
+                                {(() => {
+                                    const stockRecord = stocks?.find(s => s.product_variation_id === variation.id) || stocks?.find(s => !s.product_variation_id);
+                                    const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
+                                    if (available !== null) {
+                                        return (
+                                            <span className={`text-[9px] font-bold ${available.gt(0) ? 'text-gray-400' : 'text-red-500'}`}>
+                                                Estoque: {available.toFixed(2)}
+                                            </span>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
                             <button
                                 onClick={() => submit(variation.id)}
-                                className="h-9 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95 text-[10px] font-bold uppercase tracking-tight"
+                                disabled={isSubmitting || (() => {
+                                    const stockRecord = stocks?.find(s => s.product_variation_id === variation.id) || stocks?.find(s => !s.product_variation_id);
+                                    const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
+                                    return available !== null && available.lte(0);
+                                })()}
+                                className="h-9 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95 text-[10px] font-bold uppercase tracking-tight disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
                             >
-                                Selecionar
+                                {isSubmitting ? "Adicionando..." : "Selecionar"}
                             </button>
                         </div>
                     ))

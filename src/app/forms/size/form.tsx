@@ -58,6 +58,7 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
     });
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 

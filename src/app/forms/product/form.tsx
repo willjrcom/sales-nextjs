@@ -130,6 +130,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     }, [filteredSizes, replace]);
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 

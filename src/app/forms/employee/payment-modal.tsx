@@ -56,6 +56,7 @@ export default function PaymentModal({ employeeId, onClose, onSuccess }: Payment
     };
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError("Verifique os campos obrigatórios");
     };
 

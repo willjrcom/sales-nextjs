@@ -159,6 +159,7 @@ const ClientForm = ({ item, isUpdate }: CreateFormsProps<Client>) => {
     }
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Formulário inválido. Verifique os campos obrigatórios.');
     }
 

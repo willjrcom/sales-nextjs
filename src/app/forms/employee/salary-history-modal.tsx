@@ -58,6 +58,7 @@ export default function SalaryHistoryModal({ employeeId, onClose, onSuccess }: S
     };
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError("Verifique os campos obrigatórios");
     };
 

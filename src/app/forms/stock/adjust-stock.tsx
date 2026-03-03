@@ -41,6 +41,7 @@ const AdjustStockForm = ({ stock }: AdjustStockFormProps) => {
     const formData = watch();
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 

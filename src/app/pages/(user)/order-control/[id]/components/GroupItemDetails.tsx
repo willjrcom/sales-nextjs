@@ -32,6 +32,8 @@ export const GroupItemDetails = ({ groupItem, isStaging }: GroupItemDetailsProps
     const handleOpenComplementModal = () => {
         // Set current group item so ListComplementItems can use it
         queryClient.setQueryData(['group-item', 'current'], groupItem);
+        // Invalidate stocks to ensure fresh data when modal opens
+        queryClient.invalidateQueries({ queryKey: ['stocks'] });
         setComplementModalOpen(true);
     };
 

@@ -72,6 +72,11 @@ const CompanyCategoryForm = ({ item, isUpdate }: CreateFormsProps<CompanyCategor
         }
     });
 
+    const onInvalid = () => {
+        console.log(errors);
+        notifyError('Verifique os campos obrigatórios');
+    };
+
     const onSubmit = (formData: CompanyCategoryFormData) => {
         if (!data) return;
 
@@ -120,7 +125,7 @@ const CompanyCategoryForm = ({ item, isUpdate }: CreateFormsProps<CompanyCategor
                 <ButtonsModal
                     item={item || { id: '', name: '', image_path: '' }}
                     name="Categoria de Cliente"
-                    onSubmit={handleSubmit(onSubmit)}
+                    onSubmit={handleSubmit(onSubmit, onInvalid)}
                     deleteItem={isUpdate ? onDelete : undefined}
                     isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || isSubmitting}
                 />

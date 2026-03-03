@@ -84,6 +84,11 @@ const SponsorForm = ({ item, isUpdate }: CreateFormsProps<Sponsor>) => {
         }
     });
 
+    const onInvalid = () => {
+        console.log(errors);
+        notifyError('Verifique os campos obrigatórios');
+    };
+
     const onSubmit = (formData: SponsorFormData) => {
         if (!data) return;
 
@@ -190,7 +195,7 @@ const SponsorForm = ({ item, isUpdate }: CreateFormsProps<Sponsor>) => {
                 <ButtonsModal
                     item={item || { id: '', name: '', cnpj: '' }}
                     name="Patrocinador"
-                    onSubmit={handleSubmit(onSubmit) as any}
+                    onSubmit={handleSubmit(onSubmit, onInvalid) as any}
                     deleteItem={isUpdate ? onDelete : undefined}
                     isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || isSubmitting}
                 />

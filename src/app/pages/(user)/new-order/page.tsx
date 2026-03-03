@@ -17,9 +17,33 @@ const PageNewOrder = () => {
   });
 
   const isEnabled = (key: string) => {
-    if (!company) return true; // Default to enabled while loading or if not found
+    if (!company) return true;
     return company.preferences[key] === 'true';
   };
+
+  const isStoreOpen = () => {
+    if (!company || !company.schedules || company.schedules.length === 0) return true;
+
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ...
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    const daySchedule = company.schedules.find((s: any) => s.day_of_week === dayOfWeek);
+    if (!daySchedule) return true; // Default to open if no schedule for today
+
+    if (!daySchedule.is_open) return false;
+    if (!daySchedule.hours || daySchedule.hours.length === 0) return true;
+
+    return daySchedule.hours.some((h: any) => {
+      const [startHour, startMin] = h.opening_time.split(':').map(Number);
+      const [endHour, endMin] = h.closing_time.split(':').map(Number);
+      const startTime = startHour * 60 + startMin;
+      const endTime = endHour * 60 + endMin;
+      return currentTime >= startTime && currentTime <= endTime;
+    });
+  };
+
+  const isOpen = isStoreOpen();
 
   const options = [
     {
@@ -29,7 +53,8 @@ const PageNewOrder = () => {
       icon: <Utensils className="w-12 h-12 text-blue-600" />,
       route: "/pages/new-order/table",
       color: "blue",
-      disabled: !isEnabled('enable_table')
+      disabled: !isEnabled('enable_table') || !isOpen,
+      reason: !isOpen ? "Fora do horário de funcionamento" : "Desativado nas preferências"
     },
     {
       id: "entrega",
@@ -38,7 +63,8 @@ const PageNewOrder = () => {
       icon: <Bike className="w-12 h-12 text-green-600" />,
       route: "/pages/new-order/delivery",
       color: "green",
-      disabled: !isEnabled('enable_delivery')
+      disabled: !isEnabled('enable_delivery') || !isOpen,
+      reason: !isOpen ? "Fora do horário de funcionamento" : "Desativado nas preferências"
     },
     {
       id: "balcao",
@@ -47,7 +73,8 @@ const PageNewOrder = () => {
       icon: <ShoppingBag className="w-12 h-12 text-orange-600" />,
       route: "/pages/new-order/pickup",
       color: "orange",
-      disabled: !isEnabled('enable_pickup')
+      disabled: !isEnabled('enable_pickup') || !isOpen,
+      reason: !isOpen ? "Fora do horário de funcionamento" : "Desativado nas preferências"
     },
   ];
 
@@ -110,7 +137,7 @@ const PageNewOrder = () => {
                     </div>
                   ) : (
                     <div className="text-gray-400 text-sm font-medium italic">
-                      Habilite nas configurações da empresa
+                      {option.reason}
                     </div>
                   )}
                 </CardContent>

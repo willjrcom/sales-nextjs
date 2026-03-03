@@ -99,6 +99,11 @@ const AdvertisingForm = ({ item, isUpdate }: CreateFormsProps<Advertising>) => {
         }
     });
 
+    const onInvalid = () => {
+        console.log(errors);
+        notifyError('Verifique os campos obrigatórios');
+    };
+
     const onSubmit = (formData: AdvertisingFormData) => {
         if (!data) return;
 
@@ -233,7 +238,7 @@ const AdvertisingForm = ({ item, isUpdate }: CreateFormsProps<Advertising>) => {
                 <ButtonsModal
                     item={item || { id: '', title: '' }}
                     name="Propaganda"
-                    onSubmit={handleSubmit(onSubmit)}
+                    onSubmit={handleSubmit(onSubmit, onInvalid)}
                     deleteItem={isUpdate ? onDelete : undefined}
                     isPending={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || isSubmitting}
                 />

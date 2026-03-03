@@ -49,6 +49,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const table = watch();
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 

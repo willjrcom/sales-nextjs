@@ -127,6 +127,7 @@ const ClientAddressForm = ({ item, deliveryId }: UpdateAddressOrderProps) => {
     }
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Formulário inválido. Verifique os campos obrigatórios.');
     }
 

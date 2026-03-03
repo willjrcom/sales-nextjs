@@ -33,7 +33,7 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
         handleSubmit,
         setValue,
         watch,
-        formState: { isSubmitting }
+        formState: { isSubmitting, errors }
     } = useForm({
         defaultValues: {
             ...item,
@@ -72,6 +72,7 @@ export default function EmployeeInfoTab({ item }: EmployeeInfoTabProps) {
     }
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Formulário incompleto. Verifique os campos obrigatórios.');
     };
 

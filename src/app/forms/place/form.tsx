@@ -47,6 +47,7 @@ const PlaceForm = ({ item, isUpdate }: CreateFormsProps<Place>) => {
     const place = watch();
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 

@@ -18,6 +18,7 @@ export default class Company {
   is_blocked: boolean = false;
   image_path: string = '';
   categories: CompanyCategory[] = [];
+  schedules: Schedule[] = [];
 
   monthly_payment_due_day?: number;
   monthly_payment_due_day_updated_at?: string;
@@ -42,6 +43,14 @@ export const SchemaCompany = z.object({
   preferences: z.record(z.string()).optional(),
   address: z.any().optional(),
   monthly_payment_due_day: z.number().optional(),
+  schedules: z.array(z.object({
+    day_of_week: z.number(),
+    is_open: z.boolean(),
+    hours: z.array(z.object({
+      opening_time: z.string(),
+      closing_time: z.string()
+    }))
+  })).optional(),
 });
 
 export const SchemaCompanyUpdate = SchemaCompany.extend({
@@ -69,3 +78,14 @@ export const ValidateCompanyForm = (company: Company) => {
   }
   return {};
 };
+
+export interface Schedule {
+  day_of_week: number;
+  is_open: boolean;
+  hours: BusinessHour[];
+}
+
+export interface BusinessHour {
+  opening_time: string;
+  closing_time: string;
+}

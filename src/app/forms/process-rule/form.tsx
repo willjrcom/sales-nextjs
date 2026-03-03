@@ -76,6 +76,7 @@ const ProcessRuleForm = ({ item, isUpdate, category, onSuccess }: ProcessRuleFor
     }, [processRulesByCategory, processRule.order, processRule.id]);
 
     const onInvalid = () => {
+        console.log(errors);
         notifyError('Verifique os campos obrigatórios');
     };
 
