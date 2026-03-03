@@ -11,7 +11,6 @@ export default class StockMovement {
     order_id?: string;
     employee_id?: string;
     price: Decimal = new Decimal(0);
-    total_price: Decimal = new Decimal(0);
     created_at: string = '';
     product?: Product;
 
@@ -24,7 +23,7 @@ export const SchemaAddStockMovement = z.object({
     quantity: z.coerce.number().gt(0, 'Quantidade deve ser maior que 0'),
     reason: z.string().min(1, 'Motivo é obrigatório').max(255, 'Motivo deve ter no máximo 255 caracteres'),
     price: z.coerce.number().gt(0, 'Custo unitário deve ser maior que 0'),
-    total_price: z.coerce.number().gt(0, 'Custo total deve ser maior que 0'),
+    expires_at: z.string().optional(),
 });
 
 export type AddStockMovementFormData = z.infer<typeof SchemaAddStockMovement>;

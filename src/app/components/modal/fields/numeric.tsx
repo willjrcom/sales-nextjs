@@ -5,8 +5,8 @@ interface NumericFieldProps {
     name: string;
     placeholder?: string;
     disabled?: boolean;
-    value: number;
-    setValue: (value: number) => void;
+    value: number | null;
+    setValue: (value: number | null) => void;
     optional?: boolean;
 }
 
@@ -29,8 +29,15 @@ const NumericField = ({ friendlyName, name, disabled, value, setValue, placehold
                 id={name}
                 name={name}
                 disabled={disabled}
-                value={value}
-                onValueChange={(values) => setValue(values.floatValue || 0)}  // Garante que estamos passando um número
+                value={value === null ? undefined : value}
+                allowEmptyFormatting
+                onValueChange={(values) => {
+                    if (values.value === "") {
+                        setValue(null);
+                        return;
+                    }
+                    setValue(values.floatValue ?? 0);
+                }}
                 placeholder={placeholder}
                 className={InputClassName}
             />

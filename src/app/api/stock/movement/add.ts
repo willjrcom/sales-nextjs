@@ -10,7 +10,7 @@ export interface AddStockRequest {
     employee_id?: string;
     quantity: Decimal;
     price: Decimal;
-    total_price: Decimal;
+    expires_at?: string;
 }
 
 const AddStock = async (id: string, movement: AddStockRequest, session: Session): Promise<StockMovement> => {

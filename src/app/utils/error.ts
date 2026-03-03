@@ -51,6 +51,9 @@ const errorTranslations: Record<string, string> = {
     "no pending costs found": "Nenhum custo pendente encontrado",
     "fiscal invoice functionality is not enabled for this company": "A funcionalidade de nota fiscal não está habilitada para esta empresa",
     "start change must be higher than 0": "O valor inicial do caixa deve ser maior que 0",
+    "order delivery is disabled": "A entrega do pedido está desabilitada",
+    "order table is disabled": "A mesa do pedido está desabilitada",
+    "order pickup is disabled": "A retirada do pedido está desabilitada",
 
     // Erros de Pedido (Order)
     "order must have at least one item": "O pedido deve ter pelo menos um item",

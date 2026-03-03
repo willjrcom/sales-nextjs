@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 
 const GetAllAlerts = async (session: Session): Promise<StockAlert[]> => {
     const response = await RequestApi<null, StockAlert[]>({
-        path: "/stock/alerts", 
+        path: "/stock/alerts",
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -14,7 +14,7 @@ const GetAllAlerts = async (session: Session): Promise<StockAlert[]> => {
 
 const GetAlertByID = async (id: string, session: Session): Promise<StockAlert> => {
     const response = await RequestApi<null, StockAlert>({
-        path: `/stock/alerts/${id}`, 
+        path: `/stock/alerts/${id}`,
         method: "GET",
         headers: AddAccessToken(session),
     });
@@ -24,7 +24,7 @@ const GetAlertByID = async (id: string, session: Session): Promise<StockAlert> =
 
 const ResolveAlert = async (id: string, session: Session): Promise<void> => {
     await RequestApi<null, void>({
-        path: `/stock/alerts/${id}/resolve`, 
+        path: `/stock/alerts/${id}/resolve`,
         method: "PUT",
         headers: AddAccessToken(session),
     });
@@ -32,8 +32,26 @@ const ResolveAlert = async (id: string, session: Session): Promise<void> => {
 
 const DeleteAlert = async (id: string, session: Session): Promise<void> => {
     await RequestApi<null, void>({
-        path: `/stock/alerts/${id}`, 
+        path: `/stock/alerts/${id}`,
         method: "DELETE",
+        headers: AddAccessToken(session),
+    });
+};
+
+const GetExpiryAlerts = async (session: Session): Promise<StockAlert[]> => {
+    const response = await RequestApi<null, StockAlert[]>({
+        path: `/stock/alerts/expiry`,
+        method: "GET",
+        headers: AddAccessToken(session),
+    });
+
+    return response.data
+};
+
+const TriggerExpiryCheck = async (days: number, session: Session): Promise<void> => {
+    await RequestApi<null, void>({
+        path: `/stock/alerts/expiry/check?days=${days}`,
+        method: "POST",
         headers: AddAccessToken(session),
     });
 };
@@ -42,5 +60,7 @@ export {
     GetAllAlerts,
     GetAlertByID,
     ResolveAlert,
-    DeleteAlert
+    DeleteAlert,
+    GetExpiryAlerts,
+    TriggerExpiryCheck,
 }; 

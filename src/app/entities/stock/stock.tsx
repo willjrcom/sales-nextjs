@@ -7,6 +7,7 @@ export default class Stock {
     product_id: string = '';
     product_variation_id?: string;
     current_stock: Decimal = new Decimal(0);
+    reserved_stock: Decimal = new Decimal(0);
     min_stock: Decimal = new Decimal(0);
     max_stock: Decimal = new Decimal(1000);
     unit: string = '';

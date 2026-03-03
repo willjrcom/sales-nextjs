@@ -2,10 +2,10 @@
 
 import React, { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { GetAllAlerts, ResolveAlert, DeleteAlert } from '@/app/api/stock/alerts';
+import { GetAllAlerts, ResolveAlert, DeleteAlert, TriggerExpiryCheck } from '@/app/api/stock/alerts';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
 import RequestError from '@/app/utils/error';
-import { FaCheck, FaTrash } from 'react-icons/fa';
+import { FaCheck, FaTrash, FaClock } from 'react-icons/fa';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Refresh, { FormatRefreshTime } from '../crud/refresh';
 
@@ -13,6 +13,7 @@ const StockAlerts = () => {
     const { data } = useSession();
     const queryClient = useQueryClient();
     const [lastUpdate, setLastUpdate] = useState<string>(FormatRefreshTime(new Date()));
+    const [isCheckingExpiry, setIsCheckingExpiry] = useState(false);
 
     const { isFetching, isLoading, data: stockAlertsResponse, refetch } = useQuery({
         queryKey: ['stock-alerts'],
@@ -40,7 +41,6 @@ const StockAlerts = () => {
 
     const handleDeleteAlert = async (alertId: string) => {
         if (!data) return;
-
         try {
             await DeleteAlert(alertId, data);
             queryClient.invalidateQueries({ queryKey: ['stock-alerts'] });
@@ -48,6 +48,21 @@ const StockAlerts = () => {
         } catch (error) {
             const err = error as RequestError;
             notifyError(err.message || 'Erro ao remover alerta');
+        }
+    };
+
+    const handleCheckExpiry = async () => {
+        if (!data) return;
+        setIsCheckingExpiry(true);
+        try {
+            await TriggerExpiryCheck(30, data);
+            queryClient.invalidateQueries({ queryKey: ['stock-alerts'] });
+            notifySuccess('Verificação de vencimentos concluída');
+        } catch (error) {
+            const err = error as RequestError;
+            notifyError(err.message || 'Erro ao verificar vencimentos');
+        } finally {
+            setIsCheckingExpiry(false);
         }
     };
 
@@ -59,6 +74,10 @@ const StockAlerts = () => {
                 return 'bg-red-100 text-red-800';
             case 'over_stock':
                 return 'bg-blue-100 text-blue-800';
+            case 'near_expiration':
+                return 'bg-orange-100 text-orange-800';
+            case 'expired':
+                return 'bg-red-200 text-red-900';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
@@ -72,6 +91,10 @@ const StockAlerts = () => {
                 return 'Sem Estoque';
             case 'over_stock':
                 return 'Estoque Alto';
+            case 'near_expiration':
+                return 'Próximo do Vencimento';
+            case 'expired':
+                return 'Lote Vencido';
             default:
                 return 'Alerta';
         }
@@ -84,7 +107,18 @@ const StockAlerts = () => {
         <div className="p-6">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold mb-4">Alertas de Estoque</h2>
-                <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleCheckExpiry}
+                        disabled={isCheckingExpiry}
+                        title="Verificar vencimentos dos lotes"
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm rounded border hover:bg-orange-50 text-orange-700 border-orange-300 disabled:opacity-50"
+                    >
+                        <FaClock className="text-orange-500" />
+                        {isCheckingExpiry ? 'Verificando...' : 'Verificar vencimentos'}
+                    </button>
+                    <Refresh onRefresh={refetch} isFetching={isFetching} lastUpdate={lastUpdate} />
+                </div>
             </div>
 
             {isLoading && (

@@ -1,5 +1,4 @@
 
-import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
@@ -145,6 +144,10 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
     };
 
     const hasItems = Object.keys(groupedItems).length > 0;
+    const hasStagingGroupItems = order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0);
+    const hasIncompleteGroupItems = order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)
+    const canSubmitOrder = hasStagingGroupItems && !hasIncompleteGroupItems
+    const isOpenedOrder = order?.status !== 'Finished' && order?.status !== 'Cancelled' // IS DIFFERENT OF GFOOD APP !!!!!!!!!
 
     const GoToMenu = () => {
         setView('menu');
@@ -170,11 +173,11 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                     </Card>
                 ) : (
                     <>
-                        {(order?.status === 'Staging' || (order?.table && order?.table.status === 'Pending')) && (
+                        {isOpenedOrder && (
                             <Button
                                 className='mt-3 w-full'
                                 variant='outline'
-                                disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
+                                disabled={hasIncompleteGroupItems}
                                 onClick={handleAddNewGroup}
                             >
                                 Adicionar mais itens
@@ -229,7 +232,7 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                                         Adicionar
                                                     </button>
                                                 )}
-                                                {groupItem.status !== 'Staging' && groupItem.status !== 'Cancelled' && (
+                                                {groupItem.status !== 'Staging' && groupItem.status !== 'Cancelled' && order.status !== 'Finished' && order.status !== 'Cancelled' && (
                                                     <button
                                                         onClick={() => setGroupToCancel({ id: groupItem.id, category: category?.name || 'Grupo' })}
                                                         className='flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-medium px-2 py-1 rounded bg-red-50 transition-colors'
@@ -328,38 +331,37 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
                                 <p className='text-2xl font-extrabold text-blue-600'>R$ {total.toFixed(2)}</p>
                             </div>
 
-                            {
-                                <>
-                                    <div className="space-y-3 mt-6">
-                                        {(order?.status === 'Staging' || (order?.table && order?.table.status === 'Pending')) && order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0) ? (
-                                            order.group_items.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1) ? (
-                                                <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-800 text-sm font-medium flex items-center gap-2">
-                                                    <span className="material-symbols-outlined text-orange-500 text-lg">warning</span>
-                                                    Finalize os itens fracionados incompletos para enviar o pedido.
-                                                </div>
-                                            ) : (
-                                                <Button className='w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
-                                                    {order.table ? '👨‍🍳 Enviar para Cozinha' : '🚀 Enviar pedido'}
-                                                </Button>
-                                            )
-                                        ) : (
-                                            <Button className='w-full h-12 text-lg bg-blue-500 hover:bg-blue-600' onClick={() => setView('checkout')}>
-                                                🔍 Ver pedido
-                                            </Button>
-                                        )}
+                            <div className="space-y-3 mt-6">
+                                {hasIncompleteGroupItems && (
+                                    <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-800 text-sm font-medium flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-orange-500 text-lg">warning</span>
+                                        Finalize os itens fracionados incompletos para enviar o pedido.
                                     </div>
+                                )}
 
-                                    {(order?.status === 'Staging' || (order?.table && order?.table.status === 'Pending')) && (
-                                        <Button
-                                            className='mt-3 w-full'
-                                            variant='outline'
-                                            disabled={order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)}
-                                            onClick={handleAddNewGroup}
-                                        >
-                                            Adicionar mais itens
-                                        </Button>
-                                    )}
-                                </>}
+                                {canSubmitOrder && (
+                                    <Button className='w-full h-12 text-lg bg-green-500 hover:bg-green-600' onClick={() => setView('checkout')}>
+                                        {order?.table ? '👨‍🍳 Enviar para Cozinha' : '🚀 Enviar pedido'}
+                                    </Button>
+                                )}
+
+                                {!hasIncompleteGroupItems && !canSubmitOrder && (
+                                    <Button className='w-full h-12 text-lg bg-blue-500 hover:bg-blue-600' onClick={() => setView('checkout')}>
+                                        🔍 Ver Pedido
+                                    </Button>
+                                )}
+                            </div>
+
+                            {isOpenedOrder && (
+                                <Button
+                                    className='mt-3 w-full'
+                                    variant='outline'
+                                    disabled={hasIncompleteGroupItems}
+                                    onClick={handleAddNewGroup}
+                                >
+                                    Adicionar mais itens
+                                </Button>
+                            )}
                         </Card>
                     </>
                 )}

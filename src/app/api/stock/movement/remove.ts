@@ -10,7 +10,6 @@ export interface RemoveStockRequest {
     employee_id?: string;
     quantity: Decimal;
     price: Decimal;
-    total_price: Decimal;
 }
 
 const RemoveStock = async (id: string, movement: RemoveStockRequest, session: Session): Promise<StockMovement> => {

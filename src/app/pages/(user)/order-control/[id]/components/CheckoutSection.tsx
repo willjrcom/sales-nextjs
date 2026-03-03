@@ -39,6 +39,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
     const modalHandler = useModal();
     const [paymentMethod, setPaymentMethod] = useState<string>('Dinheiro');
     const [changeFor, setChangeFor] = useState<string>('');
+    const [hasPaymentChanges, setHasPaymentChanges] = useState(false);
 
     const { data: company } = useQuery({
         queryKey: ['company'],
@@ -59,6 +60,9 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
         if (order?.delivery) {
             setPaymentMethod(order.delivery.payment_method || 'Dinheiro');
             setChangeFor(order.delivery.change ? new Decimal(order.delivery.change).toFixed(2) : '');
+            setHasPaymentChanges(false);
+        } else {
+            setHasPaymentChanges(false);
         }
     }, [order]);
 
@@ -71,6 +75,8 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
+            setHasPaymentChanges(false);
+            notifySuccess('Forma de pagamento salva');
         },
         onError: (error: any) => {
             notifyError(error?.message || 'Erro ao atualizar pagamento');
@@ -95,20 +101,13 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
 
     const handlePaymentChange = async (method: string) => {
         setPaymentMethod(method);
-        // Auto update when changing method? Or wait? 
-        // gfood Logic updates on blur or submit. Let's update state only here.
-    };
-
-    const handleChangeForBlur = () => {
-        if (paymentMethod === 'Dinheiro' && changeFor) {
-            updatePaymentMutation.mutate();
-        }
+        setHasPaymentChanges(true);
     };
 
     const handleSubmitOrder = () => {
-        // Ensure payment is saved before submitting
-        if (order?.delivery && paymentMethod !== order.delivery.payment_method) {
-            updatePaymentMutation.mutate();
+        if (order?.delivery && hasPaymentChanges) {
+            notifyError('Salve a forma de pagamento antes de enviar o pedido.');
+            return;
         }
         submitOrderMutation.mutate();
     };
@@ -148,6 +147,12 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
     const fees = order.fees || [];
     const client = order.delivery?.client;
     const address = client?.address;
+
+    const hasStagingGroupItems = order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0);
+    const hasIncompleteGroupItems = order?.group_items?.some(g => g.status === 'Staging' && g.items?.length > 0 && g.quantity < 1)
+    const canSubmitOrder = hasStagingGroupItems && !hasIncompleteGroupItems
+    const requireSavedPayment = Boolean(order.delivery);
+    const canShowSubmitButton = canSubmitOrder && (!requireSavedPayment || !hasPaymentChanges);
 
     return (
         <div className='min-h-screen bg-gray-50 pb-24 pt-4'>
@@ -335,9 +340,7 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                     value={paymentMethod}
                                     onChange={(e) => {
                                         handlePaymentChange(e.target.value);
-                                        // updatePaymentMutation.mutate(); // wait for blur/submit? or instant?
                                     }}
-                                    onBlur={() => updatePaymentMutation.mutate()} // Trigger update on blur of select
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
                                 >
                                     {payMethodsWithId.map((method: { id: string, name: string }) => (
@@ -362,9 +365,9 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                             const value = e.target.value.replace(',', '.');
                                             if (/^\d*\.?\d{0,2}$/.test(value)) {
                                                 setChangeFor(value);
+                                                setHasPaymentChanges(true);
                                             }
                                         }}
-                                        onBlur={handleChangeForBlur}
                                         placeholder='R$ 0,00'
                                         className='text-base'
                                     />
@@ -373,13 +376,27 @@ export function CheckoutSection({ orderID, setView }: CheckoutSectionProps) {
                                     </p>
                                 </div>
                             )}
+
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => updatePaymentMutation.mutate()}
+                                disabled={!hasPaymentChanges || updatePaymentMutation.isPending}
+                            >
+                                {updatePaymentMutation.isPending ? 'Salvando...' : 'Salvar forma de pagamento'}
+                            </Button>
+                            {hasPaymentChanges && (
+                                <p className="text-xs text-amber-600 text-center">
+                                    Salve a forma de pagamento para liberar o envio.
+                                </p>
+                            )}
                         </div>
                     </Card>
                 )}
 
 
                 {/* Submit Button */}
-                {(order.status === 'Staging' || (order.table && order.table.status === 'Pending')) && (
+                {canShowSubmitButton && (
                     <Button
                         size='lg'
                         className='w-full h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold text-lg shadow-lg'

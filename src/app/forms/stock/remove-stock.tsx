@@ -67,7 +67,6 @@ const RemoveStockForm = ({ stock }: RemoveStockFormProps) => {
             quantity: new Decimal(data.quantity),
             reason: data.reason,
             price: new Decimal(0),
-            total_price: new Decimal(0),
             new_stock: 0,
         } as RemoveStockRequest;
 

@@ -871,7 +871,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             </ButtonIconText>
                         )}
 
-                        {!editBlocked && !isOrderStatusCancelled && (
+                        {!editBlocked && !isOrderStatusCancelled && !isOrderStatusFinished && (
                             <ButtonIconText modalName={"cancel-order-" + order.id} title="Cancelar" size="md" color="red" icon={X} className="flex-1 md:flex-none">
                                 <div className="space-y-6 py-4">
                                     <div className="text-center space-y-2">

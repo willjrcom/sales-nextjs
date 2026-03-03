@@ -38,7 +38,7 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
             quantity: 0,
             reason: '',
             price: 0,
-            total_price: 0,
+            expires_at: '',
         }
     });
 
@@ -70,8 +70,8 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
             quantity: new Decimal(data.quantity),
             reason: data.reason,
             price: new Decimal(data.price),
-            total_price: new Decimal(data.total_price),
             new_stock: 0,
+            expires_at: data.expires_at || undefined,
         } as AddStockRequest;
 
         createMutation.mutate(request);
@@ -104,13 +104,17 @@ const AddStockForm = ({ stock }: AddStockFormProps) => {
                 error={errors.price?.message}
             />
 
-            <PriceField
-                friendlyName="Custo Total"
-                name="total_price"
-                setValue={(value: any) => setValue('total_price', value)}
-                value={formData.total_price.toString()}
-                error={errors.total_price?.message}
-            />
+
+
+            <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Data de Validade (opcional)</label>
+                <input
+                    type="date"
+                    value={formData.expires_at || ''}
+                    onChange={(e) => setValue('expires_at', e.target.value)}
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
 
             <ButtonsModal
                 item={{ ...formData, id: stock?.id || '' }}

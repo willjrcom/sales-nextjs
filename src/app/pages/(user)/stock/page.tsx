@@ -55,6 +55,10 @@ const PageStock = () => {
             filteredStocks = filteredStocks.filter(s => new Decimal(s?.current_stock || 0).lessThanOrEqualTo(0));
         }
 
+        if (stockFilter === "reserved") {
+            filteredStocks = filteredStocks.filter(s => new Decimal(s?.reserved_stock || 0).greaterThan(0));
+        }
+
         // IMPORTANTÍSSIMO:
         // sort muta o array, então clona antes
         return [...filteredStocks].sort((a, b) => (a.product?.name || '').localeCompare(b.product?.name || ''));
@@ -95,7 +99,8 @@ const PageStock = () => {
                         values={[
                             { id: "all", name: "Mostrar Todos" },
                             { id: "low", name: "Estoque Baixo" },
-                            { id: "out", name: "Sem Estoque" }
+                            { id: "out", name: "Sem Estoque" },
+                            { id: "reserved", name: "Com Reserva" },
                         ]}
                     />
                 }

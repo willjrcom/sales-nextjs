@@ -34,7 +34,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
   const queryClient = useQueryClient();
   const { data } = useSession();
   const [product, setProduct] = useState<Product>(new Product(item));
-  const [quantity, setQuantity] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number | null>(1);
   const [observation, setObservation] = useState('');
   const [reloadProduct, setReloadProduct] = useState(false);
   const [selectedFlavor, setSelectedFlavor] = useState<string | null>(item?.flavors?.[0] || null);
@@ -117,6 +117,31 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
 
   const stocks = useMemo(() => stocksResponse || [], [stocksResponse]);
 
+  const selectedVariationStock = useMemo(() => {
+    if (!selectedVariation || stocks.length === 0) return null;
+    const stockRecord =
+      stocks.find(stock => stock.product_variation_id === selectedVariation.id) ||
+      stocks.find(stock => !stock.product_variation_id);
+
+    if (!stockRecord) return null;
+
+    try {
+      return new Decimal(stockRecord.current_stock ?? 0);
+    } catch {
+      return null;
+    }
+  }, [selectedVariation, stocks]);
+
+  const isStockInsufficient = useMemo(() => {
+    if (!selectedVariationStock) return false;
+    return new Decimal(quantity ?? 0).greaterThan(selectedVariationStock);
+  }, [selectedVariationStock, quantity]);
+
+  const remainingStockAfterAdd = useMemo(() => {
+    if (!selectedVariationStock) return null;
+    return selectedVariationStock.minus(new Decimal(quantity ?? 0));
+  }, [selectedVariationStock, quantity]);
+
   const getStockAvailability = (productId: string, variationId: string) => {
     const stock = stocks.find(s =>
       s.product_id === productId &&
@@ -177,11 +202,11 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
 
   const isQuantityExceeded = useMemo(() => {
     if (!currentGroupItem || !currentGroupItem.id) return false;
-    return currentFilledQty.plus(new Decimal(quantity)).greaterThan(1);
+    return currentFilledQty.plus(new Decimal(quantity ?? 0)).greaterThan(1);
   }, [currentGroupItem, currentFilledQty, quantity]);
 
   const isFractional = useMemo(() => {
-    return !new Decimal(quantity || 0).isInteger();
+    return !new Decimal(quantity ?? 0).isInteger();
   }, [quantity]);
 
   const showFractionalWarning = useMemo(() => {
@@ -193,14 +218,16 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
     if (isBlockedByFractional) return false;
     if (isQuantityExceeded) return false;
     if (showFractionalWarning) return false;
+    if (!quantity || quantity <= 0) return false;
     if (!selectedVariation || !selectedVariation.is_available) return false;
+    if (isStockInsufficient) return false;
     return true;
-  }, [isSubmitting, isBlockedByFractional, isQuantityExceeded, selectedVariation, showFractionalWarning]);
+  }, [isSubmitting, isBlockedByFractional, isQuantityExceeded, selectedVariation, showFractionalWarning, isStockInsufficient, quantity]);
 
   const submit = async () => {
     if (!data) return;
 
-    if (quantity <= 0) return notifyError("Selecione uma quantidade válida");
+    if (!quantity || quantity <= 0) return notifyError("Selecione uma quantidade válida");
 
     if (showFractionalWarning) {
       return notifyError("Esta categoria não permite números com vírgula.");
@@ -221,13 +248,18 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
       return;
     }
 
+    if (isStockInsufficient) {
+      notifyError(`Estoque insuficiente para esta quantidade. Disponível: ${selectedVariationStock?.toFixed(2) ?? 0}`);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const body = {
         product_id: product.id,
         variation_id: selectedVariationId, // Pass variation ID
-        quantity: quantity,
+        quantity: quantity ?? 0,
         order_id: order?.id,
         group_item_id: groupItem?.id,
         observation: observation,
@@ -271,6 +303,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
     } catch (error) {
       const err = error as RequestError;
       notifyError(err.message || 'Erro ao adicionar item');
+      await queryClient.invalidateQueries({ queryKey: ['stocks', 'product', item.id] });
     } finally {
       setIsSubmitting(false);
     }
@@ -289,7 +322,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
       price = new Decimal(selectedVariation.price);
     }
 
-    let total = price.times(quantity);
+    let total = price.times(quantity ?? 0);
 
     // Add additionals cost
     Object.entries(selectedAdditionals).forEach(([productId, addQty]) => {
@@ -514,6 +547,16 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
 
             {/* Quantity Selector */}
             <NumericField name="quantity" friendlyName="Quantidade" placeholder="Digite a quantidade" setValue={setQuantity} value={quantity} />
+            {isStockInsufficient && (
+              <p className="text-red-600 text-[10px] font-bold -mt-3 mb-3 text-center">
+                Estoque insuficiente. Disponível: {selectedVariationStock?.toFixed(2) ?? '0,00'}
+              </p>
+            )}
+            {!isStockInsufficient && selectedVariationStock && (quantity ?? 0) > 0 && (
+              <p className="text-[11px] text-gray-500 -mt-3 mb-3 text-center">
+                Estoque disponível: {selectedVariationStock.toFixed(2)} • Restará após adicionar: {Decimal.max(remainingStockAfterAdd || new Decimal(0), new Decimal(0)).toFixed(2)}
+              </p>
+            )}
             {isQuantityExceeded && (
               <p className="text-red-600 text-[10px] font-bold mt-2 animate-pulse text-center">
                 Limite do grupo excedido! (Ocupado: {currentFilledQty.toNumber()}, Disponível: {new Decimal(1).minus(currentFilledQty).toNumber()})
@@ -576,6 +619,8 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
                   <span>Finalize o item fracionado primeiro</span>
                 ) : isQuantityExceeded ? (
                   <span>Quantidade excede o limite (1.0)</span>
+                ) : isStockInsufficient ? (
+                  <span>Estoque insuficiente</span>
                 ) : (
                   <>
                     <span>Adicionar ao Carrinho</span>

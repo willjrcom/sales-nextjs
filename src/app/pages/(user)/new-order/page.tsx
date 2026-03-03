@@ -2,10 +2,25 @@
 
 import Link from "next/link";
 import React from "react";
-import { Utensils, Bike, ShoppingBag, ArrowRight } from "lucide-react";
+import { Utensils, Bike, ShoppingBag, ArrowRight, Lock as LockIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useQuery } from '@tanstack/react-query';
+import { useSession } from "next-auth/react";
+import GetCompany from "@/app/api/company/company";
 
 const PageNewOrder = () => {
+  const { data: session } = useSession();
+  const { data: company, isLoading } = useQuery({
+    queryKey: ['company'],
+    queryFn: () => GetCompany(session as any),
+    enabled: !!session,
+  });
+
+  const isEnabled = (key: string) => {
+    if (!company) return true; // Default to enabled while loading or if not found
+    return company.preferences[key] === 'true';
+  };
+
   const options = [
     {
       id: "mesa",
@@ -13,7 +28,8 @@ const PageNewOrder = () => {
       description: "Atendimento presencial com controle de mesas e comandas.",
       icon: <Utensils className="w-12 h-12 text-blue-600" />,
       route: "/pages/new-order/table",
-      color: "blue"
+      color: "blue",
+      disabled: !isEnabled('enable_table')
     },
     {
       id: "entrega",
@@ -21,7 +37,8 @@ const PageNewOrder = () => {
       description: "Pedidos para entrega externa com busca de clientes e taxas.",
       icon: <Bike className="w-12 h-12 text-green-600" />,
       route: "/pages/new-order/delivery",
-      color: "green"
+      color: "green",
+      disabled: !isEnabled('enable_delivery')
     },
     {
       id: "balcao",
@@ -29,11 +46,13 @@ const PageNewOrder = () => {
       description: "Venda rápida direta no caixa para consumo ou retirada.",
       icon: <ShoppingBag className="w-12 h-12 text-orange-600" />,
       route: "/pages/new-order/pickup",
-      color: "orange"
+      color: "orange",
+      disabled: !isEnabled('enable_pickup')
     },
   ];
 
-  const getColorClasses = (color: string) => {
+  const getColorClasses = (color: string, disabled?: boolean) => {
+    if (disabled) return 'border-gray-200 bg-gray-50/50 cursor-not-allowed grayscale-[0.8]';
     switch (color) {
       case 'blue': return 'hover:border-blue-500 hover:bg-blue-50/50 shadow-blue-100';
       case 'green': return 'hover:border-green-500 hover:bg-green-50/50 shadow-green-100';
@@ -41,6 +60,14 @@ const PageNewOrder = () => {
       default: return 'hover:border-purple-500 hover:bg-purple-50/50 shadow-purple-100';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[90vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[90vh] p-4 bg-gray-50/50">
@@ -55,28 +82,55 @@ const PageNewOrder = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {options.map((option) => (
-            <Link href={option.route} key={option.id} className="group">
-              <Card className={`h-full border-2 border-transparent transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ${getColorClasses(option.color)}`}>
+          {options.map((option) => {
+            const CardContentWrapper = (
+              <Card className={`h-full border-2 transition-all duration-300 relative overflow-hidden flex flex-col ${getColorClasses(option.color, option.disabled)} ${!option.disabled ? 'group-hover:-translate-y-2 group-hover:shadow-2xl transform' : ''}`}>
+                {option.disabled && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <div className="bg-gray-200/80 backdrop-blur-sm text-gray-500 px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border border-gray-300">
+                      <LockIcon className="w-3 h-3" /> INDISPONÍVEL
+                    </div>
+                  </div>
+                )}
                 <CardHeader className="pb-2">
-                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300
+                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 ${!option.disabled ? 'group-hover:scale-110' : ''}
                     ${option.color === 'blue' ? 'bg-blue-100' : option.color === 'green' ? 'bg-green-100' : 'bg-orange-100'}`}>
                     {option.icon}
                   </div>
                   <CardTitle className="text-2xl font-bold">{option.label}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
                   <CardDescription className="text-base leading-relaxed">
                     {option.description}
                   </CardDescription>
-                  <div className={`flex items-center gap-2 font-bold transition-colors
-                    ${option.color === 'blue' ? 'text-blue-600' : option.color === 'green' ? 'text-green-600' : 'text-orange-600'}`}>
-                    Iniciar <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
+                  {!option.disabled ? (
+                    <div className={`flex items-center gap-2 font-bold transition-colors
+                                            ${option.color === 'blue' ? 'text-blue-600' : option.color === 'green' ? 'text-green-600' : 'text-orange-600'}`}>
+                      Iniciar <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  ) : (
+                    <div className="text-gray-400 text-sm font-medium italic">
+                      Habilite nas configurações da empresa
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            </Link>
-          ))}
+            );
+
+            if (option.disabled) {
+              return (
+                <div key={option.id} className="opacity-75">
+                  {CardContentWrapper}
+                </div>
+              );
+            }
+
+            return (
+              <Link href={option.route} key={option.id} className="group">
+                {CardContentWrapper}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>
