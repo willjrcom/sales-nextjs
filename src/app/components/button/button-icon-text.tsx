@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface NewButtonProps {
-    icon?: LucideIcon;
+    icon?: any;
     size?: 'sm' | 'md' | 'lg' | 'xl' | 'default';
     modalName: string;
     title?: string;

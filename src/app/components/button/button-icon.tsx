@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface NewButtonProps {
-    icon?: LucideIcon;
+    icon?: any;
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'icon';
     modalName: string;
     title?: string;
