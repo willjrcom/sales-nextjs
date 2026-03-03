@@ -30,7 +30,6 @@ const NumericField = ({ friendlyName, name, disabled, value, setValue, placehold
                 name={name}
                 disabled={disabled}
                 value={value === null ? undefined : value}
-                allowEmptyFormatting
                 onValueChange={(values) => {
                     if (values.value === "") {
                         setValue(null);

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import RequestError from "@/app/utils/error";
 import DeleteItem from "@/app/api/item/delete/item";
 import { useModal } from "@/app/context/modal/context";
@@ -17,8 +18,11 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
     const { data } = useSession();
     const modalName = "delete-item-" + item.id;
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onDelete = async () => {
         if (!data) return;
+        setIsSubmitting(true);
         try {
             const groupItemDeleted = await DeleteItem(item.id, data);
 
@@ -34,13 +38,21 @@ const DeleteItemModal = ({ item }: DeleteItemModalProps) => {
             modalHandler.hideModal(modalName);
         } catch (error: RequestError | any) {
             notifyError(error.message || "Erro ao excluir item");
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
     return (
         <>
             <div className="text-center mb-4"><h2>Tem certeza que deseja excluir {item.name}?</h2></div>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={onDelete}>Excluir</button>
+            <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+                onClick={onDelete}
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? "Excluindo..." : "Excluir"}
+            </button>
         </>
     )
 };
