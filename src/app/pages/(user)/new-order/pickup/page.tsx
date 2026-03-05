@@ -12,19 +12,39 @@ import PatternField from "@/app/components/modal/fields/pattern";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const pickupSchema = z.object({
+    orderName: z.string().min(1, "O nome ou identificação é obrigatório."),
+    contact: z.string().optional().refine(val => !val || val.length === 11, {
+        message: "Contato incompleto. Informe os 11 dígitos (DDD + número)."
+    })
+});
+
+type PickupFormData = z.infer<typeof pickupSchema>;
 
 const PageNewOrderPickup = () => {
-    const [orderName, setOrderName] = useState('');
-    const [contact, setContact] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const router = useRouter();
     const { data } = useSession();
 
-    const newOrder = async (name: string, contact: string) => {
+    const { control, handleSubmit, formState: { errors }, watch } = useForm<PickupFormData>({
+        resolver: zodResolver(pickupSchema),
+        defaultValues: {
+            orderName: '',
+            contact: ''
+        }
+    });
+
+    const orderNameValue = watch('orderName');
+
+    const newOrder = async (formData: PickupFormData) => {
         if (!data || isCreating) return
         setIsCreating(true);
         try {
-            const response = await NewOrderPickup(name, contact, data)
+            const response = await NewOrderPickup(formData.orderName, formData.contact || '', data)
             router.push('/pages/order-control/' + response.order_id)
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
@@ -60,50 +80,66 @@ const PageNewOrderPickup = () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                    <User className="w-4 h-4" /> Nome / Identificação
+                        <form onSubmit={handleSubmit(newOrder)} className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                        <User className="w-4 h-4" /> Nome / Identificação
+                                    </div>
+                                    <Controller
+                                        name="orderName"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                name={field.name}
+                                                placeholder="Ex: João da Silva ou Mesa 05"
+                                                setValue={field.onChange}
+                                                value={field.value}
+                                                error={errors.orderName?.message}
+                                            />
+                                        )}
+                                    />
                                 </div>
-                                <TextField
-                                    name="orderName"
-                                    placeholder="Ex: João da Silva ou Mesa 05"
-                                    setValue={setOrderName}
-                                    value={orderName}
-                                />
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                        <Phone className="w-4 h-4" /> Contato (Opcional)
+                                    </div>
+                                    <Controller
+                                        name="contact"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <PatternField
+                                                name={field.name}
+                                                value={field.value || ''}
+                                                setValue={field.onChange}
+                                                patternName="full-phone"
+                                                error={errors.contact?.message}
+                                                optional
+                                            />
+                                        )}
+                                    />
+                                </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                    <Phone className="w-4 h-4" /> Contato (Opcional)
-                                </div>
-                                <PatternField
-                                    name="contact"
-                                    value={contact}
-                                    setValue={setContact}
-                                    patternName="full-phone"
-                                    optional
-                                />
-                            </div>
-                        </div>
-
-                        <Button
-                            disabled={orderName.length === 0 || isCreating}
-                            onClick={() => newOrder(orderName, contact)}
-                            className="w-full h-14 text-lg font-bold shadow-lg shadow-orange-200/50 hover:shadow-orange-300/50 transform transition-all active:scale-[0.98] duration-200 bg-orange-600 hover:bg-orange-700"
-                        >
-                            {isCreating ? (
-                                <>
-                                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                                    Iniciando...
-                                </>
-                            ) : (
-                                <>
-                                    <Plus className="mr-2 h-5 w-5" />
-                                    Abrir Pedido no Balcão
-                                </>
-                            )}
-                        </Button>
+                            <Button
+                                type="submit"
+                                disabled={!orderNameValue || isCreating}
+                                className="w-full h-14 text-lg font-bold shadow-lg shadow-orange-200/50 hover:shadow-orange-300/50 transform transition-all active:scale-[0.98] duration-200 bg-orange-600 hover:bg-orange-700"
+                            >
+                                {isCreating ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                                        Iniciando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="mr-2 h-5 w-5" />
+                                        Abrir Pedido no Balcão
+                                    </>
+                                )}
+                            </Button>
+                        </form>
                     </CardContent>
                 </Card>
             </div>

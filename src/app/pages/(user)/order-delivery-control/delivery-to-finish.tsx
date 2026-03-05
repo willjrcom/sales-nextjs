@@ -11,6 +11,9 @@ import CrudTable from "@/app/components/crud/table";
 // import Address from "@/app/entities/address/address";
 import { FaCheck } from "react-icons/fa";
 import { SelectField } from "@/app/components/modal/field";
+import { Loader2, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/app/utils/format";
 import Decimal from 'decimal.js';
 import CardOrder from "@/app/components/card-order/card-order";
 import { useModal } from "@/app/context/modal/context";
@@ -207,24 +210,50 @@ export const FinishDelivery = ({ order }: FinishDeliveryProps) => {
 
     const paymentMethod = order.delivery?.payment_method || 'N/A';
     const change = order.delivery?.change ? new Decimal(order.delivery.change).toFixed(2) : '0.00';
-    const subtotal = new Decimal(order.sub_total).toFixed(2);
-    const total = new Decimal(order.total).toFixed(2);
+    const totalToReceive = new Decimal(order.total).plus(new Decimal(order.delivery?.change || 0)).toNumber();
+
     return (
-        <div>
-            <div className="space-y-2 mb-4">
-                <p className="text-sm text-gray-700">Confirma finalização da entrega?</p>
-                <p className="text-sm"><strong>Método de pagamento:</strong> {paymentMethod}</p>
-                <p className="text-sm"><strong>Troco (R$):</strong> {change}</p>
-                <p className="text-sm"><strong>Subtotal (R$):</strong> {subtotal}</p>
-                <p className="text-sm"><strong>Total a pagar (R$):</strong> {total}</p>
+        <div className="space-y-6">
+            <div className="text-center space-y-2">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8" />
+                </div>
+                <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Receber Entrega?</h2>
+                <p className="text-gray-500 font-medium">Confirma a finalização desta entrega?</p>
             </div>
-            <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50 disabled:cursor-not-allowed"
+
+            <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Método</span>
+                    <span className="font-black text-gray-800">{paymentMethod}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Total do Pedido</span>
+                    <span className="font-black text-gray-800">{formatCurrency(Number(order.total))}</span>
+                </div>
+                {new Decimal(change).gt(0) && (
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Troco p/ Cliente</span>
+                        <span className="font-black text-amber-600">{formatCurrency(Number(change))}</span>
+                    </div>
+                )}
+                <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <span className="text-emerald-600 font-black uppercase text-[12px] tracking-widest">Total a Receber</span>
+                    <div className="text-right">
+                        <span className="block text-[10px] font-bold text-emerald-600/50 uppercase tracking-tighter leading-none mb-1">(Pedido + Troco)</span>
+                        <span className="text-2xl font-black text-emerald-700">{formatCurrency(totalToReceive)}</span>
+                    </div>
+                </div>
+            </div>
+
+            <Button
                 onClick={submit}
                 disabled={isProcessing}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest h-12 rounded-xl gap-2 shadow-lg shadow-emerald-100"
             >
+                {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                 {isProcessing ? 'Confirmando...' : 'Confirmar Recebimento'}
-            </button>
+            </Button>
         </div>
     );
 };

@@ -22,11 +22,12 @@ import AddRemovedItem from "@/app/api/item/update/removed-item/add/item";
 import Image from "next/image";
 import { OrderControlView } from "@/app/pages/(user)/order-control/[id]/page";
 
-const AdditionalItemRow = ({ additional, qty, updateAdditional, session }: {
+const AdditionalItemRow = ({ additional, qty, updateAdditional, session, mainQty }: {
   additional: Product,
   qty: number,
   updateAdditional: (id: string, delta: number) => void,
-  session: any
+  session: any,
+  mainQty: number
 }) => {
   const { data: stocks } = useQuery({
     queryKey: ['stocks', 'product', additional.id],
@@ -37,7 +38,8 @@ const AdditionalItemRow = ({ additional, qty, updateAdditional, session }: {
   const variationId = additional.variations?.[0]?.id;
   const stockRecord = stocks?.find(s => s.product_variation_id === variationId) || stocks?.find(s => !s.product_variation_id);
   const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
-  const remaining = available ? available.minus(new Decimal(qty)) : null;
+  const requiredForNext = new Decimal(qty + 1).times(mainQty);
+  const isOutOfStock = available !== null && available.lt(requiredForNext);
 
   let price = new Decimal(0);
   if (additional.variations && additional.variations.length > 0) {
@@ -64,17 +66,18 @@ const AdditionalItemRow = ({ additional, qty, updateAdditional, session }: {
           {qty > 0 && <span className="font-semibold w-4 text-center">{qty}</span>}
           <button
             onClick={() => updateAdditional(additional.id, 1)}
-            disabled={(available !== null && remaining !== null && remaining.lte(0))}
-            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${qty > 0 ? 'bg-green-50 text-green-600 border border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 hover:text-gray-600'}${(available !== null && remaining !== null && remaining.lte(0)) ? ' opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isOutOfStock}
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${qty > 0 ? 'bg-green-50 text-green-600 border border-green-100 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 hover:text-gray-600'}${isOutOfStock ? ' opacity-50 cursor-not-allowed' : ''}`}
           >
             +
           </button>
         </div>
       </div>
       <div className="flex flex-col items-center mt-2 space-y-1">
-        {available && qty > 0 && (
-          <p className="text-[10px] text-gray-400 text-center italic">
-            Estoque disponível: {available.toFixed(2)} • Restará após adicionar: {Decimal.max(remaining || 0, 0).toFixed(2)}
+        {available !== null && (
+          <p className={`text-[10px] text-center italic ${isOutOfStock ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+            Estoque: {available.toFixed(2)} {qty > 0 && `• Necessário: ${new Decimal(qty).times(mainQty).toFixed(2)}`}
+            {isOutOfStock && mainQty > 1 && ` (Precisa de ${requiredForNext.toFixed(2)} para +1)`}
           </p>
         )}
       </div>
@@ -545,6 +548,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
                       qty={selectedAdditionals[additional.id] || 0}
                       updateAdditional={updateAdditional}
                       session={data}
+                      mainQty={quantity || 1}
                     />
                   ))}
                 </div>

@@ -15,21 +15,43 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const searchSchema = z.object({
+    contact: z.string().optional().refine(val => !val || val.length === 11, {
+        message: "Contato incompleto. Informe os 11 dígitos (DDD + número)."
+    })
+});
+
+type SearchFormData = z.infer<typeof searchSchema>;
 
 const PageNewOrderDelivery = () => {
-    const [contact, setContact] = useState('');
     const [client, setClient] = useState<Client | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const { data } = useSession();
 
-    const search = async () => {
+    const { control, handleSubmit, formState: { errors }, watch } = useForm<SearchFormData>({
+        resolver: zodResolver(searchSchema),
+        defaultValues: {
+            contact: ''
+        }
+    });
+
+    const contactValue = watch('contact');
+
+    const search = async (formData: SearchFormData) => {
         if (!data || isSearching) return
         setIsSearching(true);
         try {
-            const clientFound = await GetClientByContact(contact, data);
+            const clientFound = await GetClientByContact(formData.contact || '', data);
             if (clientFound.id !== '') {
                 setClient(clientFound);
+            } else {
+                notifyError('Cliente não encontrado');
+                setClient(null);
             }
 
         } catch (error: RequestError | any) {
@@ -64,33 +86,42 @@ const PageNewOrderDelivery = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <PatternField
-                                patternName="full-phone"
-                                name="contato"
-                                placeholder="Ex: (11) 99999-9999"
-                                setValue={setContact}
-                                value={contact}
-                                optional
-                            />
-                        </div>
+                            <form onSubmit={handleSubmit(search)}>
+                                <Controller
+                                    name="contact"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <PatternField
+                                            patternName="full-phone"
+                                            name={field.name}
+                                            placeholder="Ex: (11) 99999-9999"
+                                            setValue={field.onChange}
+                                            value={field.value || ''}
+                                            error={errors.contact?.message}
+                                            optional
+                                        />
+                                    )}
+                                />
 
-                        <Button
-                            onClick={search}
-                            disabled={isSearching || !contact}
-                            className="w-full h-12 text-lg font-medium transition-all duration-200"
-                        >
-                            {isSearching ? (
-                                <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Buscando...
-                                </>
-                            ) : (
-                                <>
-                                    <Search className="mr-2 h-5 w-5" />
-                                    Localizar Cliente
-                                </>
-                            )}
-                        </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isSearching || !contactValue}
+                                    className="w-full h-12 text-lg font-medium transition-all duration-200"
+                                >
+                                    {isSearching ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                            Buscando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Search className="mr-2 h-5 w-5" />
+                                            Localizar Cliente
+                                        </>
+                                    )}
+                                </Button>
+                            </form>
+                        </div>
                     </CardContent>
 
                     {client && (

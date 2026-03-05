@@ -15,9 +15,11 @@ import { GetStockByProductID } from "@/app/api/stock/stock";
 
 interface AddComplementItemModalProps {
     product: Product;
+    onToggleVariations?: (show: boolean) => void;
+    initialShowVariations?: boolean;
 }
 
-const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
+const AddComplementItemModal = ({ product, onToggleVariations, initialShowVariations = false }: AddComplementItemModalProps) => {
     const { data } = useSession();
     const queryClient = useQueryClient();
     const modalHandler = useModal();
@@ -30,8 +32,13 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
         enabled: !!session?.user,
     });
 
-    const [showVariations, setShowVariations] = useState(false);
+    const [showVariations, setShowVariations] = useState(initialShowVariations);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleToggleVariations = (show: boolean) => {
+        setShowVariations(show);
+        if (onToggleVariations) onToggleVariations(show);
+    };
 
     const submit = async (variationId: string) => {
         if (!data) return
@@ -56,7 +63,7 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
         return (
             <div
                 className="group border rounded-xl bg-white overflow-hidden w-full max-w-sm mx-auto transition-all duration-300 hover:shadow-xl hover:border-blue-300 cursor-pointer"
-                onClick={() => setShowVariations(true)}
+                onClick={() => handleToggleVariations(true)}
             >
                 {/* Header info with image */}
                 <div className="relative h-40 bg-gray-50 overflow-hidden">
@@ -93,7 +100,7 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
             {/* Small Header for navigation back */}
             <div className="flex items-center gap-3 p-3 bg-gray-50 border-b relative">
                 <button
-                    onClick={() => setShowVariations(false)}
+                    onClick={() => handleToggleVariations(false)}
                     className="p-1.5 hover:bg-gray-200 rounded-full transition-colors text-gray-500"
                     title="Voltar"
                 >
@@ -105,49 +112,46 @@ const AddComplementItemModal = ({ product }: AddComplementItemModalProps) => {
                     <h2 className="font-bold text-xs leading-tight text-gray-900 truncate">{product.name}</h2>
                     <p className="text-[10px] text-gray-400 font-medium">Selecione o tamanho</p>
                 </div>
-                <span className="bg-white text-gray-500 text-[9px] px-1.5 py-0.5 rounded border font-mono">
-                    #{product.sku}
-                </span>
+                {product.sku && (
+                    <span className="bg-white text-gray-500 text-[9px] px-1.5 py-0.5 rounded border font-mono">
+                        #{product.sku}
+                    </span>
+                )}
             </div>
 
             {/* Variations List */}
             <div className="max-h-64 overflow-y-auto p-1 divide-y divide-gray-50">
                 {product.variations?.length > 0 ? (
-                    product.variations.map((variation) => (
-                        <div key={variation.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 transition-colors group/item">
-                            <div className="flex flex-col">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">
-                                    {typeof variation.size === 'string' ? variation.size : variation.size?.name}
-                                </span>
-                                <span className="text-sm font-extrabold text-blue-600">
-                                    R$ {new Decimal(variation.price).toFixed(2)}
-                                </span>
-                                {(() => {
-                                    const stockRecord = stocks?.find(s => s.product_variation_id === variation.id) || stocks?.find(s => !s.product_variation_id);
-                                    const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
-                                    if (available !== null) {
-                                        return (
-                                            <span className={`text-[9px] font-bold ${available.gt(0) ? 'text-gray-400' : 'text-red-500'}`}>
-                                                Estoque: {available.toFixed(2)}
-                                            </span>
-                                        );
-                                    }
-                                    return null;
-                                })()}
+                    product.variations.map((variation) => {
+                        const stockRecord = stocks?.find(s => s.product_variation_id === variation.id) || stocks?.find(s => !s.product_variation_id);
+                        const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
+                        const isOutOfStock = available !== null && available.lt(groupItem?.quantity || 1);
+
+                        return (
+                            <div key={variation.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 transition-colors group/item">
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">
+                                        {typeof variation.size === 'string' ? variation.size : variation.size?.name}
+                                    </span>
+                                    <span className="text-sm font-extrabold text-blue-600">
+                                        R$ {new Decimal(variation.price || 0).toFixed(2)}
+                                    </span>
+                                    {available !== null && (
+                                        <span className={`text-[9px] font-bold ${!isOutOfStock ? 'text-gray-400' : 'text-red-500'}`}>
+                                            Estoque: {available.toFixed(2)}
+                                        </span>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => submit(variation.id)}
+                                    disabled={isSubmitting || isOutOfStock}
+                                    className="h-9 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95 text-[10px] font-bold uppercase tracking-tight disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+                                >
+                                    {isSubmitting ? "..." : isOutOfStock ? "Sem Estoque" : "Selecionar"}
+                                </button>
                             </div>
-                            <button
-                                onClick={() => submit(variation.id)}
-                                disabled={isSubmitting || (() => {
-                                    const stockRecord = stocks?.find(s => s.product_variation_id === variation.id) || stocks?.find(s => !s.product_variation_id);
-                                    const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
-                                    return available !== null && available.lte(0);
-                                })()}
-                                className="h-9 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95 text-[10px] font-bold uppercase tracking-tight disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
-                            >
-                                {isSubmitting ? "Adicionando..." : "Selecionar"}
-                            </button>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <div className="text-center py-10">
                         <p className="text-xs text-gray-400 italic">Nenhuma variação disponível</p>

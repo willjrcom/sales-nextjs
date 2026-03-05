@@ -1,5 +1,5 @@
 import GroupItem from '@/app/entities/order/group-item';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Carousel from '../../../../../../components/carousel/carousel';
 import AddComplementItemModal from './add-complement-item-modal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,6 +18,7 @@ const ListComplementItems = () => {
     });
 
     const complementItems = useMemo(() => complementProductsResponse?.items || [], [complementProductsResponse?.items]);
+    const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
     return (
         <div className="py-4">
@@ -27,10 +28,23 @@ const ListComplementItems = () => {
                         <p className="text-gray-400 text-sm italic">Nenhum produto disponível para esta categoria</p>
                     </div>
                 )}
-                {complementItems.length > 0 && (
+                {complementItems.length > 0 && !selectedProductId && (
                     <Carousel items={complementItems}>
-                        {(product) => <AddComplementItemModal key={product.id} product={product} />}
+                        {(product) => (
+                            <AddComplementItemModal
+                                key={product.id}
+                                product={product}
+                                onToggleVariations={(show) => setSelectedProductId(show ? product.id : null)}
+                            />
+                        )}
                     </Carousel>
+                )}
+                {selectedProductId && complementItems.find(p => p.id === selectedProductId) && (
+                    <AddComplementItemModal
+                        product={complementItems.find(p => p.id === selectedProductId)!}
+                        initialShowVariations={true}
+                        onToggleVariations={(show) => setSelectedProductId(show ? selectedProductId : null)}
+                    />
                 )}
             </div>
         </div>

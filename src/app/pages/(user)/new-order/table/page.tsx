@@ -15,15 +15,38 @@ import PatternField from "@/app/components/modal/fields/pattern";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const tableSchema = z.object({
+    placeID: z.string().min(1, "O local é obrigatório."),
+    tableID: z.string().min(1, "A mesa é obrigatória."),
+    name: z.string().optional(),
+    contact: z.string().optional().refine(val => !val || val.length === 11, {
+        message: "Contato incompleto. Informe os 11 dígitos (DDD + número)."
+    })
+});
+
+type TableFormData = z.infer<typeof tableSchema>;
 
 const PageNewOrderTable = () => {
-    const [placeID, setPlaceID] = useState<string>('');
-    const [tableID, setTableID] = useState<string>('');
-    const [name, setName] = useState<string>("");
-    const [contact, setContact] = useState<string>("");
     const [isCreating, setIsCreating] = useState(false);
     const router = useRouter();
     const { data } = useSession();
+
+    const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<TableFormData>({
+        resolver: zodResolver(tableSchema),
+        defaultValues: {
+            placeID: '',
+            tableID: '',
+            name: '',
+            contact: ''
+        }
+    });
+
+    const placeIDValue = watch('placeID');
+    const tableIDValue = watch('tableID');
 
     const { data: placesResponse } = useQuery({
         queryKey: ['places'],
@@ -33,23 +56,23 @@ const PageNewOrderTable = () => {
 
     const places = useMemo(() => placesResponse?.items || [], [placesResponse?.items]);
     const selectedPlace = useMemo(() => {
-        return places.find(p => p.id === placeID);
-    }, [placeID, places]);
+        return places.find((p: any) => p.id === placeIDValue);
+    }, [placeIDValue, places]);
 
     const tables = useMemo(() => {
         if (!selectedPlace) return [];
         const filteredTables: Table[] = [];
-        for (const placeTable of selectedPlace.tables) {
+        for (const placeTable of (selectedPlace as any).tables) {
             filteredTables.push(placeTable.table);
         }
         return filteredTables;
     }, [selectedPlace]);
 
-    const newOrder = async (tableID: string) => {
+    const newOrder = async (formData: TableFormData) => {
         if (!data || isCreating) return;
         setIsCreating(true);
         try {
-            const response = await NewOrderTable(data, tableID, name, contact);
+            const response = await NewOrderTable(data, formData.tableID, formData.name || '', formData.contact || '');
             router.push('/pages/order-control/' + response.order_id);
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao criar o pedido');
@@ -85,78 +108,112 @@ const PageNewOrderTable = () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                    <MapPin className="w-4 h-4" /> Local
+                        <form onSubmit={handleSubmit(newOrder)} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                        <MapPin className="w-4 h-4" /> Local
+                                    </div>
+                                    <Controller
+                                        name="placeID"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <SelectField
+                                                friendlyName="Local"
+                                                name={field.name}
+                                                selectedValue={field.value}
+                                                setSelectedValue={(val: string) => {
+                                                    field.onChange(val);
+                                                    setValue('tableID', ''); // Reset table when place changes
+                                                }}
+                                                values={places}
+                                                error={errors.placeID?.message}
+                                            />
+                                        )}
+                                    />
                                 </div>
-                                <SelectField
-                                    friendlyName="Local"
-                                    name="local"
-                                    selectedValue={placeID}
-                                    setSelectedValue={setPlaceID}
-                                    values={places}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                    <Utensils className="w-4 h-4" /> Mesa
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                        <Utensils className="w-4 h-4" /> Mesa
+                                    </div>
+                                    <Controller
+                                        name="tableID"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <SelectField
+                                                friendlyName="Mesa"
+                                                name={field.name}
+                                                selectedValue={field.value}
+                                                setSelectedValue={field.onChange}
+                                                values={tables}
+                                                disabled={!placeIDValue}
+                                                error={errors.tableID?.message}
+                                            />
+                                        )}
+                                    />
                                 </div>
-                                <SelectField
-                                    friendlyName="Mesa"
-                                    name="mesa"
-                                    selectedValue={tableID}
-                                    setSelectedValue={setTableID}
-                                    values={tables}
-                                    disabled={!placeID}
-                                />
                             </div>
-                        </div>
 
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                    <User className="w-4 h-4" /> Nome (Opcional)
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                        <User className="w-4 h-4" /> Nome (Opcional)
+                                    </div>
+                                    <Controller
+                                        name="name"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                placeholder="Identificação do cliente"
+                                                name={field.name}
+                                                optional
+                                                value={field.value || ''}
+                                                setValue={field.onChange}
+                                                error={errors.name?.message}
+                                            />
+                                        )}
+                                    />
                                 </div>
-                                <TextField
-                                    placeholder="Identificação do cliente"
-                                    name="name" optional
-                                    value={name}
-                                    setValue={setName}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                                    <Phone className="w-4 h-4" /> Contato (Opcional)
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
+                                        <Phone className="w-4 h-4" /> Contato (Opcional)
+                                    </div>
+                                    <Controller
+                                        name="contact"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <PatternField
+                                                placeholder="(00) 00000-0000"
+                                                name={field.name}
+                                                value={field.value || ''}
+                                                setValue={field.onChange}
+                                                patternName="full-phone"
+                                                error={errors.contact?.message}
+                                                optional
+                                            />
+                                        )}
+                                    />
                                 </div>
-                                <PatternField
-                                    placeholder="(00) 00000-0000"
-                                    name="contact"
-                                    value={contact}
-                                    setValue={setContact}
-                                    patternName="full-phone"
-                                    optional
-                                />
                             </div>
-                        </div>
 
-                        <Button
-                            disabled={!tableID || isCreating}
-                            onClick={() => newOrder(tableID)}
-                            className="w-full h-14 text-lg font-bold shadow-lg shadow-blue-200/50 hover:shadow-blue-300/50 transform transition-all active:scale-[0.98] duration-200 bg-blue-600 hover:bg-blue-700"
-                        >
-                            {isCreating ? (
-                                <>
-                                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                                    Iniciando...
-                                </>
-                            ) : (
-                                <>
-                                    <Plus className="mr-2 h-5 w-5" />
-                                    Iniciar Atendimento
-                                </>
-                            )}
-                        </Button>
+                            <Button
+                                type="submit"
+                                disabled={!tableIDValue || isCreating}
+                                className="w-full h-14 text-lg font-bold shadow-lg shadow-blue-200/50 hover:shadow-blue-300/50 transform transition-all active:scale-[0.98] duration-200 bg-blue-600 hover:bg-blue-700"
+                            >
+                                {isCreating ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                                        Iniciando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="mr-2 h-5 w-5" />
+                                        Iniciar Atendimento
+                                    </>
+                                )}
+                            </Button>
+                        </form>
                     </CardContent>
                 </Card>
             </div>

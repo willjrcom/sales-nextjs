@@ -39,7 +39,7 @@ const OrderProcessCard = ({ orderProcess, onRefetch }: OrderProcessCardProps) =>
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !!(data?.user as any)?.access_token,
+        enabled: !!data?.user?.access_token,
     })
 
     const [now, setNow] = useState(new Date());

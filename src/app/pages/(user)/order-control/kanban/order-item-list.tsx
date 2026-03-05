@@ -36,12 +36,12 @@ function getOrderType(order: Order) {
 function getTypeConfig(order: Order) {
     const type = getOrderType(order);
     if (type === "delivery")
-        return { icon: Bike, color: "text-blue-600", bg: "bg-blue-50", label: "Delivery" };
+        return { icon: Bike, color: "text-blue-600", bg: "bg-white", border: "border-blue-200", bar: "bg-blue-500", label: "Delivery" };
     if (type === "table")
-        return { icon: Utensils, color: "text-emerald-600", bg: "bg-emerald-50", label: "Mesa" };
+        return { icon: Utensils, color: "text-emerald-600", bg: "bg-white", border: "border-emerald-200", bar: "bg-emerald-500", label: "Mesa" };
     if (type === "pickup")
-        return { icon: ShoppingBag, color: "text-amber-600", bg: "bg-amber-50", label: "Balcão" };
-    return { icon: Package, color: "text-gray-600", bg: "bg-gray-50", label: "Outro" };
+        return { icon: ShoppingBag, color: "text-amber-600", bg: "bg-white", border: "border-amber-200", bar: "bg-amber-500", label: "Balcão" };
+    return { icon: Package, color: "text-gray-600", bg: "bg-white", border: "border-gray-200", bar: "bg-gray-500", label: "Outro" };
 }
 
 function getOrderInfo(order: Order) {
@@ -127,21 +127,24 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
         );
     };
 
-    const { icon: TypeIcon, color, bg, label } = getTypeConfig(order);
+    const { icon: TypeIcon, color, bg, border, bar, label } = getTypeConfig(order);
     const info = getOrderInfo(order);
     const total = formatCurrency(Number(order.total));
     const itemsCount = order.quantity_items ?? 0;
 
     return (
         <Card
-            className="group cursor-pointer border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white overflow-hidden rounded-2xl active:scale-[0.98]"
+            className={cn(
+                "group cursor-pointer border-none shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl active:scale-[0.98]",
+                bg
+            )}
             onClick={OpenOrder}
         >
             <CardContent className="p-0">
                 <div className="p-4 flex flex-col gap-3">
                     {/* Header: Tipo e Tempo */}
                     <div className="flex items-center justify-between">
-                        <div className={cn("flex items-center gap-2 px-2 py-1 rounded-lg", bg)}>
+                        <div className={cn("flex items-center gap-2 px-2 py-1 rounded-lg bg-white shadow-sm border", border)}>
                             <TypeIcon className={cn("w-3.5 h-3.5", color)} />
                             <span className={cn("text-[10px] font-black uppercase tracking-wider", color)}>
                                 {label}
@@ -171,10 +174,10 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
                     </div>
 
                     {/* Footer: Itens e Total */}
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                    <div className="flex items-center justify-between pt-2 border-t border-black/5">
                         <div className="flex items-center gap-1.5 font-bold text-gray-500">
                             <div className="flex -space-x-2 mr-1">
-                                <div className="w-5 h-5 rounded-full bg-gray-100 border border-white flex items-center justify-center">
+                                <div className="w-5 h-5 rounded-full bg-white border border-gray-100 flex items-center justify-center shadow-sm">
                                     <ShoppingBag className="w-3 h-3 text-gray-400" />
                                 </div>
                             </div>
@@ -182,17 +185,14 @@ const OrderItemList = ({ order }: OrderItemListProps) => {
                                 {itemsCount} {itemsCount === 1 ? 'item' : 'itens'}
                             </span>
                         </div>
-                        <Badge variant="secondary" className="bg-gray-50 text-gray-600 font-black tracking-tight rounded-lg px-2 h-6 border-none">
+                        <Badge variant="secondary" className="bg-white text-gray-600 font-black tracking-tight rounded-lg px-2 h-6 border shadow-sm">
                             {total}
                         </Badge>
                     </div>
                 </div>
 
                 {/* Status Bar */}
-                <div className={cn(
-                    "h-1.5 w-full",
-                    order.status === "Pending" ? "bg-amber-400" : "bg-emerald-400"
-                )} />
+                <div className={cn("h-1.5 w-full", bar)} />
             </CardContent>
         </Card>
     );

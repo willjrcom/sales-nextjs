@@ -4,12 +4,14 @@ import ItemCard from "./item-card";
 import GroupItem from "@/app/entities/order/group-item";
 import Item from "@/app/entities/order/item";
 import { Button } from "@/components/ui/button";
-import { Printer, Package, Clock, ShoppingBag, Info } from "lucide-react";
+import { Printer, Package, Clock, ShoppingBag, Info, Activity } from "lucide-react";
 import printGroupItem from "../print/print-group-item";
 import { Session } from "next-auth";
 import { ToUtcDatetime } from "@/app/utils/date";
 import { formatCurrency } from "@/app/utils/format";
 import { Badge } from "@/components/ui/badge";
+import { useModal } from "@/app/context/modal/context";
+import OrderProcessTimeline from "./order-process-timeline";
 
 interface GroupItemCardProps {
     group: GroupItem;
@@ -17,6 +19,7 @@ interface GroupItemCardProps {
 }
 
 export default function GroupItemCard({ group, session }: GroupItemCardProps) {
+    const modalHandler = useModal();
     const total = new Decimal(group.total);
     const subtotal = new Decimal(group.sub_total || 0);
     const hasDiscount = !subtotal.equals(total);
@@ -46,13 +49,31 @@ export default function GroupItemCard({ group, session }: GroupItemCardProps) {
                         </div>
                     </div>
 
-                    <Button
-                        variant="outline" size="icon"
-                        className="h-9 w-9 bg-white border-gray-100 text-gray-400 hover:text-blue-600 rounded-xl transition-all active:scale-95"
-                        onClick={() => printGroupItem({ groupItemID: group.id, session })}
-                    >
-                        <Printer className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        {group.use_process_rule && (
+                            <Button
+                                variant="outline" size="icon"
+                                className="h-9 w-9 bg-white border-gray-100 text-blue-500 hover:text-blue-600 rounded-xl transition-all active:scale-95 shadow-sm"
+                                onClick={() => modalHandler.showModal(
+                                    'order-process-' + group.id,
+                                    'Histórico do Processo',
+                                    <div className="py-4">
+                                        <OrderProcessTimeline groupItemId={group.id} session={session} />
+                                    </div>,
+                                    'md'
+                                )}
+                            >
+                                <Activity className="w-4 h-4" />
+                            </Button>
+                        )}
+                        <Button
+                            variant="outline" size="icon"
+                            className="h-9 w-9 bg-white border-gray-100 text-gray-400 hover:text-blue-600 rounded-xl transition-all active:scale-95"
+                            onClick={() => printGroupItem({ groupItemID: group.id, session })}
+                        >
+                            <Printer className="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
 
                 {group.observation && (

@@ -54,7 +54,8 @@ import {
     Search,
     Receipt,
     History,
-    Plus
+    Plus,
+    Loader2
 } from "lucide-react";
 import GetCompany from '@/app/api/company/company';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -97,20 +98,20 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     const queryClient = useQueryClient();
     const { data, status } = useSession();
     const isAuthenticating = status === "loading";
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPrinting, setIsPrinting] = useState(false);
     const modalHandler = useModal();
-    const accessToken = data?.user?.access_token || data?.access_token;
 
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(data!),
-        enabled: !isAuthenticating && !!accessToken,
+        enabled: !isAuthenticating && !!data?.user?.access_token,
     })
 
     const { data: fiscalSettings } = useQuery({
         queryKey: ['fiscal-settings'],
         queryFn: () => getFiscalSettings(data!),
-        enabled: !isAuthenticating && !!accessToken,
+        enabled: !isAuthenticating && !!data?.user?.access_token,
     });
 
     const { isLoading, data: order, refetch } = useQuery({
@@ -118,7 +119,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
         queryFn: () => {
             return GetOrderByID(orderId!, data!);
         },
-        enabled: !!orderId && !isAuthenticating && !!accessToken,
+        enabled: !!orderId && !isAuthenticating && !!data?.user?.access_token,
         refetchInterval: 10000,
         refetchOnWindowFocus: true,
         refetchOnMount: true,
@@ -127,8 +128,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
     });
 
     const handleReady = async () => {
-        if (!order || !data || isProcessing) return;
-        setIsProcessing(true);
+        if (!order || !data || isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await ReadyOrder(order.id, data);
             refetch();
@@ -137,13 +138,13 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             const err = error as RequestError;
             notifyError(err.message || "Erro ao marcar como pronto");
         } finally {
-            setIsProcessing(false);
+            setIsSubmitting(false);
         }
     };
 
     const handleFinished = async () => {
-        if (!order || !data || isProcessing) return;
-        setIsProcessing(true);
+        if (!order || !data || isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await FinishOrder(order.id, data);
             refetch();
@@ -152,13 +153,13 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             const err = error as RequestError;
             notifyError(err.message || "Erro ao marcar como finalizado");
         } finally {
-            setIsProcessing(false);
+            setIsSubmitting(false);
         }
     };
 
     const handleCancel = async () => {
-        if (!order || !data || isProcessing) return;
-        setIsProcessing(true);
+        if (!order || !data || isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await CancelOrder(order.id, data);
             refetch();
@@ -167,7 +168,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
             const err = error as RequestError;
             notifyError(err.message || "Erro ao cancelar pedido");
         } finally {
-            setIsProcessing(false);
+            setIsSubmitting(false);
         }
     };
 
@@ -321,14 +322,22 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     {!editBlocked && order.status === "Ready" && (
                         <div className="pt-2">
                             {order.delivery.status === "Ready" && (
-                                <Button onClick={shipDelivery} className="w-full bg-blue-600 hover:bg-blue-700 font-black uppercase tracking-widest gap-2 shadow-lg shadow-blue-100">
-                                    <Truck className="w-4 h-4" />
+                                <Button
+                                    onClick={shipDelivery}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 font-black uppercase tracking-widest h-12 rounded-xl gap-2 shadow-lg shadow-blue-100 disabled:opacity-50"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Truck className="w-5 h-5" />}
                                     Enviar Entrega
                                 </Button>
                             )}
                             {order.delivery.status === "Shipped" && (
-                                <Button onClick={finishDelivery} className="w-full bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-100">
-                                    <Check className="w-4 h-4" />
+                                <Button
+                                    onClick={finishDelivery}
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest h-12 rounded-xl gap-2 shadow-lg shadow-emerald-100 disabled:opacity-50"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                                     Receber Entrega
                                 </Button>
                             )}
@@ -339,8 +348,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
         }
         if (order.table) {
             const closeTable = async () => {
-                if (!order.table?.id || !data || isProcessing) return
-                setIsProcessing(true);
+                if (!order.table?.id || !data || isSubmitting) return
+                setIsSubmitting(true);
                 try {
                     await CloseTable(order.table?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['table-orders'] });
@@ -349,7 +358,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     const err = error as RequestError;
                     notifyError(err.message || "Erro ao fechar mesa");
                 } finally {
-                    setIsProcessing(false);
+                    setIsSubmitting(false);
                 }
             }
 
@@ -435,11 +444,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                                     Cancelar
                                                 </Button>
                                                 <Button
-                                                    disabled={isProcessing}
-                                                    className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest"
+                                                    disabled={isSubmitting}
+                                                    className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest rounded-xl h-11"
                                                     onClick={onConfirm}
                                                 >
-                                                    {isProcessing ? 'Fechando...' : 'Confirmar Fechamento'}
+                                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                                                    {isSubmitting ? 'Fechando...' : 'Confirmar'}
                                                 </Button>
                                             </div>
                                         </div>,
@@ -460,8 +470,8 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
 
         if (order.pickup) {
             const deliveryPickup = async () => {
-                if (!order.pickup?.id || !data || isProcessing) return
-                setIsProcessing(true);
+                if (!order.pickup?.id || !data || isSubmitting) return
+                setIsSubmitting(true);
                 try {
                     await DeliveryPickup(order.pickup?.id, data);
                     queryClient.invalidateQueries({ queryKey: ['pickup-orders-ready'] });
@@ -471,7 +481,7 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     const err = error as RequestError;
                     notifyError(err.message || "Erro ao entregar retirada");
                 } finally {
-                    setIsProcessing(false);
+                    setIsSubmitting(false);
                 }
             }
 
@@ -559,11 +569,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                                     Cancelar
                                                 </Button>
                                                 <Button
-                                                    disabled={isProcessing}
-                                                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest"
+                                                    disabled={isSubmitting}
+                                                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest rounded-xl h-11"
                                                     onClick={onConfirm}
                                                 >
-                                                    {isProcessing ? 'Entregando...' : 'Confirmar Retirada'}
+                                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                                                    {isSubmitting ? 'Entregando...' : 'Confirmar'}
                                                 </Button>
                                             </div>
                                         </div>,
@@ -638,11 +649,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                             Voltar
                                         </Button>
                                         <Button
-                                            disabled={isProcessing}
+                                            disabled={isSubmitting}
                                             className="flex-1 bg-amber-600 hover:bg-amber-700 font-black uppercase tracking-widest rounded-xl h-11"
                                             onClick={handleReady}
                                         >
-                                            {isProcessing ? 'Processando...' : 'Confirmar'}
+                                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                                            {isSubmitting ? 'Processando...' : 'Confirmar'}
                                         </Button>
                                     </div>
                                 </div>
@@ -671,11 +683,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                             Voltar
                                         </Button>
                                         <Button
-                                            disabled={isProcessing}
+                                            disabled={isSubmitting}
                                             className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-black uppercase tracking-widest rounded-xl h-11"
                                             onClick={handleFinished}
                                         >
-                                            {isProcessing ? 'Processando...' : 'Concluir'}
+                                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                                            {isSubmitting ? 'Processando...' : 'Concluir'}
                                         </Button>
                                     </div>
                                 </div>
@@ -704,11 +717,12 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                                             Voltar
                                         </Button>
                                         <Button
-                                            disabled={isProcessing}
+                                            disabled={isSubmitting}
                                             className="flex-1 bg-red-600 hover:bg-red-700 font-black uppercase tracking-widest rounded-xl h-11"
                                             onClick={handleCancel}
                                         >
-                                            {isProcessing ? 'Cancelando...' : 'Confirmar'}
+                                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                                            {isSubmitting ? 'Cancelando...' : 'Confirmar'}
                                         </Button>
                                     </div>
                                 </div>
@@ -919,8 +933,9 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                             title="Adicionar pagamento"
                             size="md"
                             color="blue"
-                            icon={Plus}
-                            className="w-full md:w-auto h-12 px-8 rounded-2xl shadow-lg shadow-blue-100"
+                            icon={isSubmitting ? Loader2 : Plus}
+                            className="w-full md:w-auto h-12 px-8 rounded-2xl shadow-lg shadow-blue-100 disabled:opacity-50"
+                            isDisabled={isSubmitting}
                         >
                             <PaymentForm orderId={order.id} />
                         </ButtonIconText>
@@ -929,12 +944,21 @@ export default function CardOrder({ orderId, editBlocked = false }: CardOrderPro
                     <div className="flex flex-wrap items-center gap-3 ml-auto w-full md:w-auto">
                         {!isOrderStatusCancelled && company && (
                             <Button
-                                onClick={() => data && printOrder({ orderID: order.id, session: data })}
+                                onClick={async () => {
+                                    if (!data || isPrinting) return;
+                                    setIsPrinting(true);
+                                    try {
+                                        await printOrder({ orderID: order.id, session: data });
+                                    } finally {
+                                        setIsPrinting(false);
+                                    }
+                                }}
                                 variant="outline"
-                                className="flex-1 md:flex-none h-12 px-6 rounded-2xl font-black uppercase tracking-widest gap-2 bg-white border-2 border-gray-100 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-95"
+                                disabled={isPrinting}
+                                className="flex-1 md:flex-none h-12 px-6 rounded-2xl font-black uppercase tracking-widest gap-2 bg-white border-2 border-gray-100 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-95 disabled:opacity-50"
                             >
-                                <Printer className="w-4 h-4 text-gray-400" />
-                                <span>Imprimir</span>
+                                {isPrinting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4 text-gray-400" />}
+                                <span>{isPrinting ? 'Preparando...' : 'Imprimir'}</span>
                             </Button>
                         )}
 
