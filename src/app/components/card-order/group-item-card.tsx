@@ -4,6 +4,7 @@ import ItemCard from "./item-card";
 import GroupItem from "@/app/entities/order/group-item";
 import Item from "@/app/entities/order/item";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Printer, Package, Clock, ShoppingBag, Info, Activity } from "lucide-react";
 import printGroupItem from "../print/print-group-item";
 import { Session } from "next-auth";
@@ -13,12 +14,17 @@ import { Badge } from "@/components/ui/badge";
 import { useModal } from "@/app/context/modal/context";
 import OrderProcessTimeline from "./order-process-timeline";
 
+import Refresh from "../crud/refresh";
+import { HiOutlineRefresh } from "react-icons/hi";
+
 interface GroupItemCardProps {
     group: GroupItem;
     session: Session;
+    onRefresh?: () => void;
+    isFetching?: boolean;
 }
 
-export default function GroupItemCard({ group, session }: GroupItemCardProps) {
+export default function GroupItemCard({ group, session, onRefresh, isFetching }: GroupItemCardProps) {
     const modalHandler = useModal();
     const total = new Decimal(group.total);
     const subtotal = new Decimal(group.sub_total || 0);
@@ -58,7 +64,12 @@ export default function GroupItemCard({ group, session }: GroupItemCardProps) {
                                     'order-process-' + group.id,
                                     'Histórico do Processo',
                                     <div className="py-4">
-                                        <OrderProcessTimeline groupItemId={group.id} session={session} />
+                                        <OrderProcessTimeline
+                                            groupItemId={group.id}
+                                            session={session}
+                                            onRefresh={onRefresh}
+                                            isFetchingParent={isFetching}
+                                        />
                                     </div>,
                                     'md'
                                 )}

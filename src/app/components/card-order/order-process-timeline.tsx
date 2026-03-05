@@ -9,9 +9,13 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
+import Refresh from "../crud/refresh";
+
 interface OrderProcessTimelineProps {
     groupItemId: string;
     session: Session;
+    onRefresh?: () => void;
+    isFetchingParent?: boolean;
 }
 
 const statusConfig = {
@@ -23,11 +27,18 @@ const statusConfig = {
     Cancelled: { icon: XCircle, color: "text-red-500", bg: "bg-red-100", label: "Cancelado" },
 };
 
-export default function OrderProcessTimeline({ groupItemId, session }: OrderProcessTimelineProps) {
-    const { data: processes, isLoading } = useQuery({
+export default function OrderProcessTimeline({ groupItemId, session, onRefresh, isFetchingParent }: OrderProcessTimelineProps) {
+    const { data: processes, isLoading, refetch, isFetching } = useQuery({
         queryKey: ['order-processes', groupItemId],
         queryFn: () => GetProcessesByGroupItemID(groupItemId, session),
     });
+
+    const handleRefresh = () => {
+        refetch();
+        if (onRefresh) onRefresh();
+    }
+
+    const isRefreshing = isLoading || isFetching || isFetchingParent;
 
     const sortedProcesses = processes ? [...processes].sort((a, b) =>
         new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
@@ -52,73 +63,84 @@ export default function OrderProcessTimeline({ groupItemId, session }: OrderProc
     }
 
     return (
-        <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gray-100 before:via-gray-200 before:to-gray-100">
-            {sortedProcesses.map((process: OrderProcess, idx: number) => {
-                const config = statusConfig[process.status as keyof typeof statusConfig] || statusConfig.Pending;
-                const Icon = config.icon;
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Últimas Atualizações</p>
+                <Refresh
+                    onRefresh={handleRefresh}
+                    isFetching={isRefreshing}
+                    removeText={true}
+                />
+            </div>
 
-                return (
-                    <div key={process.id} className="relative flex items-start gap-6 group">
-                        {/* Dot / Icon */}
-                        <div className={cn(
-                            "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shadow-sm transition-transform group-hover:scale-110",
-                            config.bg,
-                            config.color
-                        )}>
-                            <Icon className="w-5 h-5" />
-                        </div>
+            <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gray-100 before:via-gray-200 before:to-gray-100 shadow-inner p-4 rounded-3xl bg-gray-50/20">
+                {sortedProcesses.map((process: OrderProcess, idx: number) => {
+                    const config = statusConfig[process.status as keyof typeof statusConfig] || statusConfig.Pending;
+                    const Icon = config.icon;
 
-                        {/* Content */}
-                        <div className="flex-1 space-y-1 pt-1">
-                            <div className="flex items-center justify-between">
-                                <div className="flex flex-col">
-                                    {process.process_rule?.name ? (
-                                        <>
-                                            <h4 className="font-black text-gray-900 uppercase text-[11px] tracking-tight leading-tight">
-                                                {process.process_rule.name}
-                                            </h4>
-                                            <div className={cn(
-                                                "mt-0.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter w-fit",
-                                                config.bg,
-                                                config.color
-                                            )}>
+                    return (
+                        <div key={process.id} className="relative flex items-start gap-6 group">
+                            {/* Dot / Icon */}
+                            <div className={cn(
+                                "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shadow-sm transition-transform group-hover:scale-110",
+                                config.bg,
+                                config.color
+                            )}>
+                                <Icon className="w-5 h-5" />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 space-y-1 pt-1">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex flex-col">
+                                        {process.process_rule?.name ? (
+                                            <>
+                                                <h4 className="font-black text-gray-900 uppercase text-[11px] tracking-tight leading-tight">
+                                                    {process.process_rule.name}
+                                                </h4>
+                                                <div className={cn(
+                                                    "mt-0.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter w-fit",
+                                                    config.bg,
+                                                    config.color
+                                                )}>
+                                                    {config.label}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <h4 className="font-black text-gray-800 uppercase text-xs tracking-tight">
                                                 {config.label}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <h4 className="font-black text-gray-800 uppercase text-xs tracking-tight">
-                                            {config.label}
-                                        </h4>
+                                            </h4>
+                                        )}
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tabular-nums">
+                                        {format(new Date(process.created_at), "HH:mm:ss", { locale: ptBR })}
+                                    </span>
+                                </div>
+
+                                <div className="bg-white/50 border border-gray-100/80 rounded-2xl p-3 space-y-2 shadow-sm">
+                                    <div className="flex items-center justify-between text-[10px]">
+                                        <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Data</span>
+                                        <span className="text-gray-600 font-black tabular-nums">{format(new Date(process.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
+                                    </div>
+
+                                    {process.duration_formatted && (
+                                        <div className="flex items-center justify-between text-[10px]">
+                                            <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Duração</span>
+                                            <span className="text-blue-600 font-black">{process.duration_formatted}</span>
+                                        </div>
+                                    )}
+
+                                    {process.cancelled_reason && (
+                                        <div className="mt-2 p-2 bg-red-50 rounded-xl border border-red-100">
+                                            <p className="text-[10px] text-red-700 font-bold italic">"{process.cancelled_reason}"</p>
+                                        </div>
                                     )}
                                 </div>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tabular-nums">
-                                    {format(new Date(process.created_at), "HH:mm:ss", { locale: ptBR })}
-                                </span>
-                            </div>
-
-                            <div className="bg-white/50 border border-gray-100/80 rounded-2xl p-3 space-y-2 shadow-sm">
-                                <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Data</span>
-                                    <span className="text-gray-600 font-black tabular-nums">{format(new Date(process.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
-                                </div>
-
-                                {process.duration_formatted && (
-                                    <div className="flex items-center justify-between text-[10px]">
-                                        <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Duração</span>
-                                        <span className="text-blue-600 font-black">{process.duration_formatted}</span>
-                                    </div>
-                                )}
-
-                                {process.cancelled_reason && (
-                                    <div className="mt-2 p-2 bg-red-50 rounded-xl border border-red-100">
-                                        <p className="text-[10px] text-red-700 font-bold italic">"{process.cancelled_reason}"</p>
-                                    </div>
-                                )}
                             </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
         </div>
     );
 }

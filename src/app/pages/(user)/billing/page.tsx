@@ -13,7 +13,7 @@ import { createCheckout, listPayments, getMonthlyCosts, cancelPayment, triggerMo
 import { GetSubscriptionStatus } from "@/app/api/company/subscription/status";
 import GetCompany from "@/app/api/company/company";
 import CrudTable from "@/app/components/crud/table";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Refresh, { FormatRefreshTime } from "@/app/components/crud/refresh";
@@ -21,10 +21,12 @@ import { RegisterCostDialog } from "@/app/pages/(user)/billing/register-cost-dia
 import { SubscriptionStatusCard } from "@/app/pages/(user)/billing/subscription-status-card";
 import { UpgradeDialog } from "@/app/pages/(user)/billing/upgrade-dialog";
 import { notifyError, notifyLoading, notifySuccess } from "@/app/utils/notifications";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CreditCard } from "lucide-react";
 import { paymentColumns } from "@/app/entities/company/company-payment-columns";
 import { costColumns } from "@/app/entities/company/company-usage-cost-columns";
 import { Plan } from "@/app/entities/company/subscription";
+import UpdateCompany from "@/app/api/company/update/company";
+import { SelectField } from "@/app/components/modal/field";
 
 
 // Hardcoded Plan Prices removed, will use dynamic data
@@ -44,15 +46,24 @@ export default function BillingPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
     const [loading, setLoading] = useState(false);
+    const [savingDueDay, setSavingDueDay] = useState(false);
+    const queryClient = useQueryClient();
     const [frequency, setFrequency] = useState<Frequency>("MONTHLY");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [targetUpgradePlan, setTargetUpgradePlan] = useState<{ key: string, name: string } | null>(null);
+    const [valueInUI, setValueInUI] = useState<number>(10);
 
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(session!),
         enabled: !!(session as any)?.user?.access_token,
     });
+
+    useEffect(() => {
+        if (company?.monthly_payment_due_day) {
+            setValueInUI(company.monthly_payment_due_day);
+        }
+    }, [company?.monthly_payment_due_day]);
 
     const { data: subscriptionStatus, isFetching: isLoadingStatus } = useQuery({
         queryKey: ["subscription-status"],
@@ -181,6 +192,20 @@ export default function BillingPage() {
         }
     };
 
+    const handleUpdateDueDay = async (newDay: number) => {
+        if (!session || !company) return;
+        setSavingDueDay(true);
+        try {
+            await UpdateCompany({ ...company, monthly_payment_due_day: newDay }, session as any);
+            queryClient.invalidateQueries({ queryKey: ["company"] });
+            notifySuccess("Dia de vencimento atualizado com sucesso");
+        } catch (error: any) {
+            notifyError(error?.message || "Erro ao atualizar dia de vencimento");
+        } finally {
+            setSavingDueDay(false);
+        }
+    };
+
     return (
         <div className="p-6 space-y-8 max-w-6xl mx-auto">
             <div className="flex flex-col gap-2">
@@ -193,6 +218,7 @@ export default function BillingPage() {
                     <TabsTrigger value="plans">Planos</TabsTrigger>
                     <TabsTrigger value="history">Extrato Financeiro</TabsTrigger>
                     <TabsTrigger value="costs">Custos de Uso</TabsTrigger>
+                    <TabsTrigger value="config">Configuração</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="plans" className="space-y-8">
@@ -460,6 +486,85 @@ export default function BillingPage() {
                             onPageChange={(page) => setCostsPage(page + 1)} // CrudTable uses 0-based index, API uses 1-based (from my specific impl)
                         />
                     </div>
+                </TabsContent>
+
+                <TabsContent value="config">
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-yellow-100 rounded-lg text-yellow-600">
+                                    <CreditCard className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <CardTitle>Configuração de Faturamento</CardTitle>
+                                    <CardDescription>Gerencie as configurações de cobrança da sua conta.</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {company && (() => {
+                                let isBlocked = false;
+                                let nextAllowedDate: Date | null = null;
+
+                                if (company.monthly_payment_due_day_updated_at) {
+                                    const lastUpdate = new Date(company.monthly_payment_due_day_updated_at);
+                                    nextAllowedDate = new Date(lastUpdate);
+                                    nextAllowedDate.setMonth(nextAllowedDate.getMonth() + 3);
+
+                                    if (new Date() < nextAllowedDate) {
+                                        isBlocked = true;
+                                    }
+                                }
+
+                                return (
+                                    <div className="max-w-md space-y-4">
+                                        <div className="p-4 border border-yellow-100 bg-yellow-50/50 rounded-xl space-y-2">
+                                            <p className="text-sm font-medium text-gray-800">Dia de Vencimento Mensal</p>
+                                            <p className="text-xs text-gray-600">
+                                                Configure o dia de vencimento da fatura mensal. Esta configuração só pode ser alterada a cada 3 meses.
+                                            </p>
+                                            {company.monthly_payment_due_day_updated_at && (
+                                                <p className="text-[10px] text-gray-500 italic">
+                                                    Última alteração em: {new Date(company.monthly_payment_due_day_updated_at).toLocaleDateString()}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {isBlocked && nextAllowedDate && (
+                                            <div className="flex items-center gap-2 p-3 bg-orange-50 border border-orange-100 rounded-lg text-orange-700 text-xs font-medium">
+                                                <AlertCircle className="w-4 h-4" />
+                                                <span>Alteração bloqueada até: {nextAllowedDate.toLocaleDateString()}</span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-end gap-4">
+                                            <div className="flex-1">
+                                                <SelectField
+                                                    friendlyName="Dia de Vencimento"
+                                                    name="monthly_payment_due_day"
+                                                    values={Array.from({ length: 28 }, (_, i) => ({ id: String(i + 1), name: String(i + 1) }))}
+                                                    selectedValue={String(valueInUI)}
+                                                    setSelectedValue={(val) => {
+                                                        // Handled by update button to avoid accidental triggers
+                                                        setValueInUI(parseInt(val));
+                                                    }}
+                                                    disabled={isBlocked || savingDueDay}
+                                                />
+                                            </div>
+                                            {!isBlocked && (
+                                                <Button
+                                                    onClick={() => handleUpdateDueDay(valueInUI)}
+                                                    disabled={savingDueDay || valueInUI === company.monthly_payment_due_day}
+                                                >
+                                                    {savingDueDay ? "..." : "Atualizar"}
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
 

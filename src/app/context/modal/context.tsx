@@ -87,14 +87,12 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                             sizeClasses[size]
                         )}
                     >
-                        {title && (
-                            <div className="p-5 pb-0">
-                                <DialogHeader className="mb-4">
-                                    <DialogTitle>{title}</DialogTitle>
-                                </DialogHeader>
-                                <hr className="mb-4" />
-                            </div>
-                        )}
+                        <div className={cn("p-5 pb-0", !title && "sr-only")}>
+                            <DialogHeader className={cn(title && "mb-4")}>
+                                <DialogTitle>{title || "Modal"}</DialogTitle>
+                            </DialogHeader>
+                            {title && <hr className="mb-4" />}
+                        </div>
                         <div className={cn(title ? "p-5 pt-0" : "h-full")}>
                             {content}
                         </div>

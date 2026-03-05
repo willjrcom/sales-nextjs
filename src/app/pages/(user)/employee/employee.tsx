@@ -70,7 +70,7 @@ const PageEmployee = () => {
                 }
                 tableChildren={
                     <CrudTable
-                        columns={EmployeeColumns()}
+                        columns={EmployeeColumns(data?.user?.email)}
                         data={filteredEmployees}
                         totalCount={totalCount}
                         onPageChange={(pageIndex, pageSize) => {

@@ -8,11 +8,19 @@ import EmployeeCard from "@/app/forms/employee/employee-card";
 import EmployeePermissionsTab from "@/app/forms/employee/tabs/permissions";
 
 
-const EmployeeColumns = (): ColumnDef<Employee>[] => [
+const EmployeeColumns = (email?: string): ColumnDef<Employee>[] => [
   {
     id: 'Nome',
     accessorKey: 'name',
     header: 'Nome',
+    cell: ({ row }) => {
+      const isYou = email === row.original.email;
+      return (
+        <span>
+          {row.original.name} {isYou && <span className="text-red-400 text-xs italic">(Você)</span>}
+        </span>
+      );
+    }
   },
   {
     id: 'Contato',

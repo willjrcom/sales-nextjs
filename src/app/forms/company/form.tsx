@@ -30,7 +30,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { ChevronDown, Settings, Clock, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, Settings, Clock, Plus, Trash2, MapPin, CreditCard } from 'lucide-react';
 import { FaSearch } from 'react-icons/fa';
 import GetAddressByCEP from '../../api/busca-cep/busca-cep';
 import { addressUFsWithId } from '../../entities/address/utils';
@@ -244,170 +244,196 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
             </div>
 
             {/* Seção: Endereço */}
-            <div className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-blue-200">Endereço</h3>
-                <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <PatternField
-                                patternName='cep'
-                                name="address.cep"
-                                friendlyName="Cep"
-                                placeholder="Digite o cep"
-                                setValue={(value: string) => setValue('address.cep', value)}
-                                value={company.address?.cep || ''}
-                                formatted={true}
-                                error={(errors.address as any)?.cep?.message}
-                            />
+            <Collapsible className="bg-gradient-to-br from-white to-blue-50 rounded-lg shadow-sm border border-blue-100 transition-all duration-300 hover:shadow-md overflow-hidden group">
+                <CollapsibleTrigger asChild>
+                    <div className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-blue-50/50 transition-colors">
+                        <div className='flex items-center gap-3'>
+                            <div className='p-2 bg-blue-100 rounded-lg text-blue-600 transition-transform duration-300 group-data-[state=open]:rotate-90'>
+                                <MapPin className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800">Endereço</h3>
                         </div>
-                        <div className="flex flex-col">
-                            <label className="block text-sm font-bold mb-2">&nbsp;</label>
-                            <button
-                                type="button"
-                                className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md h-[42px] px-6'
-                                onClick={fetchAddress}
-                            >
-                                <FaSearch />&nbsp;<span>Buscar</span>
-                            </button>
-                        </div>
+                        <ChevronDown className="w-5 h-5 text-blue-500 transition-transform duration-300 group-data-[state=open]:rotate-180" />
                     </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="p-6 pt-0 border-t border-blue-100/50 space-y-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <PatternField
+                                    patternName='cep'
+                                    name="address.cep"
+                                    friendlyName="Cep"
+                                    placeholder="Digite o cep"
+                                    setValue={(value: string) => setValue('address.cep', value)}
+                                    value={company.address?.cep || ''}
+                                    formatted={true}
+                                    error={(errors.address as any)?.cep?.message}
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <label className="block text-sm font-bold mb-2">&nbsp;</label>
+                                <button
+                                    type="button"
+                                    className='flex items-center justify-center space-x-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md h-[42px] px-6'
+                                    onClick={fetchAddress}
+                                >
+                                    <FaSearch />&nbsp;<span>Buscar</span>
+                                </button>
+                            </div>
+                        </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField
-                                name="address.street"
-                                friendlyName="Rua"
-                                placeholder="Digite sua rua"
-                                setValue={(value: string) => setValue('address.street', value)}
-                                value={company.address?.street || ''}
-                                error={(errors.address as any)?.street?.message}
-                            />
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="address.street"
+                                    friendlyName="Rua"
+                                    placeholder="Digite sua rua"
+                                    setValue={(value: string) => setValue('address.street', value)}
+                                    value={company.address?.street || ''}
+                                    error={(errors.address as any)?.street?.message}
+                                />
+                            </div>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="address.number"
+                                    friendlyName="Numero"
+                                    placeholder="Digite o numero"
+                                    setValue={(value: string) => setValue('address.number', value)}
+                                    value={company.address?.number || ''}
+                                    error={(errors.address as any)?.number?.message}
+                                />
+                            </div>
                         </div>
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField
-                                name="address.number"
-                                friendlyName="Numero"
-                                placeholder="Digite o numero"
-                                setValue={(value: string) => setValue('address.number', value)}
-                                value={company.address?.number || ''}
-                                error={(errors.address as any)?.number?.message}
-                            />
-                        </div>
-                    </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField
-                                name="address.neighborhood"
-                                friendlyName="Bairro"
-                                placeholder="Digite o bairro"
-                                setValue={(value: string) => setValue('address.neighborhood', value)}
-                                value={company.address?.neighborhood || ''}
-                                error={(errors.address as any)?.neighborhood?.message}
-                            />
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="address.neighborhood"
+                                    friendlyName="Bairro"
+                                    placeholder="Digite o bairro"
+                                    setValue={(value: string) => setValue('address.neighborhood', value)}
+                                    value={company.address?.neighborhood || ''}
+                                    error={(errors.address as any)?.neighborhood?.message}
+                                />
+                            </div>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="address.complement"
+                                    friendlyName="Complemento"
+                                    placeholder="Digite o complemento"
+                                    setValue={(value: string) => setValue('address.complement', value)}
+                                    value={company.address?.complement || ''}
+                                    optional
+                                    error={(errors.address as any)?.complement?.message}
+                                />
+                            </div>
                         </div>
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+
+                        <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                             <TextField
-                                name="address.complement"
-                                friendlyName="Complemento"
-                                placeholder="Digite o complemento"
-                                setValue={(value: string) => setValue('address.complement', value)}
-                                value={company.address?.complement || ''}
+                                name="address.reference"
+                                friendlyName="Referência"
+                                placeholder="Digite a referência"
+                                setValue={(value: string) => setValue('address.reference', value)}
+                                value={company.address?.reference || ''}
                                 optional
-                                error={(errors.address as any)?.complement?.message}
+                                error={(errors.address as any)?.reference?.message}
                             />
                         </div>
-                    </div>
 
-                    <div className="transform transition-transform duration-200 hover:scale-[1.01]">
-                        <TextField
-                            name="address.reference"
-                            friendlyName="Referência"
-                            placeholder="Digite a referência"
-                            setValue={(value: string) => setValue('address.reference', value)}
-                            value={company.address?.reference || ''}
-                            optional
-                            error={(errors.address as any)?.reference?.message}
-                        />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
-                            <TextField
-                                name="address.city"
-                                friendlyName="Cidade"
-                                placeholder="Digite a cidade"
-                                setValue={(value: string) => setValue('address.city', value)}
-                                value={company.address?.city || ''}
-                                error={(errors.address as any)?.city?.message}
-                            />
-                        </div>
-                        <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
-                            <SelectField
-                                name="address.uf"
-                                friendlyName="Estado"
-                                setSelectedValue={(value: string) => setValue('address.uf', value)}
-                                selectedValue={company.address?.uf || ''}
-                                values={addressUFsWithId}
-                                error={(errors.address as any)?.uf?.message}
-                            />
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 sm:flex-[2] transform transition-transform duration-200 hover:scale-[1.01]">
+                                <TextField
+                                    name="address.city"
+                                    friendlyName="Cidade"
+                                    placeholder="Digite a cidade"
+                                    setValue={(value: string) => setValue('address.city', value)}
+                                    value={company.address?.city || ''}
+                                    error={(errors.address as any)?.city?.message}
+                                />
+                            </div>
+                            <div className="flex-1 transform transition-transform duration-200 hover:scale-[1.01]">
+                                <SelectField
+                                    name="address.uf"
+                                    friendlyName="Estado"
+                                    setSelectedValue={(value: string) => setValue('address.uf', value)}
+                                    selectedValue={company.address?.uf || ''}
+                                    values={addressUFsWithId}
+                                    error={(errors.address as any)?.uf?.message}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </CollapsibleContent>
+            </Collapsible>
 
             {/* Seção: Faturamento */}
             {isUpdate && (
-                <div className="bg-gradient-to-br from-white to-yellow-50 rounded-lg shadow-sm border border-yellow-100 p-6 transition-all duration-300 hover:shadow-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-yellow-200">Faturamento</h3>
-                    {(() => {
-                        let isBlocked = false;
-                        let nextAllowedDate: Date | null = null;
-
-                        if (company.monthly_payment_due_day_updated_at) {
-                            const lastUpdate = new Date(company.monthly_payment_due_day_updated_at);
-                            nextAllowedDate = new Date(lastUpdate);
-                            nextAllowedDate.setMonth(nextAllowedDate.getMonth() + 3);
-
-                            if (new Date() < nextAllowedDate) {
-                                isBlocked = true;
-                            }
-                        }
-
-                        return (
-                            <>
-                                <p className="text-sm text-gray-600 mb-4">
-                                    Configure o dia de vencimento da fatura mensal. Só é permitido alterar a cada 3 meses.
-                                    {company.monthly_payment_due_day_updated_at && (
-                                        <span className="block mt-1 text-gray-600">
-                                            Última alteração em: {new Date(company.monthly_payment_due_day_updated_at).toLocaleDateString()}.
-                                        </span>
-                                    )}
-                                    {isBlocked && nextAllowedDate && (
-                                        <span className="block mt-1 text-orange-600 font-medium">
-                                            Bloqueado até: {nextAllowedDate.toLocaleDateString()}.
-                                        </span>
-                                    )}
-                                </p>
-                                <div className="w-full sm:w-1/2">
-                                    <SelectField
-                                        friendlyName="Dia de Vencimento Mensal"
-                                        name="monthly_payment_due_day"
-                                        values={Array.from({ length: 28 }, (_, i) => ({ id: String(i + 1), name: String(i + 1) }))}
-                                        selectedValue={String(company.monthly_payment_due_day || '10')}
-                                        setSelectedValue={value => setValue('monthly_payment_due_day', parseInt(value))}
-                                        disabled={isBlocked}
-                                    />
+                <Collapsible className="bg-gradient-to-br from-white to-yellow-50 rounded-lg shadow-sm border border-yellow-100 transition-all duration-300 hover:shadow-md overflow-hidden group">
+                    <CollapsibleTrigger asChild>
+                        <div className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-yellow-50/50 transition-colors">
+                            <div className='flex items-center gap-3'>
+                                <div className='p-2 bg-yellow-100 rounded-lg text-yellow-600 transition-transform duration-300 group-data-[state=open]:rotate-90'>
+                                    <CreditCard className="w-5 h-5" />
                                 </div>
-                            </>
-                        );
-                    })()}
-                </div>
+                                <h3 className="text-lg font-semibold text-gray-800">Faturamento</h3>
+                            </div>
+                            <ChevronDown className="w-5 h-5 text-yellow-500 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                        </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <div className="p-6 pt-0 border-t border-yellow-100/50">
+                            {(() => {
+                                let isBlocked = false;
+                                let nextAllowedDate: Date | null = null;
+
+                                if (company.monthly_payment_due_day_updated_at) {
+                                    const lastUpdate = new Date(company.monthly_payment_due_day_updated_at);
+                                    nextAllowedDate = new Date(lastUpdate);
+                                    nextAllowedDate.setMonth(nextAllowedDate.getMonth() + 3);
+
+                                    if (new Date() < nextAllowedDate) {
+                                        isBlocked = true;
+                                    }
+                                }
+
+                                return (
+                                    <>
+                                        <p className="text-sm text-gray-600 mb-4 mt-4">
+                                            Configure o dia de vencimento da fatura mensal. Só é permitido alterar a cada 3 meses.
+                                            {company.monthly_payment_due_day_updated_at && (
+                                                <span className="block mt-1 text-gray-600">
+                                                    Última alteração em: {new Date(company.monthly_payment_due_day_updated_at).toLocaleDateString()}.
+                                                </span>
+                                            )}
+                                            {isBlocked && nextAllowedDate && (
+                                                <span className="block mt-1 text-orange-600 font-medium">
+                                                    Bloqueado até: {nextAllowedDate.toLocaleDateString()}.
+                                                </span>
+                                            )}
+                                        </p>
+                                        <div className="w-full sm:w-1/2">
+                                            <SelectField
+                                                friendlyName="Dia de Vencimento Mensal"
+                                                name="monthly_payment_due_day"
+                                                values={Array.from({ length: 28 }, (_, i) => ({ id: String(i + 1), name: String(i + 1) }))}
+                                                selectedValue={String(company.monthly_payment_due_day || '10')}
+                                                setSelectedValue={value => setValue('monthly_payment_due_day', parseInt(value))}
+                                                disabled={isBlocked}
+                                            />
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
             )}
             {/* Seção: Horário de Funcionamento */}
             <Collapsible className="bg-gradient-to-br from-white to-green-50 rounded-lg shadow-sm border border-green-100 transition-all duration-300 hover:shadow-md overflow-hidden group">
                 <CollapsibleTrigger asChild>
-                    <div className="w-full flex items-center justify-between p-6 cursor-pointer hover:bg-green-50/50 transition-colors">
+                    <div className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-green-50/50 transition-colors">
                         <div className='flex items-center gap-3'>
                             <div className='p-2 bg-green-100 rounded-lg text-green-600 transition-transform duration-300 group-data-[state=open]:rotate-90'>
                                 <Clock className="w-5 h-5" />
@@ -499,7 +525,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
 
             <Collapsible className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 transition-all duration-300 hover:shadow-md overflow-hidden group">
                 <CollapsibleTrigger asChild>
-                    <div className="w-full flex items-center justify-between p-6 cursor-pointer hover:bg-purple-50/50 transition-colors">
+                    <div className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-purple-50/50 transition-colors">
                         <div className='flex items-center gap-3'>
                             <div className='p-2 bg-purple-100 rounded-lg text-purple-600 transition-transform duration-300 group-data-[state=open]:rotate-90'>
                                 <Settings className="w-5 h-5" />
