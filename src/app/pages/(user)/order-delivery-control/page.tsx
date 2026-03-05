@@ -19,7 +19,10 @@ const PageDeliveryOrder = () => {
 
     return (
         <div className="w-full px-3 py-2">
-            <ThreeColumnHeader center={<PageTitle title="Controle de Entregas" tooltip="Gerencie pedidos de entrega por status: A enviar, Na rua ou Finalizadas." />} />
+            <ThreeColumnHeader
+                center={<PageTitle title="Controle de Entregas" tooltip="Gerencie pedidos de entrega por status: A enviar, Na rua ou Finalizadas." />}
+                subtitle="Os pedidos prontos aparecerão aqui"
+            />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="to-ship">A enviar</TabsTrigger>

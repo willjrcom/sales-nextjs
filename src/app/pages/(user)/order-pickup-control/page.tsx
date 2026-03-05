@@ -62,7 +62,10 @@ const PickupOrderPage = () => {
 
     return (
         <div className="w-full px-3 py-2">
-            <ThreeColumnHeader center={<PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />} />
+            <ThreeColumnHeader
+                center={<PageTitle title="Controle de Retiradas" tooltip="Gerencie pedidos de retirada por status." />}
+                subtitle="Os pedidos prontos aparecerão aqui"
+            />
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="ready">Prontas</TabsTrigger>
