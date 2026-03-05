@@ -37,6 +37,7 @@ export const SchemaCompany = z.object({
     .string()
     .min(3, "Nome precisa ter pelo menos 3 caracteres")
     .max(100, "Nome precisa ter no máximo 100 caracteres"),
+  email: z.string().email("E-mail inválido").optional().or(z.literal("")),
   image_path: z.string().optional().or(z.literal("")),
   contacts: z.array(z.string().min(8, "Contato inválido").or(z.object({ value: z.string().min(8, "Contato inválido") }))).min(1, "Adicione pelo menos um contato"),
   categories: z.array(z.any()).optional(),

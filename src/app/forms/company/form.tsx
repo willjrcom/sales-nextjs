@@ -205,6 +205,7 @@ const CompanyForm = ({ item, isUpdate }: CreateFormsProps<Company>) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informações Básicas</h3>
                 <div className="space-y-4">
                     <TextField friendlyName="Nome da loja" name="trade_name" value={company.trade_name} setValue={(value: string) => setValue('trade_name', value)} error={errors.trade_name?.message as string} />
+                    <TextField friendlyName="E-mail" name="email" value={company.email} setValue={(value: string) => setValue('email', value)} error={errors.email?.message as string} />
                     <PatternField patternName='cnpj' friendlyName="Cnpj" name="cnpj" value={company.cnpj} setValue={(value: string) => setValue('cnpj', value)} formatted={true} error={errors.cnpj?.message as string} />
                     <div className="space-y-1">
                         <label className="text-sm font-medium text-gray-700">Categorias da Empresa</label>
