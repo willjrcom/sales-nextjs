@@ -264,7 +264,13 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                                     />
                                 </div>
                             )}
+                        </div>
+                    </div>
 
+                    {/* Seção: Configurações de Fracionamento */}
+                    <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Configurações de Fracionamento</h3>
+                        <div className="space-y-4">
                             <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                                 <CheckboxField
                                     friendlyName="Permitir fracionado?"
@@ -300,9 +306,8 @@ const CategoryForm = ({ item, isUpdate }: CreateFormsProps<Category>) => {
                         <div className="mb-3">
                             <h4 className="text-sm font-semibold text-green-900">Categorias adicionais</h4>
                             <p className="text-xs text-muted-foreground mt-1">
-                                Use para vincular sabores que serão somados como adicionais, como “Mussarela” ou “Bacon”.
-                                Exemplos práticos: meio a meio com Mussarela + Bacon, ou toppings vendidos à parte.
-                                Eles aparecem como extras quando o operador monta o pedido.
+                                Use para permitir que os clientes adicionem produtos extras dentro desta categoria (ex: Adicionar "Bacon" ou "Borda Recheada" em uma Categoria de Pizzas).
+                                Serve para vincular produtos da categoria tipo "Adicional" à sua categoria "Normal".
                             </p>
                         </div>
                         <div className="mb-4">
@@ -413,13 +418,38 @@ const TypeCategorySelector = ({ selectedType, setSelectedType }: TypeCategorySel
                             key={type}
                             className={`p-3 h-10 ${selectedType === type
                                 ? "bg-blue-500 text-white"
-                                : "bg-gray-200 text-black"
-                                } rounded-lg flex items-center justify-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1`}
-                            onClick={() => setSelectedType(type)}
+                                : "bg-gray-200 text-gray-700"
+                                } font-medium rounded-lg flex items-center justify-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setSelectedType(type);
+                            }}
                         >
                             {type}
                         </button>
                     ))}
+                </div>
+
+                <div className="mt-4 p-4 rounded-lg bg-blue-50 border border-blue-100 ring-1 ring-inset ring-blue-50">
+                    {selectedType === "Normal" && (
+                        <p className="text-sm text-blue-900 leading-relaxed">
+                            <strong>Normal:</strong> São os produtos principais do seu cardápio, que podem ser vendidos sozinhos (Ex: Pizzas, Hambúrgueres, Bebidas).
+                        </p>
+                    )}
+                    {selectedType === "Adicional" && (
+                        <p className="text-sm text-blue-900 leading-relaxed">
+                            <strong>Adicional:</strong> Produtos que servem para incrementar outros produtos principais (Ex: Bacon extra, Queijo extra). Não podem ser vendidos sozinhos no app.
+                        </p>
+                    )}
+                    {selectedType === "Complemento" && (
+                        <p className="text-sm text-blue-900 leading-relaxed">
+                            <strong>Complemento:</strong> Produtos que acompanham o produto principal como uma opção de guarnição (Ex: Batata frita no combo, Borda recheada). Não alteram os sabores principais (indicado para meia-a-meia) e não podem ser vendidos sozinhos no app.
+                        </p>
+                    )}
+                    <p className="text-xs text-red-600 font-semibold mt-2 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">warning</span>
+                        Atenção: O tipo da categoria não poderá ser alterado após a criação.
+                    </p>
                 </div>
             </div>
         </div>
