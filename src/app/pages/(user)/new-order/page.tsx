@@ -54,6 +54,7 @@ const PageNewOrder = () => {
       route: "/pages/new-order/table",
       color: "blue",
       disabled: !isEnabled('enable_table') || !isOpen,
+      isClickable: isEnabled('enable_table'),
       reason: !isOpen ? "Fora do horário de funcionamento" : "Desativado nas preferências"
     },
     {
@@ -64,6 +65,7 @@ const PageNewOrder = () => {
       route: "/pages/new-order/delivery",
       color: "green",
       disabled: !isEnabled('enable_delivery') || !isOpen,
+      isClickable: isEnabled('enable_delivery'),
       reason: !isOpen ? "Fora do horário de funcionamento" : "Desativado nas preferências"
     },
     {
@@ -74,6 +76,7 @@ const PageNewOrder = () => {
       route: "/pages/new-order/pickup",
       color: "orange",
       disabled: !isEnabled('enable_pickup') || !isOpen,
+      isClickable: isEnabled('enable_pickup'),
       reason: !isOpen ? "Fora do horário de funcionamento" : "Desativado nas preferências"
     },
   ];
@@ -115,7 +118,7 @@ const PageNewOrder = () => {
                 {option.disabled && (
                   <div className="absolute top-3 right-3 z-10">
                     <div className="bg-gray-200/80 backdrop-blur-sm text-gray-500 px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border border-gray-300">
-                      <LockIcon className="w-3 h-3" /> INDISPONÍVEL
+                      <LockIcon className="w-3 h-3" /> DISPONÍVEL
                     </div>
                   </div>
                 )}
@@ -144,7 +147,7 @@ const PageNewOrder = () => {
               </Card>
             );
 
-            if (option.disabled) {
+            if (!option.isClickable) {
               return (
                 <div key={option.id} className="opacity-75">
                   {CardContentWrapper}
@@ -153,7 +156,7 @@ const PageNewOrder = () => {
             }
 
             return (
-              <Link href={option.route} key={option.id} className="group">
+              <Link href={option.route} key={option.id} className={`group ${option.disabled ? "opacity-75" : ""}`}>
                 {CardContentWrapper}
               </Link>
             );

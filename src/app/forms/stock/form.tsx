@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react';
 import CreateFormsProps from '../create-forms-props';
 import UpdateStock from '@/app/api/stock/update/stock';
 import NewStock from '@/app/api/stock/new/stock';
+import DeleteStock from '@/app/api/stock/delete/stock';
 import { useModal } from '@/app/context/modal/context';
 import RequestError from '@/app/utils/error';
 import { notifySuccess, notifyError } from '@/app/utils/notifications';
@@ -144,6 +145,18 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
             notifyError(error.message || 'Erro ao atualizar estoque');
         },
         onSettled: () => setIsSaving(false)
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (id: string) => DeleteStock(id, session!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['stocks'] });
+            notifySuccess(`Estoque excluído com sucesso`);
+            modalHandler.hideModal(modalName);
+        },
+        onError: (error: RequestError) => {
+            notifyError(error.message || 'Erro ao excluir estoque');
+        },
     });
 
     const submit = async (formData: any) => {
@@ -290,7 +303,8 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
                 item={stock}
                 name="stock"
                 onSubmit={handleSubmit(submit, onInvalid)}
-                isPending={isSaving}
+                deleteItem={isUpdate ? () => deleteMutation.mutate(stock.id as string) : undefined}
+                isPending={isSaving || deleteMutation.isPending}
             />
         </div>
     )

@@ -7,7 +7,7 @@ import GroupItemForm from "@/app/forms/group-item/form";
 import StatusComponent from "../../../../../components/button/show-status";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaSync } from "react-icons/fa";
 import ListComplementItems from "./list-complement-items";
 import ComplementItemCard from "./complement-item-card";
 import Decimal from "decimal.js";
@@ -66,23 +66,34 @@ const EditGroupItem = () => {
             )}
 
             {containItems && !complementItem && isGroupItemStaging && (
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="default" className="gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:from-blue-600 hover:to-purple-600">
-                            <FaPlus className="h-4 w-4" />
-                            Adicionar complemento
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-5xl">
-                        <DialogHeader>
-                            <DialogTitle>Adicionar complemento</DialogTitle>
-                        </DialogHeader>
-                        <ListComplementItems />
-                        <DialogClose asChild>
-                            <Button variant="outline" className="mt-4 w-full">Fechar</Button>
-                        </DialogClose>
-                    </DialogContent>
-                </Dialog>
+                <div className="flex items-center gap-2">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="default" className="gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:from-blue-600 hover:to-purple-600">
+                                <FaPlus className="h-4 w-4" />
+                                Adicionar complemento
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-5xl">
+                            <DialogHeader>
+                                <DialogTitle>Adicionar complemento</DialogTitle>
+                            </DialogHeader>
+                            <ListComplementItems />
+                            <DialogClose asChild>
+                                <Button variant="outline" className="mt-4 w-full">Fechar</Button>
+                            </DialogClose>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Button
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => queryClient.invalidateQueries({ queryKey: ['complement-products', groupItem?.category_id] })}
+                    >
+                        <FaSync className="h-4 w-4" />
+                        Atualizar
+                    </Button>
+                </div>
             )}
 
             {containItems && complementItem &&

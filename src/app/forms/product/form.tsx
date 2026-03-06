@@ -28,6 +28,7 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
     const queryClient = useQueryClient();
     const { data: session } = useSession();
     const [isSaving, setIsSaving] = useState(false);
+    const [isChangingCategory, setIsChangingCategory] = useState(false);
 
     const initialValues = useMemo(() => {
         const prod = new Product(item);
@@ -234,13 +235,22 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
             <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg shadow-sm border border-purple-100 p-6 transition-all duration-300 hover:shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-purple-200">Categoria</h3>
                 <div className="space-y-4">
-                    {isUpdate ? (
+                    {isUpdate && !isChangingCategory ? (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Categoria selecionada</label>
-                            <div className="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm p-2 border font-bold text-purple-700">
-                                {categories.find(c => c.id === product.category_id)?.name || 'Categoria não encontrada'}
+                            <div className="flex items-center gap-4">
+                                <div className="flex-1 rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm p-2 border font-bold text-purple-700">
+                                    {categories.find(c => c.id === product.category_id)?.name || 'Categoria não encontrada'}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsChangingCategory(true)}
+                                    className="px-4 py-2 bg-purple-100 text-purple-700 font-semibold rounded-md border border-purple-200 hover:bg-purple-200 transition-colors"
+                                >
+                                    Alterar
+                                </button>
                             </div>
-                            <p className="text-xs text-gray-400 mt-2">A categoria não pode ser alterada após a criação do produto.</p>
+                            <p className="text-xs text-gray-400 mt-2">Alterar a categoria pode resetar os tamanhos e preços disponíveis nesta variação.</p>
                         </div>
                     ) : (
                         <div className="transform transition-transform duration-200 hover:scale-[1.01]">

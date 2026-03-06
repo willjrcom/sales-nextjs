@@ -3,6 +3,8 @@ import ProcessRule from "../process-rule/process-rule";
 import Product from "../product/product";
 import Size from "../size/size";
 
+export type SplitPricingStrategy = 'highest_item' | 'average' | 'sum';
+
 export default class Category {
     id: string = '';
     name: string = '';
@@ -15,6 +17,7 @@ export default class Category {
     is_complement: boolean = false;
     allow_fractional: boolean = false;
     is_active: boolean = true;
+    split_pricing_strategy: SplitPricingStrategy = 'highest_item';
     sizes: Size[] = [];
     products: Product[] = [];
     additional_categories: Category[] = [];
@@ -23,6 +26,9 @@ export default class Category {
 
     constructor(data: Partial<Category> = {}) {
         Object.assign(this, data);
+        if (!this.split_pricing_strategy) {
+            this.split_pricing_strategy = 'highest_item';
+        }
     }
 }
 
@@ -37,6 +43,7 @@ export const SchemaCategory = z.object({
     is_complement: z.boolean().optional(),
     allow_fractional: z.boolean().optional(),
     is_active: z.boolean().optional(),
+    split_pricing_strategy: z.enum(['highest_item', 'average', 'sum']).default('highest_item'),
     removable_ingredients: z.array(z.string()).optional(),
     additional_categories: z.array(z.any()).optional(),
     complement_categories: z.array(z.any()).optional(),
@@ -45,9 +52,12 @@ export const SchemaCategory = z.object({
 export class CategoryMap {
     id: string = '';
     name: string = '';
+    split_pricing_strategy: SplitPricingStrategy = 'highest_item';
 
     constructor(data: Partial<CategoryMap> = {}) {
         Object.assign(this, data);
+        if (!this.split_pricing_strategy) {
+            this.split_pricing_strategy = 'highest_item';
+        }
     }
 }
-

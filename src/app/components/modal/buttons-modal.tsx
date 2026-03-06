@@ -16,7 +16,7 @@ interface ModalProps<T> {
     isPending?: boolean;
 }
 
-const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onSubmit, deleteItem, isAddItem, isRemoveItem, deleteLabel, isPending }: ModalProps<T>) => {
+const ButtonsModal = <T extends { id: string, name?: string, is_active?: boolean }>({ item, name, onSubmit, deleteItem, isAddItem, isRemoveItem, deleteLabel, isPending }: ModalProps<T>) => {
     const modalHandler = useModal();
     const { data } = useSession();
     const modalName = "delete-" + name + "-" + item.id;
@@ -73,7 +73,7 @@ const ButtonsModal = <T extends { id: string, name?: string }>({ item, name, onS
                 )}
                 {!onSubmit && <div></div>}
 
-                {item.id !== '' && deleteItem && (
+                {item.id !== '' && deleteItem && item.is_active && (
                     <button
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={onCloseModal}

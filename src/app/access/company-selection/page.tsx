@@ -146,12 +146,7 @@ function CompanySelection() {
                 </div>
                 <EmployeeUserProfile />
             </div>
-            {isLoading && (
-                <div className="flex justify-center items-center h-64 mb-10">
-                    <Loading />
-                </div>
-            )}
-            {selecting && (
+            {(selecting || isLoading) && (
                 <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-50">
                     <Loading />
                 </div>

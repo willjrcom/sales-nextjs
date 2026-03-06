@@ -17,8 +17,6 @@ import GroupItem from "@/app/entities/order/group-item";
 import Order from "@/app/entities/order/order";
 import GetCategoryByID from "@/app/api/category/[id]/category";
 import { GetAdditionalProducts } from "@/app/api/product/product";
-import NewAdditionalItem from "@/app/api/item/update/additional/item";
-import AddRemovedItem from "@/app/api/item/update/removed-item/add/item";
 import Image from "next/image";
 import { OrderControlView } from "@/app/pages/(user)/order-control/[id]/page";
 
@@ -32,13 +30,13 @@ const AdditionalItemRow = ({ additional, qty, updateAdditional, session, mainQty
   const { data: stocks } = useQuery({
     queryKey: ['stocks', 'product', additional.id],
     queryFn: () => GetStockByProductID(additional.id, session),
-    enabled: !!session?.user?.access_token,
+    enabled: !!(session?.user as any)?.access_token,
   });
 
   const variationId = additional.variations?.[0]?.id;
   const stockRecord = stocks?.find(s => s.product_variation_id === variationId) || stocks?.find(s => !s.product_variation_id);
   const available = stockRecord ? new Decimal(stockRecord.current_stock) : null;
-  const requiredForNext = new Decimal(qty + 1).times(mainQty);
+  const requiredForNext = new Decimal(qty + 1);
   const isOutOfStock = available !== null && available.lt(requiredForNext);
 
   let price = new Decimal(0);
@@ -76,8 +74,7 @@ const AdditionalItemRow = ({ additional, qty, updateAdditional, session, mainQty
       <div className="flex flex-col items-center mt-2 space-y-1">
         {available !== null && (
           <p className={`text-[10px] text-center italic ${isOutOfStock ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
-            Estoque: {available.toFixed(2)} {qty > 0 && `• Necessário: ${new Decimal(qty).times(mainQty).toFixed(2)}`}
-            {isOutOfStock && mainQty > 1 && ` (Precisa de ${requiredForNext.toFixed(2)} para +1)`}
+            Estoque: {available.toFixed(2)}
           </p>
         )}
       </div>
@@ -112,9 +109,8 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
 
   useEffect(() => {
     const groupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
-    if (groupItem && groupItem.items) {
-      const currentTotalQty = groupItem.items.reduce((acc, item) => acc + (item.quantity || 0), 0);
-      const remainingQty = new Decimal(1).minus(new Decimal(currentTotalQty)).toNumber();
+    if (groupItem && groupItem.quantity !== undefined) {
+      const remainingQty = new Decimal(1).minus(new Decimal(groupItem.quantity || 0)).toNumber();
       if (remainingQty > 0 && remainingQty < 1) {
         setQuantity(remainingQty);
       }
@@ -123,7 +119,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
 
   useEffect(() => {
     fetchProduct();
-  }, [data?.user?.access_token, reloadProduct]);
+  }, [(data?.user as any)?.access_token, reloadProduct]);
 
   const currentGroupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
   const forcedSize = currentGroupItem?.size;
@@ -164,6 +160,8 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
     queryKey: ['additional-products', product.category_id],
     queryFn: () => GetAdditionalProducts(data!, product.category_id),
     enabled: !!data && !!product.category_id,
+    staleTime: 0,
+    refetchOnWindowFocus: true
   });
 
   const additionalProducts = useMemo(() => additionalProductsResponse?.items || [], [additionalProductsResponse]);
@@ -173,7 +171,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
   const { data: stocksResponse } = useQuery({
     queryKey: ['stocks', 'product', item.id],
     queryFn: () => GetStockByProductID(item.id, data!),
-    enabled: !!data?.user?.access_token,
+    enabled: !!(data?.user as any)?.access_token,
     staleTime: 0,
     refetchOnWindowFocus: true
   });
@@ -319,33 +317,34 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
     setIsSubmitting(true);
 
     try {
-      const body = {
+      const additions = Object.entries(selectedAdditionals)
+        .filter(([_, qty]) => qty > 0)
+        .map(([productId, addQty]) => {
+          const additionalProduct = additionalProducts.find((p: Product) => p.id === productId);
+          const variationId = additionalProduct?.variations?.[0]?.id;
+          return {
+            product_id: productId,
+            variation_id: variationId,
+            quantity: addQty
+          };
+        });
+
+      const body: NewItemProps = {
         product_id: product.id,
-        variation_id: selectedVariationId, // Pass variation ID
+        variation_id: selectedVariationId,
         quantity: quantity ?? 0,
-        order_id: order?.id,
+        order_id: order?.id as string,
         group_item_id: groupItem?.id,
         observation: observation,
         flavor: selectedFlavor || undefined,
-      } as NewItemProps
+        additions: additions.length > 0 ? additions : undefined,
+        removed_items: selectedRemovables.length > 0 ? selectedRemovables.map((name) => ({ name })) : undefined,
+      };
 
-      const response = await NewItem(body, data)
-
-      // 2. Add Additionals (Sequentially to avoid race conditions)
-      for (const [productId, addQty] of Object.entries(selectedAdditionals)) {
-        if (addQty > 0) {
-          const additionalProduct = additionalProducts.find(p => p.id === productId);
-          const variationId = additionalProduct?.variations?.[0]?.id;
-          await NewAdditionalItem(response.item_id, { product_id: productId, variation_id: variationId, quantity: addQty }, data);
-        }
-      }
-
-      // 3. Add Removables (Sequentially to avoid race conditions)
-      for (const name of selectedRemovables) {
-        await AddRemovedItem(response.item_id, name, data);
-      }
+      await NewItem(body, data);
 
       queryClient.setQueryData(['group-item', 'current'], null);
+
       queryClient.invalidateQueries({ queryKey: ['order', 'current'] });
 
       notifySuccess(`Item ${item.name} adicionado com sucesso`);
@@ -451,7 +450,7 @@ const AddProductCard = ({ product: item, setView }: AddProductCardProps) => {
               {product.name}
             </h2>
             {product.sku && (
-              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded border border-gray-200 whitespace-nowrap">
+              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded border border-gray-200 whitespace-nowrap mr-12 mt-2">
                 SKU: {product.sku}
               </span>
             )}
