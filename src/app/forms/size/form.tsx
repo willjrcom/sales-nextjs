@@ -143,7 +143,7 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
                 item={size}
                 name="Tamanho"
                 onSubmit={handleSubmit(submit, onInvalid)}
-                deleteItem={onDelete}
+                deleteItem={category?.is_additional ? undefined : onDelete}
                 isPending={isSaving}
             />
         </div>

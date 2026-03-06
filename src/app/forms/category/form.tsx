@@ -28,7 +28,7 @@ const splitPricingOptionsList = [
     { id: 'highest_item', name: 'Cobrar o sabor mais caro' },
     { id: 'average', name: 'Cobrar a média dos preços' },
     { id: 'sum', name: 'Somar todos os sabores' },
-] as const;
+];
 
 const splitPricingMessages: Record<SplitPricingStrategy, string> = {
     highest_item: '✓ Cobra o valor do item mais caro da combinação. Ideal para pizzas meio a meio, cobrando sempre o sabor premium.',
