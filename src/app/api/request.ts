@@ -121,7 +121,7 @@ const RequestExternalApi = async <T, TR>({ path, body, method, headers }: Reques
         method,
         body: body ? JSON.stringify(body) : undefined,
         headers: headers,
-        signal: AbortSignal.timeout(5000),
+        // signal: AbortSignal.timeout(5000),
         credentials: 'omit'
     });
 

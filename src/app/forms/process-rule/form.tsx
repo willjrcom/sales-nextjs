@@ -58,8 +58,8 @@ const ProcessRuleForm = ({ item, isUpdate, category, onSuccess }: ProcessRuleFor
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories', 'map', 'process-rule'],
-        queryFn: () => GetCategoriesMap(session as any, true, false, false),
-        enabled: !!(session as any)?.user?.access_token,
+        queryFn: () => GetCategoriesMap(session!, true, false, false),
+        enabled: !!session?.user?.access_token,
         refetchInterval: 60000,
     });
 
@@ -67,7 +67,7 @@ const ProcessRuleForm = ({ item, isUpdate, category, onSuccess }: ProcessRuleFor
     const { data: processRulesByCategory } = useQuery({
         queryKey: ['process-rules', 'by-category', category.id],
         queryFn: () => GetProcessRulesByCategoryID(session as any, category.id),
-        enabled: !!(session as any)?.user?.access_token && !!category.id,
+        enabled: !!session?.user?.access_token && !!category.id,
     });
 
     const isOrderDuplicate = useMemo(() => {

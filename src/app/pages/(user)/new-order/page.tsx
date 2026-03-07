@@ -12,8 +12,8 @@ const PageNewOrder = () => {
   const { data: session } = useSession();
   const { data: company, isLoading } = useQuery({
     queryKey: ['company'],
-    queryFn: () => GetCompany(session as any),
-    enabled: !!session,
+    queryFn: () => GetCompany(session!),
+    enabled: !!session?.user?.access_token,
   });
 
   const isEnabled = (key: string) => {

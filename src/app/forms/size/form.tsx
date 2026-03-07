@@ -54,7 +54,7 @@ const SizeForm = ({ item, isUpdate, categoryID, onSuccess }: SizeFormProps) => {
     const { data: category } = useQuery({
         queryKey: ['category', categoryID],
         queryFn: () => GetCategoryByID(session as any, categoryID),
-        enabled: !!(session as any)?.user?.access_token && !!categoryID,
+        enabled: !!session?.user?.access_token && !!categoryID,
     });
 
     const onInvalid = () => {

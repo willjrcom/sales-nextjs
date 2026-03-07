@@ -115,7 +115,7 @@ const TableForm = ({ item, isUpdate }: CreateFormsProps<Table>) => {
     const { data: company } = useQuery({
         queryKey: ["company"],
         queryFn: () => GetCompany(session!),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
     })
 
     const qrCodeRef = useRef<HTMLDivElement>(null);

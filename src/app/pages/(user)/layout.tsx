@@ -18,7 +18,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     const { data: subscriptionStatus } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
         staleTime: 0,
         gcTime: 0, // Added gcTime to ensure immediate update
         refetchOnWindowFocus: true,

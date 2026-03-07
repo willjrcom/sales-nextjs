@@ -68,10 +68,10 @@ export function CartSection({ orderID, setView }: CartSectionProps) {
     });
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories', 'map', 'product'],
+        queryKey: ['categories', 'map', 'order'],
         queryFn: () => {
             if (!session) return [];
-            return GetCategoriesMap(session, true)
+            return GetCategoriesMap(session, true, false, false)
         },
         enabled: !!session
     });

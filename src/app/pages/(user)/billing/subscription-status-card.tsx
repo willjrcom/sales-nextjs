@@ -42,7 +42,7 @@ export function SubscriptionStatusCard() {
     const { isFetching, isLoading, data: status } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
     });
 
     const handleCancelSubscription = async () => {

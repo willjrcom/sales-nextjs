@@ -56,7 +56,7 @@ export default function BillingPage() {
     const { data: company } = useQuery({
         queryKey: ['company'],
         queryFn: () => GetCompany(session!),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
     });
 
     useEffect(() => {
@@ -68,7 +68,7 @@ export default function BillingPage() {
     const { data: subscriptionStatus, isFetching: isLoadingStatus } = useQuery({
         queryKey: ["subscription-status"],
         queryFn: () => GetSubscriptionStatus(session!),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
     });
 
     useEffect(() => {
@@ -105,7 +105,7 @@ export default function BillingPage() {
     const { data: paymentsResponse, refetch: refetchPayments, isFetching: isFetchingPayments, dataUpdatedAt: paymentsUpdatedAt } = useQuery({
         queryKey: ['company-payments', paymentsPage, paymentsMonth, paymentsYear],
         queryFn: () => listPayments(session!, paymentsPage, 10, paymentsMonth, paymentsYear),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
     });
 
     // Costs State
@@ -116,7 +116,7 @@ export default function BillingPage() {
     const { data: costsResponse, refetch: refetchCosts, isFetching: isFetchingCosts, dataUpdatedAt: costsUpdatedAt } = useQuery({
         queryKey: ['company-costs', selectedMonth, selectedYear, costsPage],
         queryFn: () => getMonthlyCosts(session!, selectedMonth, selectedYear, costsPage),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
     });
 
     const payments = useMemo(() => paymentsResponse?.items || [], [paymentsResponse?.items]);

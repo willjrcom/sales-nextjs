@@ -18,6 +18,8 @@ import { Badge } from "@/components/ui/badge";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import ButtonIconTextFloat from "@/app/components/button/button-float";
+import ClientForm from "@/app/forms/client/form";
 
 const searchSchema = z.object({
     contact: z.string().optional().refine(val => !val || val.length === 11, {
@@ -32,6 +34,7 @@ const PageNewOrderDelivery = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const { data } = useSession();
+    const router = useRouter();
 
     const { control, handleSubmit, formState: { errors }, watch } = useForm<SearchFormData>({
         resolver: zodResolver(searchSchema),
@@ -48,15 +51,17 @@ const PageNewOrderDelivery = () => {
         try {
             const clientFound = await GetClientByContact(formData.contact || '', data);
             if (clientFound.id !== '') {
-                setClient(clientFound);
+                const response = await NewOrderDelivery(clientFound.id, data);
+                router.push('/pages/order-control/' + response.order_id);
+                // setClient(clientFound);
             } else {
                 notifyError('Cliente não encontrado');
-                setClient(null);
+                // setClient(null);
             }
 
         } catch (error: RequestError | any) {
             notifyError(error.message || 'Ocorreu um erro ao buscar o cliente');
-            setClient(null);
+            // setClient(null);
         } finally {
             setIsSearching(false);
         }
@@ -73,6 +78,10 @@ const PageNewOrderDelivery = () => {
                         Identifique o cliente para iniciar a entrega.
                     </p>
                 </div>
+
+                <ButtonIconTextFloat title="Novo cliente" modalName="new-client" position="bottom-right" >
+                    <ClientForm />
+                </ButtonIconTextFloat>
 
                 <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm">
                     <CardHeader>
@@ -123,13 +132,13 @@ const PageNewOrderDelivery = () => {
                             </form>
                         </div>
                     </CardContent>
-
+                    {/* 
                     {client && (
                         <div className="px-6 pb-6 animate-in fade-in slide-in-from-top-4 duration-300">
                             <Separator className="mb-6" />
                             <CardClient client={client} isCreating={isCreating} setIsCreating={setIsCreating} />
                         </div>
-                    )}
+                    )} */}
                 </Card>
             </div>
         </div>

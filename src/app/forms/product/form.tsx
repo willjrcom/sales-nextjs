@@ -70,15 +70,15 @@ const ProductForm = ({ item, isUpdate }: CreateFormsProps<Product>) => {
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ['categories', 'map', 'product'],
-        queryFn: () => GetCategoriesMap(session as any, true),
-        enabled: !!(session as any)?.user?.access_token,
+        queryFn: () => GetCategoriesMap(session!, true),
+        enabled: !!session?.user?.access_token,
         refetchInterval: 60000,
     });
 
     const { data: sizesResponse } = useQuery({
         queryKey: ['sizes', product.category_id],
         queryFn: () => GetSizesByCategoryID(session as any, product.category_id),
-        enabled: !!(session as any)?.user?.access_token && !!product.category_id,
+        enabled: !!session?.user?.access_token && !!product.category_id,
         refetchInterval: 60000,
     });
 

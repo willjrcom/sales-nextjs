@@ -61,29 +61,29 @@ const StockForm = ({ item, isUpdate }: CreateFormsProps<Stock>) => {
     };
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories', 'map', 'product'],
+        queryKey: ['categories', 'map', 'stock'],
         queryFn: () => GetCategoriesMap(session!, true),
-        enabled: !!(session as any)?.user?.access_token,
+        enabled: !!session?.user?.access_token,
         refetchInterval: 60000,
     });
 
     const { data: productsResponse } = useQuery({
         queryKey: ['products', 'map', categoryID],
         queryFn: () => GetProductsByCategoryID(session!, categoryID),
-        enabled: !!(session as any)?.user?.access_token && !!categoryID,
+        enabled: !!session?.user?.access_token && !!categoryID,
     });
 
     const { data: stocksResponse } = useQuery({
         queryKey: ['stocks', 'with-product'],
         queryFn: () => GetAllStocksWithProduct(session!),
-        enabled: !!(session as any)?.user?.access_token && !isUpdate && !!categoryID,
+        enabled: !!session?.user?.access_token && !isUpdate && !!categoryID,
         refetchInterval: 60000,
     });
 
     const { data: productStocksResponse } = useQuery({
         queryKey: ['stocks', 'product', stock.product_id],
         queryFn: () => GetStockByProductID(stock.product_id, session!),
-        enabled: !!(session as any)?.user?.access_token && !!stock.product_id && !isUpdate,
+        enabled: !!session?.user?.access_token && !!stock.product_id && !isUpdate,
     });
 
     const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);

@@ -40,7 +40,7 @@ export const ListProductsToAdd = () => {
 
     // Fetch categories for sidebar
     const { data: categories } = useQuery({
-        queryKey: ['categories', 'default'],
+        queryKey: ['categories', 'map', 'order'],
         queryFn: () => GetCategoriesMap(data!, true, false, false),
         enabled: !!data?.user?.access_token,
     });

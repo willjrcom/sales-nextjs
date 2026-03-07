@@ -16,8 +16,8 @@ export const CartCard = () => {
     const order = queryClient.getQueryData<Order>(['order', 'current']);
 
     const { data: categoriesResponse } = useQuery({
-        queryKey: ['categories', 'map', 'product'],
-        queryFn: () => GetCategoriesMap(session!, true),
+        queryKey: ['categories', 'map', 'order'],
+        queryFn: () => GetCategoriesMap(session!, true, false, false),
         enabled: !!session?.user?.access_token,
         refetchInterval: 60000,
     });

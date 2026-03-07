@@ -1,15 +1,22 @@
-
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { GetCategoriesMap } from '@/app/api/category/category';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { GetDefaultProducts } from '@/app/api/product/product';
-import { useMemo } from 'react';
 import GroupItem from '@/app/entities/order/group-item';
 import { useSession } from 'next-auth/react';
 import { ProductCard } from './ProductCard';
 import Product from '@/app/entities/product/product';
-import { BottomCartBar } from './BottomCartBar';
-import { OrderControlView } from '../page';
 import Refresh from "@/app/components/crud/refresh";
+import { TextField } from "@/app/components/modal/field";
+import { Button } from "@/components/ui/button";
+import GetProductBySKU from "@/app/api/product/sku/[sku]";
+import { useModal } from "@/app/context/modal/context";
+import AddProductCard from "@/app/forms/item/form";
+import RequestError from "@/app/utils/error";
+import { notifyError } from "@/app/utils/notifications";
+import { FaSearch } from 'react-icons/fa';
+import { OrderControlView } from '../page';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { GetCategoriesMap } from '@/app/api/category/category';
+import { BottomCartBar } from './BottomCartBar';
 
 interface MenuSectionProps {
     orderID: string;
@@ -19,13 +26,62 @@ interface MenuSectionProps {
 export function MenuSection({ orderID, setView }: MenuSectionProps) {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
+    const modalHandler = useModal();
+    const [searchSKU, setSearchSKU] = useState("");
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Get current group item from cache (if adding to existing group)
     const currentGroupItem = queryClient.getQueryData<GroupItem | null>(['group-item', 'current']);
 
+    const onSearch = async () => {
+        if (!session) return
+
+        try {
+            const product = await GetProductBySKU(searchSKU, session);
+            const modalName = `add-item-${product.id}`
+            const onClose = () => {
+                modalHandler.hideModal(modalName);
+            }
+
+            modalHandler.showModal(modalName, "", <AddProductCard product={product} />, "md", onClose)
+        } catch (error: RequestError | any) {
+            notifyError(error.message || "Erro ao buscar produto por codigo: " + searchSKU);
+        } finally {
+            setSearchSKU('');
+            setIsSearching(false);
+        }
+    }
+
+    // Keyboard shortcut for search
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Only trigger if not already typing in an input text area
+            const activeElement = document.activeElement;
+            const isInputActive = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA';
+
+            if (e.key === 'b' && !isInputActive) {
+                e.preventDefault();
+                setIsSearching(true);
+            }
+            if (e.key === 'Escape' && isSearching) {
+                setIsSearching(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isSearching]);
+
+    useEffect(() => {
+        if (isSearching && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [isSearching]);
+
     // Fetch categories
     const { isLoading: categoriesLoading, isFetching: categoriesFetching, data: categories = [], refetch: refetchCategories } = useQuery({
-        queryKey: ['categories', 'map', 'product'],
+        queryKey: ['categories', 'map', 'order'],
         queryFn: () => GetCategoriesMap(session!, true, false, false),
         enabled: !!session
     });
@@ -110,25 +166,60 @@ export function MenuSection({ orderID, setView }: MenuSectionProps) {
                     </div>
                 )}
 
-                {/* Categories Scroll */}
+                {/* Categories Scroll and Search */}
                 {visibleCategories.length > 0 && (
                     <div className='sticky top-0 bg-gray-50 z-10 py-2 -mx-4 px-4 flex justify-between items-center gap-2'>
-                        <div className='overflow-x-auto flex gap-2 no-scrollbar w-full'>
-                            {visibleCategories.map(c => (
-                                <a
-                                    key={c.id}
-                                    href={`#cat-${c.id}`}
-                                    className='shrink-0 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap hover:bg-gray-50 hover:border-gray-300 transition-colors'
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        document.getElementById(`cat-${c.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        {isSearching ? (
+                            <div className="flex w-full items-center gap-2 bg-white px-2 rounded-full border border-gray-300 shadow-sm animate-in fade-in slide-in-from-right-2 duration-200">
+
+                                <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    className="flex-1 bg-transparent py-2 px-1 text-sm outline-none placeholder:text-gray-400"
+                                    placeholder="Buscar por código ou SKU... (Atalho: B)"
+                                    value={searchSKU}
+                                    onChange={(e) => setSearchSKU(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            onSearch();
+                                        }
                                     }}
+                                />
+                                <button
+                                    onClick={() => setIsSearching(false)}
+                                    className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                                 >
-                                    {c.name}
-                                </a>
-                            ))}
-                        </div>
-                        <div className='shrink-0'>
+                                    ✕
+                                </button>
+                            </div>
+                        ) : (
+                            <div className='overflow-x-auto flex gap-2 no-scrollbar w-full'>
+                                {visibleCategories.map(c => (
+                                    <a
+                                        key={c.id}
+                                        href={`#cat-${c.id}`}
+                                        className='shrink-0 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap hover:bg-gray-50 hover:border-gray-300 transition-colors'
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            document.getElementById(`cat-${c.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }}
+                                    >
+                                        {c.name}
+                                    </a>
+                                ))}
+                            </div>
+                        )}
+                        <div className='shrink-0 flex items-center gap-1'>
+                            {!isSearching && (
+                                <button
+                                    onClick={() => setIsSearching(true)}
+                                    title="Buscar Código (Atalho: B)"
+                                    className="p-2 rounded-full text-gray-500 hover:bg-gray-200 transition-colors flex items-center justify-center h-10 w-10"
+                                >
+                                    <FaSearch size={18} />
+                                </button>
+                            )}
                             <Refresh
                                 onRefresh={() => {
                                     refetchCategories();
